@@ -2,6 +2,8 @@
 #include "../src/core/object.h"
 #include "../src/core/globals.h"
 #include "../src/world/rooms.h"
+#include "../src/parser/syntax.h"
+#include "../src/verbs/verbs.h"
 
 // Test object system
 TEST(ObjectCreation) {
@@ -23,6 +25,7 @@ TEST(ObjectFlags) {
 
 TEST(ObjectProperties) {
     ZObject obj(1, "test");
+    constexpr PropertyId P_SIZE = 1;
     ASSERT_EQ(obj.getProperty(P_SIZE), 0);
     
     obj.setProperty(P_SIZE, 10);
@@ -65,6 +68,118 @@ TEST(BlockedExits) {
     ASSERT_TRUE(exit != nullptr);
     ASSERT_EQ(exit->targetRoom, 0);
     ASSERT_EQ(exit->message, "The door is locked.");
+}
+
+// Test SyntaxPattern system
+TEST(SyntaxPatternSimple) {
+    // Test simple VERB OBJECT pattern (e.g., "TAKE LAMP")
+    using Element = SyntaxPattern::Element;
+    using ElementType = SyntaxPattern::ElementType;
+    
+    std::vector<Element> pattern;
+    pattern.push_back(Element(ElementType::VERB));
+    pattern.push_back(Element(ElementType::OBJECT));
+    
+    SyntaxPattern syntaxPattern(V_TAKE, pattern);
+    
+    // Test matching
+    std::vector<std::string> tokens = {"take", "lamp"};
+    ASSERT_TRUE(syntaxPattern.matches(tokens));
+    
+    // Test non-matching (missing object)
+    std::vector<std::string> tokens2 = {"take"};
+    ASSERT_FALSE(syntaxPattern.matches(tokens2));
+}
+
+TEST(SyntaxPatternWithPreposition) {
+    // Test VERB OBJECT PREP OBJECT pattern (e.g., "PUT LAMP IN BOX")
+    using Element = SyntaxPattern::Element;
+    using ElementType = SyntaxPattern::ElementType;
+    
+    std::vector<Element> pattern;
+    pattern.push_back(Element(ElementType::VERB));
+    pattern.push_back(Element(ElementType::OBJECT));
+    Element prepElement(ElementType::PREPOSITION, std::vector<std::string>{"in", "on"});
+    pattern.push_back(prepElement);
+    pattern.push_back(Element(ElementType::OBJECT));
+    
+    SyntaxPattern syntaxPattern(V_PUT, pattern);
+    
+    // Test matching with "in"
+    std::vector<std::string> tokens1 = {"put", "lamp", "in", "box"};
+    ASSERT_TRUE(syntaxPattern.matches(tokens1));
+    
+    // Test matching with "on"
+    std::vector<std::string> tokens2 = {"put", "lamp", "on", "table"};
+    ASSERT_TRUE(syntaxPattern.matches(tokens2));
+    
+    // Test non-matching (wrong preposition)
+    std::vector<std::string> tokens3 = {"put", "lamp", "with", "box"};
+    ASSERT_FALSE(syntaxPattern.matches(tokens3));
+}
+
+TEST(SyntaxPatternOptionalElement) {
+    // Test pattern with optional preposition
+    using Element = SyntaxPattern::Element;
+    using ElementType = SyntaxPattern::ElementType;
+    
+    std::vector<Element> pattern;
+    pattern.push_back(Element(ElementType::VERB));
+    pattern.push_back(Element(ElementType::OBJECT));
+    Element prepElement(ElementType::PREPOSITION, std::vector<std::string>{"with"});
+    prepElement.optional = true;
+    pattern.push_back(prepElement);
+    Element obj2Element(ElementType::OBJECT);
+    obj2Element.optional = true;  // Second object is also optional when preposition is optional
+    pattern.push_back(obj2Element);
+    
+    SyntaxPattern syntaxPattern(V_ATTACK, pattern);
+    
+    // Test matching with optional preposition present
+    std::vector<std::string> tokens1 = {"attack", "troll", "with", "sword"};
+    ASSERT_TRUE(syntaxPattern.matches(tokens1));
+    
+    // Test matching with optional preposition absent
+    std::vector<std::string> tokens2 = {"attack", "troll"};
+    ASSERT_TRUE(syntaxPattern.matches(tokens2));
+}
+
+TEST(SyntaxPatternFlagRequirement) {
+    // Test pattern with object flag requirement
+    using Element = SyntaxPattern::Element;
+    using ElementType = SyntaxPattern::ElementType;
+    
+    std::vector<Element> pattern;
+    pattern.push_back(Element(ElementType::VERB));
+    Element objElement(ElementType::OBJECT, ObjectFlag::TAKEBIT);
+    pattern.push_back(objElement);
+    
+    SyntaxPattern syntaxPattern(V_TAKE, pattern);
+    
+    // Create test objects
+    ZObject takeableObj(1, "lamp");
+    takeableObj.setFlag(ObjectFlag::TAKEBIT);
+    
+    ZObject nonTakeableObj(2, "house");
+    // No TAKEBIT flag
+    
+    // Test apply with object finder
+    auto objectFinder = [&](const std::string& name, std::optional<ObjectFlag> flag) -> ZObject* {
+        if (name == "lamp") return &takeableObj;
+        if (name == "house") return &nonTakeableObj;
+        return nullptr;
+    };
+    
+    // Test with takeable object
+    std::vector<std::string> tokens1 = {"take", "lamp"};
+    ParseResult result1 = syntaxPattern.apply(tokens1, objectFinder);
+    ASSERT_TRUE(result1.success);
+    ASSERT_EQ(result1.prso, &takeableObj);
+    
+    // Test with non-takeable object (should fail flag check)
+    std::vector<std::string> tokens2 = {"take", "house"};
+    ParseResult result2 = syntaxPattern.apply(tokens2, objectFinder);
+    ASSERT_FALSE(result2.success);
 }
 
 // Main test runner

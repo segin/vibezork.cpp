@@ -6,6 +6,7 @@
 #include <string_view>
 #include <vector>
 #include <optional>
+#include <functional>
 
 // Forward declaration
 class ZObject;
@@ -51,7 +52,10 @@ public:
     bool matches(const std::vector<std::string>& tokens) const;
     
     // Apply pattern to extract objects from matched tokens
-    ParseResult apply(const std::vector<std::string>& tokens) const;
+    // objectFinder: function to find objects by name, returns nullptr if not found
+    using ObjectFinder = std::function<ZObject*(const std::string&, std::optional<ObjectFlag>)>;
+    ParseResult apply(const std::vector<std::string>& tokens, 
+                     const ObjectFinder& objectFinder) const;
     
     // Getters
     VerbId getVerbId() const { return verbId_; }

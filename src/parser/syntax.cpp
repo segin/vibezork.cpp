@@ -68,14 +68,23 @@ bool SyntaxPattern::matches(const std::vector<std::string>& tokens) const {
                 continue;
             }
             // If we've consumed all tokens and only optional elements remain
+            // OR if there's an optional preposition followed by objects
             bool allOptional = true;
+            bool hasOptionalPrep = false;
             for (size_t i = patternIdx; i < pattern_.size(); ++i) {
-                if (!pattern_[i].optional) {
+                if (pattern_[i].type == ElementType::PREPOSITION && pattern_[i].optional) {
+                    hasOptionalPrep = true;
+                }
+                if (!pattern_[i].optional && !hasOptionalPrep) {
                     allOptional = false;
                     break;
                 }
+                // If we found an optional preposition, elements after it are implicitly optional
+                if (hasOptionalPrep && pattern_[i].type == ElementType::OBJECT) {
+                    continue;  // Treat as optional
+                }
             }
-            return allOptional;
+            return allOptional || hasOptionalPrep;
         }
         
         // Handle different element types
@@ -153,7 +162,8 @@ bool SyntaxPattern::matches(const std::vector<std::string>& tokens) const {
     return true;
 }
 
-ParseResult SyntaxPattern::apply(const std::vector<std::string>& tokens) const {
+ParseResult SyntaxPattern::apply(const std::vector<std::string>& tokens,
+                                 const ObjectFinder& objectFinder) const {
     ParseResult result;
     result.verb = verbId_;
     result.success = false;
@@ -200,17 +210,23 @@ ParseResult SyntaxPattern::apply(const std::vector<std::string>& tokens) const {
                 objName += tokens[i];
             }
             
-            // Note: Actual object lookup will be done by the parser
-            // This method just identifies what needs to be looked up
-            // The parser will need to call a separate object finder
-            // For now, we store the information in the result
+            // Use object finder to locate the object
+            result.prso = objectFinder(objName, prsoRequiredFlag);
+            if (!result.prso) {
+                result.error = "You can't see any " + objName + " here.";
+                return result;
+            }
             
-            // In a complete implementation, this would be:
-            // result.prso = findObjectByName(objName, prsoRequiredFlag);
-            // if (!result.prso) {
-            //     result.error = "You can't see any " + objName + " here.";
-            //     return result;
-            // }
+            // Validate flag requirement if specified
+            if (prsoRequiredFlag.has_value() && 
+                !result.prso->hasFlag(prsoRequiredFlag.value())) {
+                result.error = "You can't do that with the " + result.prso->getDesc() + ".";
+                return result;
+            }
+        } else if (!needsPrsi) {
+            // Need PRSO but no tokens available
+            result.error = "What do you want to " + std::to_string(verbId_) + "?";
+            return result;
         }
     }
     
@@ -226,32 +242,19 @@ ParseResult SyntaxPattern::apply(const std::vector<std::string>& tokens) const {
             objName += tokens[i];
         }
         
-        // Note: Actual object lookup will be done by the parser
-        // In a complete implementation:
-        // result.prsi = findObjectByName(objName, prsiRequiredFlag);
-        // if (!result.prsi) {
-        //     result.error = "You can't see any " + objName + " here.";
-        //     return result;
-        // }
-    }
-    
-    // Validate pattern requirements
-    // Check if PRSO has required flag (if specified)
-    if (result.prso && prsoRequiredFlag.has_value()) {
-        // In full implementation:
-        // if (!result.prso->hasFlag(prsoRequiredFlag.value())) {
-        //     result.error = "You can't do that with the " + result.prso->getDesc();
-        //     return result;
-        // }
-    }
-    
-    // Check if PRSI has required flag (if specified)
-    if (result.prsi && prsiRequiredFlag.has_value()) {
-        // In full implementation:
-        // if (!result.prsi->hasFlag(prsiRequiredFlag.value())) {
-        //     result.error = "You can't do that with the " + result.prsi->getDesc();
-        //     return result;
-        // }
+        // Use object finder to locate the object
+        result.prsi = objectFinder(objName, prsiRequiredFlag);
+        if (!result.prsi) {
+            result.error = "You can't see any " + objName + " here.";
+            return result;
+        }
+        
+        // Validate flag requirement if specified
+        if (prsiRequiredFlag.has_value() && 
+            !result.prsi->hasFlag(prsiRequiredFlag.value())) {
+            result.error = "You can't do that with the " + result.prsi->getDesc() + ".";
+            return result;
+        }
     }
     
     result.success = true;

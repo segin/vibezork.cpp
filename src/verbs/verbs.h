@@ -17,6 +17,7 @@ constexpr VerbId V_READ = 11;
 constexpr VerbId V_TURN = 12;
 constexpr VerbId V_LAMP_ON = 13;
 constexpr VerbId V_LAMP_OFF = 14;
+constexpr VerbId V_PUT = 15;
 
 // Verb handlers
 namespace Verbs {
