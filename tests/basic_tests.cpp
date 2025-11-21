@@ -1111,6 +1111,494 @@ TEST(PrepositionExtractObjects) {
     g.reset();
 }
 
+// Test special parser features - Task 6.6
+TEST(SpecialFeaturesTakeAll) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create multiple takeable objects in room
+    auto lamp = std::make_unique<ZObject>(1, "lamp");
+    lamp->addSynonym("lamp");
+    lamp->setFlag(ObjectFlag::TAKEBIT);
+    lamp->moveTo(&testRoom);
+    ZObject* lampPtr = lamp.get();
+    g.registerObject(1, std::move(lamp));
+    
+    auto knife = std::make_unique<ZObject>(2, "knife");
+    knife->addSynonym("knife");
+    knife->setFlag(ObjectFlag::TAKEBIT);
+    knife->moveTo(&testRoom);
+    ZObject* knifePtr = knife.get();
+    g.registerObject(2, std::move(knife));
+    
+    // Create non-takeable object (anchored)
+    auto house = std::make_unique<ZObject>(3, "house");
+    house->addSynonym("house");
+    house->setFlag(ObjectFlag::TRYTAKEBIT);  // Anchored, can't be taken
+    house->moveTo(&testRoom);
+    g.registerObject(3, std::move(house));
+    
+    // Create parser
+    Parser parser;
+    
+    // Test "TAKE ALL"
+    ParsedCommand cmd = parser.parse("take all");
+    
+    ASSERT_EQ(cmd.verb, V_TAKE);
+    ASSERT_TRUE(cmd.isAll);
+    ASSERT_TRUE(cmd.allObjects.size() >= 2);  // Should include lamp and knife
+    
+    // Verify lamp and knife are in the list
+    bool foundLamp = false;
+    bool foundKnife = false;
+    bool foundHouse = false;
+    
+    for (auto* obj : cmd.allObjects) {
+        if (obj == lampPtr) foundLamp = true;
+        if (obj == knifePtr) foundKnife = true;
+        if (obj == house.get()) foundHouse = true;
+    }
+    
+    ASSERT_TRUE(foundLamp);
+    ASSERT_TRUE(foundKnife);
+    ASSERT_FALSE(foundHouse);  // House should not be included (anchored)
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(SpecialFeaturesTakeAllExcept) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create multiple takeable objects
+    auto lamp = std::make_unique<ZObject>(1, "lamp");
+    lamp->addSynonym("lamp");
+    lamp->setFlag(ObjectFlag::TAKEBIT);
+    lamp->moveTo(&testRoom);
+    ZObject* lampPtr = lamp.get();
+    g.registerObject(1, std::move(lamp));
+    
+    auto knife = std::make_unique<ZObject>(2, "knife");
+    knife->addSynonym("knife");
+    knife->setFlag(ObjectFlag::TAKEBIT);
+    knife->moveTo(&testRoom);
+    ZObject* knifePtr = knife.get();
+    g.registerObject(2, std::move(knife));
+    
+    auto sword = std::make_unique<ZObject>(3, "sword");
+    sword->addSynonym("sword");
+    sword->setFlag(ObjectFlag::TAKEBIT);
+    sword->moveTo(&testRoom);
+    ZObject* swordPtr = sword.get();
+    g.registerObject(3, std::move(sword));
+    
+    // Create parser
+    Parser parser;
+    
+    // Test "TAKE ALL EXCEPT LAMP"
+    ParsedCommand cmd = parser.parse("take all except lamp");
+    
+    ASSERT_EQ(cmd.verb, V_TAKE);
+    ASSERT_TRUE(cmd.isAll);
+    ASSERT_EQ(cmd.exceptObject, lampPtr);
+    
+    // Verify lamp is NOT in the list, but knife and sword are
+    bool foundLamp = false;
+    bool foundKnife = false;
+    bool foundSword = false;
+    
+    for (auto* obj : cmd.allObjects) {
+        if (obj == lampPtr) foundLamp = true;
+        if (obj == knifePtr) foundKnife = true;
+        if (obj == swordPtr) foundSword = true;
+    }
+    
+    ASSERT_FALSE(foundLamp);  // Lamp should be excluded
+    ASSERT_TRUE(foundKnife);
+    ASSERT_TRUE(foundSword);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(SpecialFeaturesAgainCommand) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create lamp object
+    auto lamp = std::make_unique<ZObject>(1, "lamp");
+    lamp->addSynonym("lamp");
+    lamp->setFlag(ObjectFlag::TAKEBIT);
+    lamp->moveTo(&testRoom);
+    ZObject* lampPtr = lamp.get();
+    g.registerObject(1, std::move(lamp));
+    
+    // Create parser
+    Parser parser;
+    
+    // Parse initial command
+    ParsedCommand cmd1 = parser.parse("take lamp");
+    ASSERT_EQ(cmd1.verb, V_TAKE);
+    ASSERT_EQ(cmd1.directObj, lampPtr);
+    
+    // Test "AGAIN" command
+    ParsedCommand cmd2 = parser.parse("again");
+    ASSERT_EQ(cmd2.verb, V_TAKE);
+    ASSERT_EQ(cmd2.directObj, lampPtr);
+    
+    // Test "G" command (synonym for AGAIN)
+    ParsedCommand cmd3 = parser.parse("g");
+    ASSERT_EQ(cmd3.verb, V_TAKE);
+    ASSERT_EQ(cmd3.directObj, lampPtr);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(SpecialFeaturesAgainOnFirstTurn) {
+    // Create parser
+    Parser parser;
+    
+    // Test AGAIN on first turn (no previous command)
+    // Should handle gracefully without crashing
+    ParsedCommand cmd = parser.parse("again");
+    
+    // Command should be invalid (verb = 0) or handled gracefully
+    // The exact behavior is that it prints a message and returns empty command
+    ASSERT_EQ(cmd.verb, 0);
+    
+    // No cleanup needed - no globals used
+}
+
+TEST(SpecialFeaturesOopsCorrection) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create lamp object
+    auto lamp = std::make_unique<ZObject>(1, "lamp");
+    lamp->addSynonym("lamp");
+    lamp->setFlag(ObjectFlag::TAKEBIT);
+    lamp->moveTo(&testRoom);
+    ZObject* lampPtr = lamp.get();
+    g.registerObject(1, std::move(lamp));
+    
+    // Create parser
+    Parser parser;
+    
+    // Parse command with typo (unknown verb)
+    ParsedCommand cmd1 = parser.parse("tke lamp");
+    ASSERT_EQ(cmd1.verb, 0);  // Unknown verb
+    
+    // Test OOPS correction
+    ParsedCommand cmd2 = parser.parse("oops take");
+    ASSERT_EQ(cmd2.verb, V_TAKE);
+    ASSERT_EQ(cmd2.directObj, lampPtr);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(SpecialFeaturesOopsWithoutError) {
+    // Create parser
+    Parser parser;
+    
+    // Test OOPS without a previous unknown word
+    // Should handle gracefully
+    ParsedCommand cmd = parser.parse("oops take");
+    
+    // Command should be invalid or handled gracefully
+    ASSERT_EQ(cmd.verb, 0);
+    
+    // No cleanup needed
+}
+
+TEST(SpecialFeaturesPronounIt) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create lamp object
+    auto lamp = std::make_unique<ZObject>(1, "lamp");
+    lamp->addSynonym("lamp");
+    lamp->setFlag(ObjectFlag::TAKEBIT);
+    lamp->moveTo(&testRoom);
+    ZObject* lampPtr = lamp.get();
+    g.registerObject(1, std::move(lamp));
+    
+    // Create parser
+    Parser parser;
+    
+    // Parse command that mentions lamp
+    ParsedCommand cmd1 = parser.parse("examine lamp");
+    ASSERT_EQ(cmd1.verb, V_EXAMINE);
+    ASSERT_EQ(cmd1.directObj, lampPtr);
+    
+    // Test "IT" pronoun
+    ParsedCommand cmd2 = parser.parse("take it");
+    ASSERT_EQ(cmd2.verb, V_TAKE);
+    ASSERT_EQ(cmd2.directObj, lampPtr);  // "it" should refer to lamp
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(SpecialFeaturesPronounThem) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create multiple objects
+    auto lamp = std::make_unique<ZObject>(1, "lamp");
+    lamp->addSynonym("lamp");
+    lamp->setFlag(ObjectFlag::TAKEBIT);
+    lamp->moveTo(&testRoom);
+    ZObject* lampPtr = lamp.get();
+    g.registerObject(1, std::move(lamp));
+    
+    auto knife = std::make_unique<ZObject>(2, "knife");
+    knife->addSynonym("knife");
+    knife->setFlag(ObjectFlag::TAKEBIT);
+    knife->moveTo(&testRoom);
+    ZObject* knifePtr = knife.get();
+    g.registerObject(2, std::move(knife));
+    
+    // Create parser
+    Parser parser;
+    
+    // Parse "TAKE ALL" to establish multiple objects
+    ParsedCommand cmd1 = parser.parse("take all");
+    ASSERT_TRUE(cmd1.isAll);
+    ASSERT_TRUE(cmd1.allObjects.size() >= 2);
+    
+    // Move objects to inventory for DROP test
+    lampPtr->moveTo(g.winner);
+    knifePtr->moveTo(g.winner);
+    
+    // Test "THEM" pronoun
+    ParsedCommand cmd2 = parser.parse("drop them");
+    ASSERT_EQ(cmd2.verb, V_DROP);
+    ASSERT_TRUE(cmd2.isAll);
+    ASSERT_TRUE(cmd2.allObjects.size() >= 2);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(SpecialFeaturesPronounWithoutReference) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create parser
+    Parser parser;
+    
+    // Test "IT" without previous object reference
+    ParsedCommand cmd1 = parser.parse("take it");
+    ASSERT_EQ(cmd1.verb, V_TAKE);
+    ASSERT_EQ(cmd1.directObj, nullptr);  // No object to refer to
+    
+    // Test "THEM" without previous objects reference
+    ParsedCommand cmd2 = parser.parse("drop them");
+    ASSERT_EQ(cmd2.verb, V_DROP);
+    // Should either have no objects or handle gracefully
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(SpecialFeaturesDropAll) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create objects in player inventory
+    auto lamp = std::make_unique<ZObject>(1, "lamp");
+    lamp->addSynonym("lamp");
+    lamp->setFlag(ObjectFlag::TAKEBIT);
+    lamp->moveTo(g.winner);
+    ZObject* lampPtr = lamp.get();
+    g.registerObject(1, std::move(lamp));
+    
+    auto knife = std::make_unique<ZObject>(2, "knife");
+    knife->addSynonym("knife");
+    knife->setFlag(ObjectFlag::TAKEBIT);
+    knife->moveTo(g.winner);
+    ZObject* knifePtr = knife.get();
+    g.registerObject(2, std::move(knife));
+    
+    // Create parser
+    Parser parser;
+    
+    // Test "DROP ALL"
+    ParsedCommand cmd = parser.parse("drop all");
+    
+    ASSERT_EQ(cmd.verb, V_DROP);
+    ASSERT_TRUE(cmd.isAll);
+    ASSERT_TRUE(cmd.allObjects.size() >= 2);
+    
+    // Verify both objects are in the list
+    bool foundLamp = false;
+    bool foundKnife = false;
+    
+    for (auto* obj : cmd.allObjects) {
+        if (obj == lampPtr) foundLamp = true;
+        if (obj == knifePtr) foundKnife = true;
+    }
+    
+    ASSERT_TRUE(foundLamp);
+    ASSERT_TRUE(foundKnife);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(SpecialFeaturesAllButSynonym) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create multiple takeable objects
+    auto lamp = std::make_unique<ZObject>(1, "lamp");
+    lamp->addSynonym("lamp");
+    lamp->setFlag(ObjectFlag::TAKEBIT);
+    lamp->moveTo(&testRoom);
+    ZObject* lampPtr = lamp.get();
+    g.registerObject(1, std::move(lamp));
+    
+    auto knife = std::make_unique<ZObject>(2, "knife");
+    knife->addSynonym("knife");
+    knife->setFlag(ObjectFlag::TAKEBIT);
+    knife->moveTo(&testRoom);
+    ZObject* knifePtr = knife.get();
+    g.registerObject(2, std::move(knife));
+    
+    // Create parser
+    Parser parser;
+    
+    // Test "TAKE ALL BUT LAMP" (using "but" instead of "except")
+    ParsedCommand cmd = parser.parse("take all but lamp");
+    
+    ASSERT_EQ(cmd.verb, V_TAKE);
+    ASSERT_TRUE(cmd.isAll);
+    ASSERT_EQ(cmd.exceptObject, lampPtr);
+    
+    // Verify lamp is excluded
+    bool foundLamp = false;
+    bool foundKnife = false;
+    
+    for (auto* obj : cmd.allObjects) {
+        if (obj == lampPtr) foundLamp = true;
+        if (obj == knifePtr) foundKnife = true;
+    }
+    
+    ASSERT_FALSE(foundLamp);
+    ASSERT_TRUE(foundKnife);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(SpecialFeaturesEverythingSynonym) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create takeable objects
+    auto lamp = std::make_unique<ZObject>(1, "lamp");
+    lamp->addSynonym("lamp");
+    lamp->setFlag(ObjectFlag::TAKEBIT);
+    lamp->moveTo(&testRoom);
+    g.registerObject(1, std::move(lamp));
+    
+    // Create parser
+    Parser parser;
+    
+    // Test "TAKE EVERYTHING" (synonym for "all")
+    ParsedCommand cmd = parser.parse("take everything");
+    
+    ASSERT_EQ(cmd.verb, V_TAKE);
+    ASSERT_TRUE(cmd.isAll);
+    ASSERT_TRUE(cmd.allObjects.size() >= 1);
+    
+    // Cleanup
+    g.reset();
+}
+
 // Main test runner
 int main() {
     std::cout << "Running Zork C++ Tests\n";

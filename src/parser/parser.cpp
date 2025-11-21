@@ -442,12 +442,159 @@ bool Parser::validatePreposition(VerbId verb, const std::string& preposition) co
     return isPreposition(preposition);
 }
 
+// Special command support methods
+void Parser::setLastCommand(const std::string& cmd) {
+    lastCommand_ = cmd;
+}
+
+std::string_view Parser::getLastCommand() const {
+    return lastCommand_;
+}
+
+void Parser::setLastObject(ZObject* obj) {
+    lastObject_ = obj;
+}
+
+ZObject* Parser::getLastObject() const {
+    return lastObject_;
+}
+
+void Parser::setLastObjects(const std::vector<ZObject*>& objs) {
+    lastObjects_ = objs;
+}
+
+const std::vector<ZObject*>& Parser::getLastObjects() const {
+    return lastObjects_;
+}
+
+void Parser::setLastUnknownWord(const std::string& word) {
+    lastUnknownWord_ = word;
+    hadUnknownWordLastTurn_ = true;
+}
+
+std::string_view Parser::getLastUnknownWord() const {
+    return lastUnknownWord_;
+}
+
+void Parser::clearLastUnknownWord() {
+    lastUnknownWord_.clear();
+    hadUnknownWordLastTurn_ = false;
+}
+
+bool Parser::isAllKeyword(const std::string& word) const {
+    return word == "all" || word == "everything";
+}
+
+bool Parser::isExceptKeyword(const std::string& word) const {
+    return word == "except" || word == "but";
+}
+
+bool Parser::isAgainCommand(const std::vector<std::string>& tokens) const {
+    return !tokens.empty() && (tokens[0] == "again" || tokens[0] == "g");
+}
+
+bool Parser::isOopsCommand(const std::vector<std::string>& tokens) const {
+    return !tokens.empty() && tokens[0] == "oops";
+}
+
+bool Parser::isPronoun(const std::string& word) const {
+    return word == "it" || word == "them";
+}
+
+std::vector<ZObject*> Parser::findAllApplicableObjects(VerbId verb) const {
+    std::vector<ZObject*> applicable;
+    auto& g = Globals::instance();
+    
+    // Determine which objects are applicable based on the verb
+    for (const auto& [id, objPtr] : g.getAllObjects()) {
+        ZObject* obj = objPtr.get();
+        
+        // Skip invisible objects
+        if (!isObjectVisible(obj)) {
+            continue;
+        }
+        
+        // For TAKE: objects in room that can be taken
+        if (verb == V_TAKE) {
+            if (obj->getLocation() == g.here && 
+                obj->hasFlag(ObjectFlag::TAKEBIT) &&
+                !obj->hasFlag(ObjectFlag::TRYTAKEBIT)) {
+                applicable.push_back(obj);
+            }
+        }
+        // For DROP: objects in inventory
+        else if (verb == V_DROP) {
+            if (obj->getLocation() == g.winner) {
+                applicable.push_back(obj);
+            }
+        }
+        // For other verbs, include visible objects
+        else {
+            applicable.push_back(obj);
+        }
+    }
+    
+    return applicable;
+}
+
+std::string Parser::replaceOopsWord(const std::string& original, const std::string& replacement) {
+    if (lastUnknownWord_.empty()) {
+        return original;
+    }
+    
+    std::string result = original;
+    size_t pos = result.find(lastUnknownWord_);
+    if (pos != std::string::npos) {
+        result.replace(pos, lastUnknownWord_.length(), replacement);
+    }
+    
+    return result;
+}
+
 ParsedCommand Parser::parse(const std::string& input) {
     ParsedCommand cmd;
+    
+    // Handle AGAIN command
     tokenize(input, cmd.words);
+    if (isAgainCommand(cmd.words)) {
+        if (lastCommand_.empty()) {
+            printLine("You haven't entered a command yet.");
+            return cmd;
+        }
+        // Re-parse the last command
+        return parse(lastCommand_);
+    }
+    
+    // Handle OOPS command
+    if (isOopsCommand(cmd.words)) {
+        if (!hadUnknownWordLastTurn_ || lastUnknownWord_.empty()) {
+            printLine("There was no word to correct.");
+            return cmd;
+        }
+        
+        if (cmd.words.size() < 2) {
+            printLine("Oops what?");
+            return cmd;
+        }
+        
+        // Replace the unknown word and retry
+        std::string corrected = replaceOopsWord(lastCommand_, cmd.words[1]);
+        clearLastUnknownWord();
+        return parse(corrected);
+    }
+    
+    // Clear unknown word flag for normal commands
+    if (!cmd.words.empty()) {
+        hadUnknownWordLastTurn_ = false;
+    }
     
     if (cmd.words.empty()) {
         return cmd;
+    }
+    
+    // Save this command for AGAIN (but not if it's AGAIN itself)
+    if (!isAgainCommand(cmd.words) && !isOopsCommand(cmd.words)) {
+        lastCommand_ = input;
     }
     
     // Check if first word is a direction
@@ -456,8 +603,84 @@ ParsedCommand Parser::parse(const std::string& input) {
         cmd.isDirection = true;
         cmd.direction = *dir;
         cmd.verb = V_WALK;
-    } else {
-        cmd.verb = findVerb(cmd.words[0]);
+        return cmd;
+    }
+    
+    // Check for verb
+    cmd.verb = findVerb(cmd.words[0]);
+    if (cmd.verb == 0) {
+        // Unknown verb - save for OOPS
+        setLastUnknownWord(cmd.words[0]);
+        printLine("I don't know the word \"" + cmd.words[0] + "\".");
+        return cmd;
+    }
+    
+    // Check for "all" keyword
+    if (cmd.words.size() > 1 && isAllKeyword(cmd.words[1])) {
+        cmd.isAll = true;
+        
+        // Check for "all except [object]"
+        if (cmd.words.size() > 2 && isExceptKeyword(cmd.words[2])) {
+            // Find the exception object
+            if (cmd.words.size() > 3) {
+                std::vector<std::string> exceptWords(cmd.words.begin() + 3, cmd.words.end());
+                auto exceptMatches = findObjects(exceptWords, 0);
+                if (!exceptMatches.empty()) {
+                    cmd.exceptObject = exceptMatches.size() == 1
+                        ? exceptMatches[0]
+                        : disambiguate(exceptMatches, exceptWords.back());
+                }
+            }
+        }
+        
+        // Find all applicable objects for this verb
+        cmd.allObjects = findAllApplicableObjects(cmd.verb);
+        
+        // Remove the exception object if specified
+        if (cmd.exceptObject) {
+            cmd.allObjects.erase(
+                std::remove(cmd.allObjects.begin(), cmd.allObjects.end(), cmd.exceptObject),
+                cmd.allObjects.end()
+            );
+        }
+        
+        // Update pronoun tracking
+        if (!cmd.allObjects.empty()) {
+            setLastObjects(cmd.allObjects);
+            if (cmd.allObjects.size() == 1) {
+                setLastObject(cmd.allObjects[0]);
+            }
+        }
+        
+        return cmd;
+    }
+    
+    // Handle pronoun substitution
+    if (cmd.words.size() > 1) {
+        if (isPronoun(cmd.words[1])) {
+            if (cmd.words[1] == "it") {
+                if (lastObject_) {
+                    cmd.directObj = lastObject_;
+                } else {
+                    printLine("I don't know what \"it\" refers to.");
+                    return cmd;
+                }
+            } else if (cmd.words[1] == "them") {
+                if (!lastObjects_.empty()) {
+                    // For "them", treat as "all" with the last objects
+                    cmd.isAll = true;
+                    cmd.allObjects = lastObjects_;
+                } else {
+                    printLine("I don't know what \"them\" refers to.");
+                    return cmd;
+                }
+            }
+            
+            // If we substituted a pronoun, we're done with object parsing
+            if (cmd.directObj || cmd.isAll) {
+                return cmd;
+            }
+        }
     }
     
     // Find preposition and extract indirect object (PRSI)
@@ -493,6 +716,11 @@ ParsedCommand Parser::parse(const std::string& input) {
                     cmd.directObj = directMatches.size() == 1 
                         ? directMatches[0]
                         : disambiguate(directMatches, directObjWords.back());
+                    
+                    // Update pronoun tracking
+                    if (cmd.directObj) {
+                        setLastObject(cmd.directObj);
+                    }
                 }
             }
             
@@ -513,6 +741,20 @@ ParsedCommand Parser::parse(const std::string& input) {
                     cmd.directObj = matches.size() == 1
                         ? matches[0]
                         : disambiguate(matches, objWords.back());
+                    
+                    // Update pronoun tracking
+                    if (cmd.directObj) {
+                        setLastObject(cmd.directObj);
+                    }
+                } else if (!objWords.empty()) {
+                    // Check if any word is unknown
+                    for (const auto& word : objWords) {
+                        if (word != "the" && word != "a" && word != "an" && 
+                            !isPreposition(word)) {
+                            // This might be an unknown word
+                            setLastUnknownWord(word);
+                        }
+                    }
                 }
             }
         }

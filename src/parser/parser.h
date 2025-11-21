@@ -14,6 +14,9 @@ struct ParsedCommand {
     std::vector<std::string> words;
     Direction direction = Direction::NORTH;
     bool isDirection = false;
+    bool isAll = false;  // "all" keyword used
+    std::vector<ZObject*> allObjects;  // Objects for "all" command
+    ZObject* exceptObject = nullptr;  // Object to exclude in "all except"
 };
 
 // Forward declaration
@@ -25,6 +28,17 @@ public:
     Parser(VerbRegistry* registry);  // Constructor with registry
     
     ParsedCommand parse(const std::string& input);
+    
+    // Special command support
+    void setLastCommand(const std::string& cmd);
+    std::string_view getLastCommand() const;
+    void setLastObject(ZObject* obj);
+    ZObject* getLastObject() const;
+    void setLastObjects(const std::vector<ZObject*>& objs);
+    const std::vector<ZObject*>& getLastObjects() const;
+    void setLastUnknownWord(const std::string& word);
+    std::string_view getLastUnknownWord() const;
+    void clearLastUnknownWord();
     
     // Public for testing
     std::vector<ZObject*> findObjects(const std::vector<std::string>& words, size_t startIdx = 0);
@@ -52,8 +66,24 @@ private:
     // Preposition handling
     bool validatePreposition(VerbId verb, const std::string& preposition) const;
     
+    // Special command helpers
+    bool isAllKeyword(const std::string& word) const;
+    bool isExceptKeyword(const std::string& word) const;
+    bool isAgainCommand(const std::vector<std::string>& tokens) const;
+    bool isOopsCommand(const std::vector<std::string>& tokens) const;
+    bool isPronoun(const std::string& word) const;
+    std::vector<ZObject*> findAllApplicableObjects(VerbId verb) const;
+    std::string replaceOopsWord(const std::string& original, const std::string& replacement);
+    
     std::map<std::string, VerbId> verbSynonyms_;
     std::set<std::string> prepositions_;
     std::map<std::string, Direction> directions_;
     VerbRegistry* verbRegistry_;  // Optional registry for advanced validation
+    
+    // Special command state
+    std::string lastCommand_;
+    ZObject* lastObject_ = nullptr;
+    std::vector<ZObject*> lastObjects_;
+    std::string lastUnknownWord_;
+    bool hadUnknownWordLastTurn_ = false;
 };

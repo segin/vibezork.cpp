@@ -158,48 +158,48 @@ The parser is the foundation - it must be robust before we can add more content.
   - Test optional prepositions
   - _Requirements: 7, 92_
 
-- [ ] 6. Implement special parser features
+- [x] 6. Implement special parser features
   - Implement "all" and "all except" support
   - Implement AGAIN/G command
   - Implement OOPS correction
   - Implement IT/THEM pronoun tracking
   - _Requirements: 9, 74, 75, 76, 78_
 
-- [ ] 6.1 Implement "all" support
+- [x] 6.1 Implement "all" support
   - Recognize "all" keyword in input
   - Find all applicable objects for the verb
   - Apply verb to each object in sequence
   - Report results for each object
   - _Requirements: 78_
 
-- [ ] 6.2 Implement "all except" support
+- [x] 6.2 Implement "all except" support
   - Recognize "all except [object]" pattern
   - Find all applicable objects except the specified one
   - Apply verb to each object
   - _Requirements: 78_
 
-- [ ] 6.3 Implement AGAIN command
+- [x] 6.3 Implement AGAIN command
   - Track last command entered
   - When player types AGAIN or G, repeat last command
   - Don't repeat AGAIN itself
   - Handle AGAIN on first turn gracefully
   - _Requirements: 75_
 
-- [ ] 6.4 Implement OOPS correction
+- [x] 6.4 Implement OOPS correction
   - Track last unknown word
   - When player types OOPS [word], replace unknown word
   - Retry corrected command automatically
   - Only work immediately after unknown word error
   - _Requirements: 76_
 
-- [ ] 6.5 Implement pronoun tracking
+- [x] 6.5 Implement pronoun tracking
   - Track last mentioned object for IT
   - Track last mentioned objects for THEM
   - Substitute pronouns with tracked objects
   - Update pronouns after each command
   - _Requirements: 74_
 
-- [ ] 6.6 Write unit tests for special features
+- [x] 6.6 Write unit tests for special features
   - Test "take all"
   - Test "take all except lamp"
   - Test AGAIN command
@@ -215,7 +215,7 @@ The parser is the foundation - it must be robust before we can add more content.
   - Test parser with various command types
   - _Requirements: 1, 73_
 
-- [ ]* 7.1 Write integration tests for parser
+- [ ] 7.1 Write integration tests for parser
   - Test complete command parsing flow
   - Test error handling
   - Test edge cases (empty input, very long input, special characters)
@@ -484,7 +484,7 @@ Now that the parser is robust, we need content for it to operate on. Start with 
   - Exits that require puzzle solutions
   - _Requirements: 81_
 
-- [ ]* 15.4 Write unit tests for room navigation
+- [ ] 15.4 Write unit tests for room navigation
   - Test basic directional movement
   - Test conditional exits
   - Test special movement
@@ -801,7 +801,7 @@ With rooms in place, add all objects that populate the world.
   - Set other initial flags from 1dungeon.zil
   - _Requirements: 19_
 
-- [ ]* 24.4 Write unit tests for world initialization
+- [ ] 24.4 Write unit tests for world initialization
   - Test all rooms exist
   - Test all objects exist
   - Test initial placements
@@ -846,7 +846,7 @@ With the world populated, implement the verbs that operate on it.
   - Handle objects that can't be read
   - _Requirements: 25_
 
-- [ ]* 25.5 Write unit tests for examination verbs
+- [ ] 25.5 Write unit tests for examination verbs
   - Test EXAMINE on various objects
   - Test LOOK-INSIDE on containers
   - Test READ on readable objects
@@ -875,7 +875,7 @@ With the world populated, implement the verbs that operate on it.
   - Display success message
   - _Requirements: 21_
 
-- [ ]* 26.3 Write unit tests for TAKE verb
+- [ ] 26.3 Write unit tests for TAKE verb
   - Test taking normal objects
   - Test taking anchored objects (should fail)
   - Test weight limit
@@ -900,7 +900,7 @@ With the world populated, implement the verbs that operate on it.
   - Display success message
   - _Requirements: 21_
 
-- [ ]* 27.3 Write unit tests for DROP verb
+- [ ] 27.3 Write unit tests for DROP verb
   - Test dropping carried objects
   - Test dropping objects not in inventory (should fail)
   - _Requirements: 21, 92_
@@ -927,7 +927,7 @@ With the world populated, implement the verbs that operate on it.
   - Display success message
   - _Requirements: 22_
 
-- [ ]* 28.3 Write unit tests for PUT verb
+- [ ] 28.3 Write unit tests for PUT verb
   - Test putting objects in containers
   - Test putting in closed containers (should fail)
   - Test capacity limits
@@ -963,7 +963,7 @@ With the world populated, implement the verbs that operate on it.
   - Display success message
   - _Requirements: 23_
 
-- [ ]* 29.5 Write unit tests for OPEN and CLOSE verbs
+- [ ] 29.5 Write unit tests for OPEN and CLOSE verbs
   - Test opening and closing containers
   - Test opening locked containers (should fail)
   - Test opening already open containers
@@ -998,7 +998,7 @@ With the world populated, implement the verbs that operate on it.
   - Display success message
   - _Requirements: 24_
 
-- [ ]* 30.5 Write unit tests for LOCK and UNLOCK verbs
+- [ ] 30.5 Write unit tests for LOCK and UNLOCK verbs
   - Test locking and unlocking
   - Test without correct key (should fail)
   - _Requirements: 24, 92_
@@ -1031,7 +1031,7 @@ With the world populated, implement the verbs that operate on it.
   - Default: "Nothing happens"
   - _Requirements: 26_
 
-- [ ]* 31.5 Write unit tests for manipulation verbs
+- [ ] 31.5 Write unit tests for manipulation verbs
   - Test on objects with special behaviors
   - Test on objects without special behaviors
   - _Requirements: 26, 92_
@@ -1072,7 +1072,7 @@ With the world populated, implement the verbs that operate on it.
   - Default: "You feel nothing unusual"
   - _Requirements: 27_
 
-- [ ]* 32.6 Write unit tests for interaction verbs
+- [ ] 32.6 Write unit tests for interaction verbs
   - Test on objects with special behaviors
   - Test default behaviors
   - _Requirements: 27, 92_
@@ -1097,7 +1097,7 @@ With the world populated, implement the verbs that operate on it.
   - Default: "That's not drinkable"
   - _Requirements: 28_
 
-- [ ]* 33.3 Write unit tests for consumption verbs
+- [ ] 33.3 Write unit tests for consumption verbs
   - Test eating food items
   - Test eating non-food items (should fail)
   - Test drinking liquids
@@ -1128,7 +1128,7 @@ With the world populated, implement the verbs that operate on it.
   - Display success message
   - _Requirements: 30_
 
-- [ ]* 34.3 Write unit tests for light verbs
+- [ ] 34.3 Write unit tests for light verbs
   - Test turning lamp on and off
   - Test with depleted battery
   - Test on non-light objects
@@ -1169,7 +1169,7 @@ With the world populated, implement the verbs that operate on it.
   - Provide appropriate default messages
   - _Requirements: 31_
 
-- [ ]* 35.6 Write unit tests for special action verbs
+- [ ] 35.6 Write unit tests for special action verbs
   - Test on appropriate objects
   - Test default behaviors
   - _Requirements: 31, 92_
@@ -1201,7 +1201,7 @@ With the world populated, implement the verbs that operate on it.
   - Similar to ATTACK
   - _Requirements: 29_
 
-- [ ]* 36.4 Write unit tests for combat verbs
+- [ ] 36.4 Write unit tests for combat verbs
   - Test attacking NPCs
   - Test with and without weapons
   - Test throwing objects
@@ -1241,7 +1241,7 @@ With the world populated, implement the verbs that operate on it.
   - Display confirmation message
   - _Requirements: 67_
 
-- [ ]* 37.6 Write unit tests for meta-game verbs
+- [ ] 37.6 Write unit tests for meta-game verbs
   - Test SCORE display
   - Test DIAGNOSE
   - Test mode switching
@@ -1838,7 +1838,7 @@ Implement the core game systems that tie everything together.
   - Award points when treasure placed in trophy case
   - _Requirements: 85_
 
-- [ ]* 55.6 Write unit tests for score system
+- [ ] 55.6 Write unit tests for score system
   - Test score tracking
   - Test move counting
   - Test rank calculation
@@ -1886,7 +1886,7 @@ Implement the core game systems that tie everything together.
   - Display combat messages
   - _Requirements: 55_
 
-- [ ]* 56.6 Write unit tests for combat system
+- [ ] 56.6 Write unit tests for combat system
   - Test combat start/end
   - Test attack calculations
   - Test damage application
@@ -2023,7 +2023,7 @@ Implement the core game systems that tie everything together.
   - Display success/error messages
   - _Requirements: 60_
 
-- [ ]* 61.4 Write unit tests for save system
+- [ ] 61.4 Write unit tests for save system
   - Test serialization
   - Test file writing
   - Test error handling
@@ -2058,7 +2058,7 @@ Implement the core game systems that tie everything together.
   - Display success/error messages
   - _Requirements: 61_
 
-- [ ]* 62.4 Write unit tests for restore system
+- [ ] 62.4 Write unit tests for restore system
   - Test deserialization
   - Test file reading
   - Test error handling
@@ -2088,7 +2088,7 @@ Implement the core game systems that tie everything together.
   - Display "You're carrying too much"
   - _Requirements: 63_
 
-- [ ]* 63.4 Write unit tests for weight limits
+- [ ] 63.4 Write unit tests for weight limits
   - Test weight calculation
   - Test weight limit enforcement
   - Test taking heavy objects
@@ -2119,7 +2119,7 @@ Implement the core game systems that tie everything together.
   - Display "There's no room"
   - _Requirements: 64_
 
-- [ ]* 64.4 Write unit tests for capacity limits
+- [ ] 64.4 Write unit tests for capacity limits
   - Test capacity calculation
   - Test capacity enforcement
   - Test putting large objects in small containers
@@ -2161,7 +2161,7 @@ Implement the core game systems that tie everything together.
   - Format output accordingly
   - _Requirements: 65, 66, 67_
 
-- [ ]* 65.6 Write unit tests for description modes
+- [ ] 65.6 Write unit tests for description modes
   - Test verbose mode
   - Test brief mode
   - Test superbrief mode
