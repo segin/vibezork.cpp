@@ -194,22 +194,202 @@ void initializeWorld() {
     
     g.registerObject(ROOM_STONE_BARROW, std::move(stoneBarrow));
     
-    // Create Forest-1 placeholder
+    // Create Forest-1
     auto forest1 = std::make_unique<ZRoom>(
         ROOM_FOREST_1,
         "Forest",
-        ""
+        "This is a forest, with trees in all directions. To the east, there appears to be sunlight."
     );
     forest1->setFlag(ObjectFlag::RLANDBIT);
     forest1->setFlag(ObjectFlag::ONBIT);
+    forest1->setFlag(ObjectFlag::SACREDBIT);
     forest1->setRoomAction([](int rarg) {
         if (rarg == M_LOOK) {
             printLine("This is a forest, with trees in all directions. To the east, there appears to be sunlight.");
         }
     });
-    forest1->setExit(Direction::EAST, RoomExit(ROOM_WEST_OF_HOUSE));
+    // Exits will be set up in forest navigation section
+    forest1->setExit(Direction::UP, RoomExit("There is no tree here suitable for climbing."));
+    forest1->setExit(Direction::WEST, RoomExit("You would need a machete to go further west."));
     
     g.registerObject(ROOM_FOREST_1, std::move(forest1));
+    
+    // Create Forest-2
+    auto forest2 = std::make_unique<ZRoom>(
+        RoomIds::FOREST_2,
+        "Forest",
+        "This is a dimly lit forest, with large trees all around."
+    );
+    forest2->setFlag(ObjectFlag::RLANDBIT);
+    forest2->setFlag(ObjectFlag::ONBIT);
+    forest2->setFlag(ObjectFlag::SACREDBIT);
+    forest2->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is a dimly lit forest, with large trees all around.");
+        }
+    });
+    // Exits will be set up in forest navigation section
+    forest2->setExit(Direction::UP, RoomExit("There is no tree here suitable for climbing."));
+    forest2->setExit(Direction::NORTH, RoomExit("The forest becomes impenetrable to the north."));
+    
+    g.registerObject(RoomIds::FOREST_2, std::move(forest2));
+    
+    // Create Forest-3
+    auto forest3 = std::make_unique<ZRoom>(
+        RoomIds::FOREST_3,
+        "Forest",
+        "This is a dimly lit forest, with large trees all around."
+    );
+    forest3->setFlag(ObjectFlag::RLANDBIT);
+    forest3->setFlag(ObjectFlag::ONBIT);
+    forest3->setFlag(ObjectFlag::SACREDBIT);
+    forest3->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is a dimly lit forest, with large trees all around.");
+        }
+    });
+    // Exits will be set up in forest navigation section
+    forest3->setExit(Direction::UP, RoomExit("There is no tree here suitable for climbing."));
+    forest3->setExit(Direction::EAST, RoomExit("The rank undergrowth prevents eastward movement."));
+    forest3->setExit(Direction::SOUTH, RoomExit("Storm-tossed trees block your way."));
+    
+    g.registerObject(RoomIds::FOREST_3, std::move(forest3));
+    
+    // Create Mountains room
+    auto mountains = std::make_unique<ZRoom>(
+        RoomIds::MOUNTAINS,
+        "Forest",
+        "The forest thins out, revealing impassable mountains."
+    );
+    mountains->setFlag(ObjectFlag::RLANDBIT);
+    mountains->setFlag(ObjectFlag::ONBIT);
+    mountains->setFlag(ObjectFlag::SACREDBIT);
+    mountains->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("The forest thins out, revealing impassable mountains.");
+        }
+    });
+    // Mountains is a dead end - all directions lead back to FOREST_2
+    mountains->setExit(Direction::UP, RoomExit("The mountains are impassable."));
+    mountains->setExit(Direction::NORTH, RoomExit(RoomIds::FOREST_2));
+    mountains->setExit(Direction::EAST, RoomExit("The mountains are impassable."));
+    mountains->setExit(Direction::SOUTH, RoomExit(RoomIds::FOREST_2));
+    mountains->setExit(Direction::WEST, RoomExit(RoomIds::FOREST_2));
+    
+    g.registerObject(RoomIds::MOUNTAINS, std::move(mountains));
+    
+    // Create Clearing room
+    auto clearing = std::make_unique<ZRoom>(
+        RoomIds::CLEARING,
+        "Clearing",
+        "You are in a small clearing in a well marked forest path that extends to the east and west."
+    );
+    clearing->setFlag(ObjectFlag::RLANDBIT);
+    clearing->setFlag(ObjectFlag::ONBIT);
+    clearing->setFlag(ObjectFlag::SACREDBIT);
+    clearing->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("You are in a small clearing in a well marked forest path that extends to the east and west.");
+        }
+    });
+    // Exits will be set up in forest navigation section
+    clearing->setExit(Direction::UP, RoomExit("There is no tree here suitable for climbing."));
+    clearing->setExit(Direction::EAST, RoomExit(RoomIds::CANYON_VIEW));
+    clearing->setExit(Direction::NORTH, RoomExit(RoomIds::FOREST_2));
+    clearing->setExit(Direction::SOUTH, RoomExit(RoomIds::FOREST_3));
+    clearing->setExit(Direction::WEST, RoomExit(ROOM_EAST_OF_HOUSE));
+    
+    g.registerObject(RoomIds::CLEARING, std::move(clearing));
+    
+    // Create Grating Clearing room
+    auto gratingClearing = std::make_unique<ZRoom>(
+        RoomIds::GRATING_CLEARING,
+        "Clearing",
+        "You are in a clearing, with a forest surrounding you on all sides. A path leads south."
+    );
+    gratingClearing->setFlag(ObjectFlag::RLANDBIT);
+    gratingClearing->setFlag(ObjectFlag::ONBIT);
+    gratingClearing->setFlag(ObjectFlag::SACREDBIT);
+    gratingClearing->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("You are in a clearing, with a forest surrounding you on all sides. A path leads south.");
+        }
+    });
+    // Exits will be set up in forest navigation section
+    gratingClearing->setExit(Direction::NORTH, RoomExit("The forest becomes impenetrable to the north."));
+    gratingClearing->setExit(Direction::EAST, RoomExit(RoomIds::FOREST_2));
+    gratingClearing->setExit(Direction::WEST, RoomExit(RoomIds::FOREST_1));
+    gratingClearing->setExit(Direction::SOUTH, RoomExit(RoomIds::FOREST_PATH));
+    // DOWN to underground will be added when grating is implemented
+    
+    g.registerObject(RoomIds::GRATING_CLEARING, std::move(gratingClearing));
+    
+    // Create Forest Path room
+    auto forestPath = std::make_unique<ZRoom>(
+        RoomIds::FOREST_PATH,
+        "Forest Path",
+        "This is a path winding through a dimly lit forest. The path heads north-south here. One particularly large tree with some low branches stands at the edge of the path."
+    );
+    forestPath->setFlag(ObjectFlag::RLANDBIT);
+    forestPath->setFlag(ObjectFlag::ONBIT);
+    forestPath->setFlag(ObjectFlag::SACREDBIT);
+    forestPath->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is a path winding through a dimly lit forest. The path heads north-south here. One particularly large tree with some low branches stands at the edge of the path.");
+        }
+    });
+    // Exits will be set up in forest navigation section
+    forestPath->setExit(Direction::UP, RoomExit(RoomIds::UP_A_TREE));
+    forestPath->setExit(Direction::NORTH, RoomExit(RoomIds::GRATING_CLEARING));
+    forestPath->setExit(Direction::EAST, RoomExit(RoomIds::FOREST_2));
+    forestPath->setExit(Direction::SOUTH, RoomExit(ROOM_NORTH_OF_HOUSE));
+    forestPath->setExit(Direction::WEST, RoomExit(RoomIds::FOREST_1));
+    
+    g.registerObject(RoomIds::FOREST_PATH, std::move(forestPath));
+    
+    // Create Up a Tree room
+    auto upATree = std::make_unique<ZRoom>(
+        RoomIds::UP_A_TREE,
+        "Up a Tree",
+        "You are about 10 feet above the ground nestled among some large branches. The nearest branch above you is above your reach."
+    );
+    upATree->setFlag(ObjectFlag::RLANDBIT);
+    upATree->setFlag(ObjectFlag::ONBIT);
+    upATree->setFlag(ObjectFlag::SACREDBIT);
+    upATree->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("You are about 10 feet above the ground nestled among some large branches. The nearest branch above you is above your reach.");
+        }
+    });
+    upATree->setExit(Direction::UP, RoomExit("You cannot climb any higher."));
+    upATree->setExit(Direction::DOWN, RoomExit(RoomIds::FOREST_PATH));
+    
+    g.registerObject(RoomIds::UP_A_TREE, std::move(upATree));
+    
+    // Set up forest navigation (confusing interconnections)
+    // FOREST-1 connections
+    auto* f1 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::FOREST_1));
+    if (f1) {
+        f1->setExit(Direction::NORTH, RoomExit(RoomIds::GRATING_CLEARING));
+        f1->setExit(Direction::EAST, RoomExit(RoomIds::FOREST_PATH));
+        f1->setExit(Direction::SOUTH, RoomExit(RoomIds::FOREST_3));
+    }
+    
+    // FOREST-2 connections
+    auto* f2 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::FOREST_2));
+    if (f2) {
+        f2->setExit(Direction::EAST, RoomExit(RoomIds::MOUNTAINS));
+        f2->setExit(Direction::SOUTH, RoomExit(RoomIds::CLEARING));
+        f2->setExit(Direction::WEST, RoomExit(RoomIds::FOREST_PATH));
+    }
+    
+    // FOREST-3 connections
+    auto* f3 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::FOREST_3));
+    if (f3) {
+        f3->setExit(Direction::NORTH, RoomExit(RoomIds::CLEARING));
+        f3->setExit(Direction::WEST, RoomExit(RoomIds::FOREST_1));
+        f3->setExit(Direction::NW, RoomExit(ROOM_SOUTH_OF_HOUSE));
+    }
     
     // Create Mailbox object
     auto mailbox = std::make_unique<ZObject>(OBJ_MAILBOX, "small mailbox");

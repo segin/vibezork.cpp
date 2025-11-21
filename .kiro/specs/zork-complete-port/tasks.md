@@ -303,31 +303,31 @@ Now that the parser is robust, we need content for it to operate on. Start with 
   - Ensure entrance to underground is correct
   - _Requirements: 14, 15_
 
-- [ ] 10. Implement forest rooms
+- [x] 10. Implement forest rooms
   - Create FOREST_1 through FOREST_4
   - Create CLEARING and FOREST_PATH
   - Set up confusing forest navigation
   - Add appropriate descriptions
   - _Requirements: 14, 15, 17_
 
-- [ ] 10.1 Create forest rooms with descriptions
+- [x] 10.1 Create forest rooms with descriptions
   - FOREST_1 (already exists, verify)
   - FOREST_2, FOREST_3, FOREST_4
   - Make descriptions similar but subtly different
   - _Requirements: 14, 15_
 
-- [ ] 10.2 Create CLEARING room
+- [x] 10.2 Create CLEARING room
   - Add description
   - Connect to forest and house areas
   - Add grating entrance to underground
   - _Requirements: 14, 15_
 
-- [ ] 10.3 Create FOREST_PATH room
+- [x] 10.3 Create FOREST_PATH room
   - Add description
   - Connect to north of house and forest
   - _Requirements: 14, 15_
 
-- [ ] 10.4 Set up forest navigation
+- [x] 10.4 Set up forest navigation
   - Create confusing exits between forest rooms
   - Some exits loop back to same room
   - Some exits lead to unexpected rooms
