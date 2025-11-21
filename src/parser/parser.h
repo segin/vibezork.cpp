@@ -4,6 +4,8 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <set>
+#include <optional>
 
 struct ParsedCommand {
     VerbId verb = 0;
@@ -14,9 +16,13 @@ struct ParsedCommand {
     bool isDirection = false;
 };
 
+// Forward declaration
+class VerbRegistry;
+
 class Parser {
 public:
     Parser();
+    Parser(VerbRegistry* registry);  // Constructor with registry
     
     ParsedCommand parse(const std::string& input);
     
@@ -41,7 +47,13 @@ private:
     ZObject* parseDisambiguationResponse(const std::string& response, 
                                          const std::vector<ZObject*>& candidates);
     
+    // Preposition handling
+    bool isPreposition(const std::string& word) const;
+    std::optional<size_t> findPrepositionIndex(const std::vector<std::string>& tokens) const;
+    bool validatePreposition(VerbId verb, const std::string& preposition) const;
+    
     std::map<std::string, VerbId> verbSynonyms_;
-    std::map<std::string, std::string> prepositions_;
+    std::set<std::string> prepositions_;
     std::map<std::string, Direction> directions_;
+    VerbRegistry* verbRegistry_;  // Optional registry for advanced validation
 };

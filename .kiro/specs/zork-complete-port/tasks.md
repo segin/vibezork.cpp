@@ -132,20 +132,20 @@ The parser is the foundation - it must be robust before we can add more content.
   - Test invalid disambiguation responses
   - _Requirements: 8, 92_
 
-- [ ] 5. Implement preposition handling
+- [x] 5. Implement preposition handling
   - Parse prepositions from input (WITH, IN, ON, TO, FROM, etc.)
   - Identify indirect object (PRSI) after preposition
   - Validate preposition is valid for the verb
   - Support optional prepositions
   - _Requirements: 7_
 
-- [ ] 5.1 Add preposition recognition
+- [x] 5.1 Add preposition recognition
   - Create list of valid prepositions
   - Identify preposition position in tokens
   - Extract words after preposition as PRSI
   - _Requirements: 7_
 
-- [ ] 5.2 Validate preposition for verb
+- [x] 5.2 Validate preposition for verb
   - Check if verb accepts the given preposition
   - Display error for invalid prepositions
   - Support verbs with multiple valid prepositions

@@ -6,6 +6,7 @@
 #include <vector>
 #include <unordered_map>
 #include <optional>
+#include <set>
 
 /**
  * VerbRegistry manages verb synonyms and their associated syntax patterns.
@@ -77,6 +78,25 @@ public:
      * @return Vector of all registered verb IDs
      */
     std::vector<VerbId> getAllVerbs() const;
+    
+    /**
+     * Check if a preposition is valid for a given verb.
+     * Searches through all syntax patterns for the verb to see if any accept the preposition.
+     * 
+     * @param verbId The verb identifier
+     * @param preposition The preposition to check
+     * @return true if the verb accepts this preposition in at least one pattern
+     */
+    bool isPrepositionValidForVerb(VerbId verbId, const std::string& preposition) const;
+    
+    /**
+     * Get all valid prepositions for a verb.
+     * Useful for error messages.
+     * 
+     * @param verbId The verb identifier
+     * @return Set of all valid prepositions for this verb
+     */
+    std::set<std::string> getValidPrepositions(VerbId verbId) const;
     
 private:
     // Map from synonym word to verb ID

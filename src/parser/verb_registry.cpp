@@ -154,6 +154,44 @@ std::vector<VerbId> VerbRegistry::getAllVerbs() const {
     return verbs;
 }
 
+bool VerbRegistry::isPrepositionValidForVerb(VerbId verbId, const std::string& preposition) const {
+    const auto& patterns = getSyntaxPatterns(verbId);
+    
+    // Check each pattern to see if it contains this preposition
+    for (const auto& pattern : patterns) {
+        for (const auto& element : pattern.getPattern()) {
+            if (element.type == SyntaxPattern::ElementType::PREPOSITION) {
+                // Check if this preposition is in the element's values
+                for (const auto& prep : element.values) {
+                    if (prep == preposition) {
+                        return true;
+                    }
+                }
+            }
+        }
+    }
+    
+    return false;
+}
+
+std::set<std::string> VerbRegistry::getValidPrepositions(VerbId verbId) const {
+    std::set<std::string> validPreps;
+    const auto& patterns = getSyntaxPatterns(verbId);
+    
+    // Collect all prepositions from all patterns
+    for (const auto& pattern : patterns) {
+        for (const auto& element : pattern.getPattern()) {
+            if (element.type == SyntaxPattern::ElementType::PREPOSITION) {
+                for (const auto& prep : element.values) {
+                    validPreps.insert(prep);
+                }
+            }
+        }
+    }
+    
+    return validPreps;
+}
+
 
 
 void VerbRegistry::initializeSyntaxPatterns() {

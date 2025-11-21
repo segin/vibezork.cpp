@@ -1,4 +1,5 @@
 #include "parser.h"
+#include "verb_registry.h"
 #include "core/globals.h"
 #include "core/io.h"
 #include "verbs/verbs.h"
@@ -7,7 +8,7 @@
 #include <sstream>
 #include <stdexcept>
 
-Parser::Parser() {
+Parser::Parser() : verbRegistry_(nullptr) {
     // Initialize verb synonyms (from gsyntax.zil)
     verbSynonyms_["take"] = V_TAKE;
     verbSynonyms_["get"] = V_TAKE;
@@ -20,6 +21,8 @@ Parser::Parser() {
     verbSynonyms_["inventory"] = V_INVENTORY;
     verbSynonyms_["i"] = V_INVENTORY;
     verbSynonyms_["go"] = V_WALK;
+    verbSynonyms_["quit"] = V_QUIT;
+    verbSynonyms_["q"] = V_QUIT;
     
     // Directions
     directions_["north"] = Direction::NORTH;
@@ -42,14 +45,113 @@ Parser::Parser() {
     directions_["u"] = Direction::UP;
     directions_["down"] = Direction::DOWN;
     directions_["d"] = Direction::DOWN;
+    
+    // Prepositions (from gsyntax.zil)
+    // Core prepositions
+    prepositions_.insert("with");
+    prepositions_.insert("using");
+    prepositions_.insert("through");
+    prepositions_.insert("thru");
+    
+    prepositions_.insert("in");
+    prepositions_.insert("inside");
+    prepositions_.insert("into");
+    
+    prepositions_.insert("on");
+    prepositions_.insert("onto");
+    
+    prepositions_.insert("under");
+    prepositions_.insert("underneath");
+    prepositions_.insert("beneath");
+    prepositions_.insert("below");
+    
+    // Additional prepositions used in syntax patterns
+    prepositions_.insert("to");
+    prepositions_.insert("at");
+    prepositions_.insert("from");
+    prepositions_.insert("for");
+    prepositions_.insert("about");
+    prepositions_.insert("off");
+    prepositions_.insert("out");
+    prepositions_.insert("over");
+    prepositions_.insert("across");
+    prepositions_.insert("behind");
+    prepositions_.insert("around");
+    prepositions_.insert("down");
+    prepositions_.insert("up");
+}
+
+Parser::Parser(VerbRegistry* registry) : verbRegistry_(registry) {
+    // Initialize verb synonyms (from gsyntax.zil)
+    verbSynonyms_["take"] = V_TAKE;
+    verbSynonyms_["get"] = V_TAKE;
+    verbSynonyms_["drop"] = V_DROP;
+    verbSynonyms_["look"] = V_LOOK;
+    verbSynonyms_["l"] = V_LOOK;
+    verbSynonyms_["examine"] = V_EXAMINE;
+    verbSynonyms_["open"] = V_OPEN;
+    verbSynonyms_["close"] = V_CLOSE;
+    verbSynonyms_["inventory"] = V_INVENTORY;
+    verbSynonyms_["i"] = V_INVENTORY;
+    verbSynonyms_["go"] = V_WALK;
     verbSynonyms_["quit"] = V_QUIT;
     verbSynonyms_["q"] = V_QUIT;
     
-    // Prepositions
-    prepositions_["with"] = "with";
-    prepositions_["in"] = "in";
-    prepositions_["on"] = "on";
-    prepositions_["to"] = "to";
+    // Directions
+    directions_["north"] = Direction::NORTH;
+    directions_["n"] = Direction::NORTH;
+    directions_["south"] = Direction::SOUTH;
+    directions_["s"] = Direction::SOUTH;
+    directions_["east"] = Direction::EAST;
+    directions_["e"] = Direction::EAST;
+    directions_["west"] = Direction::WEST;
+    directions_["w"] = Direction::WEST;
+    directions_["ne"] = Direction::NE;
+    directions_["northeast"] = Direction::NE;
+    directions_["nw"] = Direction::NW;
+    directions_["northwest"] = Direction::NW;
+    directions_["se"] = Direction::SE;
+    directions_["southeast"] = Direction::SE;
+    directions_["sw"] = Direction::SW;
+    directions_["southwest"] = Direction::SW;
+    directions_["up"] = Direction::UP;
+    directions_["u"] = Direction::UP;
+    directions_["down"] = Direction::DOWN;
+    directions_["d"] = Direction::DOWN;
+    
+    // Prepositions (from gsyntax.zil)
+    // Core prepositions
+    prepositions_.insert("with");
+    prepositions_.insert("using");
+    prepositions_.insert("through");
+    prepositions_.insert("thru");
+    
+    prepositions_.insert("in");
+    prepositions_.insert("inside");
+    prepositions_.insert("into");
+    
+    prepositions_.insert("on");
+    prepositions_.insert("onto");
+    
+    prepositions_.insert("under");
+    prepositions_.insert("underneath");
+    prepositions_.insert("beneath");
+    prepositions_.insert("below");
+    
+    // Additional prepositions used in syntax patterns
+    prepositions_.insert("to");
+    prepositions_.insert("at");
+    prepositions_.insert("from");
+    prepositions_.insert("for");
+    prepositions_.insert("about");
+    prepositions_.insert("off");
+    prepositions_.insert("out");
+    prepositions_.insert("over");
+    prepositions_.insert("across");
+    prepositions_.insert("behind");
+    prepositions_.insert("around");
+    prepositions_.insert("down");
+    prepositions_.insert("up");
 }
 
 void Parser::tokenize(const std::string& input, std::vector<std::string>& tokens) {
@@ -311,6 +413,29 @@ ZObject* Parser::disambiguate(const std::vector<ZObject*>& candidates, const std
     return selected;
 }
 
+bool Parser::isPreposition(const std::string& word) const {
+    return prepositions_.find(word) != prepositions_.end();
+}
+
+std::optional<size_t> Parser::findPrepositionIndex(const std::vector<std::string>& tokens) const {
+    for (size_t i = 1; i < tokens.size(); ++i) {  // Start at 1 to skip verb
+        if (isPreposition(tokens[i])) {
+            return i;
+        }
+    }
+    return std::nullopt;
+}
+
+bool Parser::validatePreposition(VerbId verb, const std::string& preposition) const {
+    // If we have a verb registry, use it for validation
+    if (verbRegistry_) {
+        return verbRegistry_->isPrepositionValidForVerb(verb, preposition);
+    }
+    
+    // Otherwise, just check if it's a known preposition
+    return isPreposition(preposition);
+}
+
 ParsedCommand Parser::parse(const std::string& input) {
     ParsedCommand cmd;
     tokenize(input, cmd.words);
@@ -327,6 +452,64 @@ ParsedCommand Parser::parse(const std::string& input) {
         cmd.verb = V_WALK;
     } else {
         cmd.verb = findVerb(cmd.words[0]);
+    }
+    
+    // Find preposition and extract indirect object (PRSI)
+    if (cmd.verb != 0 && !cmd.isDirection) {
+        auto prepIdx = findPrepositionIndex(cmd.words);
+        if (prepIdx.has_value() && prepIdx.value() + 1 < cmd.words.size()) {
+            const std::string& preposition = cmd.words[prepIdx.value()];
+            
+            // Validate preposition for this verb
+            if (!validatePreposition(cmd.verb, preposition)) {
+                // Invalid preposition for this verb
+                printLine("I don't understand that.");
+                cmd.verb = 0;  // Mark command as invalid
+                return cmd;
+            }
+            
+            // Extract direct object (words between verb and preposition)
+            std::vector<std::string> directObjWords(
+                cmd.words.begin() + 1, 
+                cmd.words.begin() + prepIdx.value()
+            );
+            
+            // Extract indirect object (words after preposition)
+            std::vector<std::string> indirectObjWords(
+                cmd.words.begin() + prepIdx.value() + 1,
+                cmd.words.end()
+            );
+            
+            // Find objects
+            if (!directObjWords.empty()) {
+                auto directMatches = findObjects(directObjWords, 0);
+                if (!directMatches.empty()) {
+                    cmd.directObj = directMatches.size() == 1 
+                        ? directMatches[0]
+                        : disambiguate(directMatches, directObjWords.back());
+                }
+            }
+            
+            if (!indirectObjWords.empty()) {
+                auto indirectMatches = findObjects(indirectObjWords, 0);
+                if (!indirectMatches.empty()) {
+                    cmd.indirectObj = indirectMatches.size() == 1
+                        ? indirectMatches[0]
+                        : disambiguate(indirectMatches, indirectObjWords.back());
+                }
+            }
+        } else if (cmd.verb != 0) {
+            // No preposition, just try to find direct object
+            if (cmd.words.size() > 1) {
+                std::vector<std::string> objWords(cmd.words.begin() + 1, cmd.words.end());
+                auto matches = findObjects(objWords, 0);
+                if (!matches.empty()) {
+                    cmd.directObj = matches.size() == 1
+                        ? matches[0]
+                        : disambiguate(matches, objWords.back());
+                }
+            }
+        }
     }
     
     return cmd;
