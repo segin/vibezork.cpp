@@ -267,38 +267,38 @@ Now that the parser is robust, we need content for it to operate on. Start with 
   - All other special rooms from 1dungeon.zil
   - _Requirements: 17_
 
-- [ ] 9. Implement exterior rooms (West/North/South/Behind House area)
+- [x] 9. Implement exterior rooms (West/North/South/Behind House area)
   - Create all exterior rooms with descriptions
   - Set up exits between exterior rooms
   - Add room flags (RLANDBIT, ONBIT, SACREDBIT)
   - Implement room actions where needed
   - _Requirements: 14, 15, 17_
 
-- [ ] 9.1 Expand West of House room
+- [x] 9.1 Expand West of House room
   - Already exists, verify completeness
   - Ensure all exits are correct
   - Verify description matches original
   - _Requirements: 14, 15_
 
-- [ ] 9.2 Expand North of House room
+- [x] 9.2 Expand North of House room
   - Already exists, verify completeness
   - Add path to forest
   - Verify all exits
   - _Requirements: 14, 15_
 
-- [ ] 9.3 Expand South of House room
+- [x] 9.3 Expand South of House room
   - Already exists, verify completeness
   - Add window details
   - Verify all exits
   - _Requirements: 14, 15_
 
-- [ ] 9.4 Create Behind House room
+- [x] 9.4 Create Behind House room
   - Add description
   - Set up exits to other exterior rooms
   - Add window to kitchen
   - _Requirements: 14, 15_
 
-- [ ] 9.5 Create Stone Barrow room
+- [x] 9.5 Create Stone Barrow room
   - Already exists, verify completeness
   - Ensure entrance to underground is correct
   - _Requirements: 14, 15_
