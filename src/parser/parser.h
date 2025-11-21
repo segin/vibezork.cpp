@@ -20,11 +20,13 @@ public:
     
     ParsedCommand parse(const std::string& input);
     
+    // Public for testing
+    std::vector<ZObject*> findObjects(const std::vector<std::string>& words, size_t startIdx = 0);
+    
 private:
     void tokenize(const std::string& input, std::vector<std::string>& tokens);
     VerbId findVerb(const std::string& word);
     ZObject* findObject(const std::string& word);
-    std::vector<ZObject*> findObjects(const std::vector<std::string>& words, size_t startIdx = 0);
     Direction* findDirection(const std::string& word);
     
     // Helper methods for object matching

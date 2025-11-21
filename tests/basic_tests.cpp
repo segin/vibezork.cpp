@@ -4,6 +4,7 @@
 #include "../src/world/rooms.h"
 #include "../src/parser/syntax.h"
 #include "../src/parser/verb_registry.h"
+#include "../src/parser/parser.h"
 #include "../src/verbs/verbs.h"
 
 // Test object system
@@ -270,6 +271,309 @@ TEST(VerbRegistryAttackPatterns) {
     // Test ATTACK verb has both patterns (with and without weapon)
     const auto& attackPatterns = registry.getSyntaxPatterns(V_ATTACK);
     ASSERT_TRUE(attackPatterns.size() >= 2);  // Should have at least 2 patterns
+}
+
+// Test object recognition - Task 3.4
+TEST(ObjectRecognitionSynonymMatching) {
+    // Create test objects with synonyms
+    ZObject lamp(1, "brass lantern");
+    lamp.addSynonym("lamp");
+    lamp.addSynonym("lantern");
+    lamp.addSynonym("light");
+    lamp.setFlag(ObjectFlag::TAKEBIT);
+    
+    ZObject mailbox(2, "small mailbox");
+    mailbox.addSynonym("mailbox");
+    mailbox.addSynonym("box");
+    
+    // Test synonym matching
+    ASSERT_TRUE(lamp.hasSynonym("lamp"));
+    ASSERT_TRUE(lamp.hasSynonym("lantern"));
+    ASSERT_TRUE(lamp.hasSynonym("light"));
+    ASSERT_FALSE(lamp.hasSynonym("mailbox"));
+    
+    ASSERT_TRUE(mailbox.hasSynonym("mailbox"));
+    ASSERT_TRUE(mailbox.hasSynonym("box"));
+    ASSERT_FALSE(mailbox.hasSynonym("lamp"));
+}
+
+TEST(ObjectRecognitionAdjectiveMatching) {
+    // Create test objects with adjectives
+    ZObject lamp(1, "brass lantern");
+    lamp.addSynonym("lamp");
+    lamp.addSynonym("lantern");
+    lamp.addAdjective("brass");
+    lamp.addAdjective("small");
+    
+    ZObject knife(2, "rusty knife");
+    knife.addSynonym("knife");
+    knife.addAdjective("rusty");
+    knife.addAdjective("old");
+    
+    // Test adjective matching
+    ASSERT_TRUE(lamp.hasAdjective("brass"));
+    ASSERT_TRUE(lamp.hasAdjective("small"));
+    ASSERT_FALSE(lamp.hasAdjective("rusty"));
+    
+    ASSERT_TRUE(knife.hasAdjective("rusty"));
+    ASSERT_TRUE(knife.hasAdjective("old"));
+    ASSERT_FALSE(knife.hasAdjective("brass"));
+}
+
+TEST(ObjectRecognitionMultiWordNames) {
+    auto& g = Globals::instance();
+    
+    // Create test room and objects
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create object with multi-word name
+    auto lamp = std::make_unique<ZObject>(1, "brass lantern");
+    lamp->addSynonym("lamp");
+    lamp->addSynonym("lantern");
+    lamp->addAdjective("brass");
+    lamp->addAdjective("small");
+    lamp->moveTo(&testRoom);
+    ZObject* lampPtr = lamp.get();
+    g.registerObject(1, std::move(lamp));
+    
+    auto knife = std::make_unique<ZObject>(2, "rusty knife");
+    knife->addSynonym("knife");
+    knife->addAdjective("rusty");
+    knife->moveTo(&testRoom);
+    ZObject* knifePtr = knife.get();
+    g.registerObject(2, std::move(knife));
+    
+    // Create parser and test multi-word matching
+    Parser parser;
+    
+    // Test "brass lamp" - adjective + noun
+    std::vector<std::string> words1 = {"brass", "lamp"};
+    auto matches1 = parser.findObjects(words1);
+    ASSERT_TRUE(matches1.size() > 0);
+    ASSERT_EQ(matches1[0], lampPtr);
+    
+    // Test "small brass lantern" - multiple adjectives + noun
+    std::vector<std::string> words2 = {"small", "brass", "lantern"};
+    auto matches2 = parser.findObjects(words2);
+    ASSERT_TRUE(matches2.size() > 0);
+    ASSERT_EQ(matches2[0], lampPtr);
+    
+    // Test "rusty knife" - adjective + noun
+    std::vector<std::string> words3 = {"rusty", "knife"};
+    auto matches3 = parser.findObjects(words3);
+    ASSERT_TRUE(matches3.size() > 0);
+    ASSERT_EQ(matches3[0], knifePtr);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(ObjectRecognitionLocationPriority) {
+    auto& g = Globals::instance();
+    
+    // Create test rooms
+    ZRoom room1(100, "Room 1", "First room.");
+    ZRoom room2(101, "Room 2", "Second room.");
+    g.here = &room1;
+    
+    // Create player object
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create three lamps in different locations
+    auto lampInRoom = std::make_unique<ZObject>(1, "lamp");
+    lampInRoom->addSynonym("lamp");
+    lampInRoom->moveTo(&room1);  // In current room
+    ZObject* lampInRoomPtr = lampInRoom.get();
+    g.registerObject(1, std::move(lampInRoom));
+    
+    auto lampInInventory = std::make_unique<ZObject>(2, "lamp");
+    lampInInventory->addSynonym("lamp");
+    lampInInventory->moveTo(g.winner);  // In player inventory
+    ZObject* lampInInventoryPtr = lampInInventory.get();
+    g.registerObject(2, std::move(lampInInventory));
+    
+    auto lampElsewhere = std::make_unique<ZObject>(3, "lamp");
+    lampElsewhere->addSynonym("lamp");
+    lampElsewhere->moveTo(&room2);  // In other room
+    ZObject* lampElsewherePtr = lampElsewhere.get();
+    g.registerObject(3, std::move(lampElsewhere));
+    
+    // Create parser and test location prioritization
+    Parser parser;
+    std::vector<std::string> words = {"lamp"};
+    auto matches = parser.findObjects(words);
+    
+    // Should find objects in current room and inventory, but not elsewhere
+    ASSERT_TRUE(matches.size() >= 2);
+    
+    // First match should be from current room (highest priority)
+    ASSERT_EQ(matches[0], lampInRoomPtr);
+    
+    // Second match should be from inventory
+    ASSERT_EQ(matches[1], lampInInventoryPtr);
+    
+    // Lamp in other room should not be in matches (not visible)
+    bool foundElsewhere = false;
+    for (auto* obj : matches) {
+        if (obj == lampElsewherePtr) {
+            foundElsewhere = true;
+            break;
+        }
+    }
+    ASSERT_FALSE(foundElsewhere);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(ObjectRecognitionOpenContainerPriority) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create open container in room
+    auto box = std::make_unique<ZObject>(10, "box");
+    box->addSynonym("box");
+    box->setFlag(ObjectFlag::CONTBIT);
+    box->setFlag(ObjectFlag::OPENBIT);
+    box->moveTo(&testRoom);
+    ZObject* boxPtr = box.get();
+    g.registerObject(10, std::move(box));
+    
+    // Create object in open container
+    auto coin = std::make_unique<ZObject>(1, "coin");
+    coin->addSynonym("coin");
+    coin->moveTo(boxPtr);
+    ZObject* coinPtr = coin.get();
+    g.registerObject(1, std::move(coin));
+    
+    // Create closed container in room
+    auto chest = std::make_unique<ZObject>(11, "chest");
+    chest->addSynonym("chest");
+    chest->setFlag(ObjectFlag::CONTBIT);
+    // Not setting OPENBIT - it's closed
+    chest->moveTo(&testRoom);
+    ZObject* chestPtr = chest.get();
+    g.registerObject(11, std::move(chest));
+    
+    // Create object in closed container
+    auto gem = std::make_unique<ZObject>(2, "gem");
+    gem->addSynonym("gem");
+    gem->moveTo(chestPtr);
+    ZObject* gemPtr = gem.get();
+    g.registerObject(2, std::move(gem));
+    
+    // Create parser and test visibility
+    Parser parser;
+    
+    // Coin in open container should be visible
+    std::vector<std::string> words1 = {"coin"};
+    auto matches1 = parser.findObjects(words1);
+    ASSERT_TRUE(matches1.size() > 0);
+    ASSERT_EQ(matches1[0], coinPtr);
+    
+    // Gem in closed container should NOT be visible
+    std::vector<std::string> words2 = {"gem"};
+    auto matches2 = parser.findObjects(words2);
+    ASSERT_EQ(matches2.size(), 0);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(ObjectRecognitionAdjectiveNarrowing) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create two knives with different adjectives
+    auto brassKnife = std::make_unique<ZObject>(1, "brass knife");
+    brassKnife->addSynonym("knife");
+    brassKnife->addAdjective("brass");
+    brassKnife->moveTo(&testRoom);
+    ZObject* brassKnifePtr = brassKnife.get();
+    g.registerObject(1, std::move(brassKnife));
+    
+    auto rustyKnife = std::make_unique<ZObject>(2, "rusty knife");
+    rustyKnife->addSynonym("knife");
+    rustyKnife->addAdjective("rusty");
+    rustyKnife->moveTo(&testRoom);
+    ZObject* rustyKnifePtr = rustyKnife.get();
+    g.registerObject(2, std::move(rustyKnife));
+    
+    // Create parser
+    Parser parser;
+    
+    // Test "knife" - should match both
+    std::vector<std::string> words1 = {"knife"};
+    auto matches1 = parser.findObjects(words1);
+    ASSERT_EQ(matches1.size(), 2);
+    
+    // Test "brass knife" - should match only brass knife
+    std::vector<std::string> words2 = {"brass", "knife"};
+    auto matches2 = parser.findObjects(words2);
+    ASSERT_EQ(matches2.size(), 1);
+    ASSERT_EQ(matches2[0], brassKnifePtr);
+    
+    // Test "rusty knife" - should match only rusty knife
+    std::vector<std::string> words3 = {"rusty", "knife"};
+    auto matches3 = parser.findObjects(words3);
+    ASSERT_EQ(matches3.size(), 1);
+    ASSERT_EQ(matches3[0], rustyKnifePtr);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(ObjectRecognitionSingleWordSynonym) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create object with multiple single-word synonyms
+    auto lamp = std::make_unique<ZObject>(1, "lamp");
+    lamp->addSynonym("lamp");
+    lamp->addSynonym("lantern");
+    lamp->addSynonym("light");
+    lamp->moveTo(&testRoom);
+    ZObject* lampPtr = lamp.get();
+    g.registerObject(1, std::move(lamp));
+    
+    // Create parser
+    Parser parser;
+    
+    // Test each synonym
+    std::vector<std::string> words1 = {"lamp"};
+    auto matches1 = parser.findObjects(words1);
+    ASSERT_TRUE(matches1.size() > 0);
+    ASSERT_EQ(matches1[0], lampPtr);
+    
+    std::vector<std::string> words2 = {"lantern"};
+    auto matches2 = parser.findObjects(words2);
+    ASSERT_TRUE(matches2.size() > 0);
+    ASSERT_EQ(matches2[0], lampPtr);
+    
+    std::vector<std::string> words3 = {"light"};
+    auto matches3 = parser.findObjects(words3);
+    ASSERT_TRUE(matches3.size() > 0);
+    ASSERT_EQ(matches3[0], lampPtr);
+    
+    // Cleanup
+    g.reset();
 }
 
 // Main test runner

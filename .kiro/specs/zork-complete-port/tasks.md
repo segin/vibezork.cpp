@@ -97,7 +97,7 @@ The parser is the foundation - it must be robust before we can add more content.
   - Exclude objects in other rooms
   - _Requirements: 79_
 
-- [ ]* 3.4 Write unit tests for object recognition
+- [x] 3.4 Write unit tests for object recognition
   - Test synonym matching
   - Test adjective matching
   - Test multi-word names

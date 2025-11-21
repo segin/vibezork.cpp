@@ -33,6 +33,9 @@ public:
     ZObject* getObject(ObjectId id);
     const std::map<ObjectId, std::unique_ptr<ZObject>>& getAllObjects() const { return objects_; }
     
+    // Reset for testing
+    void reset();
+    
 private:
     Globals() = default;
     std::map<ObjectId, std::unique_ptr<ZObject>> objects_;
