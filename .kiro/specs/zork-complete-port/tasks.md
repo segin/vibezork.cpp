@@ -497,44 +497,44 @@ Now that the parser is robust, we need content for it to operate on. Start with 
 
 With rooms in place, add all objects that populate the world.
 
-- [ ] 16. Create object ID constants for all types
+- [x] 16. Create object ID constants for all types
   - Define ObjectIds namespace with all ~150 object IDs
   - Organize by type (treasures, tools, containers, NPCs, scenery)
   - Use constexpr for compile-time constants
   - Use numeric ranges to group related objects
   - _Requirements: 18_
 
-- [ ] 16.1 Define treasure object IDs
+- [x] 16.1 Define treasure object IDs
   - TROPHY, EGG, CHALICE, TRIDENT, PAINTING
   - COFFIN_TREASURE, JEWELS, COINS, etc.
   - All treasures from 1dungeon.zil
   - _Requirements: 18_
 
-- [ ] 16.2 Define tool object IDs
+- [x] 16.2 Define tool object IDs
   - SWORD, LAMP, ROPE, KNIFE, WRENCH, SCREWDRIVER
   - SHOVEL, TORCH, CANDLES, MATCHES
   - All tools from 1dungeon.zil
   - _Requirements: 18_
 
-- [ ] 16.3 Define container object IDs
+- [x] 16.3 Define container object IDs
   - MAILBOX, TROPHY_CASE, COFFIN, BASKET, SACK
   - BOTTLE, CASE, BAG
   - All containers from 1dungeon.zil
   - _Requirements: 18_
 
-- [ ] 16.4 Define NPC object IDs
+- [x] 16.4 Define NPC object IDs
   - THIEF, TROLL, CYCLOPS
   - GRUE (for darkness)
   - Any other NPCs from 1dungeon.zil
   - _Requirements: 18_
 
-- [ ] 16.5 Define scenery object IDs
+- [x] 16.5 Define scenery object IDs
   - WHITE_HOUSE, BOARD, WINDOW, DOOR
   - TREE, RUG, PAINTING_WALL
   - All scenery objects from 1dungeon.zil
   - _Requirements: 18_
 
-- [ ] 16.6 Define special object IDs
+- [x] 16.6 Define special object IDs
   - BOAT, PUMP, MACHINE, MIRROR
   - BUTTON, SWITCH, LEVER
   - All special puzzle objects from 1dungeon.zil
