@@ -3,6 +3,7 @@
 #include "../src/core/globals.h"
 #include "../src/world/rooms.h"
 #include "../src/parser/syntax.h"
+#include "../src/parser/verb_registry.h"
 #include "../src/verbs/verbs.h"
 
 // Test object system
@@ -180,6 +181,95 @@ TEST(SyntaxPatternFlagRequirement) {
     std::vector<std::string> tokens2 = {"take", "house"};
     ParseResult result2 = syntaxPattern.apply(tokens2, objectFinder);
     ASSERT_FALSE(result2.success);
+}
+
+// Test VerbRegistry system
+TEST(VerbRegistryLookup) {
+    VerbRegistry registry;
+    
+    // Test looking up verb synonyms
+    auto takeVerb = registry.lookupVerb("take");
+    ASSERT_TRUE(takeVerb.has_value());
+    ASSERT_EQ(takeVerb.value(), V_TAKE);
+    
+    auto getVerb = registry.lookupVerb("get");
+    ASSERT_TRUE(getVerb.has_value());
+    ASSERT_EQ(getVerb.value(), V_TAKE);  // "get" is synonym for "take"
+    
+    auto grabVerb = registry.lookupVerb("grab");
+    ASSERT_TRUE(grabVerb.has_value());
+    ASSERT_EQ(grabVerb.value(), V_TAKE);  // "grab" is synonym for "take"
+}
+
+TEST(VerbRegistryCaseInsensitive) {
+    VerbRegistry registry;
+    
+    // Test case-insensitive lookup
+    auto verb1 = registry.lookupVerb("TAKE");
+    ASSERT_TRUE(verb1.has_value());
+    ASSERT_EQ(verb1.value(), V_TAKE);
+    
+    auto verb2 = registry.lookupVerb("Take");
+    ASSERT_TRUE(verb2.has_value());
+    ASSERT_EQ(verb2.value(), V_TAKE);
+    
+    auto verb3 = registry.lookupVerb("take");
+    ASSERT_TRUE(verb3.has_value());
+    ASSERT_EQ(verb3.value(), V_TAKE);
+}
+
+TEST(VerbRegistryUnknownWord) {
+    VerbRegistry registry;
+    
+    // Test looking up unknown word
+    auto unknownVerb = registry.lookupVerb("xyzzy");
+    ASSERT_FALSE(unknownVerb.has_value());
+}
+
+TEST(VerbRegistryExamineSynonyms) {
+    VerbRegistry registry;
+    
+    // Test EXAMINE verb synonyms
+    auto examineVerb = registry.lookupVerb("examine");
+    ASSERT_TRUE(examineVerb.has_value());
+    ASSERT_EQ(examineVerb.value(), V_EXAMINE);
+    
+    auto xVerb = registry.lookupVerb("x");
+    ASSERT_TRUE(xVerb.has_value());
+    ASSERT_EQ(xVerb.value(), V_EXAMINE);  // "x" is synonym for "examine"
+    
+    auto describeVerb = registry.lookupVerb("describe");
+    ASSERT_TRUE(describeVerb.has_value());
+    ASSERT_EQ(describeVerb.value(), V_EXAMINE);  // "describe" is synonym for "examine"
+}
+
+TEST(VerbRegistryHasPatterns) {
+    VerbRegistry registry;
+    
+    // Test that verbs have patterns registered
+    ASSERT_TRUE(registry.hasPatterns(V_TAKE));
+    ASSERT_TRUE(registry.hasPatterns(V_EXAMINE));
+    ASSERT_TRUE(registry.hasPatterns(V_ATTACK));
+    ASSERT_TRUE(registry.hasPatterns(V_PUT));
+}
+
+TEST(VerbRegistryGetPatterns) {
+    VerbRegistry registry;
+    
+    // Test getting patterns for a verb
+    const auto& takePatterns = registry.getSyntaxPatterns(V_TAKE);
+    ASSERT_TRUE(takePatterns.size() > 0);  // Should have at least one pattern
+    
+    // TAKE should have multiple patterns (TAKE OBJECT, TAKE OBJECT FROM OBJECT)
+    ASSERT_TRUE(takePatterns.size() >= 2);
+}
+
+TEST(VerbRegistryAttackPatterns) {
+    VerbRegistry registry;
+    
+    // Test ATTACK verb has both patterns (with and without weapon)
+    const auto& attackPatterns = registry.getSyntaxPatterns(V_ATTACK);
+    ASSERT_TRUE(attackPatterns.size() >= 2);  // Should have at least 2 patterns
 }
 
 // Main test runner
