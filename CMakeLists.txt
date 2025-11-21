@@ -27,4 +27,8 @@ if(BUILD_TESTS)
     # Transcript tests
     add_executable(transcript_tests tests/transcript_tests.cpp ${LIB_SOURCES})
     add_test(NAME TranscriptTests COMMAND transcript_tests)
+    
+    # Room navigation tests
+    add_executable(room_navigation_tests tests/room_navigation_tests.cpp ${LIB_SOURCES})
+    add_test(NAME RoomNavigationTests COMMAND room_navigation_tests)
 endif()

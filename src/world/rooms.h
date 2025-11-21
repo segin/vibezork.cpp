@@ -154,15 +154,78 @@ enum class Direction {
     UP, DOWN, IN, OUT
 };
 
+// Exit type enumeration
+enum class ExitType {
+    NORMAL,        // Standard directional exit
+    DOOR,          // Door that can be opened/closed/locked
+    SPECIAL,       // Requires special verb (CLIMB, ENTER, etc.)
+    CONDITIONAL,   // Requires game state condition
+    ONE_WAY        // Can only travel in one direction
+};
+
 // Room exit structure
 struct RoomExit {
     ObjectId targetRoom = 0;
     std::string message;  // For blocked exits
     std::function<bool()> condition;  // Optional condition
+    ExitType type = ExitType::NORMAL;
+    
+    // Door-specific fields
+    ObjectId doorObject = 0;  // Reference to door object (if type == DOOR)
+    
+    // Special movement fields
+    int requiredVerb = 0;  // Verb ID required for special exits (CLIMB, ENTER, etc.)
+    std::string specialMessage;  // Message when wrong verb is used
     
     RoomExit() = default;
     RoomExit(ObjectId target) : targetRoom(target) {}
     RoomExit(const std::string& msg) : message(msg) {}
+    
+    // Door exit constructor
+    static RoomExit createDoor(ObjectId target, ObjectId door) {
+        RoomExit exit;
+        exit.targetRoom = target;
+        exit.doorObject = door;
+        exit.type = ExitType::DOOR;
+        return exit;
+    }
+    
+    // Special movement exit constructor
+    static RoomExit createSpecial(ObjectId target, int verb, const std::string& msg = "") {
+        RoomExit exit;
+        exit.targetRoom = target;
+        exit.requiredVerb = verb;
+        exit.type = ExitType::SPECIAL;
+        exit.specialMessage = msg;
+        return exit;
+    }
+    
+    // Conditional exit constructor
+    static RoomExit createConditional(ObjectId target, std::function<bool()> cond, const std::string& msg = "") {
+        RoomExit exit;
+        exit.targetRoom = target;
+        exit.condition = cond;
+        exit.type = ExitType::CONDITIONAL;
+        exit.message = msg;
+        return exit;
+    }
+    
+    // One-way exit constructor
+    static RoomExit createOneWay(ObjectId target) {
+        RoomExit exit;
+        exit.targetRoom = target;
+        exit.type = ExitType::ONE_WAY;
+        return exit;
+    }
+    
+    // Helper: Create exit that requires player to have an item
+    static RoomExit createRequiresItem(ObjectId target, ObjectId requiredItem, const std::string& msg = "You need something to proceed.");
+    
+    // Helper: Create exit that requires a flag to be set on an object
+    static RoomExit createRequiresFlag(ObjectId target, ObjectId obj, ObjectFlag flag, const std::string& msg = "You can't go that way.");
+    
+    // Helper: Create exit that requires a puzzle to be solved (generic condition)
+    static RoomExit createRequiresPuzzle(ObjectId target, std::function<bool()> puzzleSolved, const std::string& msg = "Something blocks your way.");
 };
 
 class ZRoom : public ZObject {

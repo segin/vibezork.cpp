@@ -32,7 +32,8 @@ enum class ObjectFlag : uint32_t {
     FOODBIT      = 1 << 26,
     READBIT      = 1 << 27,
     TURNBIT      = 1 << 28,
-    SACREDBIT    = 1 << 29
+    SACREDBIT    = 1 << 29,
+    LOCKEDBIT    = 1 << 30
 };
 
 inline uint32_t operator|(ObjectFlag a, ObjectFlag b) {

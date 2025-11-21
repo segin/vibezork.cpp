@@ -97,4 +97,15 @@ namespace Verbs {
     bool vClose();
     bool vWalk();
     bool vWalkDir(Direction dir);
+    
+    // Special movement verbs
+    bool vEnter();
+    bool vExit();
+    bool vClimbUp();
+    bool vClimbDown();
+    bool vBoard();
+    bool vDisembark();
+    
+    // Helper for special movement
+    bool trySpecialMovement(int verbId, Direction dir);
 }

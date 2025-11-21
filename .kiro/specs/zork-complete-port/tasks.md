@@ -459,32 +459,32 @@ Now that the parser is robust, we need content for it to operate on. Start with 
   - Implement special behaviors
   - _Requirements: 14, 15, 17_
 
-- [ ] 15. Implement conditional and special exits
+- [x] 15. Implement conditional and special exits
   - Add locked door exits
   - Add exits requiring special actions (CLIMB, ENTER)
   - Add one-way exits
   - Add exits with custom messages
   - _Requirements: 81, 82_
 
-- [ ] 15.1 Implement door exits
+- [x] 15.1 Implement door exits
   - Doors that can be opened/closed
   - Locked doors requiring keys
   - Check door state before allowing passage
   - _Requirements: 81_
 
-- [ ] 15.2 Implement special movement exits
+- [x] 15.2 Implement special movement exits
   - CLIMB exits (trees, stairs, etc.)
   - ENTER exits (house, boat, etc.)
   - Exits requiring specific verbs
   - _Requirements: 82_
 
-- [ ] 15.3 Implement conditional exits
+- [x] 15.3 Implement conditional exits
   - Exits that check game state
   - Exits that require items
   - Exits that require puzzle solutions
   - _Requirements: 81_
 
-- [ ] 15.4 Write unit tests for room navigation
+- [x] 15.4 Write unit tests for room navigation
   - Test basic directional movement
   - Test conditional exits
   - Test special movement
