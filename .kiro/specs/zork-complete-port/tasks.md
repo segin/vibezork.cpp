@@ -14,26 +14,26 @@ This task list implements the complete Zork I C++ port in execution order. Each 
 
 The parser is the foundation - it must be robust before we can add more content.
 
-- [ ] 1. Enhance parser with syntax pattern system
+- [x] 1. Enhance parser with syntax pattern system
   - Implement SyntaxPattern class to represent verb syntax rules
   - Support pattern elements: VERB, OBJECT, PREPOSITION, DIRECTION
   - Support optional elements and multiple prepositions
   - Support object flag requirements (FIND TAKEBIT, etc.)
   - _Requirements: 6_
 
-- [ ] 1.1 Create SyntaxPattern class structure
+- [x] 1.1 Create SyntaxPattern class structure
   - Define ElementType enum (VERB, OBJECT, PREPOSITION, DIRECTION)
   - Define Element struct with type, values, requiredFlag, optional
   - Implement SyntaxPattern constructor
   - _Requirements: 6_
 
-- [ ] 1.2 Implement pattern matching logic
+- [x] 1.2 Implement pattern matching logic
   - Implement matches() method to check if tokens match pattern
   - Handle optional elements correctly
   - Handle multiple preposition choices
   - _Requirements: 6_
 
-- [ ] 1.3 Implement pattern application
+- [x] 1.3 Implement pattern application
   - Implement apply() method to extract objects from matched pattern
   - Set PRSO and PRSI based on pattern
   - Return ParseResult with extracted information
