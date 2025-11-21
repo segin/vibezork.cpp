@@ -31,6 +31,7 @@ public:
     // Object registry
     void registerObject(ObjectId id, std::unique_ptr<ZObject> obj);
     ZObject* getObject(ObjectId id);
+    const std::map<ObjectId, std::unique_ptr<ZObject>>& getAllObjects() const { return objects_; }
     
 private:
     Globals() = default;

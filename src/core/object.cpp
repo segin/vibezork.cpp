@@ -38,3 +38,11 @@ void ZObject::moveTo(ZObject* location) {
         location_->contents_.push_back(this);
     }
 }
+
+bool ZObject::hasSynonym(const std::string& word) const {
+    return std::find(synonyms_.begin(), synonyms_.end(), word) != synonyms_.end();
+}
+
+bool ZObject::hasAdjective(const std::string& word) const {
+    return std::find(adjectives_.begin(), adjectives_.end(), word) != adjectives_.end();
+}

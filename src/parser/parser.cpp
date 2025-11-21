@@ -74,6 +74,142 @@ Direction* Parser::findDirection(const std::string& word) {
     return it != directions_.end() ? &it->second : nullptr;
 }
 
+bool Parser::matchesSynonym(ZObject* obj, const std::string& word) const {
+    // Check if the word matches any of the object's synonyms
+    return obj->hasSynonym(word);
+}
+
+bool Parser::matchesAdjectives(ZObject* obj, const std::vector<std::string>& adjectives) const {
+    // Check if all provided adjectives match the object
+    for (const auto& adj : adjectives) {
+        if (!obj->hasAdjective(adj)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+int Parser::getLocationPriority(ZObject* obj) const {
+    auto& g = Globals::instance();
+    
+    // Priority 1: Objects in current room
+    if (obj->getLocation() == g.here) {
+        return 3;
+    }
+    
+    // Priority 2: Objects in player inventory
+    if (obj->getLocation() == g.winner) {
+        return 2;
+    }
+    
+    // Priority 3: Objects in open containers in room or inventory
+    ZObject* loc = obj->getLocation();
+    if (loc && loc->hasFlag(ObjectFlag::CONTBIT) && loc->hasFlag(ObjectFlag::OPENBIT)) {
+        if (loc->getLocation() == g.here || loc->getLocation() == g.winner) {
+            return 1;
+        }
+    }
+    
+    // Priority 0: Objects elsewhere (not visible)
+    return 0;
+}
+
+bool Parser::isObjectVisible(ZObject* obj) const {
+    // Objects with priority > 0 are visible
+    return getLocationPriority(obj) > 0;
+}
+
+std::vector<ZObject*> Parser::findObjects(const std::vector<std::string>& words, size_t startIdx) {
+    std::vector<ZObject*> matches;
+    
+    if (startIdx >= words.size()) {
+        return matches;
+    }
+    
+    auto& g = Globals::instance();
+    
+    // Separate adjectives from nouns
+    std::vector<std::string> adjectives;
+    std::vector<std::string> nouns;
+    
+    for (size_t i = startIdx; i < words.size(); ++i) {
+        const auto& word = words[i];
+        
+        // Skip articles and prepositions
+        if (word == "the" || word == "a" || word == "an" || 
+            prepositions_.find(word) != prepositions_.end()) {
+            continue;
+        }
+        
+        // For now, treat all words as potential nouns or adjectives
+        // We'll check both during matching
+        nouns.push_back(word);
+    }
+    
+    if (nouns.empty()) {
+        return matches;
+    }
+    
+    // Search through all objects
+    for (const auto& [id, objPtr] : g.getAllObjects()) {
+        ZObject* obj = objPtr.get();
+        
+        // Skip invisible objects
+        if (!isObjectVisible(obj)) {
+            continue;
+        }
+        
+        // Try to match the object
+        bool matched = false;
+        
+        // Strategy 1: Try matching last word as noun with earlier words as adjectives
+        if (nouns.size() > 1) {
+            const std::string& noun = nouns.back();
+            std::vector<std::string> potentialAdjectives(nouns.begin(), nouns.end() - 1);
+            
+            if (matchesSynonym(obj, noun) && matchesAdjectives(obj, potentialAdjectives)) {
+                matched = true;
+            }
+        }
+        
+        // Strategy 2: Try matching any single word as a synonym
+        if (!matched) {
+            for (const auto& word : nouns) {
+                if (matchesSynonym(obj, word)) {
+                    // If we have multiple words, check if the others are adjectives
+                    if (nouns.size() > 1) {
+                        std::vector<std::string> otherWords;
+                        for (const auto& w : nouns) {
+                            if (w != word) {
+                                otherWords.push_back(w);
+                            }
+                        }
+                        // Only match if other words are adjectives or if object has no adjectives
+                        if (matchesAdjectives(obj, otherWords) || obj->getAdjectives().empty()) {
+                            matched = true;
+                            break;
+                        }
+                    } else {
+                        matched = true;
+                        break;
+                    }
+                }
+            }
+        }
+        
+        if (matched) {
+            matches.push_back(obj);
+        }
+    }
+    
+    // Sort by location priority (highest first)
+    std::sort(matches.begin(), matches.end(), [this](ZObject* a, ZObject* b) {
+        return getLocationPriority(a) > getLocationPriority(b);
+    });
+    
+    return matches;
+}
+
 ParsedCommand Parser::parse(const std::string& input) {
     ParsedCommand cmd;
     tokenize(input, cmd.words);

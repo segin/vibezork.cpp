@@ -30,6 +30,10 @@ public:
     const std::string& getDesc() const { return desc_; }
     void addSynonym(const std::string& syn) { synonyms_.push_back(syn); }
     void addAdjective(const std::string& adj) { adjectives_.push_back(adj); }
+    const std::vector<std::string>& getSynonyms() const { return synonyms_; }
+    const std::vector<std::string>& getAdjectives() const { return adjectives_; }
+    bool hasSynonym(const std::string& word) const;
+    bool hasAdjective(const std::string& word) const;
     
     // Action handler
     using ActionFunc = std::function<bool()>;

@@ -69,27 +69,27 @@ The parser is the foundation - it must be robust before we can add more content.
   - _Requirements: 6_
 
 
-- [ ] 3. Enhance object recognition with synonyms and adjectives
+- [x] 3. Enhance object recognition with synonyms and adjectives
   - Modify Parser::findObjects() to match by synonyms
   - Add support for adjective matching
   - Support multi-word object names
   - Prioritize objects by location (room > inventory > elsewhere)
   - _Requirements: 4, 5, 77_
 
-- [ ] 3.1 Implement synonym matching
+- [x] 3.1 Implement synonym matching
   - Check object synonyms against input words
   - Handle partial matches when unambiguous
   - Return all matching objects for disambiguation
   - _Requirements: 4_
 
-- [ ] 3.2 Implement adjective matching
+- [x] 3.2 Implement adjective matching
   - Check object adjectives against input words
   - Support adjective + noun combinations
   - Support multiple adjectives (SMALL BRASS LANTERN)
   - Narrow matches when adjectives are used
   - _Requirements: 5, 77_
 
-- [ ] 3.3 Implement location-based prioritization
+- [x] 3.3 Implement location-based prioritization
   - Prioritize objects in current room
   - Then objects in player inventory
   - Then objects in open containers
@@ -125,7 +125,7 @@ The parser is the foundation - it must be robust before we can add more content.
   - Retry the original command
   - _Requirements: 8_
 
-- [ ]* 4.3 Write unit tests for disambiguation
+- [ ] 4.3 Write unit tests for disambiguation
   - Test with multiple matching objects
   - Test player selection by number
   - Test player selection by name
