@@ -1,9 +1,11 @@
 #include "parser.h"
 #include "core/globals.h"
+#include "core/io.h"
 #include "verbs/verbs.h"
 #include <algorithm>
 #include <cctype>
 #include <sstream>
+#include <stdexcept>
 
 Parser::Parser() {
     // Initialize verb synonyms (from gsyntax.zil)
@@ -208,6 +210,105 @@ std::vector<ZObject*> Parser::findObjects(const std::vector<std::string>& words,
     });
     
     return matches;
+}
+
+std::string Parser::formatObjectDescription(ZObject* obj) const {
+    // Format object for disambiguation list
+    // Show description and location for clarity
+    std::string result = obj->getDesc();
+    
+    // Add location context if helpful
+    auto& g = Globals::instance();
+    ZObject* loc = obj->getLocation();
+    
+    if (loc == g.winner) {
+        result += " (in your inventory)";
+    } else if (loc && loc->hasFlag(ObjectFlag::CONTBIT)) {
+        result += " (in the " + std::string(loc->getDesc()) + ")";
+    } else if (loc == g.here) {
+        result += " (here)";
+    }
+    
+    return result;
+}
+
+ZObject* Parser::parseDisambiguationResponse(const std::string& response, 
+                                             const std::vector<ZObject*>& candidates) {
+    if (candidates.empty()) {
+        return nullptr;
+    }
+    
+    // Tokenize the response
+    std::vector<std::string> tokens;
+    tokenize(response, tokens);
+    
+    if (tokens.empty()) {
+        return nullptr;
+    }
+    
+    // Try to parse as a number (1-based index)
+    try {
+        int choice = std::stoi(tokens[0]);
+        if (choice >= 1 && choice <= static_cast<int>(candidates.size())) {
+            return candidates[choice - 1];
+        }
+    } catch (...) {
+        // Not a number, try matching by name
+    }
+    
+    // Try to match by object name/synonym
+    // Look for objects that match the response words
+    for (auto* candidate : candidates) {
+        // Check if any word in response matches a synonym
+        for (const auto& word : tokens) {
+            if (matchesSynonym(candidate, word)) {
+                return candidate;
+            }
+        }
+        
+        // Check if response matches adjectives + synonym
+        if (tokens.size() > 1) {
+            std::vector<std::string> adjectives(tokens.begin(), tokens.end() - 1);
+            const std::string& noun = tokens.back();
+            
+            if (matchesSynonym(candidate, noun) && matchesAdjectives(candidate, adjectives)) {
+                return candidate;
+            }
+        }
+    }
+    
+    return nullptr;
+}
+
+ZObject* Parser::disambiguate(const std::vector<ZObject*>& candidates, const std::string& noun) {
+    if (candidates.empty()) {
+        return nullptr;
+    }
+    
+    if (candidates.size() == 1) {
+        return candidates[0];
+    }
+    
+    // Display disambiguation prompt
+    print("Which " + noun + " do you mean?\n");
+    
+    // List the candidates with numbers
+    for (size_t i = 0; i < candidates.size(); ++i) {
+        print("  " + std::to_string(i + 1) + ". " + formatObjectDescription(candidates[i]) + "\n");
+    }
+    
+    // Read player's choice
+    print("> ");
+    std::string response = readLine();
+    
+    // Parse the response
+    ZObject* selected = parseDisambiguationResponse(response, candidates);
+    
+    if (!selected) {
+        printLine("I don't understand that choice.");
+    }
+    
+    return selected;
 }
 
 ParsedCommand Parser::parse(const std::string& input) {

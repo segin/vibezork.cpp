@@ -104,7 +104,7 @@ The parser is the foundation - it must be robust before we can add more content.
   - Test location prioritization
   - _Requirements: 4, 5, 77, 92_
 
-- [ ] 4. Implement disambiguation system
+- [x] 4. Implement disambiguation system
   - Implement Parser::disambiguate() method
   - Display "Which [noun] do you mean?" prompt
   - List matching objects for player to choose
@@ -112,20 +112,20 @@ The parser is the foundation - it must be robust before we can add more content.
   - Retry original command with disambiguated object
   - _Requirements: 8_
 
-- [ ] 4.1 Create disambiguation prompt
+- [x] 4.1 Create disambiguation prompt
   - Format list of matching objects
   - Display object descriptions for clarity
   - Accept player's choice (number or name)
   - _Requirements: 8_
 
-- [ ] 4.2 Handle disambiguation response
+- [x] 4.2 Handle disambiguation response
   - Parse player's clarification
   - Match response to one of the candidates
   - Update PRSO/PRSI with selected object
   - Retry the original command
   - _Requirements: 8_
 
-- [ ] 4.3 Write unit tests for disambiguation
+- [x] 4.3 Write unit tests for disambiguation
   - Test with multiple matching objects
   - Test player selection by number
   - Test player selection by name

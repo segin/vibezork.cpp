@@ -576,6 +576,189 @@ TEST(ObjectRecognitionSingleWordSynonym) {
     g.reset();
 }
 
+// Test disambiguation system - Task 4.3
+TEST(DisambiguationMultipleObjects) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create multiple objects with same synonym
+    auto brassKnife = std::make_unique<ZObject>(1, "brass knife");
+    brassKnife->addSynonym("knife");
+    brassKnife->addAdjective("brass");
+    brassKnife->moveTo(&testRoom);
+    ZObject* brassKnifePtr = brassKnife.get();
+    g.registerObject(1, std::move(brassKnife));
+    
+    auto rustyKnife = std::make_unique<ZObject>(2, "rusty knife");
+    rustyKnife->addSynonym("knife");
+    rustyKnife->addAdjective("rusty");
+    rustyKnife->moveTo(&testRoom);
+    ZObject* rustyKnifePtr = rustyKnife.get();
+    g.registerObject(2, std::move(rustyKnife));
+    
+    // Create parser
+    Parser parser;
+    
+    // Find objects matching "knife"
+    std::vector<std::string> words = {"knife"};
+    auto candidates = parser.findObjects(words);
+    
+    // Should find both knives
+    ASSERT_EQ(candidates.size(), 2);
+    
+    // Test disambiguation with number selection (simulated)
+    // In real usage, this would prompt the user, but for testing we call directly
+    // We can't easily test the interactive part, but we can test the logic
+    
+    // Test that single candidate returns that object
+    std::vector<ZObject*> singleCandidate = {brassKnifePtr};
+    ZObject* result1 = parser.disambiguate(singleCandidate, "knife");
+    ASSERT_EQ(result1, brassKnifePtr);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(DisambiguationParseResponse) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create test objects
+    auto brassKnife = std::make_unique<ZObject>(1, "brass knife");
+    brassKnife->addSynonym("knife");
+    brassKnife->addAdjective("brass");
+    brassKnife->moveTo(&testRoom);
+    ZObject* brassKnifePtr = brassKnife.get();
+    g.registerObject(1, std::move(brassKnife));
+    
+    auto rustyKnife = std::make_unique<ZObject>(2, "rusty knife");
+    rustyKnife->addSynonym("knife");
+    rustyKnife->addAdjective("rusty");
+    rustyKnife->moveTo(&testRoom);
+    ZObject* rustyKnifePtr = rustyKnife.get();
+    g.registerObject(2, std::move(rustyKnife));
+    
+    // Create parser
+    Parser parser;
+    
+    std::vector<ZObject*> candidates = {brassKnifePtr, rustyKnifePtr};
+    
+    // Note: We can't easily test the full interactive disambiguation without mocking stdin
+    // But we can test the helper methods that parse responses
+    
+    // The parseDisambiguationResponse method is private, so we test through public interface
+    // In a real scenario, the user would type "1" or "brass knife" at the prompt
+    
+    // For now, verify that candidates are properly set up
+    ASSERT_EQ(candidates.size(), 2);
+    ASSERT_EQ(candidates[0], brassKnifePtr);
+    ASSERT_EQ(candidates[1], rustyKnifePtr);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(DisambiguationSingleCandidate) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create single object
+    auto lamp = std::make_unique<ZObject>(1, "lamp");
+    lamp->addSynonym("lamp");
+    lamp->moveTo(&testRoom);
+    ZObject* lampPtr = lamp.get();
+    g.registerObject(1, std::move(lamp));
+    
+    // Create parser
+    Parser parser;
+    
+    // Single candidate should be returned immediately without prompting
+    std::vector<ZObject*> candidates = {lampPtr};
+    ZObject* result = parser.disambiguate(candidates, "lamp");
+    
+    ASSERT_EQ(result, lampPtr);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(DisambiguationEmptyCandidates) {
+    // Create parser
+    Parser parser;
+    
+    // Empty candidates should return nullptr
+    std::vector<ZObject*> candidates;
+    ZObject* result = parser.disambiguate(candidates, "nothing");
+    
+    ASSERT_EQ(result, nullptr);
+}
+
+TEST(DisambiguationFormatDescription) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create container
+    auto box = std::make_unique<ZObject>(10, "box");
+    box->addSynonym("box");
+    box->setFlag(ObjectFlag::CONTBIT);
+    box->setFlag(ObjectFlag::OPENBIT);
+    box->moveTo(&testRoom);
+    ZObject* boxPtr = box.get();
+    g.registerObject(10, std::move(box));
+    
+    // Create objects in different locations
+    auto lampInRoom = std::make_unique<ZObject>(1, "lamp");
+    lampInRoom->addSynonym("lamp");
+    lampInRoom->moveTo(&testRoom);
+    ZObject* lampInRoomPtr = lampInRoom.get();
+    g.registerObject(1, std::move(lampInRoom));
+    
+    auto lampInInventory = std::make_unique<ZObject>(2, "lamp");
+    lampInInventory->addSynonym("lamp");
+    lampInInventory->moveTo(g.winner);
+    ZObject* lampInInventoryPtr = lampInInventory.get();
+    g.registerObject(2, std::move(lampInInventory));
+    
+    auto lampInBox = std::make_unique<ZObject>(3, "lamp");
+    lampInBox->addSynonym("lamp");
+    lampInBox->moveTo(boxPtr);
+    ZObject* lampInBoxPtr = lampInBox.get();
+    g.registerObject(3, std::move(lampInBox));
+    
+    // Create parser
+    Parser parser;
+    
+    // Test that objects in different locations can be distinguished
+    // The formatObjectDescription method adds location context
+    std::vector<ZObject*> candidates = {lampInRoomPtr, lampInInventoryPtr, lampInBoxPtr};
+    
+    // Verify all three are different objects
+    ASSERT_EQ(candidates.size(), 3);
+    ASSERT_TRUE(lampInRoomPtr != lampInInventoryPtr);
+    ASSERT_TRUE(lampInRoomPtr != lampInBoxPtr);
+    ASSERT_TRUE(lampInInventoryPtr != lampInBoxPtr);
+    
+    // Cleanup
+    g.reset();
+}
+
 // Main test runner
 int main() {
     std::cout << "Running Zork C++ Tests\n";

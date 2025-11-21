@@ -22,6 +22,7 @@ public:
     
     // Public for testing
     std::vector<ZObject*> findObjects(const std::vector<std::string>& words, size_t startIdx = 0);
+    ZObject* disambiguate(const std::vector<ZObject*>& candidates, const std::string& noun);
     
 private:
     void tokenize(const std::string& input, std::vector<std::string>& tokens);
@@ -34,6 +35,11 @@ private:
     bool matchesAdjectives(ZObject* obj, const std::vector<std::string>& adjectives) const;
     int getLocationPriority(ZObject* obj) const;
     bool isObjectVisible(ZObject* obj) const;
+    
+    // Disambiguation helpers
+    std::string formatObjectDescription(ZObject* obj) const;
+    ZObject* parseDisambiguationResponse(const std::string& response, 
+                                         const std::vector<ZObject*>& candidates);
     
     std::map<std::string, VerbId> verbSynonyms_;
     std::map<std::string, std::string> prepositions_;
