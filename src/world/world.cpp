@@ -173,7 +173,8 @@ void initializeWorld() {
     behindHouse->setExit(Direction::SW, RoomExit(ROOM_SOUTH_OF_HOUSE));
     behindHouse->setExit(Direction::NW, RoomExit(ROOM_NORTH_OF_HOUSE));
     behindHouse->setExit(Direction::EAST, RoomExit(RoomIds::CLEARING));
-    // WEST and IN to KITCHEN require KITCHEN_WINDOW to be open - will be handled by conditional exits later
+    behindHouse->setExit(Direction::WEST, RoomExit(RoomIds::KITCHEN));  // Through window
+    behindHouse->setExit(Direction::IN, RoomExit(RoomIds::KITCHEN));  // Through window
     
     g.registerObject(ROOM_EAST_OF_HOUSE, std::move(behindHouse));
     
@@ -365,6 +366,168 @@ void initializeWorld() {
     upATree->setExit(Direction::DOWN, RoomExit(RoomIds::FOREST_PATH));
     
     g.registerObject(RoomIds::UP_A_TREE, std::move(upATree));
+    
+    // Create Canyon View room
+    auto canyonView = std::make_unique<ZRoom>(
+        RoomIds::CANYON_VIEW,
+        "Canyon View",
+        "You are at the top of the Great Canyon on its west wall. From here there is a marvelous view of the canyon and parts of the Frigid River upstream. Across the canyon, the walls of the White Cliffs join the mighty ramparts of the Flathead Mountains to the east. Following the Canyon upstream to the north, Aragain Falls may be seen, complete with rainbow. The mighty Frigid River flows out from a great dark cavern. To the west and south can be seen an immense forest, stretching for miles around. A path leads northwest."
+    );
+    canyonView->setFlag(ObjectFlag::RLANDBIT);
+    canyonView->setFlag(ObjectFlag::ONBIT);
+    canyonView->setFlag(ObjectFlag::SACREDBIT);
+    canyonView->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("You are at the top of the Great Canyon on its west wall. From here there is a marvelous view of the canyon and parts of the Frigid River upstream. Across the canyon, the walls of the White Cliffs join the mighty ramparts of the Flathead Mountains to the east. Following the Canyon upstream to the north, Aragain Falls may be seen, complete with rainbow. The mighty Frigid River flows out from a great dark cavern. To the west and south can be seen an immense forest, stretching for miles around. A path leads northwest.");
+        }
+    });
+    canyonView->setExit(Direction::WEST, RoomExit(RoomIds::CLEARING));
+    canyonView->setExit(Direction::NW, RoomExit(RoomIds::CLEARING));
+    canyonView->setExit(Direction::NORTH, RoomExit("The canyon is too wide to cross."));
+    canyonView->setExit(Direction::EAST, RoomExit("The canyon is too wide to cross."));
+    canyonView->setExit(Direction::SOUTH, RoomExit("The canyon is too wide to cross."));
+    canyonView->setExit(Direction::DOWN, RoomExit("The canyon is too deep to climb down."));
+    
+    g.registerObject(RoomIds::CANYON_VIEW, std::move(canyonView));
+    
+    // ===== HOUSE INTERIOR ROOMS =====
+    
+    // Create Living Room
+    auto livingRoom = std::make_unique<ZRoom>(
+        RoomIds::LIVING_ROOM,
+        "Living Room",
+        "You are in the living room. There is a doorway to the east, a wooden door with strange gothic lettering to the west, which appears to be nailed shut, a trophy case, and a large oriental rug in the center of the room."
+    );
+    livingRoom->setFlag(ObjectFlag::RLANDBIT);
+    livingRoom->setFlag(ObjectFlag::ONBIT);
+    livingRoom->setFlag(ObjectFlag::SACREDBIT);
+    livingRoom->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("You are in the living room. There is a doorway to the east, a wooden door with strange gothic lettering to the west, which appears to be nailed shut, a trophy case, and a large oriental rug in the center of the room.");
+        }
+    });
+    
+    // Set up exits for Living Room
+    livingRoom->setExit(Direction::EAST, RoomExit(RoomIds::KITCHEN));
+    livingRoom->setExit(Direction::WEST, RoomExit("The door is nailed shut."));
+    livingRoom->setExit(Direction::DOWN, RoomExit(RoomIds::CELLAR));  // Through trap door (will need rug moved)
+    
+    g.registerObject(RoomIds::LIVING_ROOM, std::move(livingRoom));
+    
+    // Create Kitchen
+    auto kitchen = std::make_unique<ZRoom>(
+        RoomIds::KITCHEN,
+        "Kitchen",
+        "You are in the kitchen of the white house. A table seems to have been used recently for the preparation of food. A passage leads to the west and a dark staircase can be seen leading upward. A dark chimney leads down and to the east is a small window which is open."
+    );
+    kitchen->setFlag(ObjectFlag::RLANDBIT);
+    kitchen->setFlag(ObjectFlag::ONBIT);
+    kitchen->setFlag(ObjectFlag::SACREDBIT);
+    kitchen->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("You are in the kitchen of the white house. A table seems to have been used recently for the preparation of food. A passage leads to the west and a dark staircase can be seen leading upward. A dark chimney leads down and to the east is a small window which is open.");
+        }
+    });
+    
+    // Set up exits for Kitchen
+    kitchen->setExit(Direction::WEST, RoomExit(RoomIds::LIVING_ROOM));
+    kitchen->setExit(Direction::EAST, RoomExit(ROOM_EAST_OF_HOUSE));  // Through window
+    kitchen->setExit(Direction::UP, RoomExit(RoomIds::ATTIC));
+    kitchen->setExit(Direction::DOWN, RoomExit("Only Santa Claus climbs down chimneys."));
+    
+    g.registerObject(RoomIds::KITCHEN, std::move(kitchen));
+    
+    // Create Attic
+    auto attic = std::make_unique<ZRoom>(
+        RoomIds::ATTIC,
+        "Attic",
+        "This is the attic. The only exit is a stairway leading down."
+    );
+    attic->setFlag(ObjectFlag::RLANDBIT);
+    attic->setFlag(ObjectFlag::ONBIT);
+    attic->setFlag(ObjectFlag::SACREDBIT);
+    attic->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is the attic. The only exit is a stairway leading down.");
+        }
+    });
+    
+    // Set up exits for Attic
+    attic->setExit(Direction::DOWN, RoomExit(RoomIds::KITCHEN));
+    
+    g.registerObject(RoomIds::ATTIC, std::move(attic));
+    
+    // Create Cellar
+    auto cellar = std::make_unique<ZRoom>(
+        RoomIds::CELLAR,
+        "Cellar",
+        "You are in a dark and damp cellar with a narrow passageway leading north, and a crawlway to the south. On the west is the bottom of a steep metal ramp which is unclimbable."
+    );
+    // Cellar is dark - no ONBIT flag
+    cellar->setFlag(ObjectFlag::RLANDBIT);
+    cellar->setFlag(ObjectFlag::SACREDBIT);
+    cellar->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("You are in a dark and damp cellar with a narrow passageway leading north, and a crawlway to the south. On the west is the bottom of a steep metal ramp which is unclimbable.");
+        }
+    });
+    
+    // Set up exits for Cellar
+    cellar->setExit(Direction::NORTH, RoomExit(RoomIds::TROLL_ROOM));  // To underground
+    cellar->setExit(Direction::SOUTH, RoomExit("The crawlway is too small to enter."));
+    cellar->setExit(Direction::WEST, RoomExit("The ramp is too steep to climb."));
+    cellar->setExit(Direction::UP, RoomExit(RoomIds::LIVING_ROOM));  // Through trap door
+    cellar->setExit(Direction::EAST, RoomExit(RoomIds::TROLL_ROOM));  // Alternative to north
+    
+    g.registerObject(RoomIds::CELLAR, std::move(cellar));
+    
+    // Create Gallery
+    auto gallery = std::make_unique<ZRoom>(
+        RoomIds::GALLERY,
+        "Gallery",
+        "This is an art gallery. Most of the paintings which were here have been stolen by vandals with exceptional taste. The vandals left through either the north or west exits."
+    );
+    gallery->setFlag(ObjectFlag::RLANDBIT);
+    gallery->setFlag(ObjectFlag::ONBIT);
+    gallery->setFlag(ObjectFlag::SACREDBIT);
+    gallery->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is an art gallery. Most of the paintings which were here have been stolen by vandals with exceptional taste. The vandals left through either the north or west exits.");
+        }
+    });
+    
+    // Set up exits for Gallery
+    gallery->setExit(Direction::NORTH, RoomExit(RoomIds::STUDIO));
+    gallery->setExit(Direction::WEST, RoomExit(RoomIds::KITCHEN));
+    
+    g.registerObject(RoomIds::GALLERY, std::move(gallery));
+    
+    // Create Studio
+    auto studio = std::make_unique<ZRoom>(
+        RoomIds::STUDIO,
+        "Studio",
+        "This appears to have been an artist's studio. The walls and floors are splattered with paints of 69 different colors. Strangely enough, nothing of value is hanging here. At the south end of the room is an open door (also covered with paint). A dark and narrow chimney leads up from a fireplace; although you might be able to get up it, it seems unlikely you could get back down."
+    );
+    studio->setFlag(ObjectFlag::RLANDBIT);
+    studio->setFlag(ObjectFlag::ONBIT);
+    studio->setFlag(ObjectFlag::SACREDBIT);
+    studio->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This appears to have been an artist's studio. The walls and floors are splattered with paints of 69 different colors. Strangely enough, nothing of value is hanging here. At the south end of the room is an open door (also covered with paint). A dark and narrow chimney leads up from a fireplace; although you might be able to get up it, it seems unlikely you could get back down.");
+        }
+    });
+    
+    // Set up exits for Studio
+    studio->setExit(Direction::SOUTH, RoomExit(RoomIds::GALLERY));
+    studio->setExit(Direction::UP, RoomExit("The chimney is too narrow and sooty."));
+    
+    g.registerObject(RoomIds::STUDIO, std::move(studio));
+    
+    // Update Kitchen to connect to Gallery
+    auto* kitchenPtr = dynamic_cast<ZRoom*>(g.getObject(RoomIds::KITCHEN));
+    if (kitchenPtr) {
+        kitchenPtr->setExit(Direction::NORTH, RoomExit(RoomIds::GALLERY));
+    }
     
     // Set up forest navigation (confusing interconnections)
     // FOREST-1 connections

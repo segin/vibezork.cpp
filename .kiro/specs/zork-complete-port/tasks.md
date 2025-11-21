@@ -333,39 +333,39 @@ Now that the parser is robust, we need content for it to operate on. Start with 
   - Some exits lead to unexpected rooms
   - _Requirements: 14, 81_
 
-- [ ] 11. Implement house interior rooms
+- [x] 11. Implement house interior rooms
   - Create living room, kitchen, attic, cellar
   - Create trophy room, studio, gallery
   - Set up exits between house rooms
   - Add appropriate descriptions and flags
   - _Requirements: 14, 15, 17_
 
-- [ ] 11.1 Create Living Room
+- [x] 11.1 Create Living Room
   - Add detailed description
   - Add exits to other house rooms
   - Add trophy case location
   - Set RLANDBIT, ONBIT, SACREDBIT flags
   - _Requirements: 14, 15_
 
-- [ ] 11.2 Create Kitchen
+- [x] 11.2 Create Kitchen
   - Add description
   - Add exits (including window to outside)
   - Add table and other scenery
   - _Requirements: 14, 15_
 
-- [ ] 11.3 Create Attic
+- [x] 11.3 Create Attic
   - Add description
   - Add rope and table
   - Add exit down to house
   - _Requirements: 14, 15_
 
-- [ ] 11.4 Create Cellar
+- [x] 11.4 Create Cellar
   - Add description
   - Add trap door entrance
   - Connect to underground passages
   - _Requirements: 14, 15_
 
-- [ ] 11.5 Create additional house rooms
+- [x] 11.5 Create additional house rooms
   - Trophy Room, Studio, Gallery
   - All other house rooms from 1dungeon.zil
   - Set up exits between all house rooms
