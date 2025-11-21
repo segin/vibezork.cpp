@@ -529,6 +529,807 @@ void initializeWorld() {
         kitchenPtr->setExit(Direction::NORTH, RoomExit(RoomIds::GALLERY));
     }
     
+    // ===== UNDERGROUND PASSAGES =====
+    
+    // Create Troll Room
+    auto trollRoom = std::make_unique<ZRoom>(
+        RoomIds::TROLL_ROOM,
+        "Troll Room",
+        "This is a small room with passages to the east and south and a forbidding hole leading west. Bloodstains and deep scratches (perhaps made by an axe) mar the walls."
+    );
+    // Troll room is dark - no ONBIT flag
+    trollRoom->setFlag(ObjectFlag::RLANDBIT);
+    trollRoom->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is a small room with passages to the east and south and a forbidding hole leading west. Bloodstains and deep scratches (perhaps made by an axe) mar the walls.");
+        }
+    });
+    
+    // Set up exits for Troll Room
+    trollRoom->setExit(Direction::SOUTH, RoomExit(RoomIds::CELLAR));
+    trollRoom->setExit(Direction::EAST, RoomExit(RoomIds::EW_PASSAGE));  // Will need troll flag check
+    trollRoom->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_1));  // Will need troll flag check
+    
+    g.registerObject(RoomIds::TROLL_ROOM, std::move(trollRoom));
+    
+    // Create East of Chasm room
+    auto eastOfChasm = std::make_unique<ZRoom>(
+        RoomIds::EAST_OF_CHASM,
+        "East of Chasm",
+        "You are on the east edge of a chasm, the bottom of which cannot be seen. A narrow passage goes north, and the path you are on continues to the east."
+    );
+    // Dark room - no ONBIT flag
+    eastOfChasm->setFlag(ObjectFlag::RLANDBIT);
+    eastOfChasm->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("You are on the east edge of a chasm, the bottom of which cannot be seen. A narrow passage goes north, and the path you are on continues to the east.");
+        }
+    });
+    
+    // Set up exits for East of Chasm
+    eastOfChasm->setExit(Direction::NORTH, RoomExit(RoomIds::CELLAR));
+    eastOfChasm->setExit(Direction::EAST, RoomExit(RoomIds::GALLERY));
+    eastOfChasm->setExit(Direction::DOWN, RoomExit("The chasm probably leads straight to the infernal regions."));
+    
+    g.registerObject(RoomIds::EAST_OF_CHASM, std::move(eastOfChasm));
+    
+    // Update Cellar to connect to East of Chasm
+    auto* cellarPtr = dynamic_cast<ZRoom*>(g.getObject(RoomIds::CELLAR));
+    if (cellarPtr) {
+        cellarPtr->setExit(Direction::SOUTH, RoomExit(RoomIds::EAST_OF_CHASM));
+    }
+    
+    // Update Gallery to connect to East of Chasm
+    auto* galleryPtr = dynamic_cast<ZRoom*>(g.getObject(RoomIds::GALLERY));
+    if (galleryPtr) {
+        galleryPtr->setExit(Direction::WEST, RoomExit(RoomIds::EAST_OF_CHASM));
+    }
+    
+    // Create East-West Passage
+    auto ewPassage = std::make_unique<ZRoom>(
+        RoomIds::EW_PASSAGE,
+        "East-West Passage",
+        "This is a narrow east-west passageway. There is a narrow stairway leading down at the north end of the room."
+    );
+    // Dark room - no ONBIT flag
+    ewPassage->setFlag(ObjectFlag::RLANDBIT);
+    ewPassage->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is a narrow east-west passageway. There is a narrow stairway leading down at the north end of the room.");
+        }
+    });
+    
+    // Set up exits for East-West Passage
+    ewPassage->setExit(Direction::EAST, RoomExit(RoomIds::ROUND_ROOM));
+    ewPassage->setExit(Direction::WEST, RoomExit(RoomIds::TROLL_ROOM));
+    ewPassage->setExit(Direction::DOWN, RoomExit(RoomIds::CHASM_ROOM));
+    ewPassage->setExit(Direction::NORTH, RoomExit(RoomIds::CHASM_ROOM));
+    
+    g.registerObject(RoomIds::EW_PASSAGE, std::move(ewPassage));
+    
+    // Create North-South Passage
+    auto nsPassage = std::make_unique<ZRoom>(
+        RoomIds::NS_PASSAGE,
+        "North-South Passage",
+        "This is a high north-south passage, which forks to the northeast."
+    );
+    // Dark room - no ONBIT flag
+    nsPassage->setFlag(ObjectFlag::RLANDBIT);
+    nsPassage->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is a high north-south passage, which forks to the northeast.");
+        }
+    });
+    
+    // Set up exits for North-South Passage
+    nsPassage->setExit(Direction::NORTH, RoomExit(RoomIds::CHASM_ROOM));
+    nsPassage->setExit(Direction::NE, RoomExit(RoomIds::DEEP_CANYON));
+    nsPassage->setExit(Direction::SOUTH, RoomExit(RoomIds::ROUND_ROOM));
+    
+    g.registerObject(RoomIds::NS_PASSAGE, std::move(nsPassage));
+    
+    // Create Chasm Room
+    auto chasmRoom = std::make_unique<ZRoom>(
+        RoomIds::CHASM_ROOM,
+        "Chasm",
+        "A chasm runs southwest to northeast and the path follows it. You are on the south side of the chasm, where a crack opens into a passage."
+    );
+    // Dark room - no ONBIT flag
+    chasmRoom->setFlag(ObjectFlag::RLANDBIT);
+    chasmRoom->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("A chasm runs southwest to northeast and the path follows it. You are on the south side of the chasm, where a crack opens into a passage.");
+        }
+    });
+    
+    // Set up exits for Chasm Room
+    chasmRoom->setExit(Direction::NE, RoomExit(RoomIds::RESERVOIR_SOUTH));
+    chasmRoom->setExit(Direction::SW, RoomExit(RoomIds::EW_PASSAGE));
+    chasmRoom->setExit(Direction::UP, RoomExit(RoomIds::EW_PASSAGE));
+    chasmRoom->setExit(Direction::SOUTH, RoomExit(RoomIds::NS_PASSAGE));
+    chasmRoom->setExit(Direction::DOWN, RoomExit("Are you out of your mind?"));
+    
+    g.registerObject(RoomIds::CHASM_ROOM, std::move(chasmRoom));
+    
+    // Create Round Room
+    auto roundRoom = std::make_unique<ZRoom>(
+        RoomIds::ROUND_ROOM,
+        "Round Room",
+        "This is a circular stone room with passages in all directions. Several of them have unfortunately been blocked by cave-ins."
+    );
+    // Dark room - no ONBIT flag
+    roundRoom->setFlag(ObjectFlag::RLANDBIT);
+    roundRoom->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is a circular stone room with passages in all directions. Several of them have unfortunately been blocked by cave-ins.");
+        }
+    });
+    
+    // Set up exits for Round Room - it connects to many rooms
+    roundRoom->setExit(Direction::EAST, RoomExit(RoomIds::LOUD_ROOM));
+    roundRoom->setExit(Direction::WEST, RoomExit(RoomIds::EW_PASSAGE));
+    roundRoom->setExit(Direction::NORTH, RoomExit(RoomIds::NS_PASSAGE));
+    roundRoom->setExit(Direction::SOUTH, RoomExit(RoomIds::NARROW_PASSAGE));
+    roundRoom->setExit(Direction::SE, RoomExit(RoomIds::ENGRAVINGS_CAVE));
+    
+    g.registerObject(RoomIds::ROUND_ROOM, std::move(roundRoom));
+    
+    // Create Loud Room
+    auto loudRoom = std::make_unique<ZRoom>(
+        RoomIds::LOUD_ROOM,
+        "Loud Room",
+        "This is a large room with a ceiling which cannot be detected from the ground. There is a narrow passage from east to west and a stone stairway leading upward. The room is extremely noisy. In fact, it is difficult to hear yourself think."
+    );
+    // Dark room - no ONBIT flag
+    loudRoom->setFlag(ObjectFlag::RLANDBIT);
+    loudRoom->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is a large room with a ceiling which cannot be detected from the ground. There is a narrow passage from east to west and a stone stairway leading upward. The room is extremely noisy. In fact, it is difficult to hear yourself think.");
+        }
+        // TODO: Add echo action handler for sounds
+    });
+    
+    // Set up exits for Loud Room
+    loudRoom->setExit(Direction::EAST, RoomExit(RoomIds::DAMP_CAVE));
+    loudRoom->setExit(Direction::WEST, RoomExit(RoomIds::ROUND_ROOM));
+    loudRoom->setExit(Direction::UP, RoomExit(RoomIds::DEEP_CANYON));
+    
+    g.registerObject(RoomIds::LOUD_ROOM, std::move(loudRoom));
+    
+    // Create Deep Canyon
+    auto deepCanyon = std::make_unique<ZRoom>(
+        RoomIds::DEEP_CANYON,
+        "Deep Canyon",
+        "You are on the south edge of a deep canyon. Passages lead off to the east, northwest and southwest. You can hear the sound of flowing water from below."
+    );
+    // Dark room - no ONBIT flag
+    deepCanyon->setFlag(ObjectFlag::RLANDBIT);
+    deepCanyon->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("You are on the south edge of a deep canyon. Passages lead off to the east, northwest and southwest. You can hear the sound of flowing water from below.");
+        }
+    });
+    
+    // Set up exits for Deep Canyon
+    deepCanyon->setExit(Direction::NW, RoomExit(RoomIds::RESERVOIR_SOUTH));
+    deepCanyon->setExit(Direction::EAST, RoomExit(RoomIds::DAM_ROOM));
+    deepCanyon->setExit(Direction::SW, RoomExit(RoomIds::NS_PASSAGE));
+    deepCanyon->setExit(Direction::DOWN, RoomExit(RoomIds::LOUD_ROOM));
+    
+    g.registerObject(RoomIds::DEEP_CANYON, std::move(deepCanyon));
+    
+    // Create Damp Cave
+    auto dampCave = std::make_unique<ZRoom>(
+        RoomIds::DAMP_CAVE,
+        "Damp Cave",
+        "This cave has exits to the west and east, and narrows to a crack toward the south. The earth is particularly damp here."
+    );
+    // Dark room - no ONBIT flag
+    dampCave->setFlag(ObjectFlag::RLANDBIT);
+    dampCave->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This cave has exits to the west and east, and narrows to a crack toward the south. The earth is particularly damp here.");
+        }
+    });
+    
+    // Set up exits for Damp Cave
+    dampCave->setExit(Direction::WEST, RoomExit(RoomIds::LOUD_ROOM));
+    dampCave->setExit(Direction::EAST, RoomExit(RoomIds::WHITE_CLIFFS_NORTH));
+    dampCave->setExit(Direction::SOUTH, RoomExit("It is too narrow for most insects."));
+    
+    g.registerObject(RoomIds::DAMP_CAVE, std::move(dampCave));
+    
+    // Create Cold Passage
+    auto coldPassage = std::make_unique<ZRoom>(
+        RoomIds::COLD_PASSAGE,
+        "Cold Passage",
+        "This is a cold and damp corridor where a long east-west passageway turns into a southward path."
+    );
+    // Dark room - no ONBIT flag
+    coldPassage->setFlag(ObjectFlag::RLANDBIT);
+    coldPassage->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is a cold and damp corridor where a long east-west passageway turns into a southward path.");
+        }
+    });
+    
+    // Set up exits for Cold Passage
+    coldPassage->setExit(Direction::SOUTH, RoomExit(RoomIds::MIRROR_ROOM_1));
+    coldPassage->setExit(Direction::WEST, RoomExit(RoomIds::SLIDE_ROOM));
+    
+    g.registerObject(RoomIds::COLD_PASSAGE, std::move(coldPassage));
+    
+    // Create Narrow Passage
+    auto narrowPassage = std::make_unique<ZRoom>(
+        RoomIds::NARROW_PASSAGE,
+        "Narrow Passage",
+        "This is a long and narrow corridor where a long north-south passageway briefly narrows even further."
+    );
+    // Dark room - no ONBIT flag
+    narrowPassage->setFlag(ObjectFlag::RLANDBIT);
+    narrowPassage->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is a long and narrow corridor where a long north-south passageway briefly narrows even further.");
+        }
+    });
+    
+    // Set up exits for Narrow Passage
+    narrowPassage->setExit(Direction::NORTH, RoomExit(RoomIds::ROUND_ROOM));
+    narrowPassage->setExit(Direction::SOUTH, RoomExit(RoomIds::MIRROR_ROOM_2));
+    
+    g.registerObject(RoomIds::NARROW_PASSAGE, std::move(narrowPassage));
+    
+    // Create Slide Room
+    auto slideRoom = std::make_unique<ZRoom>(
+        RoomIds::SLIDE_ROOM,
+        "Slide Room",
+        "This is a small chamber, which appears to have been part of a coal mine. On the south wall of the chamber the letters \"Granite Wall\" are etched in the rock. To the east is a long passage, and there is a steep metal slide twisting downward. To the north is a small opening."
+    );
+    // Dark room - no ONBIT flag
+    slideRoom->setFlag(ObjectFlag::RLANDBIT);
+    slideRoom->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is a small chamber, which appears to have been part of a coal mine. On the south wall of the chamber the letters \"Granite Wall\" are etched in the rock. To the east is a long passage, and there is a steep metal slide twisting downward. To the north is a small opening.");
+        }
+    });
+    
+    // Set up exits for Slide Room
+    slideRoom->setExit(Direction::EAST, RoomExit(RoomIds::COLD_PASSAGE));
+    slideRoom->setExit(Direction::NORTH, RoomExit(RoomIds::MINE_ENTRANCE));
+    slideRoom->setExit(Direction::DOWN, RoomExit(RoomIds::CELLAR));
+    
+    g.registerObject(RoomIds::SLIDE_ROOM, std::move(slideRoom));
+    
+    // Create Mine Entrance
+    auto mineEntrance = std::make_unique<ZRoom>(
+        RoomIds::MINE_ENTRANCE,
+        "Mine Entrance",
+        "You are standing at the entrance of what might have been a coal mine. The shaft enters the west wall, and there is another exit on the south end of the room."
+    );
+    // Dark room - no ONBIT flag
+    mineEntrance->setFlag(ObjectFlag::RLANDBIT);
+    mineEntrance->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("You are standing at the entrance of what might have been a coal mine. The shaft enters the west wall, and there is another exit on the south end of the room.");
+        }
+    });
+    
+    // Set up exits for Mine Entrance
+    mineEntrance->setExit(Direction::SOUTH, RoomExit(RoomIds::SLIDE_ROOM));
+    mineEntrance->setExit(Direction::IN, RoomExit(RoomIds::SQUEEKY_ROOM));
+    mineEntrance->setExit(Direction::WEST, RoomExit(RoomIds::SQUEEKY_ROOM));
+    
+    g.registerObject(RoomIds::MINE_ENTRANCE, std::move(mineEntrance));
+    
+    // Create Squeaky Room
+    auto squeekyRoom = std::make_unique<ZRoom>(
+        RoomIds::SQUEEKY_ROOM,
+        "Squeaky Room",
+        "You are in a small room. Strange squeaky sounds may be heard coming from the passage at the north end. You may also escape to the east."
+    );
+    // Dark room - no ONBIT flag
+    squeekyRoom->setFlag(ObjectFlag::RLANDBIT);
+    squeekyRoom->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("You are in a small room. Strange squeaky sounds may be heard coming from the passage at the north end. You may also escape to the east.");
+        }
+    });
+    
+    // Set up exits for Squeaky Room
+    squeekyRoom->setExit(Direction::NORTH, RoomExit(RoomIds::BAT_ROOM));
+    squeekyRoom->setExit(Direction::EAST, RoomExit(RoomIds::MINE_ENTRANCE));
+    
+    g.registerObject(RoomIds::SQUEEKY_ROOM, std::move(squeekyRoom));
+    
+    // Create Bat Room
+    auto batRoom = std::make_unique<ZRoom>(
+        RoomIds::BAT_ROOM,
+        "Bat Room",
+        "You are in a small room which has doors only to the east and south."
+    );
+    // Dark room - no ONBIT flag
+    batRoom->setFlag(ObjectFlag::RLANDBIT);
+    batRoom->setFlag(ObjectFlag::SACREDBIT);
+    batRoom->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("You are in a small room which has doors only to the east and south.");
+        }
+    });
+    
+    // Set up exits for Bat Room
+    batRoom->setExit(Direction::SOUTH, RoomExit(RoomIds::SQUEEKY_ROOM));
+    batRoom->setExit(Direction::EAST, RoomExit(RoomIds::SHAFT_ROOM));
+    
+    g.registerObject(RoomIds::BAT_ROOM, std::move(batRoom));
+    
+    // Create Shaft Room
+    auto shaftRoom = std::make_unique<ZRoom>(
+        RoomIds::SHAFT_ROOM,
+        "Shaft Room",
+        "This is a large room, in the middle of which is a small shaft descending through the floor into darkness below. To the west and the north are exits from this room. Constructed over the top of the shaft is a metal framework to which a heavy iron chain is attached."
+    );
+    // Dark room - no ONBIT flag
+    shaftRoom->setFlag(ObjectFlag::RLANDBIT);
+    shaftRoom->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is a large room, in the middle of which is a small shaft descending through the floor into darkness below. To the west and the north are exits from this room. Constructed over the top of the shaft is a metal framework to which a heavy iron chain is attached.");
+        }
+    });
+    
+    // Set up exits for Shaft Room
+    shaftRoom->setExit(Direction::DOWN, RoomExit("You wouldn't fit and would die if you could."));
+    shaftRoom->setExit(Direction::WEST, RoomExit(RoomIds::BAT_ROOM));
+    shaftRoom->setExit(Direction::NORTH, RoomExit(RoomIds::SMELLY_ROOM));
+    
+    g.registerObject(RoomIds::SHAFT_ROOM, std::move(shaftRoom));
+    
+    // Create Smelly Room
+    auto smellyRoom = std::make_unique<ZRoom>(
+        RoomIds::SMELLY_ROOM,
+        "Smelly Room",
+        "This is a small nondescript room. However, from the direction of a small descending staircase a foul odor can be detected. To the south is a narrow tunnel."
+    );
+    // Dark room - no ONBIT flag
+    smellyRoom->setFlag(ObjectFlag::RLANDBIT);
+    smellyRoom->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is a small nondescript room. However, from the direction of a small descending staircase a foul odor can be detected. To the south is a narrow tunnel.");
+        }
+    });
+    
+    // Set up exits for Smelly Room
+    smellyRoom->setExit(Direction::DOWN, RoomExit(RoomIds::GAS_ROOM));
+    smellyRoom->setExit(Direction::SOUTH, RoomExit(RoomIds::SHAFT_ROOM));
+    
+    g.registerObject(RoomIds::SMELLY_ROOM, std::move(smellyRoom));
+    
+    // Create Gas Room
+    auto gasRoom = std::make_unique<ZRoom>(
+        RoomIds::GAS_ROOM,
+        "Gas Room",
+        "This is a small room which smells strongly of coal gas. There is a short climb up some stairs and a narrow tunnel leading east."
+    );
+    // Dark room - no ONBIT flag
+    gasRoom->setFlag(ObjectFlag::RLANDBIT);
+    gasRoom->setFlag(ObjectFlag::SACREDBIT);
+    gasRoom->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is a small room which smells strongly of coal gas. There is a short climb up some stairs and a narrow tunnel leading east.");
+        }
+    });
+    
+    // Set up exits for Gas Room
+    gasRoom->setExit(Direction::UP, RoomExit(RoomIds::SMELLY_ROOM));
+    gasRoom->setExit(Direction::EAST, RoomExit(RoomIds::MINE_1));
+    
+    g.registerObject(RoomIds::GAS_ROOM, std::move(gasRoom));
+    
+    // Create Ladder Top
+    auto ladderTop = std::make_unique<ZRoom>(
+        RoomIds::LADDER_TOP,
+        "Ladder Top",
+        "This is a very small room. In the corner is a rickety wooden ladder, leading downward. It might be safe to descend. There is also a staircase leading upward."
+    );
+    // Dark room - no ONBIT flag
+    ladderTop->setFlag(ObjectFlag::RLANDBIT);
+    ladderTop->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is a very small room. In the corner is a rickety wooden ladder, leading downward. It might be safe to descend. There is also a staircase leading upward.");
+        }
+    });
+    
+    // Set up exits for Ladder Top
+    ladderTop->setExit(Direction::DOWN, RoomExit(RoomIds::LADDER_BOTTOM));
+    ladderTop->setExit(Direction::UP, RoomExit(RoomIds::MINE_4));
+    
+    g.registerObject(RoomIds::LADDER_TOP, std::move(ladderTop));
+    
+    // Create Ladder Bottom
+    auto ladderBottom = std::make_unique<ZRoom>(
+        RoomIds::LADDER_BOTTOM,
+        "Ladder Bottom",
+        "This is a rather wide room. On one side is the bottom of a narrow wooden ladder. To the west and the south are passages leaving the room."
+    );
+    // Dark room - no ONBIT flag
+    ladderBottom->setFlag(ObjectFlag::RLANDBIT);
+    ladderBottom->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is a rather wide room. On one side is the bottom of a narrow wooden ladder. To the west and the south are passages leaving the room.");
+        }
+    });
+    
+    // Set up exits for Ladder Bottom
+    ladderBottom->setExit(Direction::SOUTH, RoomExit(RoomIds::DEAD_END_5));
+    ladderBottom->setExit(Direction::WEST, RoomExit(RoomIds::TIMBER_ROOM));
+    ladderBottom->setExit(Direction::UP, RoomExit(RoomIds::LADDER_TOP));
+    
+    g.registerObject(RoomIds::LADDER_BOTTOM, std::move(ladderBottom));
+    
+    // Create Timber Room
+    auto timberRoom = std::make_unique<ZRoom>(
+        RoomIds::TIMBER_ROOM,
+        "Timber Room",
+        "This is a long and narrow passage, which is cluttered with broken timbers. A wide passage comes from the east and turns at the west end of the room into a very narrow passageway. From the west comes a strong draft."
+    );
+    // Dark room - no ONBIT flag
+    timberRoom->setFlag(ObjectFlag::RLANDBIT);
+    timberRoom->setFlag(ObjectFlag::SACREDBIT);
+    timberRoom->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is a long and narrow passage, which is cluttered with broken timbers. A wide passage comes from the east and turns at the west end of the room into a very narrow passageway. From the west comes a strong draft.");
+        }
+    });
+    
+    // Set up exits for Timber Room
+    timberRoom->setExit(Direction::EAST, RoomExit(RoomIds::LADDER_BOTTOM));
+    timberRoom->setExit(Direction::WEST, RoomExit("You cannot fit through this passage with that load."));  // Requires empty hands
+    
+    g.registerObject(RoomIds::TIMBER_ROOM, std::move(timberRoom));
+    
+    // Create Lower Shaft
+    auto lowerShaft = std::make_unique<ZRoom>(
+        RoomIds::LOWER_SHAFT,
+        "Drafty Room",
+        "This is a small drafty room in which is the bottom of a long shaft. To the south is a passageway and to the east a very narrow passage. In the shaft can be seen a heavy iron chain."
+    );
+    // Dark room - no ONBIT flag
+    lowerShaft->setFlag(ObjectFlag::RLANDBIT);
+    lowerShaft->setFlag(ObjectFlag::SACREDBIT);
+    lowerShaft->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is a small drafty room in which is the bottom of a long shaft. To the south is a passageway and to the east a very narrow passage. In the shaft can be seen a heavy iron chain.");
+        }
+    });
+    
+    // Set up exits for Lower Shaft
+    lowerShaft->setExit(Direction::SOUTH, RoomExit(RoomIds::MACHINE_ROOM));
+    lowerShaft->setExit(Direction::OUT, RoomExit("You cannot fit through this passage with that load."));  // Requires empty hands
+    lowerShaft->setExit(Direction::EAST, RoomExit("You cannot fit through this passage with that load."));  // Requires empty hands
+    
+    g.registerObject(RoomIds::LOWER_SHAFT, std::move(lowerShaft));
+    
+    // Create Machine Room
+    auto machineRoom = std::make_unique<ZRoom>(
+        RoomIds::MACHINE_ROOM,
+        "Machine Room",
+        "This is a large room full of assorted heavy machinery, whirring noisily. The room smells of burned resistors. Along one wall of the room are three buttons which are, respectively, round, triangular, and square. Naturally, above these buttons are instructions written in EBCDIC. A large sign above the buttons says \"DANGER: DEADLY RADIATION BEYOND THIS POINT!\" There are exits to the north and east."
+    );
+    // Dark room - no ONBIT flag
+    machineRoom->setFlag(ObjectFlag::RLANDBIT);
+    machineRoom->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is a large room full of assorted heavy machinery, whirring noisily. The room smells of burned resistors. Along one wall of the room are three buttons which are, respectively, round, triangular, and square. Naturally, above these buttons are instructions written in EBCDIC. A large sign above the buttons says \"DANGER: DEADLY RADIATION BEYOND THIS POINT!\" There are exits to the north and east.");
+        }
+    });
+    
+    // Set up exits for Machine Room
+    machineRoom->setExit(Direction::NORTH, RoomExit(RoomIds::LOWER_SHAFT));
+    
+    g.registerObject(RoomIds::MACHINE_ROOM, std::move(machineRoom));
+    
+    // Create Dead End 5 (coal mine dead end)
+    auto deadEnd5 = std::make_unique<ZRoom>(
+        RoomIds::DEAD_END_5,
+        "Dead End",
+        "You have come to a dead end in the mine."
+    );
+    // Dark room - no ONBIT flag
+    deadEnd5->setFlag(ObjectFlag::RLANDBIT);
+    deadEnd5->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("You have come to a dead end in the mine.");
+        }
+    });
+    
+    // Set up exits for Dead End 5
+    deadEnd5->setExit(Direction::NORTH, RoomExit(RoomIds::LADDER_BOTTOM));
+    
+    g.registerObject(RoomIds::DEAD_END_5, std::move(deadEnd5));
+    
+    // Create Coal Mine rooms (Mine 1-4)
+    auto mine1 = std::make_unique<ZRoom>(
+        RoomIds::MINE_1,
+        "Coal Mine",
+        "This is a nondescript part of a coal mine."
+    );
+    mine1->setFlag(ObjectFlag::RLANDBIT);
+    mine1->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is a nondescript part of a coal mine.");
+        }
+    });
+    mine1->setExit(Direction::NORTH, RoomExit(RoomIds::GAS_ROOM));
+    mine1->setExit(Direction::EAST, RoomExit(RoomIds::MINE_1));  // Loops to itself
+    mine1->setExit(Direction::NE, RoomExit(RoomIds::MINE_2));
+    
+    g.registerObject(RoomIds::MINE_1, std::move(mine1));
+    
+    auto mine2 = std::make_unique<ZRoom>(
+        RoomIds::MINE_2,
+        "Coal Mine",
+        "This is a nondescript part of a coal mine."
+    );
+    mine2->setFlag(ObjectFlag::RLANDBIT);
+    mine2->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is a nondescript part of a coal mine.");
+        }
+    });
+    mine2->setExit(Direction::NORTH, RoomExit(RoomIds::MINE_2));  // Loops to itself
+    mine2->setExit(Direction::SOUTH, RoomExit(RoomIds::MINE_1));
+    mine2->setExit(Direction::SE, RoomExit(RoomIds::MINE_3));
+    
+    g.registerObject(RoomIds::MINE_2, std::move(mine2));
+    
+    auto mine3 = std::make_unique<ZRoom>(
+        RoomIds::MINE_3,
+        "Coal Mine",
+        "This is a nondescript part of a coal mine."
+    );
+    mine3->setFlag(ObjectFlag::RLANDBIT);
+    mine3->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is a nondescript part of a coal mine.");
+        }
+    });
+    mine3->setExit(Direction::SOUTH, RoomExit(RoomIds::MINE_3));  // Loops to itself
+    mine3->setExit(Direction::SW, RoomExit(RoomIds::MINE_4));
+    mine3->setExit(Direction::EAST, RoomExit(RoomIds::MINE_2));
+    
+    g.registerObject(RoomIds::MINE_3, std::move(mine3));
+    
+    auto mine4 = std::make_unique<ZRoom>(
+        RoomIds::MINE_4,
+        "Coal Mine",
+        "This is a nondescript part of a coal mine."
+    );
+    mine4->setFlag(ObjectFlag::RLANDBIT);
+    mine4->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is a nondescript part of a coal mine.");
+        }
+    });
+    mine4->setExit(Direction::NORTH, RoomExit(RoomIds::MINE_3));
+    mine4->setExit(Direction::WEST, RoomExit(RoomIds::MINE_4));  // Loops to itself
+    mine4->setExit(Direction::DOWN, RoomExit(RoomIds::LADDER_TOP));
+    
+    g.registerObject(RoomIds::MINE_4, std::move(mine4));
+    
+    // ===== RESERVOIR AND DAM AREA =====
+    
+    // Create Reservoir South
+    auto reservoirSouth = std::make_unique<ZRoom>(
+        RoomIds::RESERVOIR_SOUTH,
+        "Reservoir South",
+        "You are in a long room on the south shore of a large lake, far too deep and wide for crossing. There is a path along the stream to the east or west, and a steep pathway climbing southwest along the edge of a chasm."
+    );
+    // Dark room - no ONBIT flag
+    reservoirSouth->setFlag(ObjectFlag::RLANDBIT);
+    reservoirSouth->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("You are in a long room on the south shore of a large lake, far too deep and wide for crossing. There is a path along the stream to the east or west, and a steep pathway climbing southwest along the edge of a chasm.");
+        }
+    });
+    
+    // Set up exits for Reservoir South
+    reservoirSouth->setExit(Direction::SE, RoomExit(RoomIds::DEEP_CANYON));
+    reservoirSouth->setExit(Direction::SW, RoomExit(RoomIds::CHASM_ROOM));
+    reservoirSouth->setExit(Direction::EAST, RoomExit(RoomIds::DAM_ROOM));
+    reservoirSouth->setExit(Direction::WEST, RoomExit(RoomIds::STREAM_VIEW));
+    reservoirSouth->setExit(Direction::NORTH, RoomExit("You would drown."));  // Requires LOW-TIDE flag
+    
+    g.registerObject(RoomIds::RESERVOIR_SOUTH, std::move(reservoirSouth));
+    
+    // Create Reservoir
+    auto reservoir = std::make_unique<ZRoom>(
+        RoomIds::RESERVOIR,
+        "Reservoir",
+        "You are on the lake. The water is cold and the current is strong. It is difficult to stay afloat."
+    );
+    // Water room - NONLANDBIT
+    reservoir->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("You are on the lake. The water is cold and the current is strong. It is difficult to stay afloat.");
+        }
+    });
+    
+    // Set up exits for Reservoir
+    reservoir->setExit(Direction::NORTH, RoomExit(RoomIds::RESERVOIR_NORTH));
+    reservoir->setExit(Direction::SOUTH, RoomExit(RoomIds::RESERVOIR_SOUTH));
+    reservoir->setExit(Direction::UP, RoomExit(RoomIds::IN_STREAM));
+    reservoir->setExit(Direction::WEST, RoomExit(RoomIds::IN_STREAM));
+    reservoir->setExit(Direction::DOWN, RoomExit("The dam blocks your way."));
+    
+    g.registerObject(RoomIds::RESERVOIR, std::move(reservoir));
+    
+    // Create Reservoir North
+    auto reservoirNorth = std::make_unique<ZRoom>(
+        RoomIds::RESERVOIR_NORTH,
+        "Reservoir North",
+        "You are in a long room on the north shore of a large lake, far too deep and wide for crossing."
+    );
+    // Dark room - no ONBIT flag
+    reservoirNorth->setFlag(ObjectFlag::RLANDBIT);
+    reservoirNorth->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("You are in a long room on the north shore of a large lake, far too deep and wide for crossing.");
+        }
+    });
+    
+    // Set up exits for Reservoir North
+    reservoirNorth->setExit(Direction::NORTH, RoomExit(RoomIds::ATLANTIS_ROOM));
+    reservoirNorth->setExit(Direction::SOUTH, RoomExit("You would drown."));  // Requires LOW-TIDE flag
+    
+    g.registerObject(RoomIds::RESERVOIR_NORTH, std::move(reservoirNorth));
+    
+    // Create Stream View
+    auto streamView = std::make_unique<ZRoom>(
+        RoomIds::STREAM_VIEW,
+        "Stream View",
+        "You are standing on a path beside a gently flowing stream. The path follows the stream, which flows from west to east."
+    );
+    // Dark room - no ONBIT flag
+    streamView->setFlag(ObjectFlag::RLANDBIT);
+    streamView->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("You are standing on a path beside a gently flowing stream. The path follows the stream, which flows from west to east.");
+        }
+    });
+    
+    // Set up exits for Stream View
+    streamView->setExit(Direction::EAST, RoomExit(RoomIds::RESERVOIR_SOUTH));
+    streamView->setExit(Direction::WEST, RoomExit("The stream emerges from a spot too small for you to enter."));
+    
+    g.registerObject(RoomIds::STREAM_VIEW, std::move(streamView));
+    
+    // Create In Stream
+    auto inStream = std::make_unique<ZRoom>(
+        RoomIds::IN_STREAM,
+        "Stream",
+        "You are on the gently flowing stream. The upstream route is too narrow to navigate, and the downstream route is invisible due to twisting walls. There is a narrow beach to land on."
+    );
+    // Water room - NONLANDBIT
+    inStream->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("You are on the gently flowing stream. The upstream route is too narrow to navigate, and the downstream route is invisible due to twisting walls. There is a narrow beach to land on.");
+        }
+    });
+    
+    // Set up exits for In Stream
+    inStream->setExit(Direction::UP, RoomExit("The channel is too narrow."));
+    inStream->setExit(Direction::WEST, RoomExit("The channel is too narrow."));
+    inStream->setExit(Direction::DOWN, RoomExit(RoomIds::RESERVOIR));
+    inStream->setExit(Direction::EAST, RoomExit(RoomIds::RESERVOIR));
+    
+    g.registerObject(RoomIds::IN_STREAM, std::move(inStream));
+    
+    // Create Dam Room
+    auto damRoom = std::make_unique<ZRoom>(
+        RoomIds::DAM_ROOM,
+        "Dam",
+        "You are standing on the top of the Flood Control Dam #3, which was quite a tourist attraction in times far distant. There are paths to the north, south, and west, and a scramble down."
+    );
+    damRoom->setFlag(ObjectFlag::RLANDBIT);
+    damRoom->setFlag(ObjectFlag::ONBIT);
+    damRoom->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("You are standing on the top of the Flood Control Dam #3, which was quite a tourist attraction in times far distant. There are paths to the north, south, and west, and a scramble down.");
+        }
+    });
+    
+    // Set up exits for Dam Room
+    damRoom->setExit(Direction::SOUTH, RoomExit(RoomIds::DEEP_CANYON));
+    damRoom->setExit(Direction::DOWN, RoomExit(RoomIds::DAM_BASE));
+    damRoom->setExit(Direction::EAST, RoomExit(RoomIds::DAM_BASE));
+    damRoom->setExit(Direction::NORTH, RoomExit(RoomIds::DAM_LOBBY));
+    damRoom->setExit(Direction::WEST, RoomExit(RoomIds::RESERVOIR_SOUTH));
+    
+    g.registerObject(RoomIds::DAM_ROOM, std::move(damRoom));
+    
+    // Create Dam Lobby
+    auto damLobby = std::make_unique<ZRoom>(
+        RoomIds::DAM_LOBBY,
+        "Dam Lobby",
+        "This room appears to have been the waiting room for groups touring the dam. There are open doorways here to the north and east marked \"Private\", and there is a path leading south over the top of the dam."
+    );
+    damLobby->setFlag(ObjectFlag::RLANDBIT);
+    damLobby->setFlag(ObjectFlag::ONBIT);
+    damLobby->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This room appears to have been the waiting room for groups touring the dam. There are open doorways here to the north and east marked \"Private\", and there is a path leading south over the top of the dam.");
+        }
+    });
+    
+    // Set up exits for Dam Lobby
+    damLobby->setExit(Direction::SOUTH, RoomExit(RoomIds::DAM_ROOM));
+    damLobby->setExit(Direction::NORTH, RoomExit(RoomIds::MAINTENANCE_ROOM));
+    damLobby->setExit(Direction::EAST, RoomExit(RoomIds::MAINTENANCE_ROOM));
+    
+    g.registerObject(RoomIds::DAM_LOBBY, std::move(damLobby));
+    
+    // Create Maintenance Room
+    auto maintenanceRoom = std::make_unique<ZRoom>(
+        RoomIds::MAINTENANCE_ROOM,
+        "Maintenance Room",
+        "This is what appears to have been the maintenance room for Flood Control Dam #3. Apparently, this room has been ransacked recently, for most of the valuable equipment is gone. On the wall in front of you is a group of buttons colored blue, yellow, brown, and red. There are doorways to the west and south."
+    );
+    // Dark room - no ONBIT flag
+    maintenanceRoom->setFlag(ObjectFlag::RLANDBIT);
+    maintenanceRoom->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is what appears to have been the maintenance room for Flood Control Dam #3. Apparently, this room has been ransacked recently, for most of the valuable equipment is gone. On the wall in front of you is a group of buttons colored blue, yellow, brown, and red. There are doorways to the west and south.");
+        }
+    });
+    
+    // Set up exits for Maintenance Room
+    maintenanceRoom->setExit(Direction::SOUTH, RoomExit(RoomIds::DAM_LOBBY));
+    maintenanceRoom->setExit(Direction::WEST, RoomExit(RoomIds::DAM_LOBBY));
+    
+    g.registerObject(RoomIds::MAINTENANCE_ROOM, std::move(maintenanceRoom));
+    
+    // Create Dam Base
+    auto damBase = std::make_unique<ZRoom>(
+        RoomIds::DAM_BASE,
+        "Dam Base",
+        "You are at the base of Flood Control Dam #3, which looms above you and to the north. The river Frigid is flowing by here. Along the river are the White Cliffs which seem to form giant walls stretching from north to south along the shores of the river as it winds its way downstream."
+    );
+    damBase->setFlag(ObjectFlag::RLANDBIT);
+    damBase->setFlag(ObjectFlag::ONBIT);
+    damBase->setFlag(ObjectFlag::SACREDBIT);
+    damBase->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("You are at the base of Flood Control Dam #3, which looms above you and to the north. The river Frigid is flowing by here. Along the river are the White Cliffs which seem to form giant walls stretching from north to south along the shores of the river as it winds its way downstream.");
+        }
+    });
+    
+    // Set up exits for Dam Base
+    damBase->setExit(Direction::NORTH, RoomExit(RoomIds::DAM_ROOM));
+    damBase->setExit(Direction::UP, RoomExit(RoomIds::DAM_ROOM));
+    
+    g.registerObject(RoomIds::DAM_BASE, std::move(damBase));
+    
+    // ===== SPECIAL UNDERGROUND ROOMS =====
+    
+    // Create Engravings Cave
+    auto engravingsCave = std::make_unique<ZRoom>(
+        RoomIds::ENGRAVINGS_CAVE,
+        "Engravings Cave",
+        "You have entered a low cave with passages leading northwest and east."
+    );
+    // Dark room - no ONBIT flag
+    engravingsCave->setFlag(ObjectFlag::RLANDBIT);
+    engravingsCave->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("You have entered a low cave with passages leading northwest and east.");
+        }
+    });
+    
+    // Set up exits for Engravings Cave
+    engravingsCave->setExit(Direction::NW, RoomExit(RoomIds::ROUND_ROOM));
+    engravingsCave->setExit(Direction::EAST, RoomExit(RoomIds::DOME_ROOM));
+    
+    g.registerObject(RoomIds::ENGRAVINGS_CAVE, std::move(engravingsCave));
+    
     // Set up forest navigation (confusing interconnections)
     // FOREST-1 connections
     auto* f1 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::FOREST_1));

@@ -372,32 +372,32 @@ Now that the parser is robust, we need content for it to operate on. Start with 
   - _Requirements: 14, 15, 17_
 
 
-- [ ] 12. Implement underground rooms (passages and chambers)
+- [x] 12. Implement underground rooms (passages and chambers)
   - Create all underground passage rooms
   - Create special chambers (Round Room, Loud Room, etc.)
   - Set up complex underground navigation
   - Add appropriate lighting flags
   - _Requirements: 14, 15, 17_
 
-- [ ] 12.1 Create main passages
+- [x] 12.1 Create main passages
   - EAST_WEST_PASSAGE, NORTH_SOUTH_PASSAGE
   - Connect to cellar and other areas
   - Set lighting flags (most are dark)
   - _Requirements: 14, 15_
 
-- [ ] 12.2 Create Round Room
+- [x] 12.2 Create Round Room
   - Add description with multiple exits
   - Connect to many other rooms
   - Add appropriate flags
   - _Requirements: 14, 15_
 
-- [ ] 12.3 Create Loud Room
+- [x] 12.3 Create Loud Room
   - Add description
   - Implement echo action handler
   - Connect to adjacent rooms
   - _Requirements: 14, 15, 43_
 
-- [ ] 12.4 Create remaining underground rooms
+- [x] 12.4 Create remaining underground rooms
   - Chasm, Reservoir, Dam, Maintenance Room
   - Troll Room, Maze entrance areas
   - All other underground rooms from 1dungeon.zil
