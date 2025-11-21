@@ -1330,6 +1330,287 @@ void initializeWorld() {
     
     g.registerObject(RoomIds::ENGRAVINGS_CAVE, std::move(engravingsCave));
     
+    // ===== MAZE ROOMS =====
+    // The maze is a confusing network of twisty passages, all alike
+    // Rooms have similar descriptions to disorient the player
+    
+    // Create MAZE_1 (entrance from Troll Room)
+    auto maze1 = std::make_unique<ZRoom>(
+        RoomIds::MAZE_1,
+        "Maze",
+        "This is part of a maze of twisty little passages, all alike."
+    );
+    maze1->setFlag(ObjectFlag::RLANDBIT);
+    maze1->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is part of a maze of twisty little passages, all alike.");
+        }
+    });
+    g.registerObject(RoomIds::MAZE_1, std::move(maze1));
+    
+    // Create MAZE_2
+    auto maze2 = std::make_unique<ZRoom>(
+        RoomIds::MAZE_2,
+        "Maze",
+        "This is part of a maze of twisty little passages, all alike."
+    );
+    maze2->setFlag(ObjectFlag::RLANDBIT);
+    maze2->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is part of a maze of twisty little passages, all alike.");
+        }
+    });
+    g.registerObject(RoomIds::MAZE_2, std::move(maze2));
+    
+    // Create MAZE_3
+    auto maze3 = std::make_unique<ZRoom>(
+        RoomIds::MAZE_3,
+        "Maze",
+        "This is part of a maze of twisty little passages, all alike."
+    );
+    maze3->setFlag(ObjectFlag::RLANDBIT);
+    maze3->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is part of a maze of twisty little passages, all alike.");
+        }
+    });
+    g.registerObject(RoomIds::MAZE_3, std::move(maze3));
+    
+    // Create MAZE_4
+    auto maze4 = std::make_unique<ZRoom>(
+        RoomIds::MAZE_4,
+        "Maze",
+        "This is part of a maze of twisty little passages, all alike."
+    );
+    maze4->setFlag(ObjectFlag::RLANDBIT);
+    maze4->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is part of a maze of twisty little passages, all alike.");
+        }
+    });
+    g.registerObject(RoomIds::MAZE_4, std::move(maze4));
+    
+    // Create MAZE_5
+    auto maze5 = std::make_unique<ZRoom>(
+        RoomIds::MAZE_5,
+        "Maze",
+        "This is part of a maze of twisty little passages, all alike."
+    );
+    maze5->setFlag(ObjectFlag::RLANDBIT);
+    maze5->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is part of a maze of twisty little passages, all alike.");
+        }
+    });
+    g.registerObject(RoomIds::MAZE_5, std::move(maze5));
+    
+    // Create MAZE_6
+    auto maze6 = std::make_unique<ZRoom>(
+        RoomIds::MAZE_6,
+        "Maze",
+        "This is part of a maze of twisty little passages, all alike."
+    );
+    maze6->setFlag(ObjectFlag::RLANDBIT);
+    maze6->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is part of a maze of twisty little passages, all alike.");
+        }
+    });
+    g.registerObject(RoomIds::MAZE_6, std::move(maze6));
+    
+    // Create MAZE_7
+    auto maze7 = std::make_unique<ZRoom>(
+        RoomIds::MAZE_7,
+        "Maze",
+        "This is part of a maze of twisty little passages, all alike."
+    );
+    maze7->setFlag(ObjectFlag::RLANDBIT);
+    maze7->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is part of a maze of twisty little passages, all alike.");
+        }
+    });
+    g.registerObject(RoomIds::MAZE_7, std::move(maze7));
+    
+    // Create MAZE_8
+    auto maze8 = std::make_unique<ZRoom>(
+        RoomIds::MAZE_8,
+        "Maze",
+        "This is part of a maze of twisty little passages, all alike."
+    );
+    maze8->setFlag(ObjectFlag::RLANDBIT);
+    maze8->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is part of a maze of twisty little passages, all alike.");
+        }
+    });
+    g.registerObject(RoomIds::MAZE_8, std::move(maze8));
+    
+    // Create MAZE_9
+    auto maze9 = std::make_unique<ZRoom>(
+        RoomIds::MAZE_9,
+        "Maze",
+        "This is part of a maze of twisty little passages, all alike."
+    );
+    maze9->setFlag(ObjectFlag::RLANDBIT);
+    maze9->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is part of a maze of twisty little passages, all alike.");
+        }
+    });
+    g.registerObject(RoomIds::MAZE_9, std::move(maze9));
+    
+    // Create MAZE_10
+    auto maze10 = std::make_unique<ZRoom>(
+        RoomIds::MAZE_10,
+        "Maze",
+        "This is part of a maze of twisty little passages, all alike."
+    );
+    maze10->setFlag(ObjectFlag::RLANDBIT);
+    maze10->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is part of a maze of twisty little passages, all alike.");
+        }
+    });
+    g.registerObject(RoomIds::MAZE_10, std::move(maze10));
+    
+    // Create MAZE_11
+    auto maze11 = std::make_unique<ZRoom>(
+        RoomIds::MAZE_11,
+        "Maze",
+        "This is part of a maze of twisty little passages, all alike."
+    );
+    maze11->setFlag(ObjectFlag::RLANDBIT);
+    maze11->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is part of a maze of twisty little passages, all alike.");
+        }
+    });
+    g.registerObject(RoomIds::MAZE_11, std::move(maze11));
+    
+    // Create MAZE_12
+    auto maze12 = std::make_unique<ZRoom>(
+        RoomIds::MAZE_12,
+        "Maze",
+        "This is part of a maze of twisty little passages, all alike."
+    );
+    maze12->setFlag(ObjectFlag::RLANDBIT);
+    maze12->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is part of a maze of twisty little passages, all alike.");
+        }
+    });
+    g.registerObject(RoomIds::MAZE_12, std::move(maze12));
+    
+    // Create MAZE_13
+    auto maze13 = std::make_unique<ZRoom>(
+        RoomIds::MAZE_13,
+        "Maze",
+        "This is part of a maze of twisty little passages, all alike."
+    );
+    maze13->setFlag(ObjectFlag::RLANDBIT);
+    maze13->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is part of a maze of twisty little passages, all alike.");
+        }
+    });
+    g.registerObject(RoomIds::MAZE_13, std::move(maze13));
+    
+    // Create MAZE_14
+    auto maze14 = std::make_unique<ZRoom>(
+        RoomIds::MAZE_14,
+        "Maze",
+        "This is part of a maze of twisty little passages, all alike."
+    );
+    maze14->setFlag(ObjectFlag::RLANDBIT);
+    maze14->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is part of a maze of twisty little passages, all alike.");
+        }
+    });
+    g.registerObject(RoomIds::MAZE_14, std::move(maze14));
+    
+    // Create MAZE_15
+    auto maze15 = std::make_unique<ZRoom>(
+        RoomIds::MAZE_15,
+        "Maze",
+        "This is part of a maze of twisty little passages, all alike."
+    );
+    maze15->setFlag(ObjectFlag::RLANDBIT);
+    maze15->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is part of a maze of twisty little passages, all alike.");
+        }
+    });
+    g.registerObject(RoomIds::MAZE_15, std::move(maze15));
+    
+    // Create Grating Room (exit from maze)
+    auto gratingRoom = std::make_unique<ZRoom>(
+        RoomIds::GRATING_ROOM,
+        "Grating Room",
+        "You are in a small room near the maze. There are twisty passages in the immediate vicinity."
+    );
+    gratingRoom->setFlag(ObjectFlag::RLANDBIT);
+    gratingRoom->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("You are in a small room near the maze. There are twisty passages in the immediate vicinity.");
+        }
+    });
+    g.registerObject(RoomIds::GRATING_ROOM, std::move(gratingRoom));
+    
+    // Create Dead End rooms
+    auto deadEnd1 = std::make_unique<ZRoom>(
+        RoomIds::DEAD_END_1,
+        "Dead End",
+        "You have come to a dead end in the maze."
+    );
+    deadEnd1->setFlag(ObjectFlag::RLANDBIT);
+    deadEnd1->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("You have come to a dead end in the maze.");
+        }
+    });
+    g.registerObject(RoomIds::DEAD_END_1, std::move(deadEnd1));
+    
+    auto deadEnd2 = std::make_unique<ZRoom>(
+        RoomIds::DEAD_END_2,
+        "Dead End",
+        "You have come to a dead end in the maze."
+    );
+    deadEnd2->setFlag(ObjectFlag::RLANDBIT);
+    deadEnd2->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("You have come to a dead end in the maze.");
+        }
+    });
+    g.registerObject(RoomIds::DEAD_END_2, std::move(deadEnd2));
+    
+    auto deadEnd3 = std::make_unique<ZRoom>(
+        RoomIds::DEAD_END_3,
+        "Dead End",
+        "You have come to a dead end in the maze."
+    );
+    deadEnd3->setFlag(ObjectFlag::RLANDBIT);
+    deadEnd3->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("You have come to a dead end in the maze.");
+        }
+    });
+    g.registerObject(RoomIds::DEAD_END_3, std::move(deadEnd3));
+    
+    auto deadEnd4 = std::make_unique<ZRoom>(
+        RoomIds::DEAD_END_4,
+        "Dead End",
+        "You have come to a dead end in the maze."
+    );
+    deadEnd4->setFlag(ObjectFlag::RLANDBIT);
+    deadEnd4->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("You have come to a dead end in the maze.");
+        }
+    });
+    g.registerObject(RoomIds::DEAD_END_4, std::move(deadEnd4));
+    
     // Set up forest navigation (confusing interconnections)
     // FOREST-1 connections
     auto* f1 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::FOREST_1));
@@ -1353,6 +1634,192 @@ void initializeWorld() {
         f3->setExit(Direction::NORTH, RoomExit(RoomIds::CLEARING));
         f3->setExit(Direction::WEST, RoomExit(RoomIds::FOREST_1));
         f3->setExit(Direction::NW, RoomExit(ROOM_SOUTH_OF_HOUSE));
+    }
+    
+    // ===== MAZE NAVIGATION =====
+    // Set up confusing maze connections based on original Zork I
+    // The maze is intentionally disorienting with non-intuitive paths
+    // Solution path exists but requires careful mapping
+    
+    // MAZE_1 - Entrance from Troll Room
+    auto* m1 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::MAZE_1));
+    if (m1) {
+        m1->setExit(Direction::SOUTH, RoomExit(RoomIds::MAZE_2));
+        m1->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_4));
+        m1->setExit(Direction::UP, RoomExit(RoomIds::MAZE_3));
+        m1->setExit(Direction::NORTH, RoomExit(RoomIds::MAZE_1));  // Loops back
+        m1->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_1));   // Loops back
+    }
+    
+    // MAZE_2
+    auto* m2 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::MAZE_2));
+    if (m2) {
+        m2->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_3));
+        m2->setExit(Direction::SOUTH, RoomExit(RoomIds::MAZE_5));
+        m2->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_2));   // Loops back
+        m2->setExit(Direction::DOWN, RoomExit(RoomIds::MAZE_6));
+    }
+    
+    // MAZE_3
+    auto* m3 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::MAZE_3));
+    if (m3) {
+        m3->setExit(Direction::UP, RoomExit(RoomIds::MAZE_4));
+        m3->setExit(Direction::NORTH, RoomExit(RoomIds::MAZE_5));
+        m3->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_3));   // Loops back
+        m3->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_3));   // Loops back
+    }
+    
+    // MAZE_4
+    auto* m4 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::MAZE_4));
+    if (m4) {
+        m4->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_5));
+        m4->setExit(Direction::SOUTH, RoomExit(RoomIds::DEAD_END_1));
+        m4->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_6));
+        m4->setExit(Direction::UP, RoomExit(RoomIds::MAZE_4));     // Loops back
+    }
+    
+    // MAZE_5
+    auto* m5 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::MAZE_5));
+    if (m5) {
+        m5->setExit(Direction::SW, RoomExit(RoomIds::MAZE_6));
+        m5->setExit(Direction::NE, RoomExit(RoomIds::MAZE_7));
+        m5->setExit(Direction::SE, RoomExit(RoomIds::MAZE_8));
+        m5->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_5));   // Loops back
+    }
+    
+    // MAZE_6
+    auto* m6 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::MAZE_6));
+    if (m6) {
+        m6->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_7));
+        m6->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_8));
+        m6->setExit(Direction::UP, RoomExit(RoomIds::MAZE_9));
+        m6->setExit(Direction::SOUTH, RoomExit(RoomIds::MAZE_6));  // Loops back
+    }
+    
+    // MAZE_7
+    auto* m7 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::MAZE_7));
+    if (m7) {
+        m7->setExit(Direction::SOUTH, RoomExit(RoomIds::MAZE_8));
+        m7->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_9));
+        m7->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_10));
+        m7->setExit(Direction::UP, RoomExit(RoomIds::MAZE_7));     // Loops back
+    }
+    
+    // MAZE_8
+    auto* m8 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::MAZE_8));
+    if (m8) {
+        m8->setExit(Direction::NE, RoomExit(RoomIds::MAZE_9));
+        m8->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_10));
+        m8->setExit(Direction::DOWN, RoomExit(RoomIds::MAZE_11));
+        m8->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_8));   // Loops back
+    }
+    
+    // MAZE_9
+    auto* m9 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::MAZE_9));
+    if (m9) {
+        m9->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_10));
+        m9->setExit(Direction::SOUTH, RoomExit(RoomIds::DEAD_END_2));
+        m9->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_12));
+        m9->setExit(Direction::NORTH, RoomExit(RoomIds::MAZE_9));  // Loops back
+    }
+    
+    // MAZE_10
+    auto* m10 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::MAZE_10));
+    if (m10) {
+        m10->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_11));
+        m10->setExit(Direction::DOWN, RoomExit(RoomIds::MAZE_12));
+        m10->setExit(Direction::SOUTH, RoomExit(RoomIds::MAZE_13));
+        m10->setExit(Direction::NORTH, RoomExit(RoomIds::MAZE_10)); // Loops back
+    }
+    
+    // MAZE_11
+    auto* m11 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::MAZE_11));
+    if (m11) {
+        m11->setExit(Direction::NORTH, RoomExit(RoomIds::MAZE_12));
+        m11->setExit(Direction::SOUTH, RoomExit(RoomIds::MAZE_13));
+        m11->setExit(Direction::WEST, RoomExit(RoomIds::DEAD_END_3));
+        m11->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_11));  // Loops back
+    }
+    
+    // MAZE_12
+    auto* m12 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::MAZE_12));
+    if (m12) {
+        m12->setExit(Direction::SOUTH, RoomExit(RoomIds::MAZE_13));
+        m12->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_14));
+        m12->setExit(Direction::UP, RoomExit(RoomIds::MAZE_15));
+        m12->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_12));  // Loops back
+    }
+    
+    // MAZE_13
+    auto* m13 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::MAZE_13));
+    if (m13) {
+        m13->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_14));
+        m13->setExit(Direction::DOWN, RoomExit(RoomIds::MAZE_15));
+        m13->setExit(Direction::EAST, RoomExit(RoomIds::DEAD_END_4));
+        m13->setExit(Direction::NORTH, RoomExit(RoomIds::MAZE_13)); // Loops back
+    }
+    
+    // MAZE_14
+    auto* m14 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::MAZE_14));
+    if (m14) {
+        m14->setExit(Direction::NW, RoomExit(RoomIds::MAZE_15));
+        m14->setExit(Direction::SW, RoomExit(RoomIds::GRATING_ROOM));  // Exit to grating room
+        m14->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_14));  // Loops back
+        m14->setExit(Direction::UP, RoomExit(RoomIds::MAZE_14));    // Loops back
+    }
+    
+    // MAZE_15
+    auto* m15 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::MAZE_15));
+    if (m15) {
+        m15->setExit(Direction::NORTH, RoomExit(RoomIds::GRATING_ROOM));  // Exit to grating room
+        m15->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_15));  // Loops back
+        m15->setExit(Direction::SOUTH, RoomExit(RoomIds::MAZE_15)); // Loops back
+        m15->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_15));  // Loops back
+    }
+    
+    // Dead ends in maze - all lead back to their source
+    auto* de1 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::DEAD_END_1));
+    if (de1) {
+        de1->setExit(Direction::NORTH, RoomExit(RoomIds::MAZE_4));
+    }
+    
+    auto* de2 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::DEAD_END_2));
+    if (de2) {
+        de2->setExit(Direction::NORTH, RoomExit(RoomIds::MAZE_9));
+    }
+    
+    auto* de3 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::DEAD_END_3));
+    if (de3) {
+        de3->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_11));
+    }
+    
+    auto* de4 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::DEAD_END_4));
+    if (de4) {
+        de4->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_13));
+    }
+    
+    // Grating Room - connects maze to main underground
+    auto* gratingRm = dynamic_cast<ZRoom*>(g.getObject(RoomIds::GRATING_ROOM));
+    if (gratingRm) {
+        gratingRm->setExit(Direction::SOUTH, RoomExit(RoomIds::MAZE_14));
+        gratingRm->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_15));
+        gratingRm->setExit(Direction::UP, RoomExit(RoomIds::GRATING_CLEARING));  // To surface via grating
+        // Note: UP exit will require grating to be open in actual gameplay
+    }
+    
+    // Update Troll Room to have entrance to maze (west exit)
+    // This was already set up in the Troll Room creation, but verify it's correct
+    auto* trollRm = dynamic_cast<ZRoom*>(g.getObject(RoomIds::TROLL_ROOM));
+    if (trollRm) {
+        // West exit to maze entrance (MAZE_1) - requires troll to be defeated
+        trollRm->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_1));
+    }
+    
+    // Update Grating Clearing to have down exit to Grating Room
+    auto* gratingClearingPtr = dynamic_cast<ZRoom*>(g.getObject(RoomIds::GRATING_CLEARING));
+    if (gratingClearingPtr) {
+        gratingClearingPtr->setExit(Direction::DOWN, RoomExit(RoomIds::GRATING_ROOM));
+        // Note: DOWN exit will require grating to be open in actual gameplay
     }
     
     // Create Mailbox object

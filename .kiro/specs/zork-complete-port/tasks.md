@@ -404,27 +404,27 @@ Now that the parser is robust, we need content for it to operate on. Start with 
   - Set up all exits and connections
   - _Requirements: 14, 15, 17_
 
-- [ ] 13. Implement maze rooms
+- [x] 13. Implement maze rooms
   - Create MAZE_1 through MAZE_15
   - Set up confusing maze navigation
   - Make rooms look similar
   - Add correct exits to maze solution
   - _Requirements: 14, 15, 17, 84_
 
-- [ ] 13.1 Create all maze rooms
+- [x] 13.1 Create all maze rooms
   - MAZE_1 through MAZE_15
   - Use similar descriptions
   - Set appropriate flags
   - _Requirements: 14, 15, 84_
 
-- [ ] 13.2 Set up maze navigation
+- [x] 13.2 Set up maze navigation
   - Create non-intuitive connections
   - Some exits loop back
   - Some exits lead to dead ends
   - Implement correct solution path
   - _Requirements: 14, 81, 84_
 
-- [ ] 13.3 Add maze entrance and exit
+- [x] 13.3 Add maze entrance and exit
   - Connect maze to main underground
   - Add grating room connections
   - _Requirements: 14, 84_
