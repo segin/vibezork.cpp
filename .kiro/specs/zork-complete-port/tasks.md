@@ -46,7 +46,7 @@ The parser is the foundation - it must be robust before we can add more content.
   - Test flag requirements
   - _Requirements: 6, 92_
 
-- [ ] 2. Implement VerbRegistry for synonym mapping
+- [x] 2. Implement VerbRegistry for synonym mapping
   - Create VerbRegistry class
   - Implement registerVerb() to map synonyms to verb IDs
   - Implement registerSyntax() to associate patterns with verbs
@@ -54,14 +54,14 @@ The parser is the foundation - it must be robust before we can add more content.
   - Implement getSyntaxPatterns() to get patterns for a verb
   - _Requirements: 2_
 
-- [ ] 2.1 Register all verb synonyms from gsyntax.zil
+- [x] 2.1 Register all verb synonyms from gsyntax.zil
   - Add TAKE/GET/GRAB/CARRY synonyms
   - Add EXAMINE/X/LOOK AT/DESCRIBE synonyms
   - Add DROP/PUT DOWN/RELEASE synonyms
   - Add all other verb synonyms from original
   - _Requirements: 2_
 
-- [ ] 2.2 Register all syntax patterns from gsyntax.zil
+- [x] 2.2 Register all syntax patterns from gsyntax.zil
   - Add patterns for manipulation verbs (TAKE, DROP, PUT, etc.)
   - Add patterns for examination verbs (EXAMINE, READ, etc.)
   - Add patterns for interaction verbs (OPEN, CLOSE, LOCK, etc.)
