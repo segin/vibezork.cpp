@@ -1822,6 +1822,307 @@ void initializeWorld() {
         // Note: DOWN exit will require grating to be open in actual gameplay
     }
     
+    // ===== SPECIAL AREA ROOMS =====
+    
+    // Create Cyclops Room
+    auto cyclopsRoom = std::make_unique<ZRoom>(
+        RoomIds::CYCLOPS_ROOM,
+        "Cyclops Room",
+        "This is a large room with a ceiling which cannot be detected from the ground. There is a narrow passage from east to west and a stone stairway leading upward. The room is eerie in its quietness."
+    );
+    cyclopsRoom->setFlag(ObjectFlag::RLANDBIT);
+    cyclopsRoom->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is a large room with a ceiling which cannot be detected from the ground. There is a narrow passage from east to west and a stone stairway leading upward. The room is eerie in its quietness.");
+        }
+    });
+    cyclopsRoom->setExit(Direction::EAST, RoomExit(RoomIds::STRANGE_PASSAGE));
+    cyclopsRoom->setExit(Direction::UP, RoomExit(RoomIds::TREASURE_ROOM));
+    // Note: UP exit will be conditional on cyclops being defeated/fed
+    g.registerObject(RoomIds::CYCLOPS_ROOM, std::move(cyclopsRoom));
+    
+    // Create Strange Passage
+    auto strangePassage = std::make_unique<ZRoom>(
+        RoomIds::STRANGE_PASSAGE,
+        "Strange Passage",
+        "This is a long passage. To the west is one entrance. On the east there is an old wooden door, with a large hole in it (about cyclops sized)."
+    );
+    strangePassage->setFlag(ObjectFlag::RLANDBIT);
+    strangePassage->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is a long passage. To the west is one entrance. On the east there is an old wooden door, with a large hole in it (about cyclops sized).");
+        }
+    });
+    strangePassage->setExit(Direction::WEST, RoomExit(RoomIds::CYCLOPS_ROOM));
+    // East exit will be added when connecting to other underground areas
+    g.registerObject(RoomIds::STRANGE_PASSAGE, std::move(strangePassage));
+    
+    // Create Treasure Room (Thief's Lair)
+    auto treasureRoom = std::make_unique<ZRoom>(
+        RoomIds::TREASURE_ROOM,
+        "Treasure Room",
+        "This is a large room, whose east wall is solid granite. A number of discarded bags, which crumble at your touch, are scattered about on the floor. There is an exit down a staircase."
+    );
+    treasureRoom->setFlag(ObjectFlag::RLANDBIT);
+    treasureRoom->setProperty(P_VALUE, 25);  // Room has value for scoring
+    treasureRoom->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is a large room, whose east wall is solid granite. A number of discarded bags, which crumble at your touch, are scattered about on the floor. There is an exit down a staircase.");
+        }
+        // M_ENTER action will trigger thief encounter (to be implemented with thief system)
+    });
+    treasureRoom->setExit(Direction::DOWN, RoomExit(RoomIds::CYCLOPS_ROOM));
+    g.registerObject(RoomIds::TREASURE_ROOM, std::move(treasureRoom));
+    
+    // Create Entrance to Hades
+    auto entranceToHades = std::make_unique<ZRoom>(
+        RoomIds::ENTRANCE_TO_HADES,
+        "Entrance to Hades",
+        "You are outside a large gateway, on which is inscribed:\n\n  Abandon every hope all ye who enter here\n\nThe gate is open; through it you can see a desolation, with a pile of mangled bodies in one corner. Thousands of voices, lamenting some hideous fate, can be heard."
+    );
+    entranceToHades->setFlag(ObjectFlag::RLANDBIT);
+    entranceToHades->setFlag(ObjectFlag::ONBIT);
+    entranceToHades->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("You are outside a large gateway, on which is inscribed:");
+            crlf();
+            printLine("  Abandon every hope all ye who enter here");
+            crlf();
+            printLine("The gate is open; through it you can see a desolation, with a pile of mangled bodies in one corner. Thousands of voices, lamenting some hideous fate, can be heard.");
+        }
+    });
+    entranceToHades->setExit(Direction::UP, RoomExit(RoomIds::TINY_CAVE));
+    entranceToHades->setExit(Direction::IN, RoomExit(RoomIds::LAND_OF_LIVING_DEAD));
+    entranceToHades->setExit(Direction::SOUTH, RoomExit(RoomIds::LAND_OF_LIVING_DEAD));
+    // Note: IN and SOUTH exits will be conditional on LLD-FLAG in actual gameplay
+    g.registerObject(RoomIds::ENTRANCE_TO_HADES, std::move(entranceToHades));
+    
+    // Create Land of the Living Dead
+    auto landOfLivingDead = std::make_unique<ZRoom>(
+        RoomIds::LAND_OF_LIVING_DEAD,
+        "Land of the Dead",
+        "You have entered the Land of the Living Dead. Thousands of lost souls can be heard weeping and moaning. In the corner are stacked the remains of dozens of previous adventurers less fortunate than yourself. A passage exits to the north."
+    );
+    landOfLivingDead->setFlag(ObjectFlag::RLANDBIT);
+    landOfLivingDead->setFlag(ObjectFlag::ONBIT);
+    landOfLivingDead->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("You have entered the Land of the Living Dead. Thousands of lost souls can be heard weeping and moaning. In the corner are stacked the remains of dozens of previous adventurers less fortunate than yourself. A passage exits to the north.");
+        }
+    });
+    landOfLivingDead->setExit(Direction::OUT, RoomExit(RoomIds::ENTRANCE_TO_HADES));
+    landOfLivingDead->setExit(Direction::NORTH, RoomExit(RoomIds::ENTRANCE_TO_HADES));
+    g.registerObject(RoomIds::LAND_OF_LIVING_DEAD, std::move(landOfLivingDead));
+    
+    // Create Dome Room
+    auto domeRoom = std::make_unique<ZRoom>(
+        RoomIds::DOME_ROOM,
+        "Dome Room",
+        "You are at the periphery of a large dome, which forms the ceiling of another room below. Protecting you from a precipitous drop is a wooden railing which circles the dome."
+    );
+    domeRoom->setFlag(ObjectFlag::RLANDBIT);
+    domeRoom->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("You are at the periphery of a large dome, which forms the ceiling of another room below. Protecting you from a precipitous drop is a wooden railing which circles the dome.");
+        }
+    });
+    domeRoom->setExit(Direction::WEST, RoomExit(RoomIds::ENGRAVINGS_CAVE));
+    domeRoom->setExit(Direction::DOWN, RoomExit(RoomIds::TORCH_ROOM));
+    // Note: DOWN exit will be conditional on DOME-FLAG (rope tied) in actual gameplay
+    g.registerObject(RoomIds::DOME_ROOM, std::move(domeRoom));
+    
+    // Create Torch Room
+    auto torchRoom = std::make_unique<ZRoom>(
+        RoomIds::TORCH_ROOM,
+        "Torch Room",
+        "This is a large room with a prominent doorway leading to a down staircase. To the west is a narrow twisting tunnel, through which is coming a horrible stench. Above you is a large dome painted with scenes depicting elvish hacking rites. Up around the edge of the dome (20 feet up) is a wooden railing. In the center of the room there is a white marble pedestal."
+    );
+    torchRoom->setFlag(ObjectFlag::RLANDBIT);
+    torchRoom->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is a large room with a prominent doorway leading to a down staircase. To the west is a narrow twisting tunnel, through which is coming a horrible stench. Above you is a large dome painted with scenes depicting elvish hacking rites. Up around the edge of the dome (20 feet up) is a wooden railing. In the center of the room there is a white marble pedestal.");
+        }
+    });
+    torchRoom->setExit(Direction::UP, RoomExit("You cannot reach the rope."));
+    torchRoom->setExit(Direction::SOUTH, RoomExit(RoomIds::NORTH_TEMPLE));
+    torchRoom->setExit(Direction::DOWN, RoomExit(RoomIds::NORTH_TEMPLE));
+    g.registerObject(RoomIds::TORCH_ROOM, std::move(torchRoom));
+    
+    // Create North Temple
+    auto northTemple = std::make_unique<ZRoom>(
+        RoomIds::NORTH_TEMPLE,
+        "Temple",
+        "This is the north end of a large temple. On the east wall is an ancient inscription, probably a prayer in a long-forgotten language. Below the prayer is a staircase leading down. The west wall is solid granite. The exit to the north end of the room is through huge marble pillars."
+    );
+    northTemple->setFlag(ObjectFlag::RLANDBIT);
+    northTemple->setFlag(ObjectFlag::ONBIT);
+    northTemple->setFlag(ObjectFlag::SACREDBIT);
+    northTemple->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is the north end of a large temple. On the east wall is an ancient inscription, probably a prayer in a long-forgotten language. Below the prayer is a staircase leading down. The west wall is solid granite. The exit to the north end of the room is through huge marble pillars.");
+        }
+    });
+    northTemple->setExit(Direction::DOWN, RoomExit(RoomIds::EGYPT_ROOM));
+    northTemple->setExit(Direction::EAST, RoomExit(RoomIds::EGYPT_ROOM));
+    northTemple->setExit(Direction::NORTH, RoomExit(RoomIds::TORCH_ROOM));
+    northTemple->setExit(Direction::OUT, RoomExit(RoomIds::TORCH_ROOM));
+    northTemple->setExit(Direction::UP, RoomExit(RoomIds::TORCH_ROOM));
+    northTemple->setExit(Direction::SOUTH, RoomExit(RoomIds::SOUTH_TEMPLE));
+    g.registerObject(RoomIds::NORTH_TEMPLE, std::move(northTemple));
+    
+    // Create South Temple (Altar)
+    auto southTemple = std::make_unique<ZRoom>(
+        RoomIds::SOUTH_TEMPLE,
+        "Altar",
+        "This is the south end of a large temple. In front of you is what appears to be an altar. In one corner is a small hole in the floor which leads into darkness. You probably could not get back up it."
+    );
+    southTemple->setFlag(ObjectFlag::RLANDBIT);
+    southTemple->setFlag(ObjectFlag::ONBIT);
+    southTemple->setFlag(ObjectFlag::SACREDBIT);
+    southTemple->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is the south end of a large temple. In front of you is what appears to be an altar. In one corner is a small hole in the floor which leads into darkness. You probably could not get back up it.");
+        }
+    });
+    southTemple->setExit(Direction::NORTH, RoomExit(RoomIds::NORTH_TEMPLE));
+    southTemple->setExit(Direction::DOWN, RoomExit(RoomIds::TINY_CAVE));
+    // Note: DOWN exit will be conditional on COFFIN-CURE flag in actual gameplay
+    g.registerObject(RoomIds::SOUTH_TEMPLE, std::move(southTemple));
+    
+    // Create Egyptian Room
+    auto egyptRoom = std::make_unique<ZRoom>(
+        RoomIds::EGYPT_ROOM,
+        "Egyptian Room",
+        "This is a room which looks like an Egyptian tomb. There is an ascending staircase to the west."
+    );
+    egyptRoom->setFlag(ObjectFlag::RLANDBIT);
+    egyptRoom->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is a room which looks like an Egyptian tomb. There is an ascending staircase to the west.");
+        }
+    });
+    egyptRoom->setExit(Direction::WEST, RoomExit(RoomIds::NORTH_TEMPLE));
+    egyptRoom->setExit(Direction::UP, RoomExit(RoomIds::NORTH_TEMPLE));
+    g.registerObject(RoomIds::EGYPT_ROOM, std::move(egyptRoom));
+    
+    // Create Mirror Room 1
+    auto mirrorRoom1 = std::make_unique<ZRoom>(
+        RoomIds::MIRROR_ROOM_1,
+        "Mirror Room",
+        "You are in a large square room with tall ceilings. On the south wall is an enormous mirror which fills the entire wall. There are exits on the other three sides of the room."
+    );
+    mirrorRoom1->setFlag(ObjectFlag::RLANDBIT);
+    mirrorRoom1->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("You are in a large square room with tall ceilings. On the south wall is an enormous mirror which fills the entire wall. There are exits on the other three sides of the room.");
+        }
+    });
+    mirrorRoom1->setExit(Direction::NORTH, RoomExit(RoomIds::COLD_PASSAGE));
+    mirrorRoom1->setExit(Direction::WEST, RoomExit(RoomIds::TWISTING_PASSAGE));
+    mirrorRoom1->setExit(Direction::EAST, RoomExit(RoomIds::SMALL_CAVE));
+    g.registerObject(RoomIds::MIRROR_ROOM_1, std::move(mirrorRoom1));
+    
+    // Create Mirror Room 2
+    auto mirrorRoom2 = std::make_unique<ZRoom>(
+        RoomIds::MIRROR_ROOM_2,
+        "Mirror Room",
+        "You are in a large square room with tall ceilings. On the south wall is an enormous mirror which fills the entire wall. There are exits on the other three sides of the room."
+    );
+    mirrorRoom2->setFlag(ObjectFlag::RLANDBIT);
+    mirrorRoom2->setFlag(ObjectFlag::ONBIT);
+    mirrorRoom2->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("You are in a large square room with tall ceilings. On the south wall is an enormous mirror which fills the entire wall. There are exits on the other three sides of the room.");
+        }
+    });
+    mirrorRoom2->setExit(Direction::WEST, RoomExit(RoomIds::WINDING_PASSAGE));
+    mirrorRoom2->setExit(Direction::NORTH, RoomExit(RoomIds::NARROW_PASSAGE));
+    mirrorRoom2->setExit(Direction::EAST, RoomExit(RoomIds::TINY_CAVE));
+    g.registerObject(RoomIds::MIRROR_ROOM_2, std::move(mirrorRoom2));
+    
+    // Create Small Cave
+    auto smallCave = std::make_unique<ZRoom>(
+        RoomIds::SMALL_CAVE,
+        "Cave",
+        "This is a tiny cave with entrances west and north, and a staircase leading down."
+    );
+    smallCave->setFlag(ObjectFlag::RLANDBIT);
+    smallCave->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is a tiny cave with entrances west and north, and a staircase leading down.");
+        }
+    });
+    smallCave->setExit(Direction::NORTH, RoomExit(RoomIds::MIRROR_ROOM_1));
+    smallCave->setExit(Direction::DOWN, RoomExit(RoomIds::ATLANTIS_ROOM));
+    smallCave->setExit(Direction::SOUTH, RoomExit(RoomIds::ATLANTIS_ROOM));
+    smallCave->setExit(Direction::WEST, RoomExit(RoomIds::TWISTING_PASSAGE));
+    g.registerObject(RoomIds::SMALL_CAVE, std::move(smallCave));
+    
+    // Create Tiny Cave
+    auto tinyCave = std::make_unique<ZRoom>(
+        RoomIds::TINY_CAVE,
+        "Cave",
+        "This is a tiny cave with entrances west and north, and a dark, forbidding staircase leading down."
+    );
+    tinyCave->setFlag(ObjectFlag::RLANDBIT);
+    tinyCave->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is a tiny cave with entrances west and north, and a dark, forbidding staircase leading down.");
+        }
+    });
+    tinyCave->setExit(Direction::NORTH, RoomExit(RoomIds::MIRROR_ROOM_2));
+    tinyCave->setExit(Direction::WEST, RoomExit(RoomIds::WINDING_PASSAGE));
+    tinyCave->setExit(Direction::DOWN, RoomExit(RoomIds::ENTRANCE_TO_HADES));
+    g.registerObject(RoomIds::TINY_CAVE, std::move(tinyCave));
+    
+    // Create Winding Passage
+    auto windingPassage = std::make_unique<ZRoom>(
+        RoomIds::WINDING_PASSAGE,
+        "Winding Passage",
+        "This is a winding passage. It seems that there are only exits on the east and north."
+    );
+    windingPassage->setFlag(ObjectFlag::RLANDBIT);
+    windingPassage->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is a winding passage. It seems that there are only exits on the east and north.");
+        }
+    });
+    windingPassage->setExit(Direction::NORTH, RoomExit(RoomIds::MIRROR_ROOM_2));
+    windingPassage->setExit(Direction::EAST, RoomExit(RoomIds::TINY_CAVE));
+    g.registerObject(RoomIds::WINDING_PASSAGE, std::move(windingPassage));
+    
+    // Create Twisting Passage
+    auto twistingPassage = std::make_unique<ZRoom>(
+        RoomIds::TWISTING_PASSAGE,
+        "Twisting Passage",
+        "This is a winding passage. It seems that there are only exits on the east and north."
+    );
+    twistingPassage->setFlag(ObjectFlag::RLANDBIT);
+    twistingPassage->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is a winding passage. It seems that there are only exits on the east and north.");
+        }
+    });
+    twistingPassage->setExit(Direction::NORTH, RoomExit(RoomIds::MIRROR_ROOM_1));
+    twistingPassage->setExit(Direction::EAST, RoomExit(RoomIds::SMALL_CAVE));
+    g.registerObject(RoomIds::TWISTING_PASSAGE, std::move(twistingPassage));
+    
+    // Create Atlantis Room
+    auto atlantisRoom = std::make_unique<ZRoom>(
+        RoomIds::ATLANTIS_ROOM,
+        "Atlantis Room",
+        "This is an ancient room, long under water. There is an exit to the south and a staircase leading up."
+    );
+    atlantisRoom->setFlag(ObjectFlag::RLANDBIT);
+    atlantisRoom->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("This is an ancient room, long under water. There is an exit to the south and a staircase leading up.");
+        }
+    });
+    atlantisRoom->setExit(Direction::UP, RoomExit(RoomIds::SMALL_CAVE));
+    atlantisRoom->setExit(Direction::SOUTH, RoomExit(RoomIds::RESERVOIR_NORTH));
+    g.registerObject(RoomIds::ATLANTIS_ROOM, std::move(atlantisRoom));
+    
     // Create Mailbox object
     auto mailbox = std::make_unique<ZObject>(OBJ_MAILBOX, "small mailbox");
     mailbox->addSynonym("mailbox");

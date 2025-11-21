@@ -429,32 +429,32 @@ Now that the parser is robust, we need content for it to operate on. Start with 
   - Add grating room connections
   - _Requirements: 14, 84_
 
-- [ ] 14. Implement special area rooms
+- [x] 14. Implement special area rooms
   - Create Treasure Room (thief's lair)
   - Create Entrance to Hades
   - Create Temple, Altar, and other special rooms
   - Add unique descriptions and behaviors
   - _Requirements: 14, 15, 17_
 
-- [ ] 14.1 Create Treasure Room
+- [x] 14.1 Create Treasure Room
   - Add description
   - Set up as thief's lair
   - Add special access requirements
   - _Requirements: 14, 15, 43_
 
-- [ ] 14.2 Create Entrance to Hades
+- [x] 14.2 Create Entrance to Hades
   - Add description
   - Implement resurrection mechanics location
   - Add special room action
   - _Requirements: 14, 15, 43, 59_
 
-- [ ] 14.3 Create Temple and religious areas
+- [x] 14.3 Create Temple and religious areas
   - Temple, Altar, Egyptian Room
   - Add appropriate descriptions
   - Set SACREDBIT flag where appropriate
   - _Requirements: 14, 15_
 
-- [ ] 14.4 Create remaining special rooms
+- [x] 14.4 Create remaining special rooms
   - All other unique rooms from 1dungeon.zil
   - Implement special behaviors
   - _Requirements: 14, 15, 17_
