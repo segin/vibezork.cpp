@@ -227,41 +227,41 @@ The parser is the foundation - it must be robust before we can add more content.
 
 Now that the parser is robust, we need content for it to operate on. Start with rooms since objects need locations.
 
-- [ ] 8. Create room ID constants for all areas
+- [x] 8. Create room ID constants for all areas
   - Define RoomIds namespace with all ~100 room IDs
   - Organize by area (exterior, forest, house, underground, maze, special)
   - Use constexpr for compile-time constants
   - Use numeric ranges to group related rooms
   - _Requirements: 17_
 
-- [ ] 8.1 Define exterior room IDs
+- [x] 8.1 Define exterior room IDs
   - WEST_OF_HOUSE, NORTH_OF_HOUSE, SOUTH_OF_HOUSE, BEHIND_HOUSE
   - STONE_BARROW, CLEARING, FOREST_PATH
   - _Requirements: 17_
 
-- [ ] 8.2 Define forest room IDs
+- [x] 8.2 Define forest room IDs
   - FOREST_1, FOREST_2, FOREST_3, FOREST_4
   - Additional forest areas from 1dungeon.zil
   - _Requirements: 17_
 
-- [ ] 8.3 Define house interior room IDs
+- [x] 8.3 Define house interior room IDs
   - LIVING_ROOM, KITCHEN, ATTIC, CELLAR
   - TROPHY_ROOM, STUDIO, GALLERY
   - All other house rooms from 1dungeon.zil
   - _Requirements: 17_
 
-- [ ] 8.4 Define underground room IDs
+- [x] 8.4 Define underground room IDs
   - EAST_WEST_PASSAGE, ROUND_ROOM, LOUD_ROOM
   - NORTH_SOUTH_PASSAGE, CHASM, RESERVOIR
   - All other underground rooms from 1dungeon.zil
   - _Requirements: 17_
 
-- [ ] 8.5 Define maze room IDs
+- [x] 8.5 Define maze room IDs
   - MAZE_1 through MAZE_15
   - GRATING_ROOM, GRATING_CLEARING
   - _Requirements: 17, 84_
 
-- [ ] 8.6 Define special area room IDs
+- [x] 8.6 Define special area room IDs
   - TREASURE_ROOM, ENTRANCE_TO_HADES
   - LAND_OF_LIVING_DEAD, TEMPLE
   - All other special rooms from 1dungeon.zil
