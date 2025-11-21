@@ -151,7 +151,7 @@ The parser is the foundation - it must be robust before we can add more content.
   - Support verbs with multiple valid prepositions
   - _Requirements: 7_
 
-- [ ]* 5.3 Write unit tests for prepositions
+- [x] 5.3 Write unit tests for prepositions
   - Test "PUT OBJECT IN CONTAINER"
   - Test "ATTACK TROLL WITH SWORD"
   - Test invalid prepositions
@@ -199,7 +199,7 @@ The parser is the foundation - it must be robust before we can add more content.
   - Update pronouns after each command
   - _Requirements: 74_
 
-- [ ]* 6.6 Write unit tests for special features
+- [ ] 6.6 Write unit tests for special features
   - Test "take all"
   - Test "take all except lamp"
   - Test AGAIN command

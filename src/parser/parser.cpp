@@ -13,6 +13,7 @@ Parser::Parser() : verbRegistry_(nullptr) {
     verbSynonyms_["take"] = V_TAKE;
     verbSynonyms_["get"] = V_TAKE;
     verbSynonyms_["drop"] = V_DROP;
+    verbSynonyms_["put"] = V_PUT;
     verbSynonyms_["look"] = V_LOOK;
     verbSynonyms_["l"] = V_LOOK;
     verbSynonyms_["examine"] = V_EXAMINE;
@@ -21,6 +22,8 @@ Parser::Parser() : verbRegistry_(nullptr) {
     verbSynonyms_["inventory"] = V_INVENTORY;
     verbSynonyms_["i"] = V_INVENTORY;
     verbSynonyms_["go"] = V_WALK;
+    verbSynonyms_["attack"] = V_ATTACK;
+    verbSynonyms_["kill"] = V_KILL;
     verbSynonyms_["quit"] = V_QUIT;
     verbSynonyms_["q"] = V_QUIT;
     
@@ -86,6 +89,7 @@ Parser::Parser(VerbRegistry* registry) : verbRegistry_(registry) {
     verbSynonyms_["take"] = V_TAKE;
     verbSynonyms_["get"] = V_TAKE;
     verbSynonyms_["drop"] = V_DROP;
+    verbSynonyms_["put"] = V_PUT;
     verbSynonyms_["look"] = V_LOOK;
     verbSynonyms_["l"] = V_LOOK;
     verbSynonyms_["examine"] = V_EXAMINE;
@@ -94,6 +98,8 @@ Parser::Parser(VerbRegistry* registry) : verbRegistry_(registry) {
     verbSynonyms_["inventory"] = V_INVENTORY;
     verbSynonyms_["i"] = V_INVENTORY;
     verbSynonyms_["go"] = V_WALK;
+    verbSynonyms_["attack"] = V_ATTACK;
+    verbSynonyms_["kill"] = V_KILL;
     verbSynonyms_["quit"] = V_QUIT;
     verbSynonyms_["q"] = V_QUIT;
     

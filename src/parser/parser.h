@@ -29,6 +29,8 @@ public:
     // Public for testing
     std::vector<ZObject*> findObjects(const std::vector<std::string>& words, size_t startIdx = 0);
     ZObject* disambiguate(const std::vector<ZObject*>& candidates, const std::string& noun);
+    bool isPreposition(const std::string& word) const;
+    std::optional<size_t> findPrepositionIndex(const std::vector<std::string>& tokens) const;
     
 private:
     void tokenize(const std::string& input, std::vector<std::string>& tokens);
@@ -48,8 +50,6 @@ private:
                                          const std::vector<ZObject*>& candidates);
     
     // Preposition handling
-    bool isPreposition(const std::string& word) const;
-    std::optional<size_t> findPrepositionIndex(const std::vector<std::string>& tokens) const;
     bool validatePreposition(VerbId verb, const std::string& preposition) const;
     
     std::map<std::string, VerbId> verbSynonyms_;

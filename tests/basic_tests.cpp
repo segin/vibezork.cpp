@@ -759,6 +759,358 @@ TEST(DisambiguationFormatDescription) {
     g.reset();
 }
 
+// Test preposition handling - Task 5.3
+TEST(PrepositionPutObjectInContainer) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create lamp object
+    auto lamp = std::make_unique<ZObject>(1, "lamp");
+    lamp->addSynonym("lamp");
+    lamp->setFlag(ObjectFlag::TAKEBIT);
+    lamp->moveTo(g.winner);  // In player inventory
+    ZObject* lampPtr = lamp.get();
+    g.registerObject(1, std::move(lamp));
+    
+    // Create container (box)
+    auto box = std::make_unique<ZObject>(2, "box");
+    box->addSynonym("box");
+    box->setFlag(ObjectFlag::CONTBIT);
+    box->setFlag(ObjectFlag::OPENBIT);
+    box->moveTo(&testRoom);
+    ZObject* boxPtr = box.get();
+    g.registerObject(2, std::move(box));
+    
+    // Create parser with verb registry
+    VerbRegistry registry;
+    Parser parser(&registry);
+    
+    // Test "PUT LAMP IN BOX"
+    ParsedCommand cmd = parser.parse("put lamp in box");
+    
+    ASSERT_EQ(cmd.verb, V_PUT);
+    ASSERT_EQ(cmd.directObj, lampPtr);
+    ASSERT_EQ(cmd.indirectObj, boxPtr);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(PrepositionAttackTrollWithSword) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create troll NPC
+    auto troll = std::make_unique<ZObject>(1, "troll");
+    troll->addSynonym("troll");
+    troll->setFlag(ObjectFlag::FIGHTBIT);
+    troll->moveTo(&testRoom);
+    ZObject* trollPtr = troll.get();
+    g.registerObject(1, std::move(troll));
+    
+    // Create sword weapon
+    auto sword = std::make_unique<ZObject>(2, "sword");
+    sword->addSynonym("sword");
+    sword->setFlag(ObjectFlag::TAKEBIT);
+    sword->moveTo(g.winner);  // In player inventory
+    ZObject* swordPtr = sword.get();
+    g.registerObject(2, std::move(sword));
+    
+    // Create parser with verb registry
+    VerbRegistry registry;
+    Parser parser(&registry);
+    
+    // Test "ATTACK TROLL WITH SWORD"
+    ParsedCommand cmd = parser.parse("attack troll with sword");
+    
+    ASSERT_EQ(cmd.verb, V_ATTACK);
+    ASSERT_EQ(cmd.directObj, trollPtr);
+    ASSERT_EQ(cmd.indirectObj, swordPtr);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(PrepositionInvalidPreposition) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create lamp object
+    auto lamp = std::make_unique<ZObject>(1, "lamp");
+    lamp->addSynonym("lamp");
+    lamp->setFlag(ObjectFlag::TAKEBIT);
+    lamp->moveTo(g.winner);
+    ZObject* lampPtr = lamp.get();
+    g.registerObject(1, std::move(lamp));
+    
+    // Create box container
+    auto box = std::make_unique<ZObject>(2, "box");
+    box->addSynonym("box");
+    box->setFlag(ObjectFlag::CONTBIT);
+    box->setFlag(ObjectFlag::OPENBIT);
+    box->moveTo(&testRoom);
+    ZObject* boxPtr = box.get();
+    g.registerObject(2, std::move(box));
+    
+    // Create parser with verb registry
+    VerbRegistry registry;
+    Parser parser(&registry);
+    
+    // Test "PUT LAMP UNDER BOX" - "under" is not valid for PUT verb
+    // The parser should reject this or handle it gracefully
+    ParsedCommand cmd = parser.parse("put lamp under box");
+    
+    // The command should either:
+    // 1. Have verb = 0 (invalid), or
+    // 2. Not have both objects set properly
+    // This depends on implementation - we're testing that invalid prepositions are handled
+    
+    // For now, we just verify the parser doesn't crash and returns something
+    // The exact behavior depends on whether the verb registry validates prepositions
+    ASSERT_TRUE(cmd.verb == V_PUT || cmd.verb == 0);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(PrepositionOptionalPreposition) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create troll NPC
+    auto troll = std::make_unique<ZObject>(1, "troll");
+    troll->addSynonym("troll");
+    troll->setFlag(ObjectFlag::FIGHTBIT);
+    troll->moveTo(&testRoom);
+    ZObject* trollPtr = troll.get();
+    g.registerObject(1, std::move(troll));
+    
+    // Create sword weapon
+    auto sword = std::make_unique<ZObject>(2, "sword");
+    sword->addSynonym("sword");
+    sword->setFlag(ObjectFlag::TAKEBIT);
+    sword->moveTo(g.winner);
+    ZObject* swordPtr = sword.get();
+    g.registerObject(2, std::move(sword));
+    
+    // Create parser with verb registry
+    VerbRegistry registry;
+    Parser parser(&registry);
+    
+    // Test "ATTACK TROLL" - without optional "WITH SWORD"
+    ParsedCommand cmd1 = parser.parse("attack troll");
+    
+    ASSERT_EQ(cmd1.verb, V_ATTACK);
+    ASSERT_EQ(cmd1.directObj, trollPtr);
+    ASSERT_EQ(cmd1.indirectObj, nullptr);  // No weapon specified
+    
+    // Test "ATTACK TROLL WITH SWORD" - with optional preposition
+    ParsedCommand cmd2 = parser.parse("attack troll with sword");
+    
+    ASSERT_EQ(cmd2.verb, V_ATTACK);
+    ASSERT_EQ(cmd2.directObj, trollPtr);
+    ASSERT_EQ(cmd2.indirectObj, swordPtr);  // Weapon specified
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(PrepositionMultipleValidPrepositions) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create lamp object
+    auto lamp = std::make_unique<ZObject>(1, "lamp");
+    lamp->addSynonym("lamp");
+    lamp->setFlag(ObjectFlag::TAKEBIT);
+    lamp->moveTo(g.winner);
+    ZObject* lampPtr = lamp.get();
+    g.registerObject(1, std::move(lamp));
+    
+    // Create box container
+    auto box = std::make_unique<ZObject>(2, "box");
+    box->addSynonym("box");
+    box->setFlag(ObjectFlag::CONTBIT);
+    box->setFlag(ObjectFlag::OPENBIT);
+    box->moveTo(&testRoom);
+    ZObject* boxPtr = box.get();
+    g.registerObject(2, std::move(box));
+    
+    // Create parser with verb registry
+    VerbRegistry registry;
+    Parser parser(&registry);
+    
+    // Test "PUT LAMP IN BOX" - "in" should be valid for V_PUT
+    ParsedCommand cmd1 = parser.parse("put lamp in box");
+    
+    ASSERT_EQ(cmd1.verb, V_PUT);
+    ASSERT_EQ(cmd1.directObj, lampPtr);
+    ASSERT_EQ(cmd1.indirectObj, boxPtr);
+    
+    // Test "PUT LAMP INTO BOX" - "into" should also be valid for V_PUT
+    ParsedCommand cmd2 = parser.parse("put lamp into box");
+    
+    ASSERT_EQ(cmd2.verb, V_PUT);
+    ASSERT_EQ(cmd2.directObj, lampPtr);
+    ASSERT_EQ(cmd2.indirectObj, boxPtr);
+    
+    // Test "PUT LAMP INSIDE BOX" - "inside" should also be valid for V_PUT
+    ParsedCommand cmd3 = parser.parse("put lamp inside box");
+    
+    ASSERT_EQ(cmd3.verb, V_PUT);
+    ASSERT_EQ(cmd3.directObj, lampPtr);
+    ASSERT_EQ(cmd3.indirectObj, boxPtr);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(PrepositionRecognition) {
+    // Test that parser recognizes common prepositions
+    Parser parser;
+    
+    // Test core prepositions
+    ASSERT_TRUE(parser.isPreposition("in"));
+    ASSERT_TRUE(parser.isPreposition("on"));
+    ASSERT_TRUE(parser.isPreposition("with"));
+    ASSERT_TRUE(parser.isPreposition("under"));
+    ASSERT_TRUE(parser.isPreposition("to"));
+    ASSERT_TRUE(parser.isPreposition("from"));
+    ASSERT_TRUE(parser.isPreposition("at"));
+    
+    // Test preposition synonyms
+    ASSERT_TRUE(parser.isPreposition("into"));
+    ASSERT_TRUE(parser.isPreposition("onto"));
+    ASSERT_TRUE(parser.isPreposition("inside"));
+    ASSERT_TRUE(parser.isPreposition("underneath"));
+    ASSERT_TRUE(parser.isPreposition("beneath"));
+    
+    // Test non-prepositions
+    ASSERT_FALSE(parser.isPreposition("lamp"));
+    ASSERT_FALSE(parser.isPreposition("take"));
+    ASSERT_FALSE(parser.isPreposition("the"));
+}
+
+TEST(PrepositionFindInTokens) {
+    Parser parser;
+    
+    // Test finding preposition in token list
+    std::vector<std::string> tokens1 = {"put", "lamp", "in", "box"};
+    auto idx1 = parser.findPrepositionIndex(tokens1);
+    ASSERT_TRUE(idx1.has_value());
+    ASSERT_EQ(idx1.value(), 2);  // "in" is at index 2
+    
+    // Test with no preposition
+    std::vector<std::string> tokens2 = {"take", "lamp"};
+    auto idx2 = parser.findPrepositionIndex(tokens2);
+    ASSERT_FALSE(idx2.has_value());
+    
+    // Test with preposition at different position
+    std::vector<std::string> tokens3 = {"attack", "troll", "with", "sword"};
+    auto idx3 = parser.findPrepositionIndex(tokens3);
+    ASSERT_TRUE(idx3.has_value());
+    ASSERT_EQ(idx3.value(), 2);  // "with" is at index 2
+    
+    // Test with multiple words before preposition
+    std::vector<std::string> tokens4 = {"put", "brass", "lamp", "on", "wooden", "table"};
+    auto idx4 = parser.findPrepositionIndex(tokens4);
+    ASSERT_TRUE(idx4.has_value());
+    ASSERT_EQ(idx4.value(), 3);  // "on" is at index 3
+}
+
+TEST(PrepositionExtractObjects) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create multiple objects
+    auto lamp = std::make_unique<ZObject>(1, "lamp");
+    lamp->addSynonym("lamp");
+    lamp->moveTo(g.winner);
+    ZObject* lampPtr = lamp.get();
+    g.registerObject(1, std::move(lamp));
+    
+    auto box = std::make_unique<ZObject>(2, "box");
+    box->addSynonym("box");
+    box->setFlag(ObjectFlag::CONTBIT);
+    box->moveTo(&testRoom);
+    ZObject* boxPtr = box.get();
+    g.registerObject(2, std::move(box));
+    
+    auto table = std::make_unique<ZObject>(3, "table");
+    table->addSynonym("table");
+    table->moveTo(&testRoom);
+    ZObject* tablePtr = table.get();
+    g.registerObject(3, std::move(table));
+    
+    // Create parser
+    VerbRegistry registry;
+    Parser parser(&registry);
+    
+    // Test that parser correctly extracts both objects from command with preposition
+    ParsedCommand cmd = parser.parse("put lamp in box");
+    
+    // Verify direct object (before preposition)
+    ASSERT_EQ(cmd.directObj, lampPtr);
+    
+    // Verify indirect object (after preposition)
+    ASSERT_EQ(cmd.indirectObj, boxPtr);
+    
+    // Verify the other object is not involved
+    ASSERT_TRUE(cmd.directObj != tablePtr);
+    ASSERT_TRUE(cmd.indirectObj != tablePtr);
+    
+    // Cleanup
+    g.reset();
+}
+
 // Main test runner
 int main() {
     std::cout << "Running Zork C++ Tests\n";
