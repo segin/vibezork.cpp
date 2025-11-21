@@ -1599,6 +1599,445 @@ TEST(SpecialFeaturesEverythingSynonym) {
     g.reset();
 }
 
+// Integration tests for parser - Task 7.1
+TEST(IntegrationParserCompleteFlow) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create lamp object
+    auto lamp = std::make_unique<ZObject>(1, "lamp");
+    lamp->addSynonym("lamp");
+    lamp->addSynonym("lantern");
+    lamp->setFlag(ObjectFlag::TAKEBIT);
+    lamp->moveTo(&testRoom);
+    ZObject* lampPtr = lamp.get();
+    g.registerObject(1, std::move(lamp));
+    
+    // Create parser
+    Parser parser;
+    
+    // Test complete command parsing flow
+    ParsedCommand cmd1 = parser.parse("take lamp");
+    ASSERT_EQ(cmd1.verb, V_TAKE);
+    ASSERT_EQ(cmd1.directObj, lampPtr);
+    ASSERT_EQ(cmd1.indirectObj, nullptr);
+    
+    // Test with synonym
+    ParsedCommand cmd2 = parser.parse("get lantern");
+    ASSERT_EQ(cmd2.verb, V_TAKE);
+    ASSERT_EQ(cmd2.directObj, lampPtr);
+    
+    // Test examine command
+    ParsedCommand cmd3 = parser.parse("examine lamp");
+    ASSERT_EQ(cmd3.verb, V_EXAMINE);
+    ASSERT_EQ(cmd3.directObj, lampPtr);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(IntegrationParserErrorHandling) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create parser
+    Parser parser;
+    
+    // Test unknown verb
+    ParsedCommand cmd1 = parser.parse("xyzzy lamp");
+    ASSERT_EQ(cmd1.verb, 0);  // Unknown verb
+    
+    // Test unknown object
+    ParsedCommand cmd2 = parser.parse("take unicorn");
+    ASSERT_EQ(cmd2.verb, V_TAKE);
+    ASSERT_EQ(cmd2.directObj, nullptr);  // Object not found
+    
+    // Test empty command
+    ParsedCommand cmd3 = parser.parse("");
+    ASSERT_EQ(cmd3.verb, 0);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(IntegrationParserEmptyInput) {
+    // Test empty input handling (Requirement 72.1)
+    Parser parser;
+    
+    ParsedCommand cmd1 = parser.parse("");
+    ASSERT_EQ(cmd1.verb, 0);
+    ASSERT_TRUE(cmd1.words.empty());
+    
+    // Test whitespace-only input
+    ParsedCommand cmd2 = parser.parse("   ");
+    ASSERT_EQ(cmd2.verb, 0);
+    
+    // Test tab and newline
+    ParsedCommand cmd3 = parser.parse("\t\n");
+    ASSERT_EQ(cmd3.verb, 0);
+    
+    // No cleanup needed - no globals used
+}
+
+TEST(IntegrationParserVeryLongInput) {
+    // Test very long input handling (Requirement 72.2)
+    Parser parser;
+    
+    // Create a very long command (over 1000 characters)
+    std::string longInput(1500, 'a');
+    
+    // Parser should handle this gracefully without crashing
+    ParsedCommand cmd = parser.parse(longInput);
+    
+    // Command will be invalid (unknown verb), but shouldn't crash
+    ASSERT_EQ(cmd.verb, 0);
+    
+    // No cleanup needed
+}
+
+TEST(IntegrationParserSpecialCharacters) {
+    // Test special characters handling (Requirement 72.3)
+    Parser parser;
+    
+    // Test with punctuation
+    ParsedCommand cmd1 = parser.parse("take lamp!");
+    // Should parse "take" and "lamp!" (with exclamation)
+    // The exclamation will be part of the word, which won't match
+    // But it shouldn't crash
+    ASSERT_TRUE(cmd1.verb == V_TAKE || cmd1.verb == 0);
+    
+    // Test with numbers
+    ParsedCommand cmd2 = parser.parse("take 123");
+    ASSERT_EQ(cmd2.verb, V_TAKE);
+    
+    // Test with special symbols
+    ParsedCommand cmd3 = parser.parse("take @#$%");
+    ASSERT_EQ(cmd3.verb, V_TAKE);
+    
+    // No cleanup needed
+}
+
+TEST(IntegrationParserWhitespaceNormalization) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create lamp object
+    auto lamp = std::make_unique<ZObject>(1, "lamp");
+    lamp->addSynonym("lamp");
+    lamp->setFlag(ObjectFlag::TAKEBIT);
+    lamp->moveTo(&testRoom);
+    ZObject* lampPtr = lamp.get();
+    g.registerObject(1, std::move(lamp));
+    
+    // Create parser
+    Parser parser;
+    
+    // Test with leading whitespace
+    ParsedCommand cmd1 = parser.parse("   take lamp");
+    ASSERT_EQ(cmd1.verb, V_TAKE);
+    ASSERT_EQ(cmd1.directObj, lampPtr);
+    
+    // Test with trailing whitespace
+    ParsedCommand cmd2 = parser.parse("take lamp   ");
+    ASSERT_EQ(cmd2.verb, V_TAKE);
+    ASSERT_EQ(cmd2.directObj, lampPtr);
+    
+    // Test with multiple spaces between words
+    ParsedCommand cmd3 = parser.parse("take    lamp");
+    ASSERT_EQ(cmd3.verb, V_TAKE);
+    ASSERT_EQ(cmd3.directObj, lampPtr);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(IntegrationParserComplexCommand) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create lamp object
+    auto lamp = std::make_unique<ZObject>(1, "brass lantern");
+    lamp->addSynonym("lamp");
+    lamp->addSynonym("lantern");
+    lamp->addAdjective("brass");
+    lamp->addAdjective("small");
+    lamp->setFlag(ObjectFlag::TAKEBIT);
+    lamp->moveTo(g.winner);
+    ZObject* lampPtr = lamp.get();
+    g.registerObject(1, std::move(lamp));
+    
+    // Create box container
+    auto box = std::make_unique<ZObject>(2, "wooden box");
+    box->addSynonym("box");
+    box->addAdjective("wooden");
+    box->setFlag(ObjectFlag::CONTBIT);
+    box->setFlag(ObjectFlag::OPENBIT);
+    box->moveTo(&testRoom);
+    ZObject* boxPtr = box.get();
+    g.registerObject(2, std::move(box));
+    
+    // Create parser
+    VerbRegistry registry;
+    Parser parser(&registry);
+    
+    // Test complex command with adjectives and preposition
+    ParsedCommand cmd = parser.parse("put small brass lamp in wooden box");
+    
+    ASSERT_EQ(cmd.verb, V_PUT);
+    ASSERT_EQ(cmd.directObj, lampPtr);
+    ASSERT_EQ(cmd.indirectObj, boxPtr);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(IntegrationParserDirectionCommand) {
+    auto& g = Globals::instance();
+    
+    // Create test rooms
+    ZRoom room1(100, "Room 1", "First room.");
+    ZRoom room2(101, "Room 2", "Second room.");
+    room1.setExit(Direction::NORTH, RoomExit(101));
+    
+    g.here = &room1;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create parser
+    Parser parser;
+    
+    // Test direction command
+    ParsedCommand cmd1 = parser.parse("north");
+    ASSERT_TRUE(cmd1.isDirection);
+    ASSERT_EQ(cmd1.direction, Direction::NORTH);
+    ASSERT_EQ(cmd1.verb, V_WALK);
+    
+    // Test abbreviated direction
+    ParsedCommand cmd2 = parser.parse("n");
+    ASSERT_TRUE(cmd2.isDirection);
+    ASSERT_EQ(cmd2.direction, Direction::NORTH);
+    
+    // Test other directions
+    ParsedCommand cmd3 = parser.parse("south");
+    ASSERT_TRUE(cmd3.isDirection);
+    ASSERT_EQ(cmd3.direction, Direction::SOUTH);
+    
+    ParsedCommand cmd4 = parser.parse("up");
+    ASSERT_TRUE(cmd4.isDirection);
+    ASSERT_EQ(cmd4.direction, Direction::UP);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(IntegrationParserMultipleCommands) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create lamp object
+    auto lamp = std::make_unique<ZObject>(1, "lamp");
+    lamp->addSynonym("lamp");
+    lamp->setFlag(ObjectFlag::TAKEBIT);
+    lamp->moveTo(&testRoom);
+    ZObject* lampPtr = lamp.get();
+    g.registerObject(1, std::move(lamp));
+    
+    // Create parser
+    Parser parser;
+    
+    // Test sequence of commands
+    ParsedCommand cmd1 = parser.parse("examine lamp");
+    ASSERT_EQ(cmd1.verb, V_EXAMINE);
+    ASSERT_EQ(cmd1.directObj, lampPtr);
+    
+    ParsedCommand cmd2 = parser.parse("take lamp");
+    ASSERT_EQ(cmd2.verb, V_TAKE);
+    ASSERT_EQ(cmd2.directObj, lampPtr);
+    
+    // Move lamp to inventory for next test
+    lampPtr->moveTo(g.winner);
+    
+    ParsedCommand cmd3 = parser.parse("drop lamp");
+    ASSERT_EQ(cmd3.verb, V_DROP);
+    ASSERT_EQ(cmd3.directObj, lampPtr);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(IntegrationParserCaseInsensitivity) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create lamp object
+    auto lamp = std::make_unique<ZObject>(1, "lamp");
+    lamp->addSynonym("lamp");
+    lamp->setFlag(ObjectFlag::TAKEBIT);
+    lamp->moveTo(&testRoom);
+    ZObject* lampPtr = lamp.get();
+    g.registerObject(1, std::move(lamp));
+    
+    // Create parser
+    Parser parser;
+    
+    // Test uppercase
+    ParsedCommand cmd1 = parser.parse("TAKE LAMP");
+    ASSERT_EQ(cmd1.verb, V_TAKE);
+    ASSERT_EQ(cmd1.directObj, lampPtr);
+    
+    // Test mixed case
+    ParsedCommand cmd2 = parser.parse("TaKe LaMp");
+    ASSERT_EQ(cmd2.verb, V_TAKE);
+    ASSERT_EQ(cmd2.directObj, lampPtr);
+    
+    // Test lowercase
+    ParsedCommand cmd3 = parser.parse("take lamp");
+    ASSERT_EQ(cmd3.verb, V_TAKE);
+    ASSERT_EQ(cmd3.directObj, lampPtr);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(IntegrationParserArticleIgnoring) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create lamp object
+    auto lamp = std::make_unique<ZObject>(1, "lamp");
+    lamp->addSynonym("lamp");
+    lamp->setFlag(ObjectFlag::TAKEBIT);
+    lamp->moveTo(&testRoom);
+    ZObject* lampPtr = lamp.get();
+    g.registerObject(1, std::move(lamp));
+    
+    // Create parser
+    Parser parser;
+    
+    // Test with "the"
+    ParsedCommand cmd1 = parser.parse("take the lamp");
+    ASSERT_EQ(cmd1.verb, V_TAKE);
+    ASSERT_EQ(cmd1.directObj, lampPtr);
+    
+    // Test with "a"
+    ParsedCommand cmd2 = parser.parse("take a lamp");
+    ASSERT_EQ(cmd2.verb, V_TAKE);
+    ASSERT_EQ(cmd2.directObj, lampPtr);
+    
+    // Test with "an"
+    ParsedCommand cmd3 = parser.parse("examine an lamp");
+    ASSERT_EQ(cmd3.verb, V_EXAMINE);
+    ASSERT_EQ(cmd3.directObj, lampPtr);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(IntegrationParserErrorRecovery) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create lamp object
+    auto lamp = std::make_unique<ZObject>(1, "lamp");
+    lamp->addSynonym("lamp");
+    lamp->setFlag(ObjectFlag::TAKEBIT);
+    lamp->moveTo(&testRoom);
+    ZObject* lampPtr = lamp.get();
+    g.registerObject(1, std::move(lamp));
+    
+    // Create parser
+    Parser parser;
+    
+    // Test error followed by valid command
+    ParsedCommand cmd1 = parser.parse("xyzzy lamp");
+    ASSERT_EQ(cmd1.verb, 0);  // Error
+    
+    // Parser should recover and handle next command
+    ParsedCommand cmd2 = parser.parse("take lamp");
+    ASSERT_EQ(cmd2.verb, V_TAKE);
+    ASSERT_EQ(cmd2.directObj, lampPtr);
+    
+    // Test missing object followed by valid command
+    ParsedCommand cmd3 = parser.parse("take unicorn");
+    ASSERT_EQ(cmd3.verb, V_TAKE);
+    ASSERT_EQ(cmd3.directObj, nullptr);
+    
+    // Parser should still work
+    ParsedCommand cmd4 = parser.parse("examine lamp");
+    ASSERT_EQ(cmd4.verb, V_EXAMINE);
+    ASSERT_EQ(cmd4.directObj, lampPtr);
+    
+    // Cleanup
+    g.reset();
+}
+
 // Main test runner
 int main() {
     std::cout << "Running Zork C++ Tests\n";

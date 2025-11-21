@@ -208,14 +208,14 @@ The parser is the foundation - it must be robust before we can add more content.
   - _Requirements: 9, 74, 75, 76, 78, 92_
 
 
-- [ ] 7. Integrate enhanced parser with main loop
+- [x] 7. Integrate enhanced parser with main loop
   - Update main loop to use new parser features
   - Handle ParseResult errors appropriately
   - Display helpful error messages
   - Test parser with various command types
   - _Requirements: 1, 73_
 
-- [ ] 7.1 Write integration tests for parser
+- [x] 7.1 Write integration tests for parser
   - Test complete command parsing flow
   - Test error handling
   - Test edge cases (empty input, very long input, special characters)
@@ -1287,7 +1287,7 @@ With the world populated, implement the verbs that operate on it.
   - Display copyright
   - _Requirements: 69_
 
-- [ ]* 38.6 Write unit tests for game control verbs
+- [ ] 38.6 Write unit tests for game control verbs
   - Test save and restore
   - Test restart
   - Test version display
@@ -1593,7 +1593,7 @@ Implement the core game systems that tie everything together.
   - Reset repeating timers
   - _Requirements: 44_
 
-- [ ]* 47.5 Write unit tests for timer system
+- [ ] 47.5 Write unit tests for timer system
   - Test timer registration
   - Test timer firing
   - Test enable/disable
@@ -1762,7 +1762,7 @@ Implement the core game systems that tie everything together.
   - Update room descriptions based on lighting
   - _Requirements: 50_
 
-- [ ]* 53.5 Write unit tests for light system
+- [ ] 53.5 Write unit tests for light system
   - Test room lighting checks
   - Test light source detection
   - Test lighting updates
@@ -1791,7 +1791,7 @@ Implement the core game systems that tie everything together.
   - Display death message
   - _Requirements: 51, 58_
 
-- [ ]* 54.4 Write unit tests for grue
+- [ ] 54.4 Write unit tests for grue
   - Test darkness warnings
   - Test grue attack
   - Test light prevents grue
