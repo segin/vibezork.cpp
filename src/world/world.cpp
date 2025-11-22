@@ -2454,5 +2454,156 @@ void initializeWorld() {
     bauble->moveTo(g.getObject(RoomIds::MAZE_5));
     g.registerObject(ObjectIds::BAUBLE, std::move(bauble));
     
+    // ===== TOOL OBJECTS =====
+    
+    // Create SWORD (Elvish sword - weapon that glows near enemies)
+    auto sword = std::make_unique<ZObject>(ObjectIds::SWORD, "sword");
+    sword->addSynonym("sword");
+    sword->addSynonym("blade");
+    sword->addSynonym("orcrist");
+    sword->addSynonym("glamdring");
+    sword->addAdjective("elvish");
+    sword->addAdjective("elven");
+    sword->addAdjective("old");
+    sword->addAdjective("antique");
+    sword->setFlag(ObjectFlag::TAKEBIT);
+    sword->setFlag(ObjectFlag::WEAPONBIT);
+    sword->setProperty(P_SIZE, 30);
+    // TODO: Add action handler for glowing near enemies
+    sword->moveTo(g.getObject(RoomIds::LIVING_ROOM));
+    g.registerObject(ObjectIds::SWORD, std::move(sword));
+    
+    // Create KNIFE (Nasty knife - weapon, less effective than sword)
+    auto knife = std::make_unique<ZObject>(ObjectIds::KNIFE, "nasty knife");
+    knife->addSynonym("knife");
+    knife->addSynonym("knives");
+    knife->addSynonym("blade");
+    knife->addAdjective("nasty");
+    knife->addAdjective("sharp");
+    knife->setFlag(ObjectFlag::TAKEBIT);
+    knife->setFlag(ObjectFlag::WEAPONBIT);
+    knife->setProperty(P_SIZE, 10);
+    knife->moveTo(g.getObject(RoomIds::ATTIC));
+    g.registerObject(ObjectIds::KNIFE, std::move(knife));
+    
+    // Create LAMP (Battery-powered brass lantern - light source)
+    auto lamp = std::make_unique<ZObject>(ObjectIds::LAMP, "brass lantern");
+    lamp->addSynonym("lamp");
+    lamp->addSynonym("lantern");
+    lamp->addSynonym("light");
+    lamp->addAdjective("brass");
+    lamp->addAdjective("battery");
+    lamp->setFlag(ObjectFlag::TAKEBIT);
+    lamp->setFlag(ObjectFlag::LIGHTBIT);
+    // Lamp starts off - player must turn it on
+    lamp->setProperty(P_SIZE, 15);
+    // TODO: Add battery timer and action handler
+    lamp->moveTo(g.getObject(RoomIds::LIVING_ROOM));
+    g.registerObject(ObjectIds::LAMP, std::move(lamp));
+    
+    // Create CANDLES (Pair of candles - temporary light source)
+    auto candles = std::make_unique<ZObject>(ObjectIds::CANDLES, "pair of candles");
+    candles->addSynonym("candles");
+    candles->addSynonym("candle");
+    candles->addSynonym("pair");
+    candles->addAdjective("burning");
+    candles->addAdjective("wax");
+    candles->setFlag(ObjectFlag::TAKEBIT);
+    candles->setFlag(ObjectFlag::LIGHTBIT);
+    candles->setFlag(ObjectFlag::ONBIT);  // Candles start lit
+    candles->setFlag(ObjectFlag::FLAMEBIT);
+    candles->setProperty(P_SIZE, 10);
+    // TODO: Add burn-down timer
+    candles->moveTo(g.getObject(RoomIds::SOUTH_TEMPLE));
+    g.registerObject(ObjectIds::CANDLES, std::move(candles));
+    
+    // Create MATCH (Matchbook - one-time use light source)
+    auto match = std::make_unique<ZObject>(ObjectIds::MATCH, "matchbook");
+    match->addSynonym("match");
+    match->addSynonym("matches");
+    match->addSynonym("matchbook");
+    match->addAdjective("match");
+    match->setFlag(ObjectFlag::TAKEBIT);
+    match->setProperty(P_SIZE, 2);
+    // TODO: Add action handler for lighting
+    match->moveTo(g.getObject(RoomIds::DAM_LOBBY));
+    g.registerObject(ObjectIds::MATCH, std::move(match));
+    
+    // Create ROPE (Large coil of rope - for climbing and tying)
+    auto rope = std::make_unique<ZObject>(ObjectIds::ROPE, "rope");
+    rope->addSynonym("rope");
+    rope->addSynonym("coil");
+    rope->addSynonym("hemp");
+    rope->addAdjective("large");
+    rope->addAdjective("thick");
+    rope->setFlag(ObjectFlag::TAKEBIT);
+    rope->setProperty(P_SIZE, 10);
+    // TODO: Add action handler for tying and climbing
+    rope->moveTo(g.getObject(RoomIds::ATTIC));
+    g.registerObject(ObjectIds::ROPE, std::move(rope));
+    
+    // Create WRENCH (Wrench - tool for bolts)
+    auto wrench = std::make_unique<ZObject>(ObjectIds::WRENCH, "wrench");
+    wrench->addSynonym("wrench");
+    wrench->addSynonym("tool");
+    wrench->addAdjective("metal");
+    wrench->setFlag(ObjectFlag::TAKEBIT);
+    wrench->setFlag(ObjectFlag::TOOLBIT);
+    wrench->setProperty(P_SIZE, 10);
+    wrench->moveTo(g.getObject(RoomIds::MAINTENANCE_ROOM));
+    g.registerObject(ObjectIds::WRENCH, std::move(wrench));
+    
+    // Create SCREWDRIVER (Screwdriver - tool for screws)
+    auto screwdriver = std::make_unique<ZObject>(ObjectIds::SCREWDRIVER, "screwdriver");
+    screwdriver->addSynonym("screwdriver");
+    screwdriver->addSynonym("driver");
+    screwdriver->addSynonym("tool");
+    screwdriver->addAdjective("screw");
+    screwdriver->setFlag(ObjectFlag::TAKEBIT);
+    screwdriver->setFlag(ObjectFlag::TOOLBIT);
+    screwdriver->setProperty(P_SIZE, 8);
+    screwdriver->moveTo(g.getObject(RoomIds::MAINTENANCE_ROOM));
+    g.registerObject(ObjectIds::SCREWDRIVER, std::move(screwdriver));
+    
+    // Create SHOVEL (Shovel - tool for digging)
+    auto shovel = std::make_unique<ZObject>(ObjectIds::SHOVEL, "shovel");
+    shovel->addSynonym("shovel");
+    shovel->addSynonym("spade");
+    shovel->addSynonym("tool");
+    shovel->setFlag(ObjectFlag::TAKEBIT);
+    shovel->setFlag(ObjectFlag::TOOLBIT);
+    shovel->setProperty(P_SIZE, 15);
+    shovel->moveTo(g.getObject(RoomIds::SANDY_BEACH));
+    g.registerObject(ObjectIds::SHOVEL, std::move(shovel));
+    
+    // Create PUMP (Hand-held air pump - for inflating boat)
+    auto pump = std::make_unique<ZObject>(ObjectIds::PUMP, "hand-held air pump");
+    pump->addSynonym("pump");
+    pump->addSynonym("air-pump");
+    pump->addSynonym("tool");
+    pump->addAdjective("hand-held");
+    pump->addAdjective("small");
+    pump->setFlag(ObjectFlag::TAKEBIT);
+    pump->setFlag(ObjectFlag::TOOLBIT);
+    pump->setProperty(P_SIZE, 8);
+    // TODO: Add action handler for inflating/deflating boat
+    pump->moveTo(g.getObject(RoomIds::RESERVOIR_NORTH));
+    g.registerObject(ObjectIds::PUMP, std::move(pump));
+    
+    // Create BOTTLE (Glass bottle - container and tool)
+    auto bottle = std::make_unique<ZObject>(ObjectIds::BOTTLE, "glass bottle");
+    bottle->addSynonym("bottle");
+    bottle->addSynonym("container");
+    bottle->addAdjective("glass");
+    bottle->addAdjective("clear");
+    bottle->setFlag(ObjectFlag::TAKEBIT);
+    bottle->setFlag(ObjectFlag::CONTBIT);
+    bottle->setFlag(ObjectFlag::TRANSBIT);  // Transparent
+    bottle->setProperty(P_SIZE, 8);
+    bottle->setProperty(P_CAPACITY, 4);
+    // TODO: Add action handler for filling/emptying
+    bottle->moveTo(g.getObject(RoomIds::KITCHEN));
+    g.registerObject(ObjectIds::BOTTLE, std::move(bottle));
+    
     g.lit = true;
 }

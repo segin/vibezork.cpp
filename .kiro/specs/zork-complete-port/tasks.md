@@ -572,7 +572,7 @@ With rooms in place, add all objects that populate the world.
   - Match original placement from 1dungeon.zil
   - _Requirements: 19_
 
-- [ ] 18. Implement tool objects
+- [x] 18. Implement tool objects
   - Create all tool objects with descriptions
   - Set appropriate flags (TAKEBIT, etc.)
   - Set properties (STRENGTH for weapons, etc.)
@@ -580,13 +580,13 @@ With rooms in place, add all objects that populate the world.
   - Place in initial locations
   - _Requirements: 18, 19, 37_
 
-- [ ] 18.1 Create weapon tools
+- [x] 18.1 Create weapon tools
   - SWORD (glows near enemies, weapon)
   - KNIFE (weapon, less effective than sword)
   - Set TAKEBIT flag and STRENGTH property
   - _Requirements: 18, 37_
 
-- [ ] 18.2 Create light source tools
+- [x] 18.2 Create light source tools
   - LAMP (battery-powered light)
   - TORCH (temporary light)
   - CANDLES (burn down over time)
@@ -594,7 +594,7 @@ With rooms in place, add all objects that populate the world.
   - Set LIGHTBIT flag
   - _Requirements: 18, 37_
 
-- [ ] 18.3 Create utility tools
+- [x] 18.3 Create utility tools
   - ROPE (climbing, tying)
   - WRENCH (for bolts)
   - SCREWDRIVER (for screws)
@@ -602,13 +602,13 @@ With rooms in place, add all objects that populate the world.
   - Set TAKEBIT flag
   - _Requirements: 18, 37_
 
-- [ ] 18.4 Create special tools
+- [x] 18.4 Create special tools
   - PUMP (inflate/deflate boat)
   - BOTTLE (container and tool)
   - Other special tools from 1dungeon.zil
   - _Requirements: 18, 37_
 
-- [ ] 18.5 Place all tools in initial locations
+- [x] 18.5 Place all tools in initial locations
   - Distribute tools throughout the world
   - Match original placement from 1dungeon.zil
   - _Requirements: 19_
