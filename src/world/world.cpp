@@ -2758,5 +2758,20 @@ void initializeWorld() {
     bottle->moveTo(g.getObject(RoomIds::KITCHEN));
     g.registerObject(ObjectIds::BOTTLE, std::move(bottle));
     
+    // ===== NPCs =====
+    
+    // Create THIEF NPC
+    auto thief = std::make_unique<ZObject>(ObjectIds::THIEF, "thief");
+    thief->addSynonym("thief");
+    thief->addSynonym("robber");
+    thief->addSynonym("burglar");
+    thief->setFlag(ObjectFlag::FIGHTBIT);    // Hostile NPC
+    thief->setFlag(ObjectFlag::ACTORBIT);    // Is an actor/NPC
+    thief->setProperty(P_STRENGTH, 5);       // Combat strength
+    // TODO: Add action handler for thief behavior (stealing, combat, wandering)
+    // Initial location varies - thief wanders. Start in MAZE_1 for now
+    thief->moveTo(g.getObject(RoomIds::MAZE_1));
+    g.registerObject(ObjectIds::THIEF, std::move(thief));
+    
     g.lit = true;
 }

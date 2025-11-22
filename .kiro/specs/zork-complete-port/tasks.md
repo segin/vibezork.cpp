@@ -659,7 +659,7 @@ With rooms in place, add all objects that populate the world.
   - Place in initial locations
   - _Requirements: 18, 19, 39, 40, 41_
 
-- [ ] 20.1 Create THIEF NPC
+- [x] 20.1 Create THIEF NPC
   - Add description
   - Set FIGHTBIT flag
   - Set STRENGTH property

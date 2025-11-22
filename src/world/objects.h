@@ -223,3 +223,4 @@ constexpr PropertyId P_SIZE = 1;
 constexpr PropertyId P_CAPACITY = 2;
 constexpr PropertyId P_VALUE = 3;
 constexpr PropertyId P_TVALUE = 4;
+constexpr PropertyId P_STRENGTH = 5;
