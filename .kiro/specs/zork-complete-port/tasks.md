@@ -541,7 +541,7 @@ With rooms in place, add all objects that populate the world.
   - _Requirements: 18_
 
 
-- [ ] 17. Implement treasure objects
+- [x] 17. Implement treasure objects
   - Create all treasure objects with descriptions
   - Set TRYTAKEBIT and TAKEBIT flags
   - Set VALUE properties for scoring
@@ -549,25 +549,25 @@ With rooms in place, add all objects that populate the world.
   - Place in initial locations
   - _Requirements: 18, 19, 38_
 
-- [ ] 17.1 Create basic treasures
+- [x] 17.1 Create basic treasures
   - TROPHY, EGG, CHALICE, TRIDENT
   - Set descriptions, synonyms, flags
   - Set point values
   - _Requirements: 18, 38_
 
-- [ ] 17.2 Create jewel treasures
+- [x] 17.2 Create jewel treasures
   - JEWELS, COINS, DIAMONDS, EMERALD
   - Set descriptions, synonyms, flags
   - Set point values
   - _Requirements: 18, 38_
 
-- [ ] 17.3 Create special treasures
+- [x] 17.3 Create special treasures
   - PAINTING (can be taken from wall, has back side)
   - COFFIN (treasure and container)
   - Other treasures with special behaviors
   - _Requirements: 18, 38, 42_
 
-- [ ] 17.4 Place all treasures in initial locations
+- [x] 17.4 Place all treasures in initial locations
   - Distribute treasures throughout the world
   - Match original placement from 1dungeon.zil
   - _Requirements: 19_
