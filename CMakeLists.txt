@@ -35,4 +35,8 @@ if(BUILD_TESTS)
     # World initialization tests
     add_executable(world_initialization_tests tests/world_initialization_tests.cpp ${LIB_SOURCES})
     add_test(NAME WorldInitializationTests COMMAND world_initialization_tests)
+    
+    # Examination verb tests
+    add_executable(examination_verb_tests tests/examination_verb_tests.cpp ${LIB_SOURCES})
+    add_test(NAME ExaminationVerbTests COMMAND examination_verb_tests)
 endif()

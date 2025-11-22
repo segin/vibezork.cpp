@@ -69,7 +69,57 @@ bool vDrop() {
 }
 
 bool vExamine() {
-    printLine("You see nothing special.");
+    auto& g = Globals::instance();
+    
+    // Check if object is specified
+    if (!g.prso) {
+        printLine("Examine what?");
+        return RTRUE;
+    }
+    
+    // Check if object has an action handler that handles EXAMINE
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Display detailed object description
+    printLine(g.prso->getDesc());
+    
+    // Show object state
+    // Check if it's a container
+    if (g.prso->hasFlag(ObjectFlag::CONTBIT)) {
+        if (g.prso->hasFlag(ObjectFlag::OPENBIT)) {
+            const auto& contents = g.prso->getContents();
+            if (contents.empty()) {
+                printLine("The " + g.prso->getDesc() + " is empty.");
+            } else {
+                printLine("The " + g.prso->getDesc() + " contains:");
+                for (const auto* obj : contents) {
+                    print("  ");
+                    printLine(obj->getDesc());
+                }
+            }
+        } else {
+            printLine("The " + g.prso->getDesc() + " is closed.");
+        }
+    }
+    
+    // Check if it's a light source
+    if (g.prso->hasFlag(ObjectFlag::LIGHTBIT)) {
+        if (g.prso->hasFlag(ObjectFlag::ONBIT)) {
+            printLine("The " + g.prso->getDesc() + " is on.");
+        } else {
+            printLine("The " + g.prso->getDesc() + " is off.");
+        }
+    }
+    
+    // Check if it's locked
+    if (g.prso->hasFlag(ObjectFlag::DOORBIT) || g.prso->hasFlag(ObjectFlag::CONTBIT)) {
+        if (g.prso->hasFlag(ObjectFlag::LOCKEDBIT)) {
+            printLine("The " + g.prso->getDesc() + " is locked.");
+        }
+    }
+    
     return RTRUE;
 }
 
@@ -380,6 +430,83 @@ bool vRead() {
     
     // Display the text
     printLine(g.prso->getText());
+    return RTRUE;
+}
+
+bool vLookInside() {
+    auto& g = Globals::instance();
+    
+    // Check if object is specified
+    if (!g.prso) {
+        printLine("Look inside what?");
+        return RTRUE;
+    }
+    
+    // Check if object is a container
+    if (!g.prso->hasFlag(ObjectFlag::CONTBIT)) {
+        printLine("The " + g.prso->getDesc() + " isn't a container.");
+        return RTRUE;
+    }
+    
+    // Check if container is open or transparent
+    if (!g.prso->hasFlag(ObjectFlag::OPENBIT) && !g.prso->hasFlag(ObjectFlag::TRANSBIT)) {
+        printLine("The " + g.prso->getDesc() + " is closed.");
+        return RTRUE;
+    }
+    
+    // List contents of container
+    const auto& contents = g.prso->getContents();
+    if (contents.empty()) {
+        printLine("The " + g.prso->getDesc() + " is empty.");
+    } else {
+        printLine("The " + g.prso->getDesc() + " contains:");
+        for (const auto* obj : contents) {
+            print("  ");
+            printLine(obj->getDesc());
+        }
+    }
+    
+    return RTRUE;
+}
+
+bool vSearch() {
+    auto& g = Globals::instance();
+    
+    // Check if object is specified
+    if (!g.prso) {
+        printLine("Search what?");
+        return RTRUE;
+    }
+    
+    // Check if object has an action handler that handles SEARCH
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Similar to LOOK-INSIDE but more thorough
+    // Check if object is a container
+    if (g.prso->hasFlag(ObjectFlag::CONTBIT)) {
+        // SEARCH can reveal contents even if closed (but not locked)
+        if (g.prso->hasFlag(ObjectFlag::LOCKEDBIT)) {
+            printLine("The " + g.prso->getDesc() + " is locked.");
+            return RTRUE;
+        }
+        
+        const auto& contents = g.prso->getContents();
+        if (contents.empty()) {
+            printLine("You find nothing of interest.");
+        } else {
+            printLine("You find:");
+            for (const auto* obj : contents) {
+                print("  ");
+                printLine(obj->getDesc());
+            }
+        }
+    } else {
+        // For non-containers, just give a generic message
+        printLine("You find nothing unusual.");
+    }
+    
     return RTRUE;
 }
 

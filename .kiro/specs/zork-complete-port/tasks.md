@@ -776,7 +776,7 @@ With rooms in place, add all objects that populate the world.
   - Set TEXT properties
   - _Requirements: 18, 25_
 
-- [x] 24. Set up initial game state
+- [ ] 24. Set up initial game state
   - Place player at WEST_OF_HOUSE
   - Set initial object locations
   - Set initial flags and properties
@@ -814,7 +814,7 @@ With rooms in place, add all objects that populate the world.
 
 With the world populated, implement the verbs that operate on it.
 
-- [ ] 25. Implement examination verbs
+- [x] 25. Implement examination verbs
   - Implement EXAMINE verb
   - Implement LOOK-INSIDE verb
   - Implement SEARCH verb
@@ -822,31 +822,31 @@ With the world populated, implement the verbs that operate on it.
   - Add pre-verb checks
   - _Requirements: 25_
 
-- [ ] 25.1 Implement EXAMINE verb
+- [x] 25.1 Implement EXAMINE verb
   - Display detailed object description
   - Show object state (open/closed, on/off, etc.)
   - Call object action handler if present
   - _Requirements: 25_
 
-- [ ] 25.2 Implement LOOK-INSIDE verb
+- [x] 25.2 Implement LOOK-INSIDE verb
   - Check if object is a container
   - Check if container is open or transparent
   - List contents of container
   - _Requirements: 25_
 
-- [ ] 25.3 Implement SEARCH verb
+- [x] 25.3 Implement SEARCH verb
   - Similar to LOOK-INSIDE but more thorough
   - May reveal hidden objects
   - Call object action handler if present
   - _Requirements: 25_
 
-- [ ] 25.4 Implement READ verb
+- [x] 25.4 Implement READ verb
   - Check if object has TEXT property
   - Display text content
   - Handle objects that can't be read
   - _Requirements: 25_
 
-- [ ] 25.5 Write unit tests for examination verbs
+- [x] 25.5 Write unit tests for examination verbs
   - Test EXAMINE on various objects
   - Test LOOK-INSIDE on containers
   - Test READ on readable objects
