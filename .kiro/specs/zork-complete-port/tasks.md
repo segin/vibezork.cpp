@@ -752,25 +752,25 @@ With rooms in place, add all objects that populate the world.
   - Place in appropriate locations
   - _Requirements: 18, 42_
 
-- [ ] 23. Implement readable objects
+- [x] 23. Implement readable objects
   - Create objects with text (LEAFLET, BOOK, etc.)
   - Set TEXT property with readable content
   - Add READ verb support
   - _Requirements: 18, 25_
 
-- [ ] 23.1 Create LEAFLET
+- [x] 23.1 Create LEAFLET
   - Add "WELCOME TO ZORK!" text
   - Set TEXT property
   - Initially in mailbox
   - _Requirements: 18, 25_
 
-- [ ] 23.2 Create BOOK and GUIDEBOOK
+- [x] 23.2 Create BOOK and GUIDEBOOK
   - Add readable text
   - Set TEXT property
   - Place in appropriate locations
   - _Requirements: 18, 25_
 
-- [ ] 23.3 Create other readable objects
+- [x] 23.3 Create other readable objects
   - NEWSPAPER, LABEL, INSCRIPTION
   - All other readable objects from 1dungeon.zil
   - Set TEXT properties

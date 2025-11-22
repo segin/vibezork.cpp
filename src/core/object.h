@@ -15,6 +15,11 @@ public:
     void setProperty(PropertyId prop, int value);
     int getProperty(PropertyId prop) const;
     
+    // Text property accessors
+    void setText(const std::string& text);
+    const std::string& getText() const;
+    bool hasText() const;
+    
     // Flag operations
     void setFlag(ObjectFlag flag);
     void clearFlag(ObjectFlag flag);
@@ -47,6 +52,7 @@ private:
     std::vector<std::string> adjectives_;
     uint32_t flags_ = 0;
     std::map<PropertyId, int> properties_;
+    std::string text_;  // For readable objects
     ZObject* location_ = nullptr;
     std::vector<ZObject*> contents_;
     ActionFunc action_;

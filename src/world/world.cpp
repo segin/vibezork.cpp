@@ -2136,6 +2136,125 @@ void initializeWorld() {
     
     g.registerObject(OBJ_MAILBOX, std::move(mailbox));
     
+    // Create LEAFLET (Advertisement) - readable object
+    auto leaflet = std::make_unique<ZObject>(ObjectIds::ADVERTISEMENT, "leaflet");
+    leaflet->addSynonym("leaflet");
+    leaflet->addSynonym("advertisement");
+    leaflet->addSynonym("mail");
+    leaflet->addSynonym("booklet");
+    leaflet->addSynonym("pamphlet");
+    leaflet->setFlag(ObjectFlag::TAKEBIT);
+    leaflet->setFlag(ObjectFlag::READBIT);
+    leaflet->setFlag(ObjectFlag::BURNBIT);
+    leaflet->setProperty(P_SIZE, 2);
+    leaflet->setText(
+        "WELCOME TO ZORK!\n\n"
+        "ZORK is a game of adventure, danger, and low cunning. In it you will explore some of the most amazing territory ever seen by mortals. No computer should be without one!"
+    );
+    leaflet->moveTo(g.getObject(OBJ_MAILBOX));  // Initially in mailbox
+    
+    g.registerObject(ObjectIds::ADVERTISEMENT, std::move(leaflet));
+    
+    // Create BOOK (Black book) - readable object
+    auto book = std::make_unique<ZObject>(ObjectIds::BOOK, "black book");
+    book->addSynonym("book");
+    book->addSynonym("tome");
+    book->addAdjective("black");
+    book->setFlag(ObjectFlag::TAKEBIT);
+    book->setFlag(ObjectFlag::READBIT);
+    book->setFlag(ObjectFlag::BURNBIT);
+    book->setProperty(P_SIZE, 5);
+    book->setText(
+        "Commandment #12592\n\n"
+        "Oh ye who go about saying unto each: 'Hello sailor':\n"
+        "Dost thou know the magnitude of thy sin before the gods?\n"
+        "Yea, verily, thou shalt be ground between two stones.\n"
+        "Shall the angry gods cast thy body into the whirlpool?\n"
+        "Surely, thy eye shall be put out with a sharp stick!\n"
+        "Even unto the ends of the earth shalt thou wander and\n"
+        "Unto the land of the dead shalt thou be sent at last.\n"
+        "Surely thou shalt repent of thy cunning."
+    );
+    // Book location will be set when we know where it should be placed
+    // For now, let's put it in the library or a similar location
+    // book->moveTo(g.getObject(RoomIds::LIBRARY));  // TODO: Set proper location
+    
+    g.registerObject(ObjectIds::BOOK, std::move(book));
+    
+    // Create GUIDE (Tour guidebook) - readable object
+    auto guide = std::make_unique<ZObject>(ObjectIds::GUIDE, "tour guidebook");
+    guide->addSynonym("guide");
+    guide->addSynonym("guidebook");
+    guide->addSynonym("book");
+    guide->addAdjective("tour");
+    guide->setFlag(ObjectFlag::TAKEBIT);
+    guide->setFlag(ObjectFlag::READBIT);
+    guide->setFlag(ObjectFlag::BURNBIT);
+    guide->setProperty(P_SIZE, 3);
+    guide->setText(
+        "Flood Control Dam #3\n\n"
+        "FCD#3 was constructed in year 783 of the Great Underground Empire to harness the mighty Frigid River. This work was supported by a grant of 37 million zorkmids from your omnipotent local tyrant Lord Dimwit Flathead the Excessive. This impressive structure is composed of 370,000 cubic feet of concrete, is 256 feet tall at the center, and 193 feet wide at the top. The reservoir created behind the dam has a volume of 1.7 billion cubic feet, an area of 12 million square feet, and a shore line of 36 thousand feet.\n\n"
+        "The construction of FCD#3 took 112 days from ground breaking to the dedication. It required a work force of 384 slaves, 34 slave drivers, 12 engineers, 2 turtle doves, and a partridge in a pear tree. The work was managed by a command team composed of 2345 bureaucrats, 2347 secretaries (at least two of whom could type), 12,256 paper shufflers, 52,469 rubber stampers, 245,193 red tape processors, and nearly one million dead trees.\n\n"
+        "We will now point out some of the more interesting features of FCD#3 as we conduct you on a guided tour of the facilities..."
+    );
+    // Guide location will be set when we know where it should be placed
+    // guide->moveTo(g.getObject(RoomIds::DAM_LOBBY));  // TODO: Set proper location
+    
+    g.registerObject(ObjectIds::GUIDE, std::move(guide));
+    
+    // Create OWNERS_MANUAL (Owner's manual) - readable object
+    auto ownersManual = std::make_unique<ZObject>(ObjectIds::OWNERS_MANUAL, "owner's manual");
+    ownersManual->addSynonym("manual");
+    ownersManual->addSynonym("book");
+    ownersManual->addAdjective("owners");
+    ownersManual->addAdjective("owner's");
+    ownersManual->setFlag(ObjectFlag::TAKEBIT);
+    ownersManual->setFlag(ObjectFlag::READBIT);
+    ownersManual->setFlag(ObjectFlag::BURNBIT);
+    ownersManual->setProperty(P_SIZE, 3);
+    ownersManual->setText(
+        "Congratulations! You are the proud owner of a FROBOZZ MAGIC BOAT, the finest boat in the world. Your boat is guaranteed against all defects for a period of 76 years. If you have any questions about the operation of your boat, please consult your local dealer."
+    );
+    // Manual location will be set when we know where it should be placed
+    // ownersManual->moveTo(g.getObject(RoomIds::BOAT_LOCATION));  // TODO: Set proper location
+    
+    g.registerObject(ObjectIds::OWNERS_MANUAL, std::move(ownersManual));
+    
+    // Create MAP (Map) - readable object
+    auto map = std::make_unique<ZObject>(ObjectIds::MAP, "map");
+    map->addSynonym("map");
+    map->addSynonym("chart");
+    map->setFlag(ObjectFlag::TAKEBIT);
+    map->setFlag(ObjectFlag::READBIT);
+    map->setFlag(ObjectFlag::BURNBIT);
+    map->setProperty(P_SIZE, 2);
+    map->setText(
+        "The map shows a complex maze of twisty passages, all alike."
+    );
+    // Map location will be set when we know where it should be placed
+    // map->moveTo(g.getObject(RoomIds::MAZE_ENTRANCE));  // TODO: Set proper location
+    
+    g.registerObject(ObjectIds::MAP, std::move(map));
+    
+    // Create BOAT_LABEL (Label on boat) - readable object
+    auto boatLabel = std::make_unique<ZObject>(ObjectIds::BOAT_LABEL, "label");
+    boatLabel->addSynonym("label");
+    boatLabel->addSynonym("tag");
+    boatLabel->setFlag(ObjectFlag::READBIT);
+    boatLabel->setFlag(ObjectFlag::TRYTAKEBIT);  // Cannot be taken (attached to boat)
+    boatLabel->setProperty(P_SIZE, 1);
+    boatLabel->setText(
+        "FROBOZZ MAGIC BOAT COMPANY\n"
+        "  Inflatable Boat\n"
+        "  Capacity: 2\n"
+        "  Model: FMB-1\n"
+        "  Serial Number: 123456789"
+    );
+    // Label location will be set when boat is created
+    // boatLabel->moveTo(g.getObject(ObjectIds::BOAT_INFLATABLE));  // TODO: Set proper location
+    
+    g.registerObject(ObjectIds::BOAT_LABEL, std::move(boatLabel));
+    
     // Create Trophy Case container
     auto trophyCase = std::make_unique<ZObject>(ObjectIds::TROPHY_CASE, "trophy case");
     trophyCase->addSynonym("case");

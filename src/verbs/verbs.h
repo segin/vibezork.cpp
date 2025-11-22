@@ -93,6 +93,7 @@ namespace Verbs {
     bool vTake();
     bool vDrop();
     bool vExamine();
+    bool vRead();
     bool vOpen();
     bool vClose();
     bool vWalk();

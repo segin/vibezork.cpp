@@ -357,5 +357,31 @@ bool vDisembark() {
     return RTRUE;
 }
 
+bool vRead() {
+    auto& g = Globals::instance();
+    
+    // Check if object is specified
+    if (!g.prso) {
+        printLine("Read what?");
+        return RTRUE;
+    }
+    
+    // Check if object has READBIT flag
+    if (!g.prso->hasFlag(ObjectFlag::READBIT)) {
+        printLine("How does one read a " + g.prso->getDesc() + "?");
+        return RTRUE;
+    }
+    
+    // Check if object has text
+    if (!g.prso->hasText()) {
+        printLine("There is nothing written on the " + g.prso->getDesc() + ".");
+        return RTRUE;
+    }
+    
+    // Display the text
+    printLine(g.prso->getText());
+    return RTRUE;
+}
+
 } // namespace Verbs
 

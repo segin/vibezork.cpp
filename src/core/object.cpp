@@ -46,3 +46,15 @@ bool ZObject::hasSynonym(const std::string& word) const {
 bool ZObject::hasAdjective(const std::string& word) const {
     return std::find(adjectives_.begin(), adjectives_.end(), word) != adjectives_.end();
 }
+
+void ZObject::setText(const std::string& text) {
+    text_ = text;
+}
+
+const std::string& ZObject::getText() const {
+    return text_;
+}
+
+bool ZObject::hasText() const {
+    return !text_.empty();
+}
