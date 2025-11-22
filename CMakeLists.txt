@@ -51,4 +51,8 @@ if(BUILD_TESTS)
     # Consumption verb tests
     add_executable(consumption_verb_tests tests/consumption_verb_tests.cpp ${LIB_SOURCES})
     add_test(NAME ConsumptionVerbTests COMMAND consumption_verb_tests)
+    
+    # Light verb tests
+    add_executable(light_verb_tests tests/light_verb_tests.cpp ${LIB_SOURCES})
+    add_test(NAME LightVerbTests COMMAND light_verb_tests)
 endif()

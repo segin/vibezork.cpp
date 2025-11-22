@@ -1206,4 +1206,93 @@ bool vDrink() {
     return RTRUE;
 }
 
+// Light Source Verbs (Requirement 30)
+
+bool vLampOn() {
+    auto& g = Globals::instance();
+    
+    // Check if object is specified
+    if (!g.prso) {
+        printLine("Turn on what?");
+        return RTRUE;
+    }
+    
+    // Check if object has LIGHTBIT flag (is a light source)
+    if (!g.prso->hasFlag(ObjectFlag::LIGHTBIT)) {
+        printLine("You can't turn that on.");
+        return RTRUE;
+    }
+    
+    // Check if already on
+    if (g.prso->hasFlag(ObjectFlag::ONBIT)) {
+        printLine("It's already on.");
+        return RTRUE;
+    }
+    
+    // Check if lamp has battery/fuel
+    // For the lamp, check if it has been depleted
+    if (g.prso->getProperty(P_CAPACITY) == 0) {
+        printLine("The lamp has no more power.");
+        return RTRUE;
+    }
+    
+    // Call object action handler first
+    // This allows objects to override default behavior
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Default LAMP-ON behavior
+    // Set ONBIT flag
+    g.prso->setFlag(ObjectFlag::ONBIT);
+    
+    // Update room lighting
+    // This will be handled by the light system when implemented
+    // For now, just set the flag
+    
+    printLine("The " + g.prso->getDesc() + " is now on.");
+    
+    return RTRUE;
+}
+
+bool vLampOff() {
+    auto& g = Globals::instance();
+    
+    // Check if object is specified
+    if (!g.prso) {
+        printLine("Turn off what?");
+        return RTRUE;
+    }
+    
+    // Check if object has LIGHTBIT flag (is a light source)
+    if (!g.prso->hasFlag(ObjectFlag::LIGHTBIT)) {
+        printLine("You can't turn that off.");
+        return RTRUE;
+    }
+    
+    // Check if lamp is on
+    if (!g.prso->hasFlag(ObjectFlag::ONBIT)) {
+        printLine("It's already off.");
+        return RTRUE;
+    }
+    
+    // Call object action handler first
+    // This allows objects to override default behavior
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Default LAMP-OFF behavior
+    // Clear ONBIT flag
+    g.prso->clearFlag(ObjectFlag::ONBIT);
+    
+    // Update room lighting
+    // This will be handled by the light system when implemented
+    // For now, just clear the flag
+    
+    printLine("The " + g.prso->getDesc() + " is now off.");
+    
+    return RTRUE;
+}
+
 } // namespace Verbs

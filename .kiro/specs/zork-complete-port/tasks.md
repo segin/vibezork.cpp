@@ -1104,7 +1104,7 @@ With the world populated, implement the verbs that operate on it.
   - _Requirements: 28, 92_
 
 
-- [ ] 34. Implement light source verbs (LAMP-ON, LAMP-OFF, LIGHT)
+- [x] 34. Implement light source verbs (LAMP-ON, LAMP-OFF, LIGHT)
   - Implement LAMP-ON verb
   - Implement LAMP-OFF verb
   - Implement LIGHT as synonym
@@ -1112,7 +1112,7 @@ With the world populated, implement the verbs that operate on it.
   - Integrate with light system
   - _Requirements: 30_
 
-- [ ] 34.1 Implement LAMP-ON verb
+- [x] 34.1 Implement LAMP-ON verb
   - Check if object has LIGHTBIT flag
   - Check if lamp has battery/fuel
   - Set ONBIT flag
@@ -1120,7 +1120,7 @@ With the world populated, implement the verbs that operate on it.
   - Display success message
   - _Requirements: 30_
 
-- [ ] 34.2 Implement LAMP-OFF verb
+- [x] 34.2 Implement LAMP-OFF verb
   - Check if object has LIGHTBIT flag
   - Check if lamp is on
   - Clear ONBIT flag
@@ -1128,7 +1128,7 @@ With the world populated, implement the verbs that operate on it.
   - Display success message
   - _Requirements: 30_
 
-- [ ] 34.3 Write unit tests for light verbs
+- [x] 34.3 Write unit tests for light verbs
   - Test turning lamp on and off
   - Test with depleted battery
   - Test on non-light objects
@@ -1142,7 +1142,7 @@ With the world populated, implement the verbs that operate on it.
   - Implement WAVE, RUB, RING verbs
   - _Requirements: 31_
 
-- [ ] 35.1 Implement INFLATE verb
+- [-] 35.1 Implement INFLATE verb
   - Check for pump and boat
   - Call object action handler
   - Default: "You can't inflate that"

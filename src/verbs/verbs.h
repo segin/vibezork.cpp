@@ -129,6 +129,10 @@ namespace Verbs {
     bool vEat();
     bool vDrink();
     
+    // Light source verbs
+    bool vLampOn();
+    bool vLampOff();
+    
     // Helper for special movement
     bool trySpecialMovement(int verbId, Direction dir);
 }
