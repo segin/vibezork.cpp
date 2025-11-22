@@ -613,7 +613,7 @@ With rooms in place, add all objects that populate the world.
   - Match original placement from 1dungeon.zil
   - _Requirements: 19_
 
-- [ ] 19. Implement container objects
+- [x] 19. Implement container objects
   - Create all container objects with descriptions
   - Set CONTBIT flag
   - Set CAPACITY properties
@@ -622,31 +622,31 @@ With rooms in place, add all objects that populate the world.
   - Place in initial locations
   - _Requirements: 18, 19, 36_
 
-- [ ] 19.1 Create MAILBOX container
+- [x] 19.1 Create MAILBOX container
   - Already exists, verify completeness
   - Ensure TRYTAKEBIT flag (anchored)
   - Contains leaflet initially
   - _Requirements: 18, 36_
 
-- [ ] 19.2 Create TROPHY_CASE container
+- [x] 19.2 Create TROPHY_CASE container
   - Large capacity for treasures
   - Set CONTBIT and OPENBIT flags
   - Located in living room
   - _Requirements: 18, 36_
 
-- [ ] 19.3 Create portable containers
+- [x] 19.3 Create portable containers
   - SACK, BAG, BASKET
   - Set TAKEBIT and CONTBIT flags
   - Set appropriate capacities
   - _Requirements: 18, 36_
 
-- [ ] 19.4 Create special containers
+- [x] 19.4 Create special containers
   - COFFIN (treasure and container)
   - BOTTLE (liquid container)
   - Other special containers from 1dungeon.zil
   - _Requirements: 18, 36_
 
-- [ ] 19.5 Place all containers in initial locations
+- [x] 19.5 Place all containers in initial locations
   - Distribute containers throughout the world
   - Match original placement from 1dungeon.zil
   - _Requirements: 19_

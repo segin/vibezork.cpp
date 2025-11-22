@@ -2136,6 +2136,156 @@ void initializeWorld() {
     
     g.registerObject(OBJ_MAILBOX, std::move(mailbox));
     
+    // Create Trophy Case container
+    auto trophyCase = std::make_unique<ZObject>(ObjectIds::TROPHY_CASE, "trophy case");
+    trophyCase->addSynonym("case");
+    trophyCase->addAdjective("trophy");
+    trophyCase->setFlag(ObjectFlag::CONTBIT);
+    trophyCase->setFlag(ObjectFlag::TRANSBIT);  // Transparent - can see contents
+    trophyCase->setFlag(ObjectFlag::OPENBIT);   // Initially open
+    trophyCase->setFlag(ObjectFlag::TRYTAKEBIT); // Cannot be taken (anchored)
+    trophyCase->setFlag(ObjectFlag::NDESCBIT);   // Don't describe separately
+    trophyCase->setFlag(ObjectFlag::SEARCHBIT);  // Can be searched
+    trophyCase->setProperty(P_CAPACITY, 10000);  // Large capacity for treasures
+    // TODO: Add action handler for scoring treasures
+    trophyCase->moveTo(g.getObject(RoomIds::LIVING_ROOM));
+    
+    g.registerObject(ObjectIds::TROPHY_CASE, std::move(trophyCase));
+    
+    // Create SACK (Brown sack/sandwich bag) - portable container
+    auto sack = std::make_unique<ZObject>(ObjectIds::SACK, "brown sack");
+    sack->addSynonym("sack");
+    sack->addSynonym("bag");
+    sack->addAdjective("brown");
+    sack->addAdjective("elongated");
+    sack->addAdjective("smelly");
+    sack->setFlag(ObjectFlag::TAKEBIT);
+    sack->setFlag(ObjectFlag::CONTBIT);
+    sack->setFlag(ObjectFlag::OPENBIT);    // Initially open
+    sack->setFlag(ObjectFlag::BURNBIT);    // Can be burned
+    sack->setProperty(P_CAPACITY, 9);
+    sack->setProperty(P_SIZE, 9);
+    // TODO: Add action handler
+    sack->moveTo(g.getObject(RoomIds::KITCHEN));  // On kitchen table
+    
+    g.registerObject(ObjectIds::SACK, std::move(sack));
+    
+    // Create BAG (Large bag - thief's bag) - portable container
+    auto bag = std::make_unique<ZObject>(ObjectIds::BAG, "large bag");
+    bag->addSynonym("bag");
+    bag->addSynonym("sack");
+    bag->addAdjective("large");
+    bag->setFlag(ObjectFlag::TAKEBIT);
+    bag->setFlag(ObjectFlag::CONTBIT);
+    bag->setFlag(ObjectFlag::OPENBIT);     // Initially open
+    bag->setProperty(P_CAPACITY, 100);     // Large capacity
+    bag->setProperty(P_SIZE, 20);
+    // TODO: Add action handler
+    // Initially with thief - will be placed when thief is created
+    
+    g.registerObject(ObjectIds::BAG, std::move(bag));
+    
+    // Create RAISED_BASKET (Basket at top of shaft) - special container
+    auto raisedBasket = std::make_unique<ZObject>(ObjectIds::RAISED_BASKET, "basket");
+    raisedBasket->addSynonym("basket");
+    raisedBasket->addSynonym("cage");
+    raisedBasket->addSynonym("dumbwaiter");
+    raisedBasket->setFlag(ObjectFlag::CONTBIT);
+    raisedBasket->setFlag(ObjectFlag::TRANSBIT);  // Transparent
+    raisedBasket->setFlag(ObjectFlag::OPENBIT);   // Open
+    raisedBasket->setFlag(ObjectFlag::TRYTAKEBIT); // Cannot be taken
+    raisedBasket->setProperty(P_CAPACITY, 50);
+    // TODO: Add action handler for basket mechanics
+    raisedBasket->moveTo(g.getObject(RoomIds::SHAFT_ROOM));
+    
+    g.registerObject(ObjectIds::RAISED_BASKET, std::move(raisedBasket));
+    
+    // Create LOWERED_BASKET (Basket at bottom of shaft) - special container
+    auto loweredBasket = std::make_unique<ZObject>(ObjectIds::BASKET, "basket");
+    loweredBasket->addSynonym("basket");
+    loweredBasket->addSynonym("cage");
+    loweredBasket->addSynonym("dumbwaiter");
+    loweredBasket->addAdjective("lowered");
+    loweredBasket->setFlag(ObjectFlag::TRYTAKEBIT); // Cannot be taken
+    // Note: This basket is not a container when lowered - it becomes one when raised
+    // TODO: Add action handler for basket mechanics
+    loweredBasket->moveTo(g.getObject(RoomIds::LOWER_SHAFT));
+    
+    g.registerObject(ObjectIds::BASKET, std::move(loweredBasket));
+    
+    // Create BUOY (Red buoy - portable container)
+    auto buoy = std::make_unique<ZObject>(ObjectIds::BUOY, "red buoy");
+    buoy->addSynonym("buoy");
+    buoy->addAdjective("red");
+    buoy->setFlag(ObjectFlag::TAKEBIT);
+    buoy->setFlag(ObjectFlag::CONTBIT);
+    buoy->setFlag(ObjectFlag::OPENBIT);
+    buoy->setProperty(P_CAPACITY, 20);
+    buoy->setProperty(P_SIZE, 10);
+    // TODO: Add action handler
+    // Will be placed in River-4 when that room is created
+    
+    g.registerObject(ObjectIds::BUOY, std::move(buoy));
+    
+    // Create NEST (Bird's nest - portable container)
+    auto nest = std::make_unique<ZObject>(ObjectIds::NEST, "bird's nest");
+    nest->addSynonym("nest");
+    nest->addAdjective("birds");
+    nest->setFlag(ObjectFlag::TAKEBIT);
+    nest->setFlag(ObjectFlag::CONTBIT);
+    nest->setFlag(ObjectFlag::OPENBIT);
+    nest->setFlag(ObjectFlag::BURNBIT);
+    nest->setFlag(ObjectFlag::SEARCHBIT);
+    nest->setProperty(P_CAPACITY, 20);
+    // TODO: Add action handler
+    nest->moveTo(g.getObject(RoomIds::UP_A_TREE));
+    
+    g.registerObject(ObjectIds::NEST, std::move(nest));
+    
+    // Create TOOL_CHEST (Group of tool chests - anchored container)
+    auto toolChest = std::make_unique<ZObject>(ObjectIds::TOOL_CHEST, "group of tool chests");
+    toolChest->addSynonym("chest");
+    toolChest->addSynonym("chests");
+    toolChest->addSynonym("group");
+    toolChest->addSynonym("toolchests");
+    toolChest->addAdjective("tool");
+    toolChest->setFlag(ObjectFlag::CONTBIT);
+    toolChest->setFlag(ObjectFlag::OPENBIT);
+    toolChest->setFlag(ObjectFlag::TRYTAKEBIT);  // Cannot be taken
+    toolChest->setFlag(ObjectFlag::SACREDBIT);
+    // TODO: Add action handler
+    // Will be placed in Maintenance Room when that room is created
+    
+    g.registerObject(ObjectIds::TOOL_CHEST, std::move(toolChest));
+    
+    // Create ALTAR (Altar - surface container)
+    auto altar = std::make_unique<ZObject>(ObjectIds::ALTAR, "altar");
+    altar->addSynonym("altar");
+    altar->setFlag(ObjectFlag::CONTBIT);
+    altar->setFlag(ObjectFlag::OPENBIT);
+    altar->setFlag(ObjectFlag::SURFACEBIT);
+    altar->setFlag(ObjectFlag::NDESCBIT);
+    altar->setProperty(P_CAPACITY, 50);
+    // TODO: Add action handler
+    // Will be placed in South Temple when that room is created
+    
+    g.registerObject(ObjectIds::ALTAR, std::move(altar));
+    
+    // Create PEDESTAL (White marble pedestal - surface container)
+    auto pedestal = std::make_unique<ZObject>(ObjectIds::PEDESTAL, "pedestal");
+    pedestal->addSynonym("pedestal");
+    pedestal->addAdjective("white");
+    pedestal->addAdjective("marble");
+    pedestal->setFlag(ObjectFlag::CONTBIT);
+    pedestal->setFlag(ObjectFlag::OPENBIT);
+    pedestal->setFlag(ObjectFlag::SURFACEBIT);
+    pedestal->setFlag(ObjectFlag::NDESCBIT);
+    pedestal->setProperty(P_CAPACITY, 30);
+    // TODO: Add action handler
+    // Will be placed in Torch Room when that room is created
+    
+    g.registerObject(ObjectIds::PEDESTAL, std::move(pedestal));
+    
     // Create White House global object
     auto whiteHouse = std::make_unique<ZObject>(OBJ_WHITE_HOUSE, "white house");
     whiteHouse->addSynonym("house");
@@ -2317,19 +2467,22 @@ void initializeWorld() {
     // TODO: Add action handler for examining back side
     g.registerObject(ObjectIds::PAINTING, std::move(painting));
     
-    // Create COFFIN (Coffin - both treasure and container)
-    auto coffin = std::make_unique<ZObject>(ObjectIds::COFFIN, "coffin");
+    // Create COFFIN (Gold coffin - both treasure and container)
+    auto coffin = std::make_unique<ZObject>(ObjectIds::COFFIN, "gold coffin");
     coffin->addSynonym("coffin");
     coffin->addSynonym("casket");
+    coffin->addSynonym("treasure");
+    coffin->addAdjective("solid");
     coffin->addAdjective("gold");
-    coffin->addAdjective("golden");
     coffin->setFlag(ObjectFlag::TAKEBIT);
     coffin->setFlag(ObjectFlag::CONTBIT);
-    coffin->setFlag(ObjectFlag::OPENBIT);
+    coffin->setFlag(ObjectFlag::SACREDBIT);
+    coffin->setFlag(ObjectFlag::SEARCHBIT);
     coffin->setProperty(P_VALUE, 10);
     coffin->setProperty(P_TVALUE, 10);
-    coffin->setProperty(P_SIZE, 20);
-    coffin->setProperty(P_CAPACITY, 20);
+    coffin->setProperty(P_SIZE, 55);
+    coffin->setProperty(P_CAPACITY, 35);
+    // TODO: Add action handler
     coffin->moveTo(g.getObject(RoomIds::EGYPT_ROOM));
     g.registerObject(ObjectIds::COFFIN, std::move(coffin));
     
