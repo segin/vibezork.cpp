@@ -17,6 +17,7 @@ Parser::Parser() : verbRegistry_(nullptr) {
     verbSynonyms_["look"] = V_LOOK;
     verbSynonyms_["l"] = V_LOOK;
     verbSynonyms_["examine"] = V_EXAMINE;
+    verbSynonyms_["read"] = V_READ;
     verbSynonyms_["open"] = V_OPEN;
     verbSynonyms_["close"] = V_CLOSE;
     verbSynonyms_["inventory"] = V_INVENTORY;
@@ -93,6 +94,7 @@ Parser::Parser(VerbRegistry* registry) : verbRegistry_(registry) {
     verbSynonyms_["look"] = V_LOOK;
     verbSynonyms_["l"] = V_LOOK;
     verbSynonyms_["examine"] = V_EXAMINE;
+    verbSynonyms_["read"] = V_READ;
     verbSynonyms_["open"] = V_OPEN;
     verbSynonyms_["close"] = V_CLOSE;
     verbSynonyms_["inventory"] = V_INVENTORY;

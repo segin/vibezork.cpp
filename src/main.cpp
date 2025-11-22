@@ -14,6 +14,7 @@ std::map<VerbId, std::function<bool()>> verbHandlers = {
     {V_TAKE, Verbs::vTake},
     {V_DROP, Verbs::vDrop},
     {V_EXAMINE, Verbs::vExamine},
+    {V_READ, Verbs::vRead},
     {V_OPEN, Verbs::vOpen},
     {V_CLOSE, Verbs::vClose},
     {V_WALK, Verbs::vWalk}
