@@ -719,34 +719,34 @@ With rooms in place, add all objects that populate the world.
   - _Requirements: 19_
 
 
-- [ ] 22. Implement special puzzle objects
+- [x] 22. Implement special puzzle objects
   - Create all puzzle objects with descriptions
   - Set appropriate flags and properties
   - Add synonyms and adjectives
   - Place in initial locations
   - _Requirements: 18, 19, 42_
 
-- [ ] 22.1 Create BOAT and PUMP
+- [x] 22.1 Create BOAT and PUMP
   - BOAT (inflatable, vehicle)
   - PUMP (inflates/deflates boat)
   - Set appropriate flags
   - Located at dam/reservoir area
   - _Requirements: 18, 42, 83_
 
-- [ ] 22.2 Create MACHINE puzzle
+- [x] 22.2 Create MACHINE puzzle
   - MACHINE (complex button puzzle)
   - BUTTONS, SWITCHES, LEVERS
   - Set up puzzle state
   - Located in machine room
   - _Requirements: 18, 42_
 
-- [ ] 22.3 Create MIRROR puzzle
+- [x] 22.3 Create MIRROR puzzle
   - MIRROR (shows different reflections)
   - Set up special behavior
   - Located in mirror room
   - _Requirements: 18, 42_
 
-- [ ] 22.4 Create other puzzle objects
+- [x] 22.4 Create other puzzle objects
   - All remaining puzzle objects from 1dungeon.zil
   - Set up special behaviors
   - Place in appropriate locations
