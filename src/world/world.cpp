@@ -2773,5 +2773,37 @@ void initializeWorld() {
     thief->moveTo(g.getObject(RoomIds::MAZE_1));
     g.registerObject(ObjectIds::THIEF, std::move(thief));
     
+    // Create TROLL NPC
+    auto troll = std::make_unique<ZObject>(ObjectIds::TROLL, "troll");
+    troll->addSynonym("troll");
+    troll->setFlag(ObjectFlag::FIGHTBIT);    // Hostile NPC
+    troll->setFlag(ObjectFlag::ACTORBIT);    // Is an actor/NPC
+    troll->setProperty(P_STRENGTH, 8);       // Stronger than thief
+    // TODO: Add action handler for troll behavior (blocking bridge, combat)
+    // Located at Troll Room initially
+    troll->moveTo(g.getObject(RoomIds::TROLL_ROOM));
+    g.registerObject(ObjectIds::TROLL, std::move(troll));
+    
+    // Create CYCLOPS NPC
+    auto cyclops = std::make_unique<ZObject>(ObjectIds::CYCLOPS, "cyclops");
+    cyclops->addSynonym("cyclops");
+    cyclops->addSynonym("giant");
+    cyclops->setFlag(ObjectFlag::FIGHTBIT);    // Initially hostile
+    cyclops->setFlag(ObjectFlag::ACTORBIT);    // Is an actor/NPC
+    cyclops->setProperty(P_STRENGTH, 10);      // Very strong
+    // TODO: Add action handler for cyclops behavior (blocking, hunger, eating)
+    // Located at Cyclops Room initially
+    cyclops->moveTo(g.getObject(RoomIds::CYCLOPS_ROOM));
+    g.registerObject(ObjectIds::CYCLOPS, std::move(cyclops));
+    
+    // Create GRUE object (for darkness attacks)
+    // The grue is never seen, only felt - it's not a physical object in the world
+    auto grue = std::make_unique<ZObject>(ObjectIds::GRUE, "grue");
+    grue->addSynonym("grue");
+    grue->setFlag(ObjectFlag::INVISIBLE);      // Never visible
+    // The grue doesn't have a location - it exists in darkness
+    // TODO: Add action handler for grue attacks in darkness
+    g.registerObject(ObjectIds::GRUE, std::move(grue));
+    
     g.lit = true;
 }

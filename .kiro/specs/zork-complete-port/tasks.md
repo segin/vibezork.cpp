@@ -651,7 +651,7 @@ With rooms in place, add all objects that populate the world.
   - Match original placement from 1dungeon.zil
   - _Requirements: 19_
 
-- [ ] 20. Implement NPC objects
+- [x] 20. Implement NPC objects
   - Create all NPC objects with descriptions
   - Set appropriate flags (FIGHTBIT for hostile NPCs)
   - Set properties (STRENGTH, health, etc.)
@@ -667,7 +667,7 @@ With rooms in place, add all objects that populate the world.
   - Initial location varies (wandering)
   - _Requirements: 18, 39_
 
-- [ ] 20.2 Create TROLL NPC
+- [x] 20.2 Create TROLL NPC
   - Add description
   - Set FIGHTBIT flag
   - Set STRENGTH property (stronger than thief)
@@ -675,7 +675,7 @@ With rooms in place, add all objects that populate the world.
   - Located at troll room initially
   - _Requirements: 18, 40_
 
-- [ ] 20.3 Create CYCLOPS NPC
+- [x] 20.3 Create CYCLOPS NPC
   - Add description
   - Set FIGHTBIT flag initially
   - Set STRENGTH property
@@ -683,7 +683,7 @@ With rooms in place, add all objects that populate the world.
   - Located at cyclops room initially
   - _Requirements: 18, 41_
 
-- [ ] 20.4 Create GRUE object
+- [x] 20.4 Create GRUE object
   - Add description (never seen, only felt)
   - Used for darkness attacks
   - Not a physical object in the world

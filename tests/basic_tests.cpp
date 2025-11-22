@@ -2,6 +2,8 @@
 #include "../src/core/object.h"
 #include "../src/core/globals.h"
 #include "../src/world/rooms.h"
+#include "../src/world/objects.h"
+#include "../src/world/world.h"
 #include "../src/parser/syntax.h"
 #include "../src/parser/verb_registry.h"
 #include "../src/parser/parser.h"
@@ -2033,6 +2035,114 @@ TEST(IntegrationParserErrorRecovery) {
     ParsedCommand cmd4 = parser.parse("examine lamp");
     ASSERT_EQ(cmd4.verb, V_EXAMINE);
     ASSERT_EQ(cmd4.directObj, lampPtr);
+    
+    // Cleanup
+    g.reset();
+}
+// Test NPC creation - Task 20
+TEST(NPCCreationTroll) {
+    auto& g = Globals::instance();
+    
+    // Initialize world to create NPCs
+    initializeWorld();
+    
+    // Verify TROLL NPC exists
+    ZObject* troll = g.getObject(ObjectIds::TROLL);
+    ASSERT_TRUE(troll != nullptr);
+    ASSERT_EQ(troll->getDesc(), "troll");
+    
+    // Verify TROLL has correct flags
+    ASSERT_TRUE(troll->hasFlag(ObjectFlag::FIGHTBIT));
+    ASSERT_TRUE(troll->hasFlag(ObjectFlag::ACTORBIT));
+    
+    // Verify TROLL has correct strength (stronger than thief)
+    ASSERT_EQ(troll->getProperty(P_STRENGTH), 8);
+    
+    // Verify TROLL has correct synonyms
+    ASSERT_TRUE(troll->hasSynonym("troll"));
+    
+    // Verify TROLL is in correct location (Troll Room)
+    ASSERT_EQ(troll->getLocation(), g.getObject(RoomIds::TROLL_ROOM));
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(NPCCreationCyclops) {
+    auto& g = Globals::instance();
+    
+    // Initialize world to create NPCs
+    initializeWorld();
+    
+    // Verify CYCLOPS NPC exists
+    ZObject* cyclops = g.getObject(ObjectIds::CYCLOPS);
+    ASSERT_TRUE(cyclops != nullptr);
+    ASSERT_EQ(cyclops->getDesc(), "cyclops");
+    
+    // Verify CYCLOPS has correct flags
+    ASSERT_TRUE(cyclops->hasFlag(ObjectFlag::FIGHTBIT));
+    ASSERT_TRUE(cyclops->hasFlag(ObjectFlag::ACTORBIT));
+    
+    // Verify CYCLOPS has correct strength
+    ASSERT_EQ(cyclops->getProperty(P_STRENGTH), 10);
+    
+    // Verify CYCLOPS has correct synonyms
+    ASSERT_TRUE(cyclops->hasSynonym("cyclops"));
+    ASSERT_TRUE(cyclops->hasSynonym("giant"));
+    
+    // Verify CYCLOPS is in correct location (Cyclops Room)
+    ASSERT_EQ(cyclops->getLocation(), g.getObject(RoomIds::CYCLOPS_ROOM));
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(NPCCreationGrue) {
+    auto& g = Globals::instance();
+    
+    // Initialize world to create NPCs
+    initializeWorld();
+    
+    // Verify GRUE object exists
+    ZObject* grue = g.getObject(ObjectIds::GRUE);
+    ASSERT_TRUE(grue != nullptr);
+    ASSERT_EQ(grue->getDesc(), "grue");
+    
+    // Verify GRUE has INVISIBLE flag (never seen, only felt)
+    ASSERT_TRUE(grue->hasFlag(ObjectFlag::INVISIBLE));
+    
+    // Verify GRUE has correct synonym
+    ASSERT_TRUE(grue->hasSynonym("grue"));
+    
+    // Verify GRUE has no location (exists in darkness)
+    ASSERT_EQ(grue->getLocation(), nullptr);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(NPCCreationThief) {
+    auto& g = Globals::instance();
+    
+    // Initialize world to create NPCs
+    initializeWorld();
+    
+    // Verify THIEF NPC exists (already created in task 20.1)
+    ZObject* thief = g.getObject(ObjectIds::THIEF);
+    ASSERT_TRUE(thief != nullptr);
+    ASSERT_EQ(thief->getDesc(), "thief");
+    
+    // Verify THIEF has correct flags
+    ASSERT_TRUE(thief->hasFlag(ObjectFlag::FIGHTBIT));
+    ASSERT_TRUE(thief->hasFlag(ObjectFlag::ACTORBIT));
+    
+    // Verify THIEF has correct strength
+    ASSERT_EQ(thief->getProperty(P_STRENGTH), 5);
+    
+    // Verify THIEF has correct synonyms
+    ASSERT_TRUE(thief->hasSynonym("thief"));
+    ASSERT_TRUE(thief->hasSynonym("robber"));
+    ASSERT_TRUE(thief->hasSynonym("burglar"));
     
     // Cleanup
     g.reset();
