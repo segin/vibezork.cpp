@@ -624,5 +624,105 @@ bool vSearch() {
     return RTRUE;
 }
 
+bool vPut() {
+    auto& g = Globals::instance();
+    
+    // PRE-PUT checks (Requirement 22, 34, 64)
+    
+    // Check if direct object is specified
+    if (!g.prso) {
+        printLine("Put what?");
+        return RTRUE;
+    }
+    
+    // Check if indirect object is specified
+    if (!g.prsi) {
+        printLine("Put it in what?");
+        return RTRUE;
+    }
+    
+    // Verify direct object is takeable (has TAKEBIT flag)
+    if (!g.prso->hasFlag(ObjectFlag::TAKEBIT)) {
+        printLine("You can't take that.");
+        return RTRUE;
+    }
+    
+    // Check if direct object is accessible
+    ZObject* objLocation = g.prso->getLocation();
+    bool accessible = false;
+    
+    if (objLocation == g.here || objLocation == g.winner) {
+        accessible = true;
+    } else if (objLocation) {
+        // Check if object is in an open container
+        if (objLocation->hasFlag(ObjectFlag::CONTBIT) && 
+            objLocation->hasFlag(ObjectFlag::OPENBIT)) {
+            ZObject* containerLocation = objLocation->getLocation();
+            if (containerLocation == g.here || containerLocation == g.winner) {
+                accessible = true;
+            }
+        }
+    }
+    
+    if (!accessible) {
+        printLine("You can't see any such thing.");
+        return RTRUE;
+    }
+    
+    // Verify indirect object has CONTBIT flag (is a container)
+    if (!g.prsi->hasFlag(ObjectFlag::CONTBIT)) {
+        printLine("You can't put something in that.");
+        return RTRUE;
+    }
+    
+    // Check if container is open
+    if (!g.prsi->hasFlag(ObjectFlag::OPENBIT)) {
+        printLine("The " + g.prsi->getDesc() + " is closed.");
+        return RTRUE;
+    }
+    
+    // Check container capacity (Requirement 64)
+    int capacity = g.prsi->getProperty(P_CAPACITY);
+    if (capacity == 0) {
+        capacity = 100;  // Default capacity if not specified
+    }
+    
+    // Calculate current contents size
+    int currentSize = 0;
+    for (const auto* obj : g.prsi->getContents()) {
+        currentSize += obj->getProperty(P_SIZE);
+    }
+    
+    // Get object size
+    int objectSize = g.prso->getProperty(P_SIZE);
+    if (objectSize == 0) {
+        objectSize = 5;  // Default size if not specified
+    }
+    
+    // Check if adding this object would exceed capacity
+    if (currentSize + objectSize > capacity) {
+        printLine("There's no room in the " + g.prsi->getDesc() + ".");
+        return RTRUE;
+    }
+    
+    // Call object action handlers (Requirement 22)
+    // First check if direct object has special PUT behavior
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Then check if indirect object (container) has special PUT behavior
+    if (g.prsi->performAction()) {
+        return RTRUE;
+    }
+    
+    // Default PUT behavior
+    // Move object to container
+    g.prso->moveTo(g.prsi);
+    printLine("Done.");
+    
+    return RTRUE;
+}
+
 } // namespace Verbs
 

@@ -906,28 +906,28 @@ With the world populated, implement the verbs that operate on it.
   - _Requirements: 21, 92_
 
 
-- [ ] 28. Implement PUT verb (put object in container)
+- [x] 28. Implement PUT verb (put object in container)
   - Check if indirect object is a container
   - Check if container is open
   - Check container capacity
   - Move object to container
   - _Requirements: 22, 64_
 
-- [ ] 28.1 Implement PRE-PUT checks
+- [x] 28.1 Implement PRE-PUT checks
   - Verify direct object is takeable
   - Verify indirect object has CONTBIT flag
   - Check if container is open
   - Check container capacity
   - _Requirements: 22, 34, 64_
 
-- [ ] 28.2 Implement PUT verb handler
+- [x] 28.2 Implement PUT verb handler
   - Call object action handlers
   - If not handled, perform default put
   - Move object to container
   - Display success message
   - _Requirements: 22_
 
-- [ ] 28.3 Write unit tests for PUT verb
+- [x] 28.3 Write unit tests for PUT verb
   - Test putting objects in containers
   - Test putting in closed containers (should fail)
   - Test capacity limits
