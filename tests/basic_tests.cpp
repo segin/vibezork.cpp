@@ -2171,3 +2171,307 @@ int main() {
     
     return failed > 0 ? 1 : 0;
 }
+
+// Test TAKE verb - Task 26.3
+TEST(TakeVerbNormalObject) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create takeable object
+    auto lamp = std::make_unique<ZObject>(1, "lamp");
+    lamp->addSynonym("lamp");
+    lamp->setFlag(ObjectFlag::TAKEBIT);
+    lamp->setProperty(P_SIZE, 5);
+    lamp->moveTo(&testRoom);
+    ZObject* lampPtr = lamp.get();
+    g.registerObject(1, std::move(lamp));
+    
+    // Set up for TAKE command
+    g.prso = lampPtr;
+    g.prsa = V_TAKE;
+    
+    // Execute TAKE verb
+    bool result = Verbs::vTake();
+    
+    // Verify object was taken
+    ASSERT_TRUE(result);
+    ASSERT_EQ(lampPtr->getLocation(), g.winner);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(TakeVerbAnchoredObject) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create anchored object (TRYTAKEBIT set)
+    auto mailbox = std::make_unique<ZObject>(1, "mailbox");
+    mailbox->addSynonym("mailbox");
+    mailbox->setFlag(ObjectFlag::TRYTAKEBIT);  // Anchored - cannot be taken
+    mailbox->moveTo(&testRoom);
+    ZObject* mailboxPtr = mailbox.get();
+    g.registerObject(1, std::move(mailbox));
+    
+    // Set up for TAKE command
+    g.prso = mailboxPtr;
+    g.prsa = V_TAKE;
+    
+    // Execute TAKE verb
+    bool result = Verbs::vTake();
+    
+    // Verify object was NOT taken (still in room)
+    ASSERT_TRUE(result);
+    ASSERT_EQ(mailboxPtr->getLocation(), &testRoom);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(TakeVerbWeightLimit) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Set a low weight limit for testing
+    g.loadAllowed = 20;
+    
+    // Create heavy object already in inventory
+    auto heavyItem = std::make_unique<ZObject>(1, "heavy item");
+    heavyItem->setProperty(P_SIZE, 15);
+    heavyItem->moveTo(g.winner);
+    g.registerObject(1, std::move(heavyItem));
+    
+    // Create another object that would exceed the limit
+    auto lamp = std::make_unique<ZObject>(2, "lamp");
+    lamp->addSynonym("lamp");
+    lamp->setFlag(ObjectFlag::TAKEBIT);
+    lamp->setProperty(P_SIZE, 10);  // 15 + 10 = 25 > 20 (limit)
+    lamp->moveTo(&testRoom);
+    ZObject* lampPtr = lamp.get();
+    g.registerObject(2, std::move(lamp));
+    
+    // Set up for TAKE command
+    g.prso = lampPtr;
+    g.prsa = V_TAKE;
+    
+    // Execute TAKE verb
+    bool result = Verbs::vTake();
+    
+    // Verify object was NOT taken (weight limit exceeded)
+    ASSERT_TRUE(result);
+    ASSERT_EQ(lampPtr->getLocation(), &testRoom);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(TakeVerbFromOpenContainer) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create open container in room
+    auto box = std::make_unique<ZObject>(10, "box");
+    box->addSynonym("box");
+    box->setFlag(ObjectFlag::CONTBIT);
+    box->setFlag(ObjectFlag::OPENBIT);
+    box->moveTo(&testRoom);
+    ZObject* boxPtr = box.get();
+    g.registerObject(10, std::move(box));
+    
+    // Create object in open container
+    auto coin = std::make_unique<ZObject>(1, "coin");
+    coin->addSynonym("coin");
+    coin->setFlag(ObjectFlag::TAKEBIT);
+    coin->setProperty(P_SIZE, 2);
+    coin->moveTo(boxPtr);
+    ZObject* coinPtr = coin.get();
+    g.registerObject(1, std::move(coin));
+    
+    // Set up for TAKE command
+    g.prso = coinPtr;
+    g.prsa = V_TAKE;
+    
+    // Execute TAKE verb
+    bool result = Verbs::vTake();
+    
+    // Verify object was taken from container
+    ASSERT_TRUE(result);
+    ASSERT_EQ(coinPtr->getLocation(), g.winner);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(TakeVerbFromClosedContainer) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create closed container in room
+    auto chest = std::make_unique<ZObject>(10, "chest");
+    chest->addSynonym("chest");
+    chest->setFlag(ObjectFlag::CONTBIT);
+    // Not setting OPENBIT - it's closed
+    chest->moveTo(&testRoom);
+    ZObject* chestPtr = chest.get();
+    g.registerObject(10, std::move(chest));
+    
+    // Create object in closed container
+    auto gem = std::make_unique<ZObject>(1, "gem");
+    gem->addSynonym("gem");
+    gem->setFlag(ObjectFlag::TAKEBIT);
+    gem->setProperty(P_SIZE, 2);
+    gem->moveTo(chestPtr);
+    ZObject* gemPtr = gem.get();
+    g.registerObject(1, std::move(gem));
+    
+    // Set up for TAKE command
+    g.prso = gemPtr;
+    g.prsa = V_TAKE;
+    
+    // Execute TAKE verb
+    bool result = Verbs::vTake();
+    
+    // Verify object was NOT taken (container is closed, not accessible)
+    ASSERT_TRUE(result);
+    ASSERT_EQ(gemPtr->getLocation(), chestPtr);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(TakeVerbNonTakeableObject) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create non-takeable object (no TAKEBIT flag)
+    auto house = std::make_unique<ZObject>(1, "house");
+    house->addSynonym("house");
+    // No TAKEBIT flag set
+    house->moveTo(&testRoom);
+    ZObject* housePtr = house.get();
+    g.registerObject(1, std::move(house));
+    
+    // Set up for TAKE command
+    g.prso = housePtr;
+    g.prsa = V_TAKE;
+    
+    // Execute TAKE verb
+    bool result = Verbs::vTake();
+    
+    // Verify object was NOT taken
+    ASSERT_TRUE(result);
+    ASSERT_EQ(housePtr->getLocation(), &testRoom);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(TakeVerbAlreadyHeld) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create object already in inventory
+    auto lamp = std::make_unique<ZObject>(1, "lamp");
+    lamp->addSynonym("lamp");
+    lamp->setFlag(ObjectFlag::TAKEBIT);
+    lamp->setProperty(P_SIZE, 5);
+    lamp->moveTo(g.winner);  // Already in inventory
+    ZObject* lampPtr = lamp.get();
+    g.registerObject(1, std::move(lamp));
+    
+    // Set up for TAKE command
+    g.prso = lampPtr;
+    g.prsa = V_TAKE;
+    
+    // Execute TAKE verb
+    bool result = Verbs::vTake();
+    
+    // Verify object is still in inventory (no change)
+    ASSERT_TRUE(result);
+    ASSERT_EQ(lampPtr->getLocation(), g.winner);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(TakeVerbNoObject) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Set up for TAKE command with no object
+    g.prso = nullptr;
+    g.prsa = V_TAKE;
+    
+    // Execute TAKE verb
+    bool result = Verbs::vTake();
+    
+    // Should return true (command handled, even if it's an error)
+    ASSERT_TRUE(result);
+    
+    // Cleanup
+    g.reset();
+}

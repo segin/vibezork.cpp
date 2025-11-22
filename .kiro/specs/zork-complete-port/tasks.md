@@ -852,7 +852,7 @@ With the world populated, implement the verbs that operate on it.
   - Test READ on readable objects
   - _Requirements: 25, 92_
 
-- [ ] 26. Implement TAKE verb with full validation
+- [x] 26. Implement TAKE verb with full validation
   - Check if object has TAKEBIT flag
   - Check if object has TRYTAKEBIT flag (anchored)
   - Check inventory weight limits
@@ -861,21 +861,21 @@ With the world populated, implement the verbs that operate on it.
   - Move object to player inventory
   - _Requirements: 21, 63, 80_
 
-- [ ] 26.1 Implement PRE-TAKE checks
+- [x] 26.1 Implement PRE-TAKE checks
   - Verify object exists and is visible
   - Check TAKEBIT flag
   - Check TRYTAKEBIT flag (refuse if set)
   - Check inventory weight limit
   - _Requirements: 21, 34, 63, 80_
 
-- [ ] 26.2 Implement TAKE verb handler
+- [x] 26.2 Implement TAKE verb handler
   - Call object action handler first
   - If not handled, perform default take
   - Move object to player inventory
   - Display success message
   - _Requirements: 21_
 
-- [ ] 26.3 Write unit tests for TAKE verb
+- [x] 26.3 Write unit tests for TAKE verb
   - Test taking normal objects
   - Test taking anchored objects (should fail)
   - Test weight limit

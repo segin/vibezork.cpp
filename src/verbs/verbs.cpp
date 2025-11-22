@@ -2,6 +2,7 @@
 #include "core/globals.h"
 #include "core/io.h"
 #include "world/rooms.h"
+#include "world/objects.h"
 
 namespace Verbs {
 
@@ -59,7 +60,90 @@ bool vQuit() {
 }
 
 bool vTake() {
+    auto& g = Globals::instance();
+    
+    // PRE-TAKE checks (Requirement 21, 34, 63, 80)
+    
+    // Check if object is specified
+    if (!g.prso) {
+        printLine("Take what?");
+        return RTRUE;
+    }
+    
+    // Check if object is already in inventory
+    if (g.prso->getLocation() == g.winner) {
+        printLine("You already have that.");
+        return RTRUE;
+    }
+    
+    // Check TRYTAKEBIT flag (anchored objects cannot be taken)
+    if (g.prso->hasFlag(ObjectFlag::TRYTAKEBIT)) {
+        printLine("You can't take that.");
+        return RTRUE;
+    }
+    
+    // Check TAKEBIT flag (only takeable objects can be taken)
+    if (!g.prso->hasFlag(ObjectFlag::TAKEBIT)) {
+        printLine("You can't take that.");
+        return RTRUE;
+    }
+    
+    // Check if object is accessible (must be in current room, inventory, or open container)
+    ZObject* objLocation = g.prso->getLocation();
+    bool accessible = false;
+    
+    if (objLocation == g.here) {
+        // Object is in current room
+        accessible = true;
+    } else if (objLocation == g.winner) {
+        // Object is already in inventory (handled above)
+        accessible = true;
+    } else if (objLocation) {
+        // Check if object is in an open container in the room or inventory
+        if (objLocation->hasFlag(ObjectFlag::CONTBIT) && 
+            objLocation->hasFlag(ObjectFlag::OPENBIT)) {
+            ZObject* containerLocation = objLocation->getLocation();
+            if (containerLocation == g.here || containerLocation == g.winner) {
+                accessible = true;
+            }
+        }
+    }
+    
+    if (!accessible) {
+        printLine("You can't see any such thing.");
+        return RTRUE;
+    }
+    
+    // Check inventory weight limit (Requirement 63)
+    // Calculate current inventory weight
+    int currentWeight = 0;
+    for (const auto* obj : g.winner->getContents()) {
+        currentWeight += obj->getProperty(P_SIZE);
+    }
+    
+    // Get object size
+    int objectSize = g.prso->getProperty(P_SIZE);
+    if (objectSize == 0) {
+        objectSize = 5;  // Default size if not specified
+    }
+    
+    // Check if adding this object would exceed the limit
+    if (currentWeight + objectSize > g.loadAllowed) {
+        printLine("You're carrying too much.");
+        return RTRUE;
+    }
+    
+    // Call object action handler if present (Requirement 35)
+    // This allows objects to override default behavior
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Default TAKE behavior
+    // Move object to player inventory
+    g.prso->moveTo(g.winner);
     printLine("Taken.");
+    
     return RTRUE;
 }
 
