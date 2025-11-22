@@ -99,6 +99,8 @@ namespace Verbs {
     bool vSearch();
     bool vOpen();
     bool vClose();
+    bool vLock();
+    bool vUnlock();
     bool vWalk();
     bool vWalkDir(Direction dir);
     

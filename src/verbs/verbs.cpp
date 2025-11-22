@@ -328,6 +328,150 @@ bool vClose() {
     return RTRUE;
 }
 
+bool vLock() {
+    auto& g = Globals::instance();
+    
+    // PRE-LOCK checks (Requirement 24, 34)
+    
+    // Check if object is specified
+    if (!g.prso) {
+        printLine("Lock what?");
+        return RTRUE;
+    }
+    
+    // Check if key is specified
+    if (!g.prsi) {
+        printLine("Lock it with what?");
+        return RTRUE;
+    }
+    
+    // Verify object can be locked (has DOORBIT or CONTBIT flag)
+    if (!g.prso->hasFlag(ObjectFlag::DOORBIT) && !g.prso->hasFlag(ObjectFlag::CONTBIT)) {
+        printLine("You can't lock that.");
+        return RTRUE;
+    }
+    
+    // Check if already locked
+    if (g.prso->hasFlag(ObjectFlag::LOCKEDBIT)) {
+        printLine("It's already locked.");
+        return RTRUE;
+    }
+    
+    // Verify player has the key (must be in inventory or accessible)
+    ZObject* keyLocation = g.prsi->getLocation();
+    bool hasKey = false;
+    
+    if (keyLocation == g.winner) {
+        // Key is in inventory
+        hasKey = true;
+    } else if (keyLocation == g.here) {
+        // Key is in current room
+        hasKey = true;
+    } else if (keyLocation) {
+        // Check if key is in an open container in the room or inventory
+        if (keyLocation->hasFlag(ObjectFlag::CONTBIT) && 
+            keyLocation->hasFlag(ObjectFlag::OPENBIT)) {
+            ZObject* containerLocation = keyLocation->getLocation();
+            if (containerLocation == g.here || containerLocation == g.winner) {
+                hasKey = true;
+            }
+        }
+    }
+    
+    if (!hasKey) {
+        printLine("You don't have that.");
+        return RTRUE;
+    }
+    
+    // Verify the key has TOOLBIT flag (is a tool/key)
+    if (!g.prsi->hasFlag(ObjectFlag::TOOLBIT)) {
+        printLine("You can't lock anything with that.");
+        return RTRUE;
+    }
+    
+    // Call object action handler first (Requirement 24)
+    // This allows objects to override default behavior (e.g., check for correct key)
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Default LOCK behavior
+    // Set LOCKEDBIT flag
+    g.prso->setFlag(ObjectFlag::LOCKEDBIT);
+    printLine("Locked.");
+    
+    return RTRUE;
+}
+
+bool vUnlock() {
+    auto& g = Globals::instance();
+    
+    // PRE-UNLOCK checks (Requirement 24, 34)
+    
+    // Check if object is specified
+    if (!g.prso) {
+        printLine("Unlock what?");
+        return RTRUE;
+    }
+    
+    // Check if key is specified
+    if (!g.prsi) {
+        printLine("Unlock it with what?");
+        return RTRUE;
+    }
+    
+    // Verify object is locked
+    if (!g.prso->hasFlag(ObjectFlag::LOCKEDBIT)) {
+        printLine("It's not locked.");
+        return RTRUE;
+    }
+    
+    // Verify player has the key (must be in inventory or accessible)
+    ZObject* keyLocation = g.prsi->getLocation();
+    bool hasKey = false;
+    
+    if (keyLocation == g.winner) {
+        // Key is in inventory
+        hasKey = true;
+    } else if (keyLocation == g.here) {
+        // Key is in current room
+        hasKey = true;
+    } else if (keyLocation) {
+        // Check if key is in an open container in the room or inventory
+        if (keyLocation->hasFlag(ObjectFlag::CONTBIT) && 
+            keyLocation->hasFlag(ObjectFlag::OPENBIT)) {
+            ZObject* containerLocation = keyLocation->getLocation();
+            if (containerLocation == g.here || containerLocation == g.winner) {
+                hasKey = true;
+            }
+        }
+    }
+    
+    if (!hasKey) {
+        printLine("You don't have that.");
+        return RTRUE;
+    }
+    
+    // Verify the key has TOOLBIT flag (is a tool/key)
+    if (!g.prsi->hasFlag(ObjectFlag::TOOLBIT)) {
+        printLine("You can't unlock anything with that.");
+        return RTRUE;
+    }
+    
+    // Call object action handler first (Requirement 24)
+    // This allows objects to override default behavior (e.g., check for correct key)
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Default UNLOCK behavior
+    // Clear LOCKEDBIT flag
+    g.prso->clearFlag(ObjectFlag::LOCKEDBIT);
+    printLine("Unlocked.");
+    
+    return RTRUE;
+}
+
 bool vWalk() {
     auto& g = Globals::instance();
     ZRoom* currentRoom = dynamic_cast<ZRoom*>(g.here);

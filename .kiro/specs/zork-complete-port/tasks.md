@@ -969,36 +969,36 @@ With the world populated, implement the verbs that operate on it.
   - Test opening already open containers
   - _Requirements: 23, 92_
 
-- [ ] 30. Implement LOCK and UNLOCK verbs
+- [x] 30. Implement LOCK and UNLOCK verbs
   - Check if object can be locked
   - Check for correct key
   - Set or clear LOCKEDBIT flag
   - _Requirements: 24_
 
-- [ ] 30.1 Implement PRE-LOCK checks
+- [x] 30.1 Implement PRE-LOCK checks
   - Verify object can be locked
   - Check if already locked
   - Verify player has correct key
   - _Requirements: 24, 34_
 
-- [ ] 30.2 Implement LOCK verb handler
+- [x] 30.2 Implement LOCK verb handler
   - Call object action handler first
   - If not handled, set LOCKEDBIT flag
   - Display success message
   - _Requirements: 24_
 
-- [ ] 30.3 Implement PRE-UNLOCK checks
+- [x] 30.3 Implement PRE-UNLOCK checks
   - Verify object is locked
   - Verify player has correct key
   - _Requirements: 24, 34_
 
-- [ ] 30.4 Implement UNLOCK verb handler
+- [x] 30.4 Implement UNLOCK verb handler
   - Call object action handler first
   - If not handled, clear LOCKEDBIT flag
   - Display success message
   - _Requirements: 24_
 
-- [ ] 30.5 Write unit tests for LOCK and UNLOCK verbs
+- [x] 30.5 Write unit tests for LOCK and UNLOCK verbs
   - Test locking and unlocking
   - Test without correct key (should fail)
   - _Requirements: 24, 92_

@@ -985,6 +985,387 @@ TEST(OpenCloseSequence) {
     g.reset();
 }
 
+// Test LOCK and UNLOCK verbs - Task 30.5
+
+TEST(LockVerbBasic) {
+    // Test locking an unlocked container with a key
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto testRoom = std::make_unique<ZRoom>(100, "Test Room", "A test room.");
+    g.here = testRoom.get();
+    g.registerObject(100, std::move(testRoom));
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create lockable container (chest) in room
+    auto chest = std::make_unique<ZObject>(1, "chest");
+    chest->addSynonym("chest");
+    chest->setFlag(ObjectFlag::CONTBIT);
+    // Note: LOCKEDBIT is NOT set (unlocked)
+    chest->moveTo(g.here);
+    ZObject* chestPtr = chest.get();
+    g.registerObject(1, std::move(chest));
+    
+    // Create key in player inventory
+    auto key = std::make_unique<ZObject>(2, "key");
+    key->addSynonym("key");
+    key->setFlag(ObjectFlag::TOOLBIT);
+    key->moveTo(g.winner);
+    ZObject* keyPtr = key.get();
+    g.registerObject(2, std::move(key));
+    
+    // Set up verb context
+    g.prso = chestPtr;
+    g.prsi = keyPtr;
+    g.prsa = V_LOCK;
+    
+    // Test LOCK verb
+    bool result = Verbs::vLock();
+    ASSERT_TRUE(result);
+    
+    // Verify chest is now locked
+    ASSERT_TRUE(chestPtr->hasFlag(ObjectFlag::LOCKEDBIT));
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(LockVerbAlreadyLocked) {
+    // Test locking an already locked container
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto testRoom = std::make_unique<ZRoom>(100, "Test Room", "A test room.");
+    g.here = testRoom.get();
+    g.registerObject(100, std::move(testRoom));
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create locked container (safe) in room
+    auto safe = std::make_unique<ZObject>(1, "safe");
+    safe->addSynonym("safe");
+    safe->setFlag(ObjectFlag::CONTBIT);
+    safe->setFlag(ObjectFlag::LOCKEDBIT);  // Already locked
+    safe->moveTo(g.here);
+    ZObject* safePtr = safe.get();
+    g.registerObject(1, std::move(safe));
+    
+    // Create key in player inventory
+    auto key = std::make_unique<ZObject>(2, "key");
+    key->addSynonym("key");
+    key->setFlag(ObjectFlag::TOOLBIT);
+    key->moveTo(g.winner);
+    ZObject* keyPtr = key.get();
+    g.registerObject(2, std::move(key));
+    
+    // Set up verb context
+    g.prso = safePtr;
+    g.prsi = keyPtr;
+    g.prsa = V_LOCK;
+    
+    // Test LOCK verb on already locked container
+    bool result = Verbs::vLock();
+    ASSERT_TRUE(result);
+    
+    // Verify safe is still locked
+    ASSERT_TRUE(safePtr->hasFlag(ObjectFlag::LOCKEDBIT));
+    
+    // Should display "It's already locked." message
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(LockVerbWithoutKey) {
+    // Test locking without a key (should fail)
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto testRoom = std::make_unique<ZRoom>(100, "Test Room", "A test room.");
+    g.here = testRoom.get();
+    g.registerObject(100, std::move(testRoom));
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create lockable container (chest) in room
+    auto chest = std::make_unique<ZObject>(1, "chest");
+    chest->addSynonym("chest");
+    chest->setFlag(ObjectFlag::CONTBIT);
+    chest->moveTo(g.here);
+    ZObject* chestPtr = chest.get();
+    g.registerObject(1, std::move(chest));
+    
+    // Set up verb context without key
+    g.prso = chestPtr;
+    g.prsi = nullptr;
+    g.prsa = V_LOCK;
+    
+    // Test LOCK verb without key
+    bool result = Verbs::vLock();
+    ASSERT_TRUE(result);
+    
+    // Verify chest is still unlocked
+    ASSERT_FALSE(chestPtr->hasFlag(ObjectFlag::LOCKEDBIT));
+    
+    // Should display "Lock it with what?" message
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(LockVerbNonLockable) {
+    // Test locking a non-lockable object (should fail)
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto testRoom = std::make_unique<ZRoom>(100, "Test Room", "A test room.");
+    g.here = testRoom.get();
+    g.registerObject(100, std::move(testRoom));
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create non-lockable object (lamp) in room
+    auto lamp = std::make_unique<ZObject>(1, "lamp");
+    lamp->addSynonym("lamp");
+    // Note: Neither DOORBIT nor CONTBIT is set
+    lamp->moveTo(g.here);
+    ZObject* lampPtr = lamp.get();
+    g.registerObject(1, std::move(lamp));
+    
+    // Create key in player inventory
+    auto key = std::make_unique<ZObject>(2, "key");
+    key->addSynonym("key");
+    key->setFlag(ObjectFlag::TOOLBIT);
+    key->moveTo(g.winner);
+    ZObject* keyPtr = key.get();
+    g.registerObject(2, std::move(key));
+    
+    // Set up verb context
+    g.prso = lampPtr;
+    g.prsi = keyPtr;
+    g.prsa = V_LOCK;
+    
+    // Test LOCK verb on non-lockable object
+    bool result = Verbs::vLock();
+    ASSERT_TRUE(result);
+    
+    // Should display "You can't lock that." message
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(UnlockVerbBasic) {
+    // Test unlocking a locked container with a key
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto testRoom = std::make_unique<ZRoom>(100, "Test Room", "A test room.");
+    g.here = testRoom.get();
+    g.registerObject(100, std::move(testRoom));
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create locked container (chest) in room
+    auto chest = std::make_unique<ZObject>(1, "chest");
+    chest->addSynonym("chest");
+    chest->setFlag(ObjectFlag::CONTBIT);
+    chest->setFlag(ObjectFlag::LOCKEDBIT);  // Locked
+    chest->moveTo(g.here);
+    ZObject* chestPtr = chest.get();
+    g.registerObject(1, std::move(chest));
+    
+    // Create key in player inventory
+    auto key = std::make_unique<ZObject>(2, "key");
+    key->addSynonym("key");
+    key->setFlag(ObjectFlag::TOOLBIT);
+    key->moveTo(g.winner);
+    ZObject* keyPtr = key.get();
+    g.registerObject(2, std::move(key));
+    
+    // Set up verb context
+    g.prso = chestPtr;
+    g.prsi = keyPtr;
+    g.prsa = V_UNLOCK;
+    
+    // Test UNLOCK verb
+    bool result = Verbs::vUnlock();
+    ASSERT_TRUE(result);
+    
+    // Verify chest is now unlocked
+    ASSERT_FALSE(chestPtr->hasFlag(ObjectFlag::LOCKEDBIT));
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(UnlockVerbNotLocked) {
+    // Test unlocking an already unlocked container
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto testRoom = std::make_unique<ZRoom>(100, "Test Room", "A test room.");
+    g.here = testRoom.get();
+    g.registerObject(100, std::move(testRoom));
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create unlocked container (box) in room
+    auto box = std::make_unique<ZObject>(1, "box");
+    box->addSynonym("box");
+    box->setFlag(ObjectFlag::CONTBIT);
+    // Note: LOCKEDBIT is NOT set (unlocked)
+    box->moveTo(g.here);
+    ZObject* boxPtr = box.get();
+    g.registerObject(1, std::move(box));
+    
+    // Create key in player inventory
+    auto key = std::make_unique<ZObject>(2, "key");
+    key->addSynonym("key");
+    key->setFlag(ObjectFlag::TOOLBIT);
+    key->moveTo(g.winner);
+    ZObject* keyPtr = key.get();
+    g.registerObject(2, std::move(key));
+    
+    // Set up verb context
+    g.prso = boxPtr;
+    g.prsi = keyPtr;
+    g.prsa = V_UNLOCK;
+    
+    // Test UNLOCK verb on unlocked container
+    bool result = Verbs::vUnlock();
+    ASSERT_TRUE(result);
+    
+    // Verify box is still unlocked
+    ASSERT_FALSE(boxPtr->hasFlag(ObjectFlag::LOCKEDBIT));
+    
+    // Should display "It's not locked." message
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(UnlockVerbWithoutKey) {
+    // Test unlocking without a key (should fail)
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto testRoom = std::make_unique<ZRoom>(100, "Test Room", "A test room.");
+    g.here = testRoom.get();
+    g.registerObject(100, std::move(testRoom));
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create locked container (chest) in room
+    auto chest = std::make_unique<ZObject>(1, "chest");
+    chest->addSynonym("chest");
+    chest->setFlag(ObjectFlag::CONTBIT);
+    chest->setFlag(ObjectFlag::LOCKEDBIT);
+    chest->moveTo(g.here);
+    ZObject* chestPtr = chest.get();
+    g.registerObject(1, std::move(chest));
+    
+    // Set up verb context without key
+    g.prso = chestPtr;
+    g.prsi = nullptr;
+    g.prsa = V_UNLOCK;
+    
+    // Test UNLOCK verb without key
+    bool result = Verbs::vUnlock();
+    ASSERT_TRUE(result);
+    
+    // Verify chest is still locked
+    ASSERT_TRUE(chestPtr->hasFlag(ObjectFlag::LOCKEDBIT));
+    
+    // Should display "Unlock it with what?" message
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(LockUnlockSequence) {
+    // Test locking and unlocking a container in sequence
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto testRoom = std::make_unique<ZRoom>(100, "Test Room", "A test room.");
+    g.here = testRoom.get();
+    g.registerObject(100, std::move(testRoom));
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create lockable container (safe) in room
+    auto safe = std::make_unique<ZObject>(1, "safe");
+    safe->addSynonym("safe");
+    safe->setFlag(ObjectFlag::CONTBIT);
+    safe->moveTo(g.here);
+    ZObject* safePtr = safe.get();
+    g.registerObject(1, std::move(safe));
+    
+    // Create key in player inventory
+    auto key = std::make_unique<ZObject>(2, "key");
+    key->addSynonym("key");
+    key->setFlag(ObjectFlag::TOOLBIT);
+    key->moveTo(g.winner);
+    ZObject* keyPtr = key.get();
+    g.registerObject(2, std::move(key));
+    
+    // Verify initially unlocked
+    ASSERT_FALSE(safePtr->hasFlag(ObjectFlag::LOCKEDBIT));
+    
+    // Lock the safe
+    g.prso = safePtr;
+    g.prsi = keyPtr;
+    g.prsa = V_LOCK;
+    bool result1 = Verbs::vLock();
+    ASSERT_TRUE(result1);
+    ASSERT_TRUE(safePtr->hasFlag(ObjectFlag::LOCKEDBIT));
+    
+    // Unlock the safe
+    g.prso = safePtr;
+    g.prsi = keyPtr;
+    g.prsa = V_UNLOCK;
+    bool result2 = Verbs::vUnlock();
+    ASSERT_TRUE(result2);
+    ASSERT_FALSE(safePtr->hasFlag(ObjectFlag::LOCKEDBIT));
+    
+    // Lock again
+    g.prso = safePtr;
+    g.prsi = keyPtr;
+    g.prsa = V_LOCK;
+    bool result3 = Verbs::vLock();
+    ASSERT_TRUE(result3);
+    ASSERT_TRUE(safePtr->hasFlag(ObjectFlag::LOCKEDBIT));
+    
+    // Cleanup
+    g.reset();
+}
+
 int main() {
     auto results = TestFramework::instance().runAll();
     
