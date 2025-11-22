@@ -125,6 +125,10 @@ namespace Verbs {
     bool vSmell();
     bool vTouch();
     
+    // Consumption verbs
+    bool vEat();
+    bool vDrink();
+    
     // Helper for special movement
     bool trySpecialMovement(int verbId, Direction dir);
 }

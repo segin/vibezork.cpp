@@ -47,4 +47,8 @@ if(BUILD_TESTS)
     # Interaction verb tests
     add_executable(interaction_verb_tests tests/interaction_verb_tests.cpp ${LIB_SOURCES})
     add_test(NAME InteractionVerbTests COMMAND interaction_verb_tests)
+    
+    # Consumption verb tests
+    add_executable(consumption_verb_tests tests/consumption_verb_tests.cpp ${LIB_SOURCES})
+    add_test(NAME ConsumptionVerbTests COMMAND consumption_verb_tests)
 endif()

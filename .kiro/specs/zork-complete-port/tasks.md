@@ -1077,27 +1077,27 @@ With the world populated, implement the verbs that operate on it.
   - Test default behaviors
   - _Requirements: 27, 92_
 
-- [ ] 33. Implement consumption verbs (EAT, DRINK)
+- [x] 33. Implement consumption verbs (EAT, DRINK)
   - Implement EAT verb
   - Implement DRINK verb
   - Remove consumed items from game
   - _Requirements: 28_
 
-- [ ] 33.1 Implement EAT verb
+- [x] 33.1 Implement EAT verb
   - Check if object has FOODBIT flag
   - Call object action handler
   - Remove object from game if consumed
   - Default: "That's not edible"
   - _Requirements: 28_
 
-- [ ] 33.2 Implement DRINK verb
+- [x] 33.2 Implement DRINK verb
   - Check if object has DRINKBIT flag
   - Call object action handler
   - Remove object from game if consumed
   - Default: "That's not drinkable"
   - _Requirements: 28_
 
-- [ ] 33.3 Write unit tests for consumption verbs
+- [x] 33.3 Write unit tests for consumption verbs
   - Test eating food items
   - Test eating non-food items (should fail)
   - Test drinking liquids

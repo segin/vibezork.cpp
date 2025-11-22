@@ -1144,4 +1144,66 @@ bool vTouch() {
     return RTRUE;
 }
 
+// Consumption Verbs (Requirement 28)
+
+bool vEat() {
+    auto& g = Globals::instance();
+    
+    // Check if object is specified
+    if (!g.prso) {
+        printLine("Eat what?");
+        return RTRUE;
+    }
+    
+    // Check if object has FOODBIT flag
+    if (!g.prso->hasFlag(ObjectFlag::FOODBIT)) {
+        printLine("That's not edible.");
+        return RTRUE;
+    }
+    
+    // Call object action handler first
+    // This allows objects to override default behavior
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Default EAT behavior
+    // Remove object from game (consumed)
+    g.prso->moveTo(nullptr);
+    
+    printLine("Thank you very much. It really hit the spot.");
+    
+    return RTRUE;
+}
+
+bool vDrink() {
+    auto& g = Globals::instance();
+    
+    // Check if object is specified
+    if (!g.prso) {
+        printLine("Drink what?");
+        return RTRUE;
+    }
+    
+    // Check if object has DRINKBIT flag
+    if (!g.prso->hasFlag(ObjectFlag::DRINKBIT)) {
+        printLine("That's not drinkable.");
+        return RTRUE;
+    }
+    
+    // Call object action handler first
+    // This allows objects to override default behavior
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Default DRINK behavior
+    // Remove object from game (consumed)
+    g.prso->moveTo(nullptr);
+    
+    printLine("Thank you very much. It really hit the spot.");
+    
+    return RTRUE;
+}
+
 } // namespace Verbs
