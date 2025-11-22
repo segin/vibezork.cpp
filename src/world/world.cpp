@@ -2447,13 +2447,18 @@ void initializeWorld() {
     
     g.registerObject(OBJ_KITCHEN_WINDOW, std::move(kitchenWindow));
     
-    // Create Adventurer object
+    // Create Adventurer object (Task 24.1: Initialize player state)
     auto adventurer = std::make_unique<ZObject>(OBJ_ADVENTURER, "adventurer");
     adventurer->addSynonym("adventurer");
+    adventurer->addSynonym("me");
+    adventurer->addSynonym("myself");
+    adventurer->addSynonym("self");
     adventurer->setFlag(ObjectFlag::NDESCBIT);
     adventurer->setFlag(ObjectFlag::INVISIBLE);
     adventurer->setFlag(ObjectFlag::SACREDBIT);
     adventurer->setFlag(ObjectFlag::ACTORBIT);
+    adventurer->setProperty(P_STRENGTH, 10);  // Player strength
+    // Player starts at West of House (g.here is already set to WEST_OF_HOUSE)
     adventurer->moveTo(g.here);
     
     g.winner = adventurer.get();
@@ -3004,5 +3009,8 @@ void initializeWorld() {
     // TODO: Add action handler for grue attacks in darkness
     g.registerObject(ObjectIds::GRUE, std::move(grue));
     
-    g.lit = true;
+    // Initialize game state variables (Task 24.3)
+    g.lit = true;  // West of House is lit
+    g.score = 0;
+    g.moves = 0;
 }

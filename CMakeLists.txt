@@ -31,4 +31,8 @@ if(BUILD_TESTS)
     # Room navigation tests
     add_executable(room_navigation_tests tests/room_navigation_tests.cpp ${LIB_SOURCES})
     add_test(NAME RoomNavigationTests COMMAND room_navigation_tests)
+    
+    # World initialization tests
+    add_executable(world_initialization_tests tests/world_initialization_tests.cpp ${LIB_SOURCES})
+    add_test(NAME WorldInitializationTests COMMAND world_initialization_tests)
 endif()

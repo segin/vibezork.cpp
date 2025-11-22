@@ -776,32 +776,32 @@ With rooms in place, add all objects that populate the world.
   - Set TEXT properties
   - _Requirements: 18, 25_
 
-- [ ] 24. Set up initial game state
+- [x] 24. Set up initial game state
   - Place player at WEST_OF_HOUSE
   - Set initial object locations
   - Set initial flags and properties
   - Initialize global state
   - _Requirements: 19_
 
-- [ ] 24.1 Initialize player state
+- [x] 24.1 Initialize player state
   - Set player location to WEST_OF_HOUSE
   - Set player as winner (current actor)
   - Initialize inventory as empty
   - _Requirements: 19_
 
-- [ ] 24.2 Verify all object placements
+- [x] 24.2 Verify all object placements
   - Check all objects are in correct initial locations
   - Verify containment relationships
   - Ensure no orphaned objects
   - _Requirements: 19_
 
-- [ ] 24.3 Set initial flags
+- [x] 24.3 Set initial flags
   - Set ONBIT for lit rooms
   - Set OPENBIT for initially open containers
   - Set other initial flags from 1dungeon.zil
   - _Requirements: 19_
 
-- [ ] 24.4 Write unit tests for world initialization
+- [x] 24.4 Write unit tests for world initialization
   - Test all rooms exist
   - Test all objects exist
   - Test initial placements
