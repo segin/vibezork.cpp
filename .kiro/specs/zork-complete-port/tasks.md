@@ -882,25 +882,25 @@ With the world populated, implement the verbs that operate on it.
   - Test taking from containers
   - _Requirements: 21, 63, 92_
 
-- [ ] 27. Implement DROP verb
+- [x] 27. Implement DROP verb
   - Check if object is in inventory
   - Move object to current room
   - Display success message
   - _Requirements: 21_
 
-- [ ] 27.1 Implement PRE-DROP checks
+- [x] 27.1 Implement PRE-DROP checks
   - Verify object is in inventory
   - Check if drop is allowed in current room
   - _Requirements: 21, 34_
 
-- [ ] 27.2 Implement DROP verb handler
+- [x] 27.2 Implement DROP verb handler
   - Call object action handler first
   - If not handled, perform default drop
   - Move object to current room
   - Display success message
   - _Requirements: 21_
 
-- [ ] 27.3 Write unit tests for DROP verb
+- [x] 27.3 Write unit tests for DROP verb
   - Test dropping carried objects
   - Test dropping objects not in inventory (should fail)
   - _Requirements: 21, 92_

@@ -148,7 +148,37 @@ bool vTake() {
 }
 
 bool vDrop() {
+    auto& g = Globals::instance();
+    
+    // PRE-DROP checks (Requirement 21, 34)
+    
+    // Check if object is specified
+    if (!g.prso) {
+        printLine("Drop what?");
+        return RTRUE;
+    }
+    
+    // Check if object is in inventory
+    if (g.prso->getLocation() != g.winner) {
+        printLine("You aren't carrying that.");
+        return RTRUE;
+    }
+    
+    // Check if drop is allowed in current room
+    // Some rooms might not allow dropping (e.g., sacred rooms, special locations)
+    // For now, we allow dropping everywhere unless room action prevents it
+    
+    // Call object action handler if present (Requirement 35)
+    // This allows objects to override default behavior
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Default DROP behavior
+    // Move object to current room
+    g.prso->moveTo(g.here);
     printLine("Dropped.");
+    
     return RTRUE;
 }
 

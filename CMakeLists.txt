@@ -39,4 +39,8 @@ if(BUILD_TESTS)
     # Examination verb tests
     add_executable(examination_verb_tests tests/examination_verb_tests.cpp ${LIB_SOURCES})
     add_test(NAME ExaminationVerbTests COMMAND examination_verb_tests)
+    
+    # Manipulation verb tests
+    add_executable(manipulation_verb_tests tests/manipulation_verb_tests.cpp ${LIB_SOURCES})
+    add_test(NAME ManipulationVerbTests COMMAND manipulation_verb_tests)
 endif()
