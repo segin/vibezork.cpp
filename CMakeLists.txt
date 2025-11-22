@@ -43,4 +43,8 @@ if(BUILD_TESTS)
     # Manipulation verb tests
     add_executable(manipulation_verb_tests tests/manipulation_verb_tests.cpp ${LIB_SOURCES})
     add_test(NAME ManipulationVerbTests COMMAND manipulation_verb_tests)
+    
+    # Interaction verb tests
+    add_executable(interaction_verb_tests tests/interaction_verb_tests.cpp ${LIB_SOURCES})
+    add_test(NAME InteractionVerbTests COMMAND interaction_verb_tests)
 endif()

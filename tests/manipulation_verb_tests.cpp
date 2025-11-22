@@ -1366,6 +1366,260 @@ TEST(LockUnlockSequence) {
     g.reset();
 }
 
+// Test manipulation verbs (TURN, PUSH, PULL, MOVE) - Task 31.5
+
+TEST(TurnVerbBasic) {
+    // Test TURN verb on an object
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto testRoom = std::make_unique<ZRoom>(100, "Test Room", "A test room.");
+    g.here = testRoom.get();
+    g.registerObject(100, std::move(testRoom));
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create object (dial) in room
+    auto dial = std::make_unique<ZObject>(1, "dial");
+    dial->addSynonym("dial");
+    dial->moveTo(g.here);
+    ZObject* dialPtr = dial.get();
+    g.registerObject(1, std::move(dial));
+    
+    // Set up verb context
+    g.prso = dialPtr;
+    g.prsa = V_TURN;
+    
+    // Test TURN verb
+    bool result = Verbs::vTurn();
+    ASSERT_TRUE(result);
+    
+    // Should display "Nothing obvious happens." message
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(TurnVerbNoObject) {
+    // Test TURN verb without specifying an object
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto testRoom = std::make_unique<ZRoom>(100, "Test Room", "A test room.");
+    g.here = testRoom.get();
+    g.registerObject(100, std::move(testRoom));
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Set up verb context without object
+    g.prso = nullptr;
+    g.prsa = V_TURN;
+    
+    // Test TURN verb without object
+    bool result = Verbs::vTurn();
+    ASSERT_TRUE(result);
+    
+    // Should display "Turn what?" message
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(PushVerbBasic) {
+    // Test PUSH verb on an object
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto testRoom = std::make_unique<ZRoom>(100, "Test Room", "A test room.");
+    g.here = testRoom.get();
+    g.registerObject(100, std::move(testRoom));
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create object (button) in room
+    auto button = std::make_unique<ZObject>(1, "button");
+    button->addSynonym("button");
+    button->moveTo(g.here);
+    ZObject* buttonPtr = button.get();
+    g.registerObject(1, std::move(button));
+    
+    // Set up verb context
+    g.prso = buttonPtr;
+    g.prsa = V_PUSH;
+    
+    // Test PUSH verb
+    bool result = Verbs::vPush();
+    ASSERT_TRUE(result);
+    
+    // Should display "Nothing obvious happens." message
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(PushVerbNoObject) {
+    // Test PUSH verb without specifying an object
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto testRoom = std::make_unique<ZRoom>(100, "Test Room", "A test room.");
+    g.here = testRoom.get();
+    g.registerObject(100, std::move(testRoom));
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Set up verb context without object
+    g.prso = nullptr;
+    g.prsa = V_PUSH;
+    
+    // Test PUSH verb without object
+    bool result = Verbs::vPush();
+    ASSERT_TRUE(result);
+    
+    // Should display "Push what?" message
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(PullVerbBasic) {
+    // Test PULL verb on an object
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto testRoom = std::make_unique<ZRoom>(100, "Test Room", "A test room.");
+    g.here = testRoom.get();
+    g.registerObject(100, std::move(testRoom));
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create object (lever) in room
+    auto lever = std::make_unique<ZObject>(1, "lever");
+    lever->addSynonym("lever");
+    lever->moveTo(g.here);
+    ZObject* leverPtr = lever.get();
+    g.registerObject(1, std::move(lever));
+    
+    // Set up verb context
+    g.prso = leverPtr;
+    g.prsa = V_PULL;
+    
+    // Test PULL verb
+    bool result = Verbs::vPull();
+    ASSERT_TRUE(result);
+    
+    // Should display "Nothing obvious happens." message
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(PullVerbNoObject) {
+    // Test PULL verb without specifying an object
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto testRoom = std::make_unique<ZRoom>(100, "Test Room", "A test room.");
+    g.here = testRoom.get();
+    g.registerObject(100, std::move(testRoom));
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Set up verb context without object
+    g.prso = nullptr;
+    g.prsa = V_PULL;
+    
+    // Test PULL verb without object
+    bool result = Verbs::vPull();
+    ASSERT_TRUE(result);
+    
+    // Should display "Pull what?" message
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(MoveVerbBasic) {
+    // Test MOVE verb on an object
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto testRoom = std::make_unique<ZRoom>(100, "Test Room", "A test room.");
+    g.here = testRoom.get();
+    g.registerObject(100, std::move(testRoom));
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create object (rug) in room
+    auto rug = std::make_unique<ZObject>(1, "rug");
+    rug->addSynonym("rug");
+    rug->moveTo(g.here);
+    ZObject* rugPtr = rug.get();
+    g.registerObject(1, std::move(rug));
+    
+    // Set up verb context
+    g.prso = rugPtr;
+    g.prsa = V_MOVE;
+    
+    // Test MOVE verb
+    bool result = Verbs::vMove();
+    ASSERT_TRUE(result);
+    
+    // Should display "Nothing obvious happens." message
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(MoveVerbNoObject) {
+    // Test MOVE verb without specifying an object
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto testRoom = std::make_unique<ZRoom>(100, "Test Room", "A test room.");
+    g.here = testRoom.get();
+    g.registerObject(100, std::move(testRoom));
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Set up verb context without object
+    g.prso = nullptr;
+    g.prsa = V_MOVE;
+    
+    // Test MOVE verb without object
+    bool result = Verbs::vMove();
+    ASSERT_TRUE(result);
+    
+    // Should display "Move what?" message
+    
+    // Cleanup
+    g.reset();
+}
+
 int main() {
     auto results = TestFramework::instance().runAll();
     

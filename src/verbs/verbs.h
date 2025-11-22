@@ -112,6 +112,19 @@ namespace Verbs {
     bool vBoard();
     bool vDisembark();
     
+    // Manipulation verbs
+    bool vTurn();
+    bool vPush();
+    bool vPull();
+    bool vMove();
+    
+    // Interaction verbs
+    bool vTie();
+    bool vUntie();
+    bool vListen();
+    bool vSmell();
+    bool vTouch();
+    
     // Helper for special movement
     bool trySpecialMovement(int verbId, Direction dir);
 }

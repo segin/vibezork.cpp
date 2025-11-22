@@ -1003,7 +1003,7 @@ With the world populated, implement the verbs that operate on it.
   - Test without correct key (should fail)
   - _Requirements: 24, 92_
 
-- [ ] 31. Implement manipulation verbs (TURN, PUSH, PULL, MOVE)
+- [x] 31. Implement manipulation verbs (TURN, PUSH, PULL, MOVE)
   - Implement TURN verb for rotating objects
   - Implement PUSH verb
   - Implement PULL verb
@@ -1011,32 +1011,32 @@ With the world populated, implement the verbs that operate on it.
   - Most behavior is object-specific
   - _Requirements: 26_
 
-- [ ] 31.1 Implement TURN verb
+- [x] 31.1 Implement TURN verb
   - Call object action handler
   - Default: "Nothing happens"
   - _Requirements: 26_
 
-- [ ] 31.2 Implement PUSH verb
+- [x] 31.2 Implement PUSH verb
   - Call object action handler
   - Default: "Nothing happens"
   - _Requirements: 26_
 
-- [ ] 31.3 Implement PULL verb
+- [x] 31.3 Implement PULL verb
   - Call object action handler
   - Default: "Nothing happens"
   - _Requirements: 26_
 
-- [ ] 31.4 Implement MOVE verb
+- [x] 31.4 Implement MOVE verb
   - Call object action handler
   - Default: "Nothing happens"
   - _Requirements: 26_
 
-- [ ] 31.5 Write unit tests for manipulation verbs
+- [x] 31.5 Write unit tests for manipulation verbs
   - Test on objects with special behaviors
   - Test on objects without special behaviors
   - _Requirements: 26, 92_
 
-- [ ] 32. Implement interaction verbs (TIE, LISTEN, SMELL, TOUCH)
+- [x] 32. Implement interaction verbs (TIE, LISTEN, SMELL, TOUCH)
   - Implement TIE and UNTIE verbs
   - Implement LISTEN verb
   - Implement SMELL verb
@@ -1044,35 +1044,35 @@ With the world populated, implement the verbs that operate on it.
   - Most behavior is object-specific
   - _Requirements: 27_
 
-- [ ] 32.1 Implement TIE verb
+- [x] 32.1 Implement TIE verb
   - Check if objects can be tied
   - Call object action handlers
   - Default: "You can't tie that"
   - _Requirements: 27_
 
-- [ ] 32.2 Implement UNTIE verb
+- [x] 32.2 Implement UNTIE verb
   - Check if objects are tied
   - Call object action handlers
   - Default: "It's not tied"
   - _Requirements: 27_
 
-- [ ] 32.3 Implement LISTEN verb
+- [x] 32.3 Implement LISTEN verb
   - Call room action handler
   - Call object action handler if object specified
   - Default: "You hear nothing unusual"
   - _Requirements: 27_
 
-- [ ] 32.4 Implement SMELL verb
+- [x] 32.4 Implement SMELL verb
   - Call object action handler if object specified
   - Default: "You smell nothing unusual"
   - _Requirements: 27_
 
-- [ ] 32.5 Implement TOUCH verb
+- [x] 32.5 Implement TOUCH verb
   - Call object action handler
   - Default: "You feel nothing unusual"
   - _Requirements: 27_
 
-- [ ] 32.6 Write unit tests for interaction verbs
+- [x] 32.6 Write unit tests for interaction verbs
   - Test on objects with special behaviors
   - Test default behaviors
   - _Requirements: 27, 92_

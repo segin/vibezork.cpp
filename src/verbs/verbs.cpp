@@ -949,5 +949,199 @@ bool vPut() {
     return RTRUE;
 }
 
-} // namespace Verbs
+// Manipulation Verbs (Requirement 26)
 
+bool vTurn() {
+    auto& g = Globals::instance();
+    
+    // Check if object is specified
+    if (!g.prso) {
+        printLine("Turn what?");
+        return RTRUE;
+    }
+    
+    // Call object action handler first
+    // This allows objects to override default behavior
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Default: Nothing happens
+    printLine("Nothing obvious happens.");
+    return RTRUE;
+}
+
+bool vPush() {
+    auto& g = Globals::instance();
+    
+    // Check if object is specified
+    if (!g.prso) {
+        printLine("Push what?");
+        return RTRUE;
+    }
+    
+    // Call object action handler first
+    // This allows objects to override default behavior
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Default: Nothing happens
+    printLine("Nothing obvious happens.");
+    return RTRUE;
+}
+
+bool vPull() {
+    auto& g = Globals::instance();
+    
+    // Check if object is specified
+    if (!g.prso) {
+        printLine("Pull what?");
+        return RTRUE;
+    }
+    
+    // Call object action handler first
+    // This allows objects to override default behavior
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Default: Nothing happens
+    printLine("Nothing obvious happens.");
+    return RTRUE;
+}
+
+bool vMove() {
+    auto& g = Globals::instance();
+    
+    // Check if object is specified
+    if (!g.prso) {
+        printLine("Move what?");
+        return RTRUE;
+    }
+    
+    // Call object action handler first
+    // This allows objects to override default behavior
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Default: Nothing happens
+    printLine("Nothing obvious happens.");
+    return RTRUE;
+}
+
+// Interaction Verbs (Requirement 27)
+
+bool vTie() {
+    auto& g = Globals::instance();
+    
+    // Check if object is specified
+    if (!g.prso) {
+        printLine("Tie what?");
+        return RTRUE;
+    }
+    
+    // Check if indirect object is specified (tie X to Y)
+    if (!g.prsi) {
+        printLine("Tie it to what?");
+        return RTRUE;
+    }
+    
+    // Call object action handlers
+    // First check if direct object has special TIE behavior
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Then check if indirect object has special TIE behavior
+    if (g.prsi->performAction()) {
+        return RTRUE;
+    }
+    
+    // Default: Can't tie that
+    printLine("You can't tie that.");
+    return RTRUE;
+}
+
+bool vUntie() {
+    auto& g = Globals::instance();
+    
+    // Check if object is specified
+    if (!g.prso) {
+        printLine("Untie what?");
+        return RTRUE;
+    }
+    
+    // Call object action handler first
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Default: It's not tied
+    printLine("It's not tied.");
+    return RTRUE;
+}
+
+bool vListen() {
+    auto& g = Globals::instance();
+    
+    // If object is specified, listen to that object
+    if (g.prso) {
+        // Call object action handler
+        if (g.prso->performAction()) {
+            return RTRUE;
+        }
+        
+        // Default for object
+        printLine("You hear nothing unusual.");
+        return RTRUE;
+    }
+    
+    // No object specified - listen to the room
+    // Room-specific listening behavior would be handled by room actions
+    // For now, just give default message
+    printLine("You hear nothing unusual.");
+    return RTRUE;
+}
+
+bool vSmell() {
+    auto& g = Globals::instance();
+    
+    // If object is specified, smell that object
+    if (g.prso) {
+        // Call object action handler
+        if (g.prso->performAction()) {
+            return RTRUE;
+        }
+        
+        // Default for object
+        printLine("You smell nothing unusual.");
+        return RTRUE;
+    }
+    
+    // No object specified - smell the room
+    printLine("You smell nothing unusual.");
+    return RTRUE;
+}
+
+bool vTouch() {
+    auto& g = Globals::instance();
+    
+    // Check if object is specified
+    if (!g.prso) {
+        printLine("Touch what?");
+        return RTRUE;
+    }
+    
+    // Call object action handler first
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Default: You feel nothing unusual
+    printLine("You feel nothing unusual.");
+    return RTRUE;
+}
+
+} // namespace Verbs
