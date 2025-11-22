@@ -689,32 +689,32 @@ With rooms in place, add all objects that populate the world.
   - Not a physical object in the world
   - _Requirements: 18, 51_
 
-- [ ] 21. Implement scenery objects
+- [x] 21. Implement scenery objects
   - Create all scenery objects with descriptions
   - Set TRYTAKEBIT flag (cannot be taken)
   - Add synonyms and adjectives
   - Place in appropriate rooms
   - _Requirements: 18, 19_
 
-- [ ] 21.1 Create house scenery
+- [x] 21.1 Create house scenery
   - WHITE_HOUSE (already exists, verify)
   - BOARD (already exists, verify)
   - WINDOW, DOOR, CHIMNEY
   - _Requirements: 18_
 
-- [ ] 21.2 Create natural scenery
+- [x] 21.2 Create natural scenery
   - TREE, FOREST (already exists, verify)
   - RIVER, STREAM, RAINBOW
   - MOUNTAIN, SKY, GROUND
   - _Requirements: 18_
 
-- [ ] 21.3 Create interior scenery
+- [x] 21.3 Create interior scenery
   - RUG, PAINTING_WALL, MANTLE
   - TABLE, CHAIR, CHANDELIER
   - All other interior scenery from 1dungeon.zil
   - _Requirements: 18_
 
-- [ ] 21.4 Place all scenery in appropriate rooms
+- [x] 21.4 Place all scenery in appropriate rooms
   - Match original placement from 1dungeon.zil
   - _Requirements: 19_
 

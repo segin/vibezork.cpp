@@ -2758,6 +2758,86 @@ void initializeWorld() {
     bottle->moveTo(g.getObject(RoomIds::KITCHEN));
     g.registerObject(ObjectIds::BOTTLE, std::move(bottle));
     
+
+    // ===== SCENERY OBJECTS =====
+    
+    // House Scenery - Task 21.1
+    
+    // WHITE_HOUSE and BOARD already exist - verified
+    
+    // Create WINDOW (Generic window)
+    auto window = std::make_unique<ZObject>(ObjectIds::WINDOW, "window");
+    window->addSynonym("window");
+    window->addSynonym("windows");
+    window->setFlag(ObjectFlag::TRYTAKEBIT);
+    window->setFlag(ObjectFlag::NDESCBIT);
+    g.registerObject(ObjectIds::WINDOW, std::move(window));
+    
+    // Create FRONT_DOOR (Front door of house - boarded)
+    auto frontDoor = std::make_unique<ZObject>(ObjectIds::FRONT_DOOR, "front door");
+    frontDoor->addSynonym("door");
+    frontDoor->addAdjective("front");
+    frontDoor->addAdjective("boarded");
+    frontDoor->setFlag(ObjectFlag::TRYTAKEBIT);
+    frontDoor->setFlag(ObjectFlag::NDESCBIT);
+    frontDoor->setFlag(ObjectFlag::DOORBIT);
+    g.registerObject(ObjectIds::FRONT_DOOR, std::move(frontDoor));
+    
+    // Create CHIMNEY (Chimney in kitchen)
+    auto chimney = std::make_unique<ZObject>(ObjectIds::CHIMNEY, "chimney");
+    chimney->addSynonym("chimney");
+    chimney->addAdjective("dark");
+    chimney->setFlag(ObjectFlag::TRYTAKEBIT);
+    chimney->setFlag(ObjectFlag::NDESCBIT);
+    chimney->moveTo(g.getObject(RoomIds::KITCHEN));
+    g.registerObject(ObjectIds::CHIMNEY, std::move(chimney));
+    
+    // Natural Scenery - Task 21.2
+    
+    // TREE and FOREST already exist - verified
+    
+    // Create RIVER (Frigid River)
+    auto river = std::make_unique<ZObject>(ObjectIds::RIVER, "river");
+    river->addSynonym("river");
+    river->addSynonym("stream");
+    river->addSynonym("water");
+    river->addAdjective("frigid");
+    river->setFlag(ObjectFlag::TRYTAKEBIT);
+    river->setFlag(ObjectFlag::NDESCBIT);
+    g.registerObject(ObjectIds::RIVER, std::move(river));
+    
+    // Create RAINBOW (Rainbow at Aragain Falls)
+    auto rainbow = std::make_unique<ZObject>(ObjectIds::RAINBOW, "rainbow");
+    rainbow->addSynonym("rainbow");
+    rainbow->addAdjective("beautiful");
+    rainbow->setFlag(ObjectFlag::TRYTAKEBIT);
+    rainbow->setFlag(ObjectFlag::NDESCBIT);
+    rainbow->moveTo(g.getObject(RoomIds::CANYON_VIEW));
+    g.registerObject(ObjectIds::RAINBOW, std::move(rainbow));
+    
+    // Create MOUNTAIN_RANGE (Mountains in distance)
+    auto mountainRange = std::make_unique<ZObject>(ObjectIds::MOUNTAIN_RANGE, "mountain range");
+    mountainRange->addSynonym("mountains");
+    mountainRange->addSynonym("mountain");
+    mountainRange->addSynonym("range");
+    mountainRange->addAdjective("flathead");
+    mountainRange->setFlag(ObjectFlag::TRYTAKEBIT);
+    mountainRange->setFlag(ObjectFlag::NDESCBIT);
+    g.registerObject(ObjectIds::MOUNTAIN_RANGE, std::move(mountainRange));
+    
+    // Interior Scenery - Task 21.3
+    
+    // Create RUG (Oriental rug in living room)
+    auto rug = std::make_unique<ZObject>(ObjectIds::RUG, "oriental rug");
+    rug->addSynonym("rug");
+    rug->addSynonym("carpet");
+    rug->addAdjective("oriental");
+    rug->addAdjective("large");
+    rug->setFlag(ObjectFlag::TRYTAKEBIT);
+    rug->setFlag(ObjectFlag::NDESCBIT);
+    rug->moveTo(g.getObject(RoomIds::LIVING_ROOM));
+    g.registerObject(ObjectIds::RUG, std::move(rug));
+    
     // ===== NPCs =====
     
     // Create THIEF NPC
