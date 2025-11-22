@@ -564,6 +564,427 @@ TEST(PutVerbMultipleObjects) {
     g.reset();
 }
 
+// Test OPEN and CLOSE verbs - Task 29.5
+
+TEST(OpenVerbBasic) {
+    // Test opening a closed container
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto testRoom = std::make_unique<ZRoom>(100, "Test Room", "A test room.");
+    g.here = testRoom.get();
+    g.registerObject(100, std::move(testRoom));
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create closed container (chest) in room
+    auto chest = std::make_unique<ZObject>(1, "chest");
+    chest->addSynonym("chest");
+    chest->setFlag(ObjectFlag::CONTBIT);
+    // Note: OPENBIT is NOT set (closed)
+    chest->moveTo(g.here);
+    ZObject* chestPtr = chest.get();
+    g.registerObject(1, std::move(chest));
+    
+    // Set up verb context
+    g.prso = chestPtr;
+    g.prsa = V_OPEN;
+    
+    // Test OPEN verb
+    bool result = Verbs::vOpen();
+    ASSERT_TRUE(result);
+    
+    // Verify chest is now open
+    ASSERT_TRUE(chestPtr->hasFlag(ObjectFlag::OPENBIT));
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(OpenVerbWithContents) {
+    // Test opening a container with contents
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto testRoom = std::make_unique<ZRoom>(100, "Test Room", "A test room.");
+    g.here = testRoom.get();
+    g.registerObject(100, std::move(testRoom));
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create closed container (box) in room
+    auto box = std::make_unique<ZObject>(1, "box");
+    box->addSynonym("box");
+    box->setFlag(ObjectFlag::CONTBIT);
+    box->moveTo(g.here);
+    ZObject* boxPtr = box.get();
+    g.registerObject(1, std::move(box));
+    
+    // Create item inside the box
+    auto gem = std::make_unique<ZObject>(2, "gem");
+    gem->addSynonym("gem");
+    gem->moveTo(boxPtr);
+    g.registerObject(2, std::move(gem));
+    
+    // Set up verb context
+    g.prso = boxPtr;
+    g.prsa = V_OPEN;
+    
+    // Test OPEN verb
+    bool result = Verbs::vOpen();
+    ASSERT_TRUE(result);
+    
+    // Verify box is now open
+    ASSERT_TRUE(boxPtr->hasFlag(ObjectFlag::OPENBIT));
+    
+    // Should display contents
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(OpenVerbAlreadyOpen) {
+    // Test opening an already open container
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto testRoom = std::make_unique<ZRoom>(100, "Test Room", "A test room.");
+    g.here = testRoom.get();
+    g.registerObject(100, std::move(testRoom));
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create open container (sack) in room
+    auto sack = std::make_unique<ZObject>(1, "sack");
+    sack->addSynonym("sack");
+    sack->setFlag(ObjectFlag::CONTBIT);
+    sack->setFlag(ObjectFlag::OPENBIT);  // Already open
+    sack->moveTo(g.here);
+    ZObject* sackPtr = sack.get();
+    g.registerObject(1, std::move(sack));
+    
+    // Set up verb context
+    g.prso = sackPtr;
+    g.prsa = V_OPEN;
+    
+    // Test OPEN verb on already open container
+    bool result = Verbs::vOpen();
+    ASSERT_TRUE(result);
+    
+    // Verify sack is still open
+    ASSERT_TRUE(sackPtr->hasFlag(ObjectFlag::OPENBIT));
+    
+    // Should display "It's already open." message
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(OpenVerbLockedContainer) {
+    // Test opening a locked container (should fail)
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto testRoom = std::make_unique<ZRoom>(100, "Test Room", "A test room.");
+    g.here = testRoom.get();
+    g.registerObject(100, std::move(testRoom));
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create locked container (safe) in room
+    auto safe = std::make_unique<ZObject>(1, "safe");
+    safe->addSynonym("safe");
+    safe->setFlag(ObjectFlag::CONTBIT);
+    safe->setFlag(ObjectFlag::LOCKEDBIT);  // Locked
+    safe->moveTo(g.here);
+    ZObject* safePtr = safe.get();
+    g.registerObject(1, std::move(safe));
+    
+    // Set up verb context
+    g.prso = safePtr;
+    g.prsa = V_OPEN;
+    
+    // Test OPEN verb on locked container
+    bool result = Verbs::vOpen();
+    ASSERT_TRUE(result);
+    
+    // Verify safe is still closed (OPENBIT not set)
+    ASSERT_FALSE(safePtr->hasFlag(ObjectFlag::OPENBIT));
+    
+    // Should display "The safe is locked." message
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(OpenVerbNonContainer) {
+    // Test opening a non-container (should fail)
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto testRoom = std::make_unique<ZRoom>(100, "Test Room", "A test room.");
+    g.here = testRoom.get();
+    g.registerObject(100, std::move(testRoom));
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create non-container object (lamp) in room
+    auto lamp = std::make_unique<ZObject>(1, "lamp");
+    lamp->addSynonym("lamp");
+    // Note: CONTBIT is NOT set (not a container)
+    lamp->moveTo(g.here);
+    ZObject* lampPtr = lamp.get();
+    g.registerObject(1, std::move(lamp));
+    
+    // Set up verb context
+    g.prso = lampPtr;
+    g.prsa = V_OPEN;
+    
+    // Test OPEN verb on non-container
+    bool result = Verbs::vOpen();
+    ASSERT_TRUE(result);
+    
+    // Should display "You can't open that." message
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(OpenVerbNoObject) {
+    // Test OPEN verb without specifying an object
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto testRoom = std::make_unique<ZRoom>(100, "Test Room", "A test room.");
+    g.here = testRoom.get();
+    g.registerObject(100, std::move(testRoom));
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Set up verb context without object
+    g.prso = nullptr;
+    g.prsa = V_OPEN;
+    
+    // Test OPEN verb without object
+    bool result = Verbs::vOpen();
+    ASSERT_TRUE(result);
+    
+    // Should display "Open what?" message
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(CloseVerbBasic) {
+    // Test closing an open container
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto testRoom = std::make_unique<ZRoom>(100, "Test Room", "A test room.");
+    g.here = testRoom.get();
+    g.registerObject(100, std::move(testRoom));
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create open container (chest) in room
+    auto chest = std::make_unique<ZObject>(1, "chest");
+    chest->addSynonym("chest");
+    chest->setFlag(ObjectFlag::CONTBIT);
+    chest->setFlag(ObjectFlag::OPENBIT);  // Open
+    chest->moveTo(g.here);
+    ZObject* chestPtr = chest.get();
+    g.registerObject(1, std::move(chest));
+    
+    // Set up verb context
+    g.prso = chestPtr;
+    g.prsa = V_CLOSE;
+    
+    // Test CLOSE verb
+    bool result = Verbs::vClose();
+    ASSERT_TRUE(result);
+    
+    // Verify chest is now closed
+    ASSERT_FALSE(chestPtr->hasFlag(ObjectFlag::OPENBIT));
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(CloseVerbAlreadyClosed) {
+    // Test closing an already closed container
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto testRoom = std::make_unique<ZRoom>(100, "Test Room", "A test room.");
+    g.here = testRoom.get();
+    g.registerObject(100, std::move(testRoom));
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create closed container (box) in room
+    auto box = std::make_unique<ZObject>(1, "box");
+    box->addSynonym("box");
+    box->setFlag(ObjectFlag::CONTBIT);
+    // Note: OPENBIT is NOT set (closed)
+    box->moveTo(g.here);
+    ZObject* boxPtr = box.get();
+    g.registerObject(1, std::move(box));
+    
+    // Set up verb context
+    g.prso = boxPtr;
+    g.prsa = V_CLOSE;
+    
+    // Test CLOSE verb on already closed container
+    bool result = Verbs::vClose();
+    ASSERT_TRUE(result);
+    
+    // Verify box is still closed
+    ASSERT_FALSE(boxPtr->hasFlag(ObjectFlag::OPENBIT));
+    
+    // Should display "It's already closed." message
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(CloseVerbNonContainer) {
+    // Test closing a non-container (should fail)
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto testRoom = std::make_unique<ZRoom>(100, "Test Room", "A test room.");
+    g.here = testRoom.get();
+    g.registerObject(100, std::move(testRoom));
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create non-container object (sword) in room
+    auto sword = std::make_unique<ZObject>(1, "sword");
+    sword->addSynonym("sword");
+    // Note: CONTBIT is NOT set (not a container)
+    sword->moveTo(g.here);
+    ZObject* swordPtr = sword.get();
+    g.registerObject(1, std::move(sword));
+    
+    // Set up verb context
+    g.prso = swordPtr;
+    g.prsa = V_CLOSE;
+    
+    // Test CLOSE verb on non-container
+    bool result = Verbs::vClose();
+    ASSERT_TRUE(result);
+    
+    // Should display "You can't close that." message
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(CloseVerbNoObject) {
+    // Test CLOSE verb without specifying an object
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto testRoom = std::make_unique<ZRoom>(100, "Test Room", "A test room.");
+    g.here = testRoom.get();
+    g.registerObject(100, std::move(testRoom));
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Set up verb context without object
+    g.prso = nullptr;
+    g.prsa = V_CLOSE;
+    
+    // Test CLOSE verb without object
+    bool result = Verbs::vClose();
+    ASSERT_TRUE(result);
+    
+    // Should display "Close what?" message
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(OpenCloseSequence) {
+    // Test opening and closing a container in sequence
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto testRoom = std::make_unique<ZRoom>(100, "Test Room", "A test room.");
+    g.here = testRoom.get();
+    g.registerObject(100, std::move(testRoom));
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create closed container (trunk) in room
+    auto trunk = std::make_unique<ZObject>(1, "trunk");
+    trunk->addSynonym("trunk");
+    trunk->setFlag(ObjectFlag::CONTBIT);
+    trunk->moveTo(g.here);
+    ZObject* trunkPtr = trunk.get();
+    g.registerObject(1, std::move(trunk));
+    
+    // Verify initially closed
+    ASSERT_FALSE(trunkPtr->hasFlag(ObjectFlag::OPENBIT));
+    
+    // Open the trunk
+    g.prso = trunkPtr;
+    g.prsa = V_OPEN;
+    bool result1 = Verbs::vOpen();
+    ASSERT_TRUE(result1);
+    ASSERT_TRUE(trunkPtr->hasFlag(ObjectFlag::OPENBIT));
+    
+    // Close the trunk
+    g.prso = trunkPtr;
+    g.prsa = V_CLOSE;
+    bool result2 = Verbs::vClose();
+    ASSERT_TRUE(result2);
+    ASSERT_FALSE(trunkPtr->hasFlag(ObjectFlag::OPENBIT));
+    
+    // Open again
+    g.prso = trunkPtr;
+    g.prsa = V_OPEN;
+    bool result3 = Verbs::vOpen();
+    ASSERT_TRUE(result3);
+    ASSERT_TRUE(trunkPtr->hasFlag(ObjectFlag::OPENBIT));
+    
+    // Cleanup
+    g.reset();
+}
+
 int main() {
     auto results = TestFramework::instance().runAll();
     

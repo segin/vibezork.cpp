@@ -933,37 +933,37 @@ With the world populated, implement the verbs that operate on it.
   - Test capacity limits
   - _Requirements: 22, 64, 92_
 
-- [ ] 29. Implement OPEN and CLOSE verbs
+- [x] 29. Implement OPEN and CLOSE verbs
   - Check if object has CONTBIT flag
   - Set or clear OPENBIT flag
   - Reveal contents when opening
   - _Requirements: 23_
 
-- [ ] 29.1 Implement PRE-OPEN checks
+- [x] 29.1 Implement PRE-OPEN checks
   - Verify object has CONTBIT flag
   - Check if already open
   - Check if locked
   - _Requirements: 23, 34_
 
-- [ ] 29.2 Implement OPEN verb handler
+- [x] 29.2 Implement OPEN verb handler
   - Call object action handler first
   - If not handled, set OPENBIT flag
   - Display contents if any
   - Display success message
   - _Requirements: 23_
 
-- [ ] 29.3 Implement PRE-CLOSE checks
+- [x] 29.3 Implement PRE-CLOSE checks
   - Verify object has CONTBIT flag
   - Check if already closed
   - _Requirements: 23, 34_
 
-- [ ] 29.4 Implement CLOSE verb handler
+- [x] 29.4 Implement CLOSE verb handler
   - Call object action handler first
   - If not handled, clear OPENBIT flag
   - Display success message
   - _Requirements: 23_
 
-- [ ] 29.5 Write unit tests for OPEN and CLOSE verbs
+- [x] 29.5 Write unit tests for OPEN and CLOSE verbs
   - Test opening and closing containers
   - Test opening locked containers (should fail)
   - Test opening already open containers

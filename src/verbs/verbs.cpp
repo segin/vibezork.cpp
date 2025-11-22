@@ -238,12 +238,93 @@ bool vExamine() {
 }
 
 bool vOpen() {
-    printLine("Opened.");
+    auto& g = Globals::instance();
+    
+    // PRE-OPEN checks (Requirement 23, 34)
+    
+    // Check if object is specified
+    if (!g.prso) {
+        printLine("Open what?");
+        return RTRUE;
+    }
+    
+    // Verify object has CONTBIT flag (is a container)
+    if (!g.prso->hasFlag(ObjectFlag::CONTBIT)) {
+        printLine("You can't open that.");
+        return RTRUE;
+    }
+    
+    // Check if already open
+    if (g.prso->hasFlag(ObjectFlag::OPENBIT)) {
+        printLine("It's already open.");
+        return RTRUE;
+    }
+    
+    // Check if locked
+    if (g.prso->hasFlag(ObjectFlag::LOCKEDBIT)) {
+        printLine("The " + g.prso->getDesc() + " is locked.");
+        return RTRUE;
+    }
+    
+    // Call object action handler first (Requirement 23)
+    // This allows objects to override default behavior
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Default OPEN behavior
+    // Set OPENBIT flag
+    g.prso->setFlag(ObjectFlag::OPENBIT);
+    
+    // Display contents if any
+    const auto& contents = g.prso->getContents();
+    if (!contents.empty()) {
+        printLine("Opening the " + g.prso->getDesc() + " reveals:");
+        for (const auto* obj : contents) {
+            print("  ");
+            printLine(obj->getDesc());
+        }
+    } else {
+        printLine("Opened.");
+    }
+    
     return RTRUE;
 }
 
 bool vClose() {
+    auto& g = Globals::instance();
+    
+    // PRE-CLOSE checks (Requirement 23, 34)
+    
+    // Check if object is specified
+    if (!g.prso) {
+        printLine("Close what?");
+        return RTRUE;
+    }
+    
+    // Verify object has CONTBIT flag (is a container)
+    if (!g.prso->hasFlag(ObjectFlag::CONTBIT)) {
+        printLine("You can't close that.");
+        return RTRUE;
+    }
+    
+    // Check if already closed
+    if (!g.prso->hasFlag(ObjectFlag::OPENBIT)) {
+        printLine("It's already closed.");
+        return RTRUE;
+    }
+    
+    // Call object action handler first (Requirement 23)
+    // This allows objects to override default behavior
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Default CLOSE behavior
+    // Clear OPENBIT flag
+    g.prso->clearFlag(ObjectFlag::OPENBIT);
     printLine("Closed.");
+    
     return RTRUE;
 }
 
