@@ -55,4 +55,8 @@ if(BUILD_TESTS)
     # Light verb tests
     add_executable(light_verb_tests tests/light_verb_tests.cpp ${LIB_SOURCES})
     add_test(NAME LightVerbTests COMMAND light_verb_tests)
+    
+    # Special action verb tests
+    add_executable(special_action_verb_tests tests/special_action_verb_tests.cpp ${LIB_SOURCES})
+    add_test(NAME SpecialActionVerbTests COMMAND special_action_verb_tests)
 endif()
