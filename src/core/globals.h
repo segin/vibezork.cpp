@@ -24,6 +24,11 @@ public:
     int loadMax = 100;
     int loadAllowed = 100;
     
+    // Display modes
+    bool verboseMode = true;           // Full descriptions
+    bool briefMode = false;            // Short descriptions for visited rooms
+    bool superbriefMode = false;       // Minimal descriptions
+    
     // Parser state
     bool pCont = false;
     bool quoteFlag = false;

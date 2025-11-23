@@ -133,6 +133,28 @@ namespace Verbs {
     bool vLampOn();
     bool vLampOff();
     
+    // Special action verbs
+    bool vInflate();
+    bool vDeflate();
+    bool vPray();
+    bool vExorcise();
+    bool vWave();
+    bool vRub();
+    bool vRing();
+    
+    // Combat verbs
+    bool vAttack();
+    bool vKill();
+    bool vThrow();
+    bool vSwing();
+    
+    // Meta-game verbs
+    bool vScore();
+    bool vDiagnose();
+    bool vVerbose();
+    bool vBrief();
+    bool vSuperbrief();
+    
     // Helper for special movement
     bool trySpecialMovement(int verbId, Direction dir);
 }

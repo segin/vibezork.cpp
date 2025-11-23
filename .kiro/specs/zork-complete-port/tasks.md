@@ -1134,7 +1134,7 @@ With the world populated, implement the verbs that operate on it.
   - Test on non-light objects
   - _Requirements: 30, 92_
 
-- [ ] 35. Implement special action verbs (INFLATE, DEFLATE, PRAY, etc.)
+- [-] 35. Implement special action verbs (INFLATE, DEFLATE, PRAY, etc.)
   - Implement INFLATE verb
   - Implement DEFLATE verb
   - Implement PRAY verb

@@ -1295,4 +1295,416 @@ bool vLampOff() {
     return RTRUE;
 }
 
+// Special Action Verbs (Requirement 31)
+
+bool vInflate() {
+    auto& g = Globals::instance();
+    
+    // Check if object is specified
+    if (!g.prso) {
+        printLine("Inflate what?");
+        return RTRUE;
+    }
+    
+    // Call object action handler first
+    // This allows objects to override default behavior (e.g., boat with pump)
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Default: Can't inflate that
+    printLine("You can't inflate that.");
+    return RTRUE;
+}
+
+bool vDeflate() {
+    auto& g = Globals::instance();
+    
+    // Check if object is specified
+    if (!g.prso) {
+        printLine("Deflate what?");
+        return RTRUE;
+    }
+    
+    // Call object action handler first
+    // This allows objects to override default behavior (e.g., boat with pump)
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Default: Can't deflate that
+    printLine("You can't deflate that.");
+    return RTRUE;
+}
+
+bool vPray() {
+    auto& g = Globals::instance();
+    
+    // PRAY is typically a room-specific action
+    // Call room action handler if present
+    ZRoom* room = dynamic_cast<ZRoom*>(g.here);
+    if (room) {
+        room->performRoomAction(M_PRAY);
+    }
+    
+    // Default: Prayers are not answered
+    printLine("Your prayers are not answered.");
+    return RTRUE;
+}
+
+bool vExorcise() {
+    auto& g = Globals::instance();
+    
+    // Check if object is specified
+    if (!g.prso) {
+        printLine("Exorcise what?");
+        return RTRUE;
+    }
+    
+    // Call object action handler first
+    // This allows objects to override default behavior
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Default: Nothing happens
+    printLine("Nothing happens.");
+    return RTRUE;
+}
+
+bool vWave() {
+    auto& g = Globals::instance();
+    
+    // Check if object is specified
+    if (!g.prso) {
+        printLine("Wave what?");
+        return RTRUE;
+    }
+    
+    // Call object action handler first
+    // This allows objects to override default behavior
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Default: Nothing happens
+    printLine("You wave the " + g.prso->getDesc() + " around.");
+    return RTRUE;
+}
+
+bool vRub() {
+    auto& g = Globals::instance();
+    
+    // Check if object is specified
+    if (!g.prso) {
+        printLine("Rub what?");
+        return RTRUE;
+    }
+    
+    // Call object action handler first
+    // This allows objects to override default behavior
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Default: Nothing happens
+    printLine("Rubbing the " + g.prso->getDesc() + " has no effect.");
+    return RTRUE;
+}
+
+bool vRing() {
+    auto& g = Globals::instance();
+    
+    // Check if object is specified
+    if (!g.prso) {
+        printLine("Ring what?");
+        return RTRUE;
+    }
+    
+    // Call object action handler first
+    // This allows objects to override default behavior (e.g., bell)
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Default: Can't ring that
+    printLine("You can't ring that.");
+    return RTRUE;
+}
+
+// Combat Verbs (Requirement 29)
+
+bool vAttack() {
+    auto& g = Globals::instance();
+    
+    // Check if target is specified
+    if (!g.prso) {
+        printLine("Attack what?");
+        return RTRUE;
+    }
+    
+    // Check if target is attackable (has FIGHTBIT flag)
+    if (!g.prso->hasFlag(ObjectFlag::FIGHTBIT)) {
+        printLine("You can't attack that.");
+        return RTRUE;
+    }
+    
+    // Check if we're in a sacred room (no fighting allowed)
+    if (g.here && g.here->hasFlag(ObjectFlag::SACREDBIT)) {
+        printLine("A mysterious force prevents you from attacking here.");
+        return RTRUE;
+    }
+    
+    // Call object action handler first
+    // This allows NPCs to have custom combat behavior
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Default ATTACK behavior
+    // Check for weapon
+    ZObject* weapon = nullptr;
+    if (g.prsi) {
+        // Weapon specified with "ATTACK X WITH Y"
+        weapon = g.prsi;
+    } else {
+        // Look for weapon in inventory
+        for (auto* obj : g.winner->getContents()) {
+            if (obj->hasFlag(ObjectFlag::WEAPONBIT)) {
+                weapon = obj;
+                break;
+            }
+        }
+    }
+    
+    if (!weapon) {
+        printLine("You have no weapon.");
+        return RTRUE;
+    }
+    
+    // Simple combat: calculate damage based on weapon strength
+    int weaponStrength = weapon->getProperty(P_STRENGTH);
+    if (weaponStrength == 0) {
+        weaponStrength = 1;  // Default weapon strength
+    }
+    
+    int enemyStrength = g.prso->getProperty(P_STRENGTH);
+    if (enemyStrength == 0) {
+        enemyStrength = 5;  // Default enemy strength
+    }
+    
+    // Simple combat resolution
+    if (weaponStrength >= enemyStrength) {
+        printLine("You strike the " + g.prso->getDesc() + " with the " + weapon->getDesc() + "!");
+        printLine("The " + g.prso->getDesc() + " is defeated!");
+        
+        // Mark enemy as dead
+        g.prso->setFlag(ObjectFlag::DEADBIT);
+        
+        // Remove FIGHTBIT so it can't be attacked again
+        g.prso->clearFlag(ObjectFlag::FIGHTBIT);
+    } else {
+        printLine("You swing at the " + g.prso->getDesc() + " but miss!");
+        printLine("The " + g.prso->getDesc() + " counterattacks!");
+        
+        // Enemy counterattack - for now just a message
+        // Full combat system would track health and damage
+        printLine("You are wounded!");
+    }
+    
+    return RTRUE;
+}
+
+bool vKill() {
+    // KILL is a synonym for ATTACK
+    return vAttack();
+}
+
+bool vThrow() {
+    auto& g = Globals::instance();
+    
+    // Check if object is specified
+    if (!g.prso) {
+        printLine("Throw what?");
+        return RTRUE;
+    }
+    
+    // Check if target is specified
+    if (!g.prsi) {
+        printLine("Throw it at what?");
+        return RTRUE;
+    }
+    
+    // Check if object is in inventory or accessible
+    ZObject* objLocation = g.prso->getLocation();
+    if (objLocation != g.winner && objLocation != g.here) {
+        printLine("You don't have that.");
+        return RTRUE;
+    }
+    
+    // Call object action handler first
+    // This allows objects to have custom throw behavior
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Default THROW behavior
+    // Calculate throw damage based on object size
+    int objectSize = g.prso->getProperty(P_SIZE);
+    if (objectSize == 0) {
+        objectSize = 5;  // Default size
+    }
+    
+    // Check if target is an NPC
+    if (g.prsi->hasFlag(ObjectFlag::FIGHTBIT)) {
+        int enemyStrength = g.prsi->getProperty(P_STRENGTH);
+        if (enemyStrength == 0) {
+            enemyStrength = 5;
+        }
+        
+        if (objectSize >= enemyStrength / 2) {
+            printLine("You throw the " + g.prso->getDesc() + " at the " + g.prsi->getDesc() + "!");
+            printLine("It hits! The " + g.prsi->getDesc() + " is stunned!");
+        } else {
+            printLine("You throw the " + g.prso->getDesc() + " at the " + g.prsi->getDesc() + ".");
+            printLine("It bounces off harmlessly.");
+        }
+    } else {
+        printLine("You throw the " + g.prso->getDesc() + " at the " + g.prsi->getDesc() + ".");
+        printLine("Nothing interesting happens.");
+    }
+    
+    // Move object to target's location
+    g.prso->moveTo(g.prsi->getLocation());
+    
+    return RTRUE;
+}
+
+bool vSwing() {
+    auto& g = Globals::instance();
+    
+    // Check if object is specified
+    if (!g.prso) {
+        printLine("Swing what?");
+        return RTRUE;
+    }
+    
+    // Check if object is a weapon
+    if (!g.prso->hasFlag(ObjectFlag::WEAPONBIT)) {
+        printLine("That's not a weapon.");
+        return RTRUE;
+    }
+    
+    // Check if target is specified
+    if (!g.prsi) {
+        // No target - just swing the weapon
+        printLine("You swing the " + g.prso->getDesc() + " around.");
+        return RTRUE;
+    }
+    
+    // Target specified - similar to ATTACK
+    // Temporarily set prso to target and prsi to weapon
+    ZObject* weapon = g.prso;
+    ZObject* target = g.prsi;
+    g.prso = target;
+    g.prsi = weapon;
+    
+    bool result = vAttack();
+    
+    // Restore original values
+    g.prso = weapon;
+    g.prsi = target;
+    
+    return result;
+}
+
+// Meta-Game Verbs (Requirement 32, 65, 66, 67, 68)
+
+bool vScore() {
+    auto& g = Globals::instance();
+    
+    // Display current score
+    print("Your score is ");
+    print(std::to_string(g.score));
+    print(" (total of 350 points), in ");
+    print(std::to_string(g.moves));
+    printLine(" moves.");
+    
+    // Display rank based on score
+    std::string rank;
+    if (g.score >= 350) {
+        rank = "Master Adventurer";
+    } else if (g.score >= 300) {
+        rank = "Wizard";
+    } else if (g.score >= 200) {
+        rank = "Master";
+    } else if (g.score >= 100) {
+        rank = "Adventurer";
+    } else if (g.score >= 50) {
+        rank = "Junior Adventurer";
+    } else if (g.score >= 25) {
+        rank = "Novice Adventurer";
+    } else {
+        rank = "Beginner";
+    }
+    
+    printLine("This gives you the rank of " + rank + ".");
+    
+    return RTRUE;
+}
+
+bool vDiagnose() {
+    auto& g = Globals::instance();
+    
+    // Display player health status
+    // For now, just display a simple message
+    // Full implementation would track injuries and health
+    
+    printLine("You are in perfect health.");
+    
+    // If we had a health system, we would check for injuries here
+    // and display them
+    
+    return RTRUE;
+}
+
+bool vVerbose() {
+    auto& g = Globals::instance();
+    
+    // Set verbose mode flag
+    g.verboseMode = true;
+    g.briefMode = false;
+    g.superbriefMode = false;
+    
+    printLine("Maximum verbosity.");
+    
+    return RTRUE;
+}
+
+bool vBrief() {
+    auto& g = Globals::instance();
+    
+    // Set brief mode flag
+    g.verboseMode = false;
+    g.briefMode = true;
+    g.superbriefMode = false;
+    
+    printLine("Brief descriptions.");
+    
+    return RTRUE;
+}
+
+bool vSuperbrief() {
+    auto& g = Globals::instance();
+    
+    // Set superbrief mode flag
+    g.verboseMode = false;
+    g.briefMode = false;
+    g.superbriefMode = true;
+    
+    printLine("Superbrief descriptions.");
+    
+    return RTRUE;
+}
+
 } // namespace Verbs
