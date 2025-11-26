@@ -1134,7 +1134,7 @@ With the world populated, implement the verbs that operate on it.
   - Test on non-light objects
   - _Requirements: 30, 92_
 
-- [ ] 35. Implement special action verbs (INFLATE, DEFLATE, PRAY, etc.)
+- [x] 35. Implement special action verbs (INFLATE, DEFLATE, PRAY, etc.)
   - Implement INFLATE verb
   - Implement DEFLATE verb
   - Implement PRAY verb
@@ -1142,39 +1142,39 @@ With the world populated, implement the verbs that operate on it.
   - Implement WAVE, RUB, RING verbs
   - _Requirements: 31_
 
-- [ ] 35.1 Implement INFLATE verb
+- [x] 35.1 Implement INFLATE verb
   - Check for pump and boat
   - Call object action handler
   - Default: "You can't inflate that"
   - _Requirements: 31_
 
-- [ ] 35.2 Implement DEFLATE verb
+- [x] 35.2 Implement DEFLATE verb
   - Check for pump and boat
   - Call object action handler
   - Default: "You can't deflate that"
   - _Requirements: 31_
 
-- [ ] 35.3 Implement PRAY verb
+- [x] 35.3 Implement PRAY verb
   - Call room action handler
   - Default: "Your prayers are not answered"
   - _Requirements: 31_
 
-- [ ] 35.4 Implement EXORCISE verb
+- [x] 35.4 Implement EXORCISE verb
   - Call object action handler
   - Default: "Nothing happens"
   - _Requirements: 31_
 
-- [ ] 35.5 Implement WAVE, RUB, RING verbs
+- [x] 35.5 Implement WAVE, RUB, RING verbs
   - Call object action handlers
   - Provide appropriate default messages
   - _Requirements: 31_
 
-- [ ] 35.6 Write unit tests for special action verbs
+- [x] 35.6 Write unit tests for special action verbs
   - Test on appropriate objects
   - Test default behaviors
   - _Requirements: 31, 92_
 
-- [ ] 36. Implement combat verbs (ATTACK, KILL, THROW, SWING)
+- [x] 36. Implement combat verbs (ATTACK, KILL, THROW, SWING)
   - Implement ATTACK verb
   - Implement KILL as synonym
   - Implement THROW verb
@@ -1182,26 +1182,26 @@ With the world populated, implement the verbs that operate on it.
   - Integrate with combat system
   - _Requirements: 29_
 
-- [ ] 36.1 Implement ATTACK verb
+- [x] 36.1 Implement ATTACK verb
   - Check if target is attackable
   - Check for weapon
   - Start combat if not already in combat
   - Call combat system
   - _Requirements: 29_
 
-- [ ] 36.2 Implement THROW verb
+- [x] 36.2 Implement THROW verb
   - Check if object is throwable
   - Calculate throw damage
   - Apply damage to target
   - Move object to target's location
   - _Requirements: 29_
 
-- [ ] 36.3 Implement SWING verb
+- [x] 36.3 Implement SWING verb
   - Check for weapon
   - Similar to ATTACK
   - _Requirements: 29_
 
-- [ ] 36.4 Write unit tests for combat verbs
+- [x] 36.4 Write unit tests for combat verbs
   - Test attacking NPCs
   - Test with and without weapons
   - Test throwing objects

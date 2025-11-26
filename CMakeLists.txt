@@ -59,4 +59,8 @@ if(BUILD_TESTS)
     # Special action verb tests
     add_executable(special_action_verb_tests tests/special_action_verb_tests.cpp ${LIB_SOURCES})
     add_test(NAME SpecialActionVerbTests COMMAND special_action_verb_tests)
+    
+    # Combat verb tests
+    add_executable(combat_verb_tests tests/combat_verb_tests.cpp ${LIB_SOURCES})
+    add_test(NAME CombatVerbTests COMMAND combat_verb_tests)
 endif()
