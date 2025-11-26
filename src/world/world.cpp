@@ -435,6 +435,211 @@ bool matchesAction() {
     return RFALSE;
 }
 
+// ============================================================================
+// TREASURE ACTION HANDLERS
+// ============================================================================
+
+// Global flag to track if painting has been examined from back
+static bool paintingExaminedBack = false;
+
+// Painting action - special treasure that can be taken from wall, has back side
+// Based on PAINTING-FCN from 1actions.zil
+bool paintingAction() {
+    auto& g = Globals::instance();
+    
+    if (!g.prso || g.prso->getId() != ObjectIds::PAINTING) {
+        return RFALSE;
+    }
+    
+    // Handle EXAMINE - show different description based on state
+    if (g.prsa == V_EXAMINE) {
+        // Check if player is looking at the back
+        if (paintingExaminedBack) {
+            printLine("The back of the painting is covered with canvas, with no visible markings.");
+            paintingExaminedBack = false;  // Reset for next examine
+        } else {
+            printLine("A masterpiece by a neglected genius. It depicts a beautiful landscape with a babbling brook and a distant village. The painting is quite valuable.");
+        }
+        return RTRUE;
+    }
+    
+    // Handle TURN/FLIP - look at back side
+    if (g.prsa == V_TURN) {
+        printLine("You turn the painting over, revealing the back.");
+        paintingExaminedBack = true;
+        return RTRUE;
+    }
+    
+    // Handle BURN - destroys the painting's value (from ZIL MUNG behavior)
+    if (g.prsa == V_BURN) {
+        // Set TVALUE to 0 (worthless)
+        g.prso->setProperty(P_TVALUE, 0);
+        printLine("Congratulations! Unlike the other vandals, who merely stole the artist's masterpieces, you have destroyed one.");
+        return RTRUE;
+    }
+    
+    return RFALSE;
+}
+
+// Forward declaration for BAD-EGG helper
+void badEgg();
+
+// Egg action - special treasure that can be opened, contains canary
+// Based on EGG-OBJECT from 1actions.zil
+bool eggAction() {
+    auto& g = Globals::instance();
+    
+    if (!g.prso || g.prso->getId() != ObjectIds::EGG) {
+        return RFALSE;
+    }
+    
+    // Handle OPEN with or without tool
+    if (g.prsa == V_OPEN) {
+        // Check if already open
+        if (g.prso->hasFlag(ObjectFlag::OPENBIT)) {
+            printLine("The egg is already open.");
+            return RTRUE;
+        }
+        
+        // Check if using a tool
+        if (!g.prsi) {
+            printLine("You have neither the tools nor the expertise.");
+            return RTRUE;
+        }
+        
+        // Check if using hands (no tool)
+        if (g.prsi->getId() == ObjectIds::ADVENTURER) {
+            printLine("I doubt you could do that without damaging it.");
+            return RTRUE;
+        }
+        
+        // Check if using a weapon or tool - damages the egg
+        if (g.prsi->hasFlag(ObjectFlag::WEAPONBIT) || g.prsi->hasFlag(ObjectFlag::TOOLBIT)) {
+            printLine("The egg is now open, but the clumsiness of your attempt has seriously compromised its esthetic appeal.");
+            badEgg();
+            return RTRUE;
+        }
+        
+        // Using something else - original response
+        printLine("The concept of using a " + g.prsi->getDesc() + " is certainly original.");
+        return RTRUE;
+    }
+    
+    // Handle CLIMB-ON or sitting on the egg - breaks it
+    if (g.prsa == V_CLIMB_ON) {
+        printLine("There is a noticeable crunch from beneath you, and inspection reveals that the egg is lying open, badly damaged.");
+        badEgg();
+        return RTRUE;
+    }
+    
+    // Handle THROW - breaks the egg
+    if (g.prsa == V_THROW) {
+        g.prso->moveTo(g.here);  // Move egg to current room
+        printLine("Your rather indelicate handling of the egg has caused it some damage, although you have succeeded in opening it.");
+        badEgg();
+        return RTRUE;
+    }
+    
+    return RFALSE;
+}
+
+// Helper function to convert egg to broken egg (BAD-EGG from ZIL)
+void badEgg() {
+    auto& g = Globals::instance();
+    
+    ZObject* egg = g.getObject(ObjectIds::EGG);
+    ZObject* brokenEgg = g.getObject(ObjectIds::BROKEN_EGG);
+    ZObject* canary = g.getObject(ObjectIds::CANARY);
+    ZObject* brokenCanary = g.getObject(ObjectIds::BROKEN_CANARY);
+    
+    if (!egg || !brokenEgg) return;
+    
+    // Get egg's location
+    ZObject* eggLocation = egg->getLocation();
+    
+    // If canary was in the egg, show the broken canary description
+    if (canary && canary->getLocation() == egg) {
+        // Move broken canary to broken egg
+        if (brokenCanary) {
+            brokenCanary->moveTo(brokenEgg);
+            print(" ");
+            printLine("There is a golden clockwork canary nestled in the egg. It seems to have recently had a bad experience. The mountings for its jewel-like eyes are empty, and its silver beak is crumpled.");
+        }
+        // Remove the good canary
+        canary->moveTo(nullptr);
+    } else {
+        // No canary in egg, remove broken canary from game
+        if (brokenCanary) {
+            brokenCanary->moveTo(nullptr);
+        }
+    }
+    
+    // Move broken egg to egg's location
+    if (eggLocation) {
+        brokenEgg->moveTo(eggLocation);
+    }
+    
+    // Remove the good egg from the game
+    egg->moveTo(nullptr);
+}
+
+// Canary action - can be wound to produce bauble
+// Based on CANARY-OBJECT from 1actions.zil
+bool canaryAction() {
+    auto& g = Globals::instance();
+    
+    // Handle both good and broken canary
+    bool isCanary = g.prso && g.prso->getId() == ObjectIds::CANARY;
+    bool isBrokenCanary = g.prso && g.prso->getId() == ObjectIds::BROKEN_CANARY;
+    
+    if (!isCanary && !isBrokenCanary) {
+        return RFALSE;
+    }
+    
+    // Handle WIND verb (winding the canary)
+    // Note: V_WIND would need to be added to verbs.h, using V_TURN as substitute
+    if (g.prsa == V_TURN) {
+        if (isCanary) {
+            // Check if in forest area - produces bauble
+            ZRoom* room = dynamic_cast<ZRoom*>(g.here);
+            bool inForest = false;
+            if (room) {
+                ObjectId roomId = room->getId();
+                inForest = (roomId == RoomIds::FOREST_1 || 
+                           roomId == RoomIds::FOREST_2 || 
+                           roomId == RoomIds::FOREST_3 ||
+                           roomId == RoomIds::FOREST_PATH ||
+                           roomId == RoomIds::UP_A_TREE);
+            }
+            
+            // Check if bauble has already been produced
+            ZObject* bauble = g.getObject(ObjectIds::BAUBLE);
+            bool baubleProduced = bauble && bauble->getLocation() != nullptr;
+            
+            if (inForest && !baubleProduced) {
+                printLine("The canary chirps, slightly off-key, an aria from a forgotten opera. From out of the greenery flies a lovely songbird. It perches on a limb just over your head and opens its beak to sing. As it does so a beautiful brass bauble drops from its mouth, bounces off the top of your head, and lands glimmering in the grass. As the canary winds down, the songbird flies away.");
+                
+                // Move bauble to current room (or forest path if in tree)
+                if (bauble) {
+                    if (g.here->getId() == RoomIds::UP_A_TREE) {
+                        bauble->moveTo(g.getObject(RoomIds::FOREST_PATH));
+                    } else {
+                        bauble->moveTo(g.here);
+                    }
+                }
+            } else {
+                printLine("The canary chirps blithely, if somewhat tinnily, for a short time.");
+            }
+        } else {
+            // Broken canary
+            printLine("There is an unpleasant grinding noise from inside the canary.");
+        }
+        return RTRUE;
+    }
+    
+    return RFALSE;
+}
+
 void initializeWorld() {
     auto& g = Globals::instance();
     
@@ -2827,21 +3032,103 @@ void initializeWorld() {
     trophy->moveTo(g.getObject(RoomIds::TREASURE_ROOM));
     g.registerObject(ObjectIds::TROPHY, std::move(trophy));
     
-    // Create EGG (Jewel-encrusted egg)
+    // Create EGG (Jewel-encrusted egg) - starts CLOSED, contains canary
     auto egg = std::make_unique<ZObject>(ObjectIds::EGG, "jewel-encrusted egg");
     egg->addSynonym("egg");
+    egg->addSynonym("treasure");
     egg->addAdjective("jewel");
     egg->addAdjective("jeweled");
     egg->addAdjective("encrusted");
+    egg->addAdjective("birds");
     egg->setFlag(ObjectFlag::TAKEBIT);
     egg->setFlag(ObjectFlag::CONTBIT);
-    egg->setFlag(ObjectFlag::OPENBIT);
+    egg->setFlag(ObjectFlag::SEARCHBIT);
+    // Note: Egg starts CLOSED (no OPENBIT) - must be opened carefully
     egg->setProperty(P_VALUE, 5);
     egg->setProperty(P_TVALUE, 5);
     egg->setProperty(P_SIZE, 5);
-    egg->setProperty(P_CAPACITY, 5);
-    egg->moveTo(g.getObject(RoomIds::UP_A_TREE));  // In nest in tree
+    egg->setProperty(P_CAPACITY, 6);
+    egg->setAction(eggAction);
+    egg->setText("In the bird's nest is a large egg encrusted with precious jewels, apparently scavenged by a childless songbird. The egg is covered with fine gold inlay, and ornamented in lapis lazuli and mother-of-pearl. Unlike most eggs, this one is hinged and closed with a delicate looking clasp. The egg appears extremely fragile.");
+    // Egg will be placed in nest after nest is created
     g.registerObject(ObjectIds::EGG, std::move(egg));
+    
+    // Create BROKEN_EGG (Broken jewel-encrusted egg) - created when egg is damaged
+    auto brokenEgg = std::make_unique<ZObject>(ObjectIds::BROKEN_EGG, "broken jewel-encrusted egg");
+    brokenEgg->addSynonym("egg");
+    brokenEgg->addSynonym("treasure");
+    brokenEgg->addAdjective("broken");
+    brokenEgg->addAdjective("birds");
+    brokenEgg->addAdjective("encrusted");
+    brokenEgg->addAdjective("jewel");
+    brokenEgg->setFlag(ObjectFlag::TAKEBIT);
+    brokenEgg->setFlag(ObjectFlag::CONTBIT);
+    brokenEgg->setFlag(ObjectFlag::OPENBIT);  // Broken egg is always open
+    brokenEgg->setProperty(P_TVALUE, 2);  // Worth less than intact egg
+    brokenEgg->setProperty(P_SIZE, 5);
+    brokenEgg->setProperty(P_CAPACITY, 6);
+    brokenEgg->setText("There is a somewhat ruined egg here.");
+    // Broken egg starts nowhere - created when egg is damaged
+    g.registerObject(ObjectIds::BROKEN_EGG, std::move(brokenEgg));
+    
+    // Create CANARY (Golden clockwork canary) - inside the egg
+    auto canary = std::make_unique<ZObject>(ObjectIds::CANARY, "golden clockwork canary");
+    canary->addSynonym("canary");
+    canary->addSynonym("treasure");
+    canary->addAdjective("clockwork");
+    canary->addAdjective("gold");
+    canary->addAdjective("golden");
+    canary->setFlag(ObjectFlag::TAKEBIT);
+    canary->setFlag(ObjectFlag::SEARCHBIT);
+    canary->setProperty(P_VALUE, 6);
+    canary->setProperty(P_TVALUE, 4);
+    canary->setProperty(P_SIZE, 3);
+    canary->setAction(canaryAction);
+    canary->setText("There is a golden clockwork canary nestled in the egg. It has ruby eyes and a silver beak. Through a crystal window below its left wing you can see intricate machinery inside. It appears to have wound down.");
+    // Canary will be placed in egg after egg is registered
+    g.registerObject(ObjectIds::CANARY, std::move(canary));
+    
+    // Now place canary in egg (after both are registered)
+    ZObject* eggObj = g.getObject(ObjectIds::EGG);
+    ZObject* canaryObj = g.getObject(ObjectIds::CANARY);
+    if (eggObj && canaryObj) {
+        canaryObj->moveTo(eggObj);
+    }
+    
+    // Place egg in UP_A_TREE room (in the nest - nest is scenery)
+    if (eggObj) {
+        eggObj->moveTo(g.getObject(RoomIds::UP_A_TREE));
+    }
+    
+    // Create BROKEN_CANARY (Broken clockwork canary) - created when egg is damaged with canary inside
+    auto brokenCanary = std::make_unique<ZObject>(ObjectIds::BROKEN_CANARY, "broken clockwork canary");
+    brokenCanary->addSynonym("canary");
+    brokenCanary->addSynonym("treasure");
+    brokenCanary->addAdjective("broken");
+    brokenCanary->addAdjective("clockwork");
+    brokenCanary->addAdjective("gold");
+    brokenCanary->addAdjective("golden");
+    brokenCanary->setFlag(ObjectFlag::TAKEBIT);
+    brokenCanary->setProperty(P_TVALUE, 1);  // Worth much less than intact canary
+    brokenCanary->setProperty(P_SIZE, 3);
+    brokenCanary->setAction(canaryAction);
+    brokenCanary->setText("There is a golden clockwork canary nestled in the egg. It seems to have recently had a bad experience. The mountings for its jewel-like eyes are empty, and its silver beak is crumpled. Through a cracked crystal window below its left wing you can see the remains of intricate machinery. It is not clear what result winding it would have, as the mainspring seems sprung.");
+    // Broken canary starts in broken egg (but broken egg starts nowhere)
+    brokenCanary->moveTo(g.getObject(ObjectIds::BROKEN_EGG));
+    g.registerObject(ObjectIds::BROKEN_CANARY, std::move(brokenCanary));
+    
+    // Create BAUBLE (Beautiful brass bauble) - produced by winding canary in forest
+    auto bauble = std::make_unique<ZObject>(ObjectIds::BAUBLE, "beautiful brass bauble");
+    bauble->addSynonym("bauble");
+    bauble->addSynonym("treasure");
+    bauble->addAdjective("brass");
+    bauble->addAdjective("beautiful");
+    bauble->setFlag(ObjectFlag::TAKEBIT);
+    bauble->setProperty(P_VALUE, 1);
+    bauble->setProperty(P_TVALUE, 1);
+    bauble->setProperty(P_SIZE, 2);
+    // Bauble starts nowhere - produced by winding canary in forest
+    g.registerObject(ObjectIds::BAUBLE, std::move(bauble));
     
     // Create CHALICE (Chalice)
     auto chalice = std::make_unique<ZObject>(ObjectIds::CHALICE, "chalice");
@@ -2924,18 +3211,22 @@ void initializeWorld() {
     emerald->moveTo(g.getObject(RoomIds::SOUTH_TEMPLE));
     g.registerObject(ObjectIds::EMERALD, std::move(emerald));
     
-    // Create PAINTING (Painting - special treasure that can be taken from wall)
+    // Create PAINTING (Painting - special treasure that can be taken from wall, has back side)
     auto painting = std::make_unique<ZObject>(ObjectIds::PAINTING, "painting");
     painting->addSynonym("painting");
     painting->addSynonym("picture");
+    painting->addSynonym("art");
+    painting->addSynonym("canvas");
+    painting->addSynonym("treasure");
     painting->addAdjective("beautiful");
-    painting->addAdjective("old");
     painting->setFlag(ObjectFlag::TAKEBIT);
+    painting->setFlag(ObjectFlag::BURNBIT);  // Can be burned (destroys value)
     painting->setProperty(P_VALUE, 4);
     painting->setProperty(P_TVALUE, 6);
     painting->setProperty(P_SIZE, 15);
+    painting->setAction(paintingAction);
+    painting->setText("Fortunately, there is still one chance for you to be a vandal, for on the far wall is a painting of unparalleled beauty.");
     painting->moveTo(g.getObject(RoomIds::GALLERY));
-    // TODO: Add action handler for examining back side
     g.registerObject(ObjectIds::PAINTING, std::move(painting));
     
     // Create COFFIN (Gold coffin - both treasure and container)
@@ -3052,33 +3343,7 @@ void initializeWorld() {
     sceptre->moveTo(g.getObject(RoomIds::EGYPT_ROOM));
     g.registerObject(ObjectIds::SCEPTRE, std::move(sceptre));
     
-    // Create CANARY (Clockwork canary)
-    auto canary = std::make_unique<ZObject>(ObjectIds::CANARY, "clockwork canary");
-    canary->addSynonym("canary");
-    canary->addSynonym("bird");
-    canary->addAdjective("clockwork");
-    canary->addAdjective("mechanical");
-    canary->addAdjective("wind");
-    canary->setFlag(ObjectFlag::TAKEBIT);
-    canary->setProperty(P_VALUE, 4);
-    canary->setProperty(P_TVALUE, 8);
-    canary->setProperty(P_SIZE, 3);
-    canary->moveTo(g.getObject(RoomIds::MINE_4));  // Coal mine area
-    // TODO: Add action handler for winding and breaking
-    g.registerObject(ObjectIds::CANARY, std::move(canary));
-    
-    // Create BAUBLE (Brass bauble)
-    auto bauble = std::make_unique<ZObject>(ObjectIds::BAUBLE, "brass bauble");
-    bauble->addSynonym("bauble");
-    bauble->addSynonym("trinket");
-    bauble->addAdjective("brass");
-    bauble->addAdjective("small");
-    bauble->setFlag(ObjectFlag::TAKEBIT);
-    bauble->setProperty(P_VALUE, 1);
-    bauble->setProperty(P_TVALUE, 1);
-    bauble->setProperty(P_SIZE, 2);
-    bauble->moveTo(g.getObject(RoomIds::MAZE_5));
-    g.registerObject(ObjectIds::BAUBLE, std::move(bauble));
+    // CANARY and BAUBLE are created earlier with the egg-related objects
     
     // ===== TOOL OBJECTS =====
     

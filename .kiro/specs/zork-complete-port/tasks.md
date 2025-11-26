@@ -1372,26 +1372,26 @@ Implement object-specific and room-specific behaviors.
   - All other tools from 1actions.zil
   - _Requirements: 37_
 
-- [ ] 41. Implement treasure action handlers
+- [x] 41. Implement treasure action handlers
   - Implement special treasure behaviors
   - Implement painting action (has back side)
   - Implement egg action (opens)
   - Implement other treasure-specific actions
   - _Requirements: 38_
 
-- [ ] 41.1 Implement painting action
+- [x] 41.1 Implement painting action
   - Can be taken from wall
   - Has back side with different description
   - Special EXAMINE behavior
   - _Requirements: 38, 42_
 
-- [ ] 41.2 Implement egg action
+- [x] 41.2 Implement egg action
   - Can be opened
   - Contains canary
   - Special behaviors
   - _Requirements: 38, 42_
 
-- [ ] 41.3 Implement other treasure actions
+- [x] 41.3 Implement other treasure actions
   - Any special behaviors from 1actions.zil
   - Most treasures have default behavior
   - _Requirements: 38_
