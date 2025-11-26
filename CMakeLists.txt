@@ -63,4 +63,8 @@ if(BUILD_TESTS)
     # Combat verb tests
     add_executable(combat_verb_tests tests/combat_verb_tests.cpp ${LIB_SOURCES})
     add_test(NAME CombatVerbTests COMMAND combat_verb_tests)
+    
+    # Meta-game verb tests
+    add_executable(meta_game_verb_tests tests/meta_game_verb_tests.cpp ${LIB_SOURCES})
+    add_test(NAME MetaGameVerbTests COMMAND meta_game_verb_tests)
 endif()

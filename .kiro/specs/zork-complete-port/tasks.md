@@ -1207,7 +1207,7 @@ With the world populated, implement the verbs that operate on it.
   - Test throwing objects
   - _Requirements: 29, 92_
 
-- [ ] 37. Implement meta-game verbs (SCORE, DIAGNOSE, VERBOSE, etc.)
+- [x] 37. Implement meta-game verbs (SCORE, DIAGNOSE, VERBOSE, etc.)
   - Implement SCORE verb
   - Implement DIAGNOSE verb
   - Implement VERBOSE verb
@@ -1215,33 +1215,33 @@ With the world populated, implement the verbs that operate on it.
   - Implement SUPERBRIEF verb
   - _Requirements: 32, 65, 66, 67, 68_
 
-- [ ] 37.1 Implement SCORE verb
+- [x] 37.1 Implement SCORE verb
   - Display current score
   - Display move count
   - Display rank
   - _Requirements: 32_
 
-- [ ] 37.2 Implement DIAGNOSE verb
+- [x] 37.2 Implement DIAGNOSE verb
   - Display player health status
   - List injuries if any
   - _Requirements: 68_
 
-- [ ] 37.3 Implement VERBOSE verb
+- [x] 37.3 Implement VERBOSE verb
   - Set verbose mode flag
   - Display confirmation message
   - _Requirements: 65_
 
-- [ ] 37.4 Implement BRIEF verb
+- [x] 37.4 Implement BRIEF verb
   - Set brief mode flag
   - Display confirmation message
   - _Requirements: 66_
 
-- [ ] 37.5 Implement SUPERBRIEF verb
+- [x] 37.5 Implement SUPERBRIEF verb
   - Set superbrief mode flag
   - Display confirmation message
   - _Requirements: 67_
 
-- [ ] 37.6 Write unit tests for meta-game verbs
+- [x] 37.6 Write unit tests for meta-game verbs
   - Test SCORE display
   - Test DIAGNOSE
   - Test mode switching
