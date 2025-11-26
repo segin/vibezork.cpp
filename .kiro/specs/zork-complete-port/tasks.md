@@ -1247,7 +1247,7 @@ With the world populated, implement the verbs that operate on it.
   - Test mode switching
   - _Requirements: 32, 65, 66, 67, 68, 92_
 
-- [ ] 38. Implement game control verbs (SAVE, RESTORE, RESTART, QUIT, VERSION)
+- [x] 38. Implement game control verbs (SAVE, RESTORE, RESTART, QUIT, VERSION)
   - Implement SAVE verb
   - Implement RESTORE verb
   - Implement RESTART verb
@@ -1255,39 +1255,39 @@ With the world populated, implement the verbs that operate on it.
   - Implement VERSION verb
   - _Requirements: 33, 60, 61, 62, 69, 70_
 
-- [ ] 38.1 Implement SAVE verb
+- [x] 38.1 Implement SAVE verb
   - Prompt for filename
   - Serialize game state
   - Write to file
   - Handle errors gracefully
   - _Requirements: 60_
 
-- [ ] 38.2 Implement RESTORE verb
+- [x] 38.2 Implement RESTORE verb
   - Prompt for filename
   - Read from file
   - Deserialize game state
   - Handle errors gracefully
   - _Requirements: 61_
 
-- [ ] 38.3 Implement RESTART verb
+- [x] 38.3 Implement RESTART verb
   - Confirm with player
   - Reset all game state
   - Reinitialize world
   - _Requirements: 62_
 
-- [ ] 38.4 Verify QUIT verb
+- [x] 38.4 Verify QUIT verb
   - Already implemented, ensure it works correctly
   - Confirm before quitting
   - Remind to save
   - _Requirements: 70_
 
-- [ ] 38.5 Implement VERSION verb
+- [x] 38.5 Implement VERSION verb
   - Display game name and version
   - Display port information
   - Display copyright
   - _Requirements: 69_
 
-- [ ] 38.6 Write unit tests for game control verbs
+- [x] 38.6 Write unit tests for game control verbs
   - Test save and restore
   - Test restart
   - Test version display

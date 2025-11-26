@@ -155,6 +155,12 @@ namespace Verbs {
     bool vBrief();
     bool vSuperbrief();
     
+    // Game control verbs
+    bool vSave();
+    bool vRestore();
+    bool vRestart();
+    bool vVersion();
+    
     // Helper for special movement
     bool trySpecialMovement(int verbId, Direction dir);
 }

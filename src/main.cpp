@@ -57,7 +57,11 @@ std::map<VerbId, std::function<bool()>> verbHandlers = {
     {V_DIAGNOSE, Verbs::vDiagnose},
     {V_VERBOSE, Verbs::vVerbose},
     {V_BRIEF, Verbs::vBrief},
-    {V_SUPERBRIEF, Verbs::vSuperbrief}
+    {V_SUPERBRIEF, Verbs::vSuperbrief},
+    {V_SAVE, Verbs::vSave},
+    {V_RESTORE, Verbs::vRestore},
+    {V_RESTART, Verbs::vRestart},
+    {V_VERSION, Verbs::vVersion}
 };
 
 // Global parser instance to maintain state across turns
