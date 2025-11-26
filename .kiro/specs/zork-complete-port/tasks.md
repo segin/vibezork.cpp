@@ -1299,7 +1299,7 @@ With the world populated, implement the verbs that operate on it.
 
 Implement object-specific and room-specific behaviors.
 
-- [ ] 39. Implement container action handlers
+- [-] 39. Implement container action handlers
   - Implement mailbox action (already exists, verify)
   - Implement trophy case action
   - Implement coffin action
@@ -1307,24 +1307,24 @@ Implement object-specific and room-specific behaviors.
   - Implement sack action
   - _Requirements: 36_
 
-- [ ] 39.1 Verify mailbox action
+- [x] 39.1 Verify mailbox action
   - Already implemented, ensure completeness
   - Anchored (can't be taken)
   - Opens to reveal leaflet
   - _Requirements: 36_
 
-- [ ] 39.2 Implement trophy case action
+- [x] 39.2 Implement trophy case action
   - Large capacity
   - Scores treasures when placed inside
   - Display special message for treasures
   - _Requirements: 36, 85_
 
-- [ ] 39.3 Implement coffin action
+- [x] 39.3 Implement coffin action
   - Container and treasure
   - Special opening behavior
   - _Requirements: 36_
 
-- [ ] 39.4 Implement basket action
+- [x] 39.4 Implement basket action
   - Part of balloon/basket system
   - Special behaviors when in balloon
   - _Requirements: 36_

@@ -52,6 +52,56 @@ bool mailboxAction() {
     return RFALSE;
 }
 
+bool trophyCaseAction() {
+    auto& g = Globals::instance();
+    if (g.prsa == V_TAKE && g.prso && g.prso->getId() == ObjectIds::TROPHY_CASE) {
+        printLine("The trophy case is securely fastened to the wall.");
+        return RTRUE;
+    }
+    return RFALSE;
+}
+
+bool coffinAction() {
+    auto& g = Globals::instance();
+    // Coffin is both a treasure and a container, but has no special behavior
+    // It can be taken and opened like a normal container
+    return RFALSE;
+}
+
+bool basketAction() {
+    auto& g = Globals::instance();
+    
+    // Basket is part of the balloon/shaft system
+    // It can be raised and lowered, but cannot be taken
+    if (g.prsa == V_TAKE && g.prso && 
+        (g.prso->getId() == ObjectIds::BASKET || 
+         g.prso->getId() == ObjectIds::RAISED_BASKET)) {
+        printLine("The basket is securely fastened to the iron chain.");
+        return RTRUE;
+    }
+    
+    // Basket cannot be interacted with in other ways in this simplified version
+    return RFALSE;
+}
+
+bool sackAction() {
+    auto& g = Globals::instance();
+    // Sack is a portable container with no special behavior
+    return RFALSE;
+}
+
+bool bagAction() {
+    auto& g = Globals::instance();
+    // Bag is a portable container with no special behavior
+    return RFALSE;
+}
+
+bool bottleAction() {
+    auto& g = Globals::instance();
+    // Bottle is a portable container with no special behavior
+    return RFALSE;
+}
+
 bool whiteHouseAction() {
     auto& g = Globals::instance();
     if (g.prsa == V_EXAMINE) {
@@ -2266,7 +2316,7 @@ void initializeWorld() {
     trophyCase->setFlag(ObjectFlag::NDESCBIT);   // Don't describe separately
     trophyCase->setFlag(ObjectFlag::SEARCHBIT);  // Can be searched
     trophyCase->setProperty(P_CAPACITY, 10000);  // Large capacity for treasures
-    // TODO: Add action handler for scoring treasures
+    trophyCase->setAction(trophyCaseAction);
     trophyCase->moveTo(g.getObject(RoomIds::LIVING_ROOM));
     
     g.registerObject(ObjectIds::TROPHY_CASE, std::move(trophyCase));
@@ -2284,7 +2334,7 @@ void initializeWorld() {
     sack->setFlag(ObjectFlag::BURNBIT);    // Can be burned
     sack->setProperty(P_CAPACITY, 9);
     sack->setProperty(P_SIZE, 9);
-    // TODO: Add action handler
+    sack->setAction(sackAction);
     sack->moveTo(g.getObject(RoomIds::KITCHEN));  // On kitchen table
     
     g.registerObject(ObjectIds::SACK, std::move(sack));
@@ -2299,7 +2349,7 @@ void initializeWorld() {
     bag->setFlag(ObjectFlag::OPENBIT);     // Initially open
     bag->setProperty(P_CAPACITY, 100);     // Large capacity
     bag->setProperty(P_SIZE, 20);
-    // TODO: Add action handler
+    bag->setAction(bagAction);
     // Initially with thief - will be placed when thief is created
     
     g.registerObject(ObjectIds::BAG, std::move(bag));
@@ -2314,7 +2364,7 @@ void initializeWorld() {
     raisedBasket->setFlag(ObjectFlag::OPENBIT);   // Open
     raisedBasket->setFlag(ObjectFlag::TRYTAKEBIT); // Cannot be taken
     raisedBasket->setProperty(P_CAPACITY, 50);
-    // TODO: Add action handler for basket mechanics
+    raisedBasket->setAction(basketAction);
     raisedBasket->moveTo(g.getObject(RoomIds::SHAFT_ROOM));
     
     g.registerObject(ObjectIds::RAISED_BASKET, std::move(raisedBasket));
@@ -2327,7 +2377,7 @@ void initializeWorld() {
     loweredBasket->addAdjective("lowered");
     loweredBasket->setFlag(ObjectFlag::TRYTAKEBIT); // Cannot be taken
     // Note: This basket is not a container when lowered - it becomes one when raised
-    // TODO: Add action handler for basket mechanics
+    loweredBasket->setAction(basketAction);
     loweredBasket->moveTo(g.getObject(RoomIds::LOWER_SHAFT));
     
     g.registerObject(ObjectIds::BASKET, std::move(loweredBasket));
@@ -2606,7 +2656,7 @@ void initializeWorld() {
     coffin->setProperty(P_TVALUE, 10);
     coffin->setProperty(P_SIZE, 55);
     coffin->setProperty(P_CAPACITY, 35);
-    // TODO: Add action handler
+    coffin->setAction(coffinAction);
     coffin->moveTo(g.getObject(RoomIds::EGYPT_ROOM));
     g.registerObject(ObjectIds::COFFIN, std::move(coffin));
     
@@ -2878,7 +2928,7 @@ void initializeWorld() {
     bottle->setFlag(ObjectFlag::TRANSBIT);  // Transparent
     bottle->setProperty(P_SIZE, 8);
     bottle->setProperty(P_CAPACITY, 4);
-    // TODO: Add action handler for filling/emptying
+    bottle->setAction(bottleAction);
     bottle->moveTo(g.getObject(RoomIds::KITCHEN));
     g.registerObject(ObjectIds::BOTTLE, std::move(bottle));
     
