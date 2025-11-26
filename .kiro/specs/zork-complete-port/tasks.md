@@ -1299,7 +1299,7 @@ With the world populated, implement the verbs that operate on it.
 
 Implement object-specific and room-specific behaviors.
 
-- [-] 39. Implement container action handlers
+- [x] 39. Implement container action handlers
   - Implement mailbox action (already exists, verify)
   - Implement trophy case action
   - Implement coffin action
@@ -1329,13 +1329,13 @@ Implement object-specific and room-specific behaviors.
   - Special behaviors when in balloon
   - _Requirements: 36_
 
-- [ ] 39.5 Implement other container actions
+- [x] 39.5 Implement other container actions
   - Sack, bag, bottle, etc.
   - Any special behaviors from 1actions.zil
   - _Requirements: 36_
 
 
-- [ ] 40. Implement tool action handlers
+- [x] 40. Implement tool action handlers
   - Implement sword action
   - Implement lamp action
   - Implement rope action
@@ -1343,31 +1343,31 @@ Implement object-specific and room-specific behaviors.
   - Implement screwdriver action
   - _Requirements: 37_
 
-- [ ] 40.1 Implement sword action
+- [x] 40.1 Implement sword action
   - Glows when near enemies
   - Effective weapon in combat
   - Special messages for glow
   - _Requirements: 37, 49_
 
-- [ ] 40.2 Implement lamp action
+- [x] 40.2 Implement lamp action
   - Provides light when on
   - Battery drains over time
   - Warnings when battery low
   - Can't be turned on when depleted
   - _Requirements: 37, 47_
 
-- [ ] 40.3 Implement rope action
+- [x] 40.3 Implement rope action
   - Used for climbing
   - Used for tying
   - Special behaviors in specific locations
   - _Requirements: 37_
 
-- [ ] 40.4 Implement wrench and screwdriver actions
+- [x] 40.4 Implement wrench and screwdriver actions
   - Used for specific puzzles
   - Special behaviors with bolts/screws
   - _Requirements: 37_
 
-- [ ] 40.5 Implement other tool actions
+- [x] 40.5 Implement other tool actions
   - Shovel, torch, candles, matches
   - All other tools from 1actions.zil
   - _Requirements: 37_

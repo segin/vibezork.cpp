@@ -138,6 +138,303 @@ bool kitchenWindowAction() {
     return RFALSE;
 }
 
+// Tool action handlers
+
+// Sword action - glows when near enemies
+bool swordAction() {
+    auto& g = Globals::instance();
+    
+    // Sword is a weapon with no special behavior in action handler
+    // Glow behavior is handled by timer system (I-SWORD timer)
+    // This handler is mainly for future extensibility
+    
+    if (g.prsa == V_EXAMINE && g.prso && g.prso->getId() == ObjectIds::SWORD) {
+        // Check if sword is glowing (has ONBIT flag set by timer)
+        if (g.prso->hasFlag(ObjectFlag::ONBIT)) {
+            printLine("The sword is glowing with a faint blue light.");
+        } else {
+            printLine("The sword is a beautiful elvish blade, but it is not glowing.");
+        }
+        return RTRUE;
+    }
+    
+    return RFALSE;
+}
+
+// Lamp action - provides light when on, battery drains over time
+bool lampAction() {
+    auto& g = Globals::instance();
+    
+    if (g.prsa == V_LAMP_ON && g.prso && g.prso->getId() == ObjectIds::LAMP) {
+        // Check if lamp is already on
+        if (g.prso->hasFlag(ObjectFlag::ONBIT)) {
+            printLine("The lamp is already on.");
+            return RTRUE;
+        }
+        
+        // Check if lamp has battery (property P_STRENGTH tracks battery level)
+        int battery = g.prso->getProperty(P_STRENGTH);
+        if (battery <= 0) {
+            printLine("The lamp has no batteries.");
+            return RTRUE;
+        }
+        
+        // Turn on the lamp
+        g.prso->setFlag(ObjectFlag::ONBIT);
+        printLine("The lamp is now on.");
+        return RTRUE;
+    }
+    
+    if (g.prsa == V_LAMP_OFF && g.prso && g.prso->getId() == ObjectIds::LAMP) {
+        // Check if lamp is already off
+        if (!g.prso->hasFlag(ObjectFlag::ONBIT)) {
+            printLine("The lamp is already off.");
+            return RTRUE;
+        }
+        
+        // Turn off the lamp
+        g.prso->clearFlag(ObjectFlag::ONBIT);
+        printLine("The lamp is now off.");
+        return RTRUE;
+    }
+    
+    if (g.prsa == V_EXAMINE && g.prso && g.prso->getId() == ObjectIds::LAMP) {
+        int battery = g.prso->getProperty(P_STRENGTH);
+        if (g.prso->hasFlag(ObjectFlag::ONBIT)) {
+            if (battery <= 10) {
+                printLine("The lamp is on, but the batteries are almost dead.");
+            } else {
+                printLine("The lamp is on and glowing brightly.");
+            }
+        } else {
+            if (battery <= 0) {
+                printLine("The lamp is off and the batteries are dead.");
+            } else {
+                printLine("The lamp is off.");
+            }
+        }
+        return RTRUE;
+    }
+    
+    return RFALSE;
+}
+
+// Rope action - used for climbing and tying
+bool ropeAction() {
+    auto& g = Globals::instance();
+    
+    if (g.prsa == V_EXAMINE && g.prso && g.prso->getId() == ObjectIds::ROPE) {
+        printLine("The rope is a large coil of strong rope, suitable for climbing or tying.");
+        return RTRUE;
+    }
+    
+    // Rope can be used for climbing in specific locations (handled by room actions)
+    // Rope can be tied to objects (handled by TIE verb)
+    // These behaviors are location/context-specific and handled elsewhere
+    
+    return RFALSE;
+}
+
+// Wrench action - used for specific puzzles with bolts
+bool wrenchAction() {
+    auto& g = Globals::instance();
+    
+    if (g.prsa == V_EXAMINE && g.prso && g.prso->getId() == ObjectIds::WRENCH) {
+        printLine("The wrench is a heavy metal tool, suitable for turning bolts and nuts.");
+        return RTRUE;
+    }
+    
+    // Wrench is used for specific puzzles (handled by object/room actions)
+    
+    return RFALSE;
+}
+
+// Screwdriver action - used for specific puzzles with screws
+bool screwdriverAction() {
+    auto& g = Globals::instance();
+    
+    if (g.prsa == V_EXAMINE && g.prso && g.prso->getId() == ObjectIds::SCREWDRIVER) {
+        printLine("The screwdriver is a metal tool with a flat blade, suitable for turning screws.");
+        return RTRUE;
+    }
+    
+    // Screwdriver is used for specific puzzles (handled by object/room actions)
+    
+    return RFALSE;
+}
+
+// Shovel action - used for digging
+bool shovelAction() {
+    auto& g = Globals::instance();
+    
+    if (g.prsa == V_EXAMINE && g.prso && g.prso->getId() == ObjectIds::SHOVEL) {
+        printLine("The shovel is a sturdy digging tool.");
+        return RTRUE;
+    }
+    
+    // Shovel is used for digging (handled by DIG verb and room actions)
+    
+    return RFALSE;
+}
+
+// Torch action - temporary light source that burns down
+bool torchAction() {
+    auto& g = Globals::instance();
+    
+    if (g.prsa == V_LAMP_ON && g.prso && g.prso->getId() == ObjectIds::TORCH) {
+        // Check if torch is already on
+        if (g.prso->hasFlag(ObjectFlag::ONBIT)) {
+            printLine("The torch is already burning.");
+            return RTRUE;
+        }
+        
+        // Check if torch has fuel (property P_STRENGTH tracks remaining fuel)
+        int fuel = g.prso->getProperty(P_STRENGTH);
+        if (fuel <= 0) {
+            printLine("The torch is too wet to light.");
+            return RTRUE;
+        }
+        
+        // Light the torch
+        g.prso->setFlag(ObjectFlag::ONBIT);
+        printLine("The torch is now burning.");
+        return RTRUE;
+    }
+    
+    if (g.prsa == V_LAMP_OFF && g.prso && g.prso->getId() == ObjectIds::TORCH) {
+        // Check if torch is already off
+        if (!g.prso->hasFlag(ObjectFlag::ONBIT)) {
+            printLine("The torch is not burning.");
+            return RTRUE;
+        }
+        
+        // Extinguish the torch
+        g.prso->clearFlag(ObjectFlag::ONBIT);
+        printLine("The torch is now out.");
+        return RTRUE;
+    }
+    
+    if (g.prsa == V_EXAMINE && g.prso && g.prso->getId() == ObjectIds::TORCH) {
+        int fuel = g.prso->getProperty(P_STRENGTH);
+        if (g.prso->hasFlag(ObjectFlag::ONBIT)) {
+            if (fuel <= 5) {
+                printLine("The torch is burning, but it's almost burned out.");
+            } else {
+                printLine("The torch is burning brightly.");
+            }
+        } else {
+            if (fuel <= 0) {
+                printLine("The torch is too wet to light.");
+            } else {
+                printLine("The torch is not burning.");
+            }
+        }
+        return RTRUE;
+    }
+    
+    return RFALSE;
+}
+
+// Candles action - temporary light source that burns down
+bool candlesAction() {
+    auto& g = Globals::instance();
+    
+    if (g.prsa == V_LAMP_ON && g.prso && g.prso->getId() == ObjectIds::CANDLES) {
+        // Check if candles are already lit
+        if (g.prso->hasFlag(ObjectFlag::ONBIT)) {
+            printLine("The candles are already lit.");
+            return RTRUE;
+        }
+        
+        // Check if candles have wax (property P_STRENGTH tracks remaining wax)
+        int wax = g.prso->getProperty(P_STRENGTH);
+        if (wax <= 0) {
+            printLine("The candles are burned down to nothing.");
+            return RTRUE;
+        }
+        
+        // Light the candles
+        g.prso->setFlag(ObjectFlag::ONBIT);
+        printLine("The candles are now lit.");
+        return RTRUE;
+    }
+    
+    if (g.prsa == V_LAMP_OFF && g.prso && g.prso->getId() == ObjectIds::CANDLES) {
+        // Check if candles are already out
+        if (!g.prso->hasFlag(ObjectFlag::ONBIT)) {
+            printLine("The candles are not lit.");
+            return RTRUE;
+        }
+        
+        // Extinguish the candles
+        g.prso->clearFlag(ObjectFlag::ONBIT);
+        printLine("The candles are now out.");
+        return RTRUE;
+    }
+    
+    if (g.prsa == V_EXAMINE && g.prso && g.prso->getId() == ObjectIds::CANDLES) {
+        int wax = g.prso->getProperty(P_STRENGTH);
+        if (g.prso->hasFlag(ObjectFlag::ONBIT)) {
+            if (wax <= 5) {
+                printLine("The candles are lit, but they're almost burned down.");
+            } else {
+                printLine("The candles are lit and burning brightly.");
+            }
+        } else {
+            if (wax <= 0) {
+                printLine("The candles are burned down to nothing.");
+            } else {
+                printLine("The candles are not lit.");
+            }
+        }
+        return RTRUE;
+    }
+    
+    return RFALSE;
+}
+
+// Matches action - one-time use light source
+bool matchesAction() {
+    auto& g = Globals::instance();
+    
+    if (g.prsa == V_LAMP_ON && g.prso && g.prso->getId() == ObjectIds::MATCH) {
+        // Check if matches have been used
+        if (g.prso->hasFlag(ObjectFlag::ONBIT)) {
+            printLine("The matches have already been used.");
+            return RTRUE;
+        }
+        
+        // Check if matches are still available
+        int count = g.prso->getProperty(P_STRENGTH);
+        if (count <= 0) {
+            printLine("There are no matches left.");
+            return RTRUE;
+        }
+        
+        // Use a match
+        g.prso->setProperty(P_STRENGTH, count - 1);
+        if (count - 1 <= 0) {
+            g.prso->setFlag(ObjectFlag::ONBIT);  // Mark as used up
+            printLine("You light a match. It burns brightly for a moment, then goes out. You have no more matches.");
+        } else {
+            printLine("You light a match. It burns brightly for a moment, then goes out.");
+        }
+        return RTRUE;
+    }
+    
+    if (g.prsa == V_EXAMINE && g.prso && g.prso->getId() == ObjectIds::MATCH) {
+        int count = g.prso->getProperty(P_STRENGTH);
+        if (count <= 0) {
+            printLine("There are no matches left.");
+        } else {
+            printLine("You have " + std::to_string(count) + " match" + (count != 1 ? "es" : "") + " left.");
+        }
+        return RTRUE;
+    }
+    
+    return RFALSE;
+}
+
 void initializeWorld() {
     auto& g = Globals::instance();
     
@@ -2736,6 +3033,8 @@ void initializeWorld() {
     torch->setProperty(P_VALUE, 6);
     torch->setProperty(P_TVALUE, 14);
     torch->setProperty(P_SIZE, 8);
+    torch->setProperty(P_STRENGTH, 30);  // Fuel remaining (0-30)
+    torch->setAction(torchAction);
     torch->moveTo(g.getObject(RoomIds::NORTH_TEMPLE));
     g.registerObject(ObjectIds::TORCH, std::move(torch));
     
@@ -2796,7 +3095,7 @@ void initializeWorld() {
     sword->setFlag(ObjectFlag::TAKEBIT);
     sword->setFlag(ObjectFlag::WEAPONBIT);
     sword->setProperty(P_SIZE, 30);
-    // TODO: Add action handler for glowing near enemies
+    sword->setAction(swordAction);
     sword->moveTo(g.getObject(RoomIds::LIVING_ROOM));
     g.registerObject(ObjectIds::SWORD, std::move(sword));
     
@@ -2824,7 +3123,8 @@ void initializeWorld() {
     lamp->setFlag(ObjectFlag::LIGHTBIT);
     // Lamp starts off - player must turn it on
     lamp->setProperty(P_SIZE, 15);
-    // TODO: Add battery timer and action handler
+    lamp->setProperty(P_STRENGTH, 100);  // Battery level (0-100)
+    lamp->setAction(lampAction);
     lamp->moveTo(g.getObject(RoomIds::LIVING_ROOM));
     g.registerObject(ObjectIds::LAMP, std::move(lamp));
     
@@ -2840,7 +3140,8 @@ void initializeWorld() {
     candles->setFlag(ObjectFlag::ONBIT);  // Candles start lit
     candles->setFlag(ObjectFlag::FLAMEBIT);
     candles->setProperty(P_SIZE, 10);
-    // TODO: Add burn-down timer
+    candles->setProperty(P_STRENGTH, 50);  // Wax remaining (0-50)
+    candles->setAction(candlesAction);
     candles->moveTo(g.getObject(RoomIds::SOUTH_TEMPLE));
     g.registerObject(ObjectIds::CANDLES, std::move(candles));
     
@@ -2852,7 +3153,8 @@ void initializeWorld() {
     match->addAdjective("match");
     match->setFlag(ObjectFlag::TAKEBIT);
     match->setProperty(P_SIZE, 2);
-    // TODO: Add action handler for lighting
+    match->setProperty(P_STRENGTH, 5);  // Number of matches remaining
+    match->setAction(matchesAction);
     match->moveTo(g.getObject(RoomIds::DAM_LOBBY));
     g.registerObject(ObjectIds::MATCH, std::move(match));
     
@@ -2865,7 +3167,7 @@ void initializeWorld() {
     rope->addAdjective("thick");
     rope->setFlag(ObjectFlag::TAKEBIT);
     rope->setProperty(P_SIZE, 10);
-    // TODO: Add action handler for tying and climbing
+    rope->setAction(ropeAction);
     rope->moveTo(g.getObject(RoomIds::ATTIC));
     g.registerObject(ObjectIds::ROPE, std::move(rope));
     
@@ -2877,6 +3179,7 @@ void initializeWorld() {
     wrench->setFlag(ObjectFlag::TAKEBIT);
     wrench->setFlag(ObjectFlag::TOOLBIT);
     wrench->setProperty(P_SIZE, 10);
+    wrench->setAction(wrenchAction);
     wrench->moveTo(g.getObject(RoomIds::MAINTENANCE_ROOM));
     g.registerObject(ObjectIds::WRENCH, std::move(wrench));
     
@@ -2889,6 +3192,7 @@ void initializeWorld() {
     screwdriver->setFlag(ObjectFlag::TAKEBIT);
     screwdriver->setFlag(ObjectFlag::TOOLBIT);
     screwdriver->setProperty(P_SIZE, 8);
+    screwdriver->setAction(screwdriverAction);
     screwdriver->moveTo(g.getObject(RoomIds::MAINTENANCE_ROOM));
     g.registerObject(ObjectIds::SCREWDRIVER, std::move(screwdriver));
     
@@ -2900,6 +3204,7 @@ void initializeWorld() {
     shovel->setFlag(ObjectFlag::TAKEBIT);
     shovel->setFlag(ObjectFlag::TOOLBIT);
     shovel->setProperty(P_SIZE, 15);
+    shovel->setAction(shovelAction);
     shovel->moveTo(g.getObject(RoomIds::SANDY_BEACH));
     g.registerObject(ObjectIds::SHOVEL, std::move(shovel));
     
