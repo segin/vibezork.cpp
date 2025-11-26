@@ -28,6 +28,14 @@ Parser::Parser() : verbRegistry_(nullptr) {
     verbSynonyms_["quit"] = V_QUIT;
     verbSynonyms_["q"] = V_QUIT;
     
+    // Meta-game verbs
+    verbSynonyms_["score"] = V_SCORE;
+    verbSynonyms_["diagnose"] = V_DIAGNOSE;
+    verbSynonyms_["verbose"] = V_VERBOSE;
+    verbSynonyms_["brief"] = V_BRIEF;
+    verbSynonyms_["superbrief"] = V_SUPERBRIEF;
+    verbSynonyms_["super"] = V_SUPERBRIEF;
+    
     // Directions
     directions_["north"] = Direction::NORTH;
     directions_["n"] = Direction::NORTH;
@@ -104,6 +112,14 @@ Parser::Parser(VerbRegistry* registry) : verbRegistry_(registry) {
     verbSynonyms_["kill"] = V_KILL;
     verbSynonyms_["quit"] = V_QUIT;
     verbSynonyms_["q"] = V_QUIT;
+    
+    // Meta-game verbs
+    verbSynonyms_["score"] = V_SCORE;
+    verbSynonyms_["diagnose"] = V_DIAGNOSE;
+    verbSynonyms_["verbose"] = V_VERBOSE;
+    verbSynonyms_["brief"] = V_BRIEF;
+    verbSynonyms_["superbrief"] = V_SUPERBRIEF;
+    verbSynonyms_["super"] = V_SUPERBRIEF;
     
     // Directions
     directions_["north"] = Direction::NORTH;
