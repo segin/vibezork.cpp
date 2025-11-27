@@ -85,6 +85,12 @@ constexpr VerbId V_BURN = 117;
 constexpr VerbId V_DIG = 118;
 constexpr VerbId V_FILL = 119;
 
+// Communication
+constexpr VerbId V_TALK = 120;
+constexpr VerbId V_ASK = 121;
+constexpr VerbId V_TELL = 122;
+constexpr VerbId V_ODYSSEUS = 123;  // Special verb for cyclops puzzle
+
 // Verb handlers
 namespace Verbs {
     bool vLook();
@@ -160,6 +166,12 @@ namespace Verbs {
     bool vRestore();
     bool vRestart();
     bool vVersion();
+    
+    // Communication verbs
+    bool vTalk();
+    bool vAsk();
+    bool vTell();
+    bool vOdysseus();
     
     // Helper for special movement
     bool trySpecialMovement(int verbId, Direction dir);

@@ -2405,12 +2405,49 @@ void initializeWorld() {
     cyclopsRoom->setFlag(ObjectFlag::RLANDBIT);
     cyclopsRoom->setRoomAction([](int rarg) {
         if (rarg == M_LOOK) {
-            printLine("This is a large room with a ceiling which cannot be detected from the ground. There is a narrow passage from east to west and a stone stairway leading upward. The room is eerie in its quietness.");
+            printLine("This room has an exit on the northwest, and a staircase leading up.");
+            
+            // Show cyclops state
+            auto& cyclopsState = NPCSystem::getCyclopsState();
+            if (cyclopsState.isAsleep && !cyclopsState.hasFled) {
+                printLine("The cyclops is sleeping blissfully at the foot of the stairs.");
+            } else if (cyclopsState.hasFled) {
+                printLine("The east wall, previously solid, now has a cyclops-sized opening in it.");
+            } else if (cyclopsState.wrathLevel == 0) {
+                printLine("A cyclops, who looks prepared to eat horses (much less mere adventurers), blocks the staircase. From his state of health, and the bloodstains on the walls, you gather that he is not very friendly, though he likes people.");
+            } else if (cyclopsState.wrathLevel > 0) {
+                printLine("The cyclops is standing in the corner, eyeing you closely. I don't think he likes you very much. He looks extremely hungry, even for a cyclops.");
+            } else {
+                // Negative wrath = thirsty after eating peppers
+                printLine("The cyclops, having eaten the hot peppers, appears to be gasping. His enflamed tongue protrudes from his man-sized mouth.");
+            }
+        } else if (rarg == M_ENTER) {
+            // Enable cyclops timer when player enters
+            auto& cyclopsState = NPCSystem::getCyclopsState();
+            if (cyclopsState.wrathLevel != 0) {
+                // Cyclops is agitated - timer is active
+            }
         }
     });
-    cyclopsRoom->setExit(Direction::EAST, RoomExit(RoomIds::STRANGE_PASSAGE));
-    cyclopsRoom->setExit(Direction::UP, RoomExit(RoomIds::TREASURE_ROOM));
-    // Note: UP exit will be conditional on cyclops being defeated/fed
+    cyclopsRoom->setExit(Direction::WEST, RoomExit(RoomIds::STRANGE_PASSAGE));
+    // UP exit is conditional - blocked by cyclops unless asleep or fled
+    cyclopsRoom->setExit(Direction::UP, RoomExit::createConditional(
+        RoomIds::TREASURE_ROOM,
+        []() {
+            auto& cyclopsState = NPCSystem::getCyclopsState();
+            return cyclopsState.isAsleep || cyclopsState.hasFled;
+        },
+        "The cyclops blocks your way."
+    ));
+    // EAST exit only available after cyclops flees (creates hole in wall)
+    cyclopsRoom->setExit(Direction::EAST, RoomExit::createConditional(
+        RoomIds::STRANGE_PASSAGE,
+        []() {
+            auto& cyclopsState = NPCSystem::getCyclopsState();
+            return cyclopsState.hasFled;
+        },
+        "There is no exit in that direction."
+    ));
     g.registerObject(RoomIds::CYCLOPS_ROOM, std::move(cyclopsRoom));
     
     // Create Strange Passage
@@ -3696,10 +3733,12 @@ void initializeWorld() {
     auto cyclops = std::make_unique<ZObject>(ObjectIds::CYCLOPS, "cyclops");
     cyclops->addSynonym("cyclops");
     cyclops->addSynonym("giant");
+    cyclops->addSynonym("monster");
+    cyclops->addSynonym("creature");
     cyclops->setFlag(ObjectFlag::FIGHTBIT);    // Initially hostile
     cyclops->setFlag(ObjectFlag::ACTORBIT);    // Is an actor/NPC
     cyclops->setProperty(P_STRENGTH, 10);      // Very strong
-    // TODO: Add action handler for cyclops behavior (blocking, hunger, eating)
+    cyclops->setAction(NPCSystem::cyclopsAction);  // Action handler for cyclops behavior
     // Located at Cyclops Room initially
     cyclops->moveTo(g.getObject(RoomIds::CYCLOPS_ROOM));
     g.registerObject(ObjectIds::CYCLOPS, std::move(cyclops));

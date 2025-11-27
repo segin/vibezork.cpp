@@ -137,4 +137,68 @@ ZObject* getTrollAxe();
 // Troll action handler - called when player interacts with troll
 bool trollAction();
 
+// ============================================================================
+// CYCLOPS SYSTEM
+// Based on CYCLOPS-FCN and I-CYCLOPS from 1actions.zil
+// ============================================================================
+
+// Cyclops state tracking
+struct CyclopsState {
+    bool isAsleep = false;         // Is cyclops asleep (fed water after peppers)?
+    bool hasFled = false;          // Has cyclops fled (said Odysseus)?
+    bool hasEatenPeppers = false;  // Has cyclops eaten the hot peppers?
+    int wrathLevel = 0;            // Cyclops anger level (-5 to 5, negative = thirsty)
+    int turnsInRoom = 0;           // Turns player has been in cyclops room
+};
+
+// Get the global cyclops state
+CyclopsState& getCyclopsState();
+
+// Initialize cyclops system - call during world initialization
+void initializeCyclops();
+
+// Process cyclops actions - call each turn from main loop
+// Returns true if cyclops did something visible to player
+bool processCyclopsTurn();
+
+// Cyclops blocking behavior
+// Prevents player from going up stairs until cyclops is dealt with
+// Returns true if cyclops blocks the player
+bool cyclopsBlocks(Direction dir);
+
+// Cyclops hunger behavior
+// Cyclops is hungry and will accept food
+// Returns true if cyclops accepts the food
+bool cyclopsAcceptsFood(ZObject* food);
+
+// Cyclops eating behavior
+// Called when player gives food to cyclops
+// Returns true if cyclops ate the food
+bool cyclopsEat(ZObject* food);
+
+// Cyclops leaving behavior
+// Called when player says "Odysseus" or "Ulysses"
+// Returns true if cyclops fled
+bool cyclopsFlee();
+
+// Cyclops combat behavior
+// Called when player attacks cyclops
+// Returns true if combat occurred
+bool cyclopsCombat();
+
+// Check if cyclops is in same room as player
+bool isCyclopsWithPlayer();
+
+// Check if cyclops is active (not asleep, not fled)
+bool isCyclopsActive();
+
+// Get cyclops object
+ZObject* getCyclops();
+
+// Cyclops action handler - called when player interacts with cyclops
+bool cyclopsAction();
+
+// Handle the ODYSSEUS/ULYSSES verb
+bool handleOdysseus();
+
 } // namespace NPCSystem

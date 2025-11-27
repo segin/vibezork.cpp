@@ -95,6 +95,12 @@ void VerbRegistry::initializeVerbSynonyms() {
     registerVerb(V_BURN, {"burn", "incinerate", "ignite"});
     registerVerb(V_DIG, {"dig"});
     registerVerb(V_FILL, {"fill"});
+    
+    // Communication verbs
+    registerVerb(V_TALK, {"talk", "speak", "say"});
+    registerVerb(V_ASK, {"ask"});
+    registerVerb(V_TELL, {"tell"});
+    registerVerb(V_ODYSSEUS, {"odysseus", "ulysses"});  // Special verb for cyclops puzzle
 }
 
 void VerbRegistry::registerVerb(VerbId verbId, std::vector<std::string> synonyms) {

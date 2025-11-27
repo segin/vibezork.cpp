@@ -62,7 +62,11 @@ std::map<VerbId, std::function<bool()>> verbHandlers = {
     {V_SAVE, Verbs::vSave},
     {V_RESTORE, Verbs::vRestore},
     {V_RESTART, Verbs::vRestart},
-    {V_VERSION, Verbs::vVersion}
+    {V_VERSION, Verbs::vVersion},
+    {V_TALK, Verbs::vTalk},
+    {V_ASK, Verbs::vAsk},
+    {V_TELL, Verbs::vTell},
+    {V_ODYSSEUS, Verbs::vOdysseus}
 };
 
 // Global parser instance to maintain state across turns
@@ -152,6 +156,7 @@ void mainLoop1() {
     // Process NPC actions (thief wandering, stealing, etc.)
     NPCSystem::processThiefTurn();
     NPCSystem::processTrollTurn();
+    NPCSystem::processCyclopsTurn();
 }
 
 void mainLoop() {
@@ -170,6 +175,7 @@ void initializeGame() {
     initializeWorld();
     NPCSystem::initializeThief();
     NPCSystem::initializeTroll();
+    NPCSystem::initializeCyclops();
 }
 
 void go() {

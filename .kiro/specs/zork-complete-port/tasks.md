@@ -1457,30 +1457,30 @@ Implement object-specific and room-specific behaviors.
   - Troll drops axe
   - _Requirements: 40_
 
-- [ ] 44. Implement cyclops NPC actions
+- [x] 44. Implement cyclops NPC actions
   - Implement cyclops blocking behavior
   - Implement cyclops hunger behavior
   - Implement cyclops eating behavior
   - Implement cyclops leaving behavior
   - _Requirements: 41_
 
-- [ ] 44.1 Implement cyclops blocking
+- [x] 44.1 Implement cyclops blocking
   - Cyclops blocks passage
   - Initially hostile
   - _Requirements: 41_
 
-- [ ] 44.2 Implement cyclops hunger
+- [x] 44.2 Implement cyclops hunger
   - Cyclops is hungry
   - Accepts food offerings
   - _Requirements: 41_
 
-- [ ] 44.3 Implement cyclops eating
+- [x] 44.3 Implement cyclops eating
   - Cyclops eats offered food
   - Becomes non-hostile when fed
   - Leaves the area
   - _Requirements: 41_
 
-- [ ] 44.4 Implement cyclops combat
+- [x] 44.4 Implement cyclops combat
   - Can be fought if not fed
   - Very strong opponent
   - _Requirements: 41, 55_

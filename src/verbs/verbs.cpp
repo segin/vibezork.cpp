@@ -4,6 +4,7 @@
 #include "world/rooms.h"
 #include "world/objects.h"
 #include "world/world.h"
+#include "systems/npc.h"
 #include <fstream>
 #include <sstream>
 
@@ -2073,6 +2074,89 @@ bool vVersion() {
     printLine("Interpreter: C++17 Native");
     
     return RTRUE;
+}
+
+// Communication Verbs
+
+bool vTalk() {
+    auto& g = Globals::instance();
+    
+    // Check if target is specified
+    if (!g.prso) {
+        printLine("Talk to whom?");
+        return RTRUE;
+    }
+    
+    // Check if target is an actor/NPC
+    if (!g.prso->hasFlag(ObjectFlag::ACTORBIT)) {
+        printLine("You can't talk to that.");
+        return RTRUE;
+    }
+    
+    // Call object action handler for custom responses
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Default response
+    printLine("There is no response.");
+    return RTRUE;
+}
+
+bool vAsk() {
+    auto& g = Globals::instance();
+    
+    // Check if target is specified
+    if (!g.prso) {
+        printLine("Ask whom?");
+        return RTRUE;
+    }
+    
+    // Check if target is an actor/NPC
+    if (!g.prso->hasFlag(ObjectFlag::ACTORBIT)) {
+        printLine("You can't ask that.");
+        return RTRUE;
+    }
+    
+    // Call object action handler for custom responses
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Default response
+    printLine("There is no response.");
+    return RTRUE;
+}
+
+bool vTell() {
+    auto& g = Globals::instance();
+    
+    // Check if target is specified
+    if (!g.prso) {
+        printLine("Tell whom?");
+        return RTRUE;
+    }
+    
+    // Check if target is an actor/NPC
+    if (!g.prso->hasFlag(ObjectFlag::ACTORBIT)) {
+        printLine("You can't tell that anything.");
+        return RTRUE;
+    }
+    
+    // Call object action handler for custom responses
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Default response
+    printLine("There is no response.");
+    return RTRUE;
+}
+
+bool vOdysseus() {
+    // Special verb for the cyclops puzzle
+    // This is called when player types "odysseus" or "ulysses"
+    return NPCSystem::handleOdysseus() ? RTRUE : RFALSE;
 }
 
 } // namespace Verbs

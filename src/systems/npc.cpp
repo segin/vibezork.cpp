@@ -819,4 +819,438 @@ bool trollAction() {
     return false;
 }
 
+// ============================================================================
+// CYCLOPS SYSTEM IMPLEMENTATION
+// Based on CYCLOPS-FCN and I-CYCLOPS from 1actions.zil
+// ============================================================================
+
+// Global cyclops state
+static CyclopsState cyclopsState;
+
+// Cyclops anger messages (from CYCLOMAD table in ZIL)
+static const std::vector<std::string> cyclopsAngerMessages = {
+    "The cyclops seems somewhat agitated.",
+    "The cyclops appears to be getting more agitated.",
+    "The cyclops is moving about the room, looking for something.",
+    "The cyclops was looking for salt and pepper. No doubt they are condiments for his upcoming snack."
+};
+
+CyclopsState& getCyclopsState() {
+    return cyclopsState;
+}
+
+ZObject* getCyclops() {
+    return Globals::instance().getObject(ObjectIds::CYCLOPS);
+}
+
+void initializeCyclops() {
+    cyclopsState = CyclopsState();
+    cyclopsState.isAsleep = false;
+    cyclopsState.hasFled = false;
+    cyclopsState.hasEatenPeppers = false;
+    cyclopsState.wrathLevel = 0;
+    cyclopsState.turnsInRoom = 0;
+}
+
+bool isCyclopsWithPlayer() {
+    auto& g = Globals::instance();
+    ZObject* cyclops = getCyclops();
+    if (!cyclops || !g.here) return false;
+    
+    return cyclops->getLocation() == g.here;
+}
+
+bool isCyclopsActive() {
+    ZObject* cyclops = getCyclops();
+    if (!cyclops) return false;
+    
+    // Cyclops is active if not asleep and not fled
+    return !cyclopsState.isAsleep && !cyclopsState.hasFled;
+}
+
+bool cyclopsBlocks(Direction dir) {
+    auto& g = Globals::instance();
+    
+    // Check if cyclops is active and in the same room
+    if (!isCyclopsWithPlayer() || !isCyclopsActive()) {
+        return false;
+    }
+    
+    // Cyclops only blocks in the Cyclops Room
+    if (!g.here || g.here->getId() != RoomIds::CYCLOPS_ROOM) {
+        return false;
+    }
+    
+    // Cyclops blocks the UP exit (stairs to treasure room)
+    if (dir == Direction::UP) {
+        if (cyclopsState.wrathLevel == 0) {
+            printLine("A cyclops, who looks prepared to eat horses (much less mere adventurers), blocks the staircase.");
+        } else if (cyclopsState.wrathLevel > 0) {
+            printLine("The cyclops is standing in the corner, eyeing you closely. He doesn't look like he'll let you pass.");
+        } else {
+            // Negative wrath = thirsty after eating peppers
+            printLine("The cyclops, gasping from the hot peppers, still blocks your way up the stairs.");
+        }
+        return true;
+    }
+    
+    return false;
+}
+
+bool cyclopsAcceptsFood(ZObject* food) {
+    if (!food) return false;
+    
+    // Cyclops accepts the lunch (hot pepper sandwich)
+    if (food->getId() == ObjectIds::LUNCH) {
+        return true;
+    }
+    
+    // Cyclops accepts water (or bottle with water)
+    if (food->getId() == ObjectIds::WATER) {
+        return true;
+    }
+    if (food->getId() == ObjectIds::BOTTLE) {
+        // Check if bottle contains water
+        auto& g = Globals::instance();
+        ZObject* water = g.getObject(ObjectIds::WATER);
+        if (water && water->getLocation() == food) {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+bool cyclopsEat(ZObject* food) {
+    auto& g = Globals::instance();
+    ZObject* cyclops = getCyclops();
+    
+    if (!cyclops || !food || !isCyclopsWithPlayer() || !isCyclopsActive()) {
+        return false;
+    }
+    
+    // Handle hot pepper sandwich (lunch)
+    if (food->getId() == ObjectIds::LUNCH) {
+        // Only accept if not already thirsty (wrath >= 0)
+        if (cyclopsState.wrathLevel >= 0) {
+            // Remove the lunch
+            food->moveTo(nullptr);
+            
+            printLine("The cyclops says \"Mmm Mmm. I love hot peppers! But oh, could I use a drink. Perhaps I could drink the blood of that thing.\" From the gleam in his eye, it could be surmised that you are \"that thing\".");
+            
+            // Set wrath to negative (thirsty state)
+            cyclopsState.wrathLevel = -1;
+            cyclopsState.hasEatenPeppers = true;
+            
+            return true;
+        }
+        return false;
+    }
+    
+    // Handle water
+    if (food->getId() == ObjectIds::WATER || food->getId() == ObjectIds::BOTTLE) {
+        // Only accept water if cyclops has eaten peppers (wrath < 0)
+        if (cyclopsState.wrathLevel < 0) {
+            // Remove the water
+            ZObject* water = g.getObject(ObjectIds::WATER);
+            if (water) {
+                water->moveTo(nullptr);
+            }
+            
+            // If bottle was given, drop it in room and open it
+            if (food->getId() == ObjectIds::BOTTLE) {
+                food->moveTo(g.here);
+                food->setFlag(ObjectFlag::OPENBIT);
+            }
+            
+            // Cyclops falls asleep
+            cyclopsState.isAsleep = true;
+            cyclops->clearFlag(ObjectFlag::FIGHTBIT);
+            
+            printLine("The cyclops takes the bottle, checks that it's open, and drinks the water. A moment later, he lets out a yawn that nearly blows you over, and then falls fast asleep (what did you put in that drink, anyway?).");
+            
+            return true;
+        } else {
+            printLine("The cyclops apparently is not thirsty and refuses your generous offer.");
+            return true;
+        }
+    }
+    
+    // Handle garlic - cyclops refuses
+    if (food->getId() == ObjectIds::GARLIC) {
+        printLine("The cyclops may be hungry, but there is a limit.");
+        return true;
+    }
+    
+    // Cyclops refuses other food
+    printLine("The cyclops is not so stupid as to eat THAT!");
+    return true;
+}
+
+bool cyclopsFlee() {
+    auto& g = Globals::instance();
+    ZObject* cyclops = getCyclops();
+    
+    if (!cyclops || !isCyclopsWithPlayer()) {
+        return false;
+    }
+    
+    // Only works if cyclops is not asleep
+    if (cyclopsState.isAsleep) {
+        printLine("The cyclops is fast asleep and doesn't hear you.");
+        return true;
+    }
+    
+    // Cyclops flees when hearing Odysseus/Ulysses
+    cyclopsState.hasFled = true;
+    cyclops->clearFlag(ObjectFlag::FIGHTBIT);
+    cyclops->moveTo(nullptr);  // Remove from game
+    
+    printLine("The cyclops, hearing the name of his father's deadly nemesis, flees the room by knocking down the wall on the east of the room.");
+    
+    // This opens a passage to the east (Strange Passage)
+    // The room action will handle showing the new exit
+    
+    return true;
+}
+
+bool cyclopsCombat() {
+    auto& g = Globals::instance();
+    ZObject* cyclops = getCyclops();
+    
+    if (!cyclops || !isCyclopsWithPlayer()) return false;
+    
+    // Can't attack sleeping cyclops without waking it
+    if (cyclopsState.isAsleep) {
+        printLine("The cyclops yawns and stares at the thing that woke him up.");
+        cyclopsState.isAsleep = false;
+        cyclops->setFlag(ObjectFlag::FIGHTBIT);
+        // Reset wrath based on previous state
+        if (cyclopsState.wrathLevel < 0) {
+            cyclopsState.wrathLevel = -cyclopsState.wrathLevel;
+        }
+        return true;
+    }
+    
+    // Check if player is attacking cyclops
+    if (g.prsa == V_ATTACK || g.prsa == V_KILL) {
+        if (g.prso == cyclops) {
+            // Check if player has a weapon
+            ZObject* weapon = g.prsi;
+            if (!weapon) {
+                // Look for weapon in inventory
+                for (auto* obj : g.winner->getContents()) {
+                    if (obj->hasFlag(ObjectFlag::WEAPONBIT)) {
+                        weapon = obj;
+                        break;
+                    }
+                }
+            }
+            
+            if (!weapon) {
+                printLine("The cyclops laughs at your puny attempt to hurt him with your bare hands.");
+                // Increase wrath
+                if (cyclopsState.wrathLevel >= 0) {
+                    cyclopsState.wrathLevel++;
+                } else {
+                    cyclopsState.wrathLevel--;
+                }
+                return true;
+            }
+            
+            // Cyclops is very strong - attacks mostly fail
+            int roll = randomRange(1, 100);
+            
+            if (roll <= 10) {
+                // Very rare hit
+                printLine("You manage to wound the cyclops slightly, but it only makes him angrier!");
+                if (cyclopsState.wrathLevel >= 0) {
+                    cyclopsState.wrathLevel += 2;
+                } else {
+                    cyclopsState.wrathLevel -= 2;
+                }
+            } else {
+                // Miss - cyclops dodges or shrugs it off
+                printLine("The cyclops shrugs but otherwise ignores your pitiful attempt.");
+                if (cyclopsState.wrathLevel >= 0) {
+                    cyclopsState.wrathLevel++;
+                } else {
+                    cyclopsState.wrathLevel--;
+                }
+            }
+            
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+bool processCyclopsTurn() {
+    auto& g = Globals::instance();
+    
+    // Check if player is in cyclops room
+    if (!g.here || g.here->getId() != RoomIds::CYCLOPS_ROOM) {
+        cyclopsState.turnsInRoom = 0;
+        return false;
+    }
+    
+    ZObject* cyclops = getCyclops();
+    if (!cyclops || cyclopsState.hasFled) return false;
+    
+    // If cyclops is asleep, nothing happens
+    if (cyclopsState.isAsleep) {
+        return false;
+    }
+    
+    // Track turns in room
+    cyclopsState.turnsInRoom++;
+    
+    // Check if cyclops should attack (wrath level too high)
+    int absWrath = cyclopsState.wrathLevel >= 0 ? cyclopsState.wrathLevel : -cyclopsState.wrathLevel;
+    
+    if (absWrath > 5) {
+        // Cyclops eats the player!
+        printLine("The cyclops, tired of all of your games and trickery, grabs you firmly. As he licks his chops, he says \"Mmm. Just like Mom used to make 'em.\" It's nice to be appreciated.");
+        // This should trigger player death - for now just print the message
+        // TODO: Integrate with death system when implemented
+        return true;
+    }
+    
+    // Show anger messages as wrath increases
+    if (absWrath > 0 && absWrath <= 4) {
+        // Show appropriate anger message
+        int msgIndex = absWrath - 1;
+        if (msgIndex < static_cast<int>(cyclopsAngerMessages.size())) {
+            printLine(cyclopsAngerMessages[msgIndex]);
+            return true;
+        }
+    }
+    
+    // Increase wrath over time if player lingers
+    if (cyclopsState.turnsInRoom > 3 && randomRange(1, 100) <= 30) {
+        if (cyclopsState.wrathLevel >= 0) {
+            cyclopsState.wrathLevel++;
+        } else {
+            cyclopsState.wrathLevel--;
+        }
+    }
+    
+    return false;
+}
+
+bool cyclopsAction() {
+    auto& g = Globals::instance();
+    ZObject* cyclops = getCyclops();
+    
+    if (!cyclops || g.prso != cyclops) return false;
+    
+    // Handle EXAMINE
+    if (g.prsa == V_EXAMINE) {
+        if (cyclopsState.hasFled) {
+            printLine("The cyclops has fled.");
+        } else if (cyclopsState.isAsleep) {
+            printLine("The cyclops is sleeping like a baby, albeit a very ugly one.");
+        } else if (cyclopsState.wrathLevel == 0) {
+            printLine("A hungry cyclops is standing at the foot of the stairs.");
+        } else if (cyclopsState.wrathLevel > 0) {
+            printLine("The cyclops is standing in the corner, eyeing you closely. I don't think he likes you very much. He looks extremely hungry, even for a cyclops.");
+        } else {
+            // Negative wrath = thirsty
+            printLine("The cyclops, having eaten the hot peppers, appears to be gasping. His enflamed tongue protrudes from his man-sized mouth.");
+        }
+        return true;
+    }
+    
+    // Handle ATTACK/KILL
+    if (g.prsa == V_ATTACK || g.prsa == V_KILL) {
+        return cyclopsCombat();
+    }
+    
+    // Handle GIVE
+    if (g.prsa == V_GIVE && g.prsi == cyclops) {
+        return cyclopsEat(g.prso);
+    }
+    
+    // Handle THROW at cyclops
+    if (g.prsa == V_THROW && g.prsi == cyclops) {
+        if (cyclopsState.isAsleep) {
+            printLine("The cyclops yawns and stares at the thing that woke him up.");
+            cyclopsState.isAsleep = false;
+            cyclops->setFlag(ObjectFlag::FIGHTBIT);
+            if (cyclopsState.wrathLevel < 0) {
+                cyclopsState.wrathLevel = -cyclopsState.wrathLevel;
+            }
+        } else {
+            printLine("The cyclops shrugs but otherwise ignores your pitiful attempt.");
+            if (g.prso) g.prso->moveTo(g.here);
+        }
+        // Increase wrath
+        if (cyclopsState.wrathLevel >= 0) {
+            cyclopsState.wrathLevel++;
+        } else {
+            cyclopsState.wrathLevel--;
+        }
+        return true;
+    }
+    
+    // Handle TAKE - can't take the cyclops
+    if (g.prsa == V_TAKE) {
+        printLine("The cyclops doesn't take kindly to being grabbed.");
+        return true;
+    }
+    
+    // Handle TIE
+    if (g.prsa == V_TIE) {
+        printLine("You cannot tie the cyclops, though he is fit to be tied.");
+        return true;
+    }
+    
+    // Handle LISTEN
+    if (g.prsa == V_LISTEN) {
+        if (cyclopsState.isAsleep) {
+            printLine("You hear loud snoring.");
+        } else {
+            printLine("You can hear his stomach rumbling.");
+        }
+        return true;
+    }
+    
+    // Handle talking to cyclops
+    if (g.prsa == V_TALK || g.prsa == V_ASK || g.prsa == V_TELL) {
+        if (cyclopsState.isAsleep) {
+            printLine("No use talking to him. He's fast asleep.");
+        } else {
+            printLine("The cyclops prefers eating to making conversation.");
+        }
+        return true;
+    }
+    
+    return false;
+}
+
+bool handleOdysseus() {
+    auto& g = Globals::instance();
+    
+    // Only works in cyclops room with cyclops present
+    if (!g.here || g.here->getId() != RoomIds::CYCLOPS_ROOM) {
+        printLine("Wasn't he a sailor?");
+        return true;
+    }
+    
+    ZObject* cyclops = getCyclops();
+    if (!cyclops || cyclopsState.hasFled) {
+        printLine("Wasn't he a sailor?");
+        return true;
+    }
+    
+    if (cyclopsState.isAsleep) {
+        printLine("The cyclops is fast asleep and doesn't hear you.");
+        return true;
+    }
+    
+    // Cyclops flees!
+    return cyclopsFlee();
+}
+
 } // namespace NPCSystem
