@@ -2,6 +2,7 @@
 #include "core/globals.h"
 #include "core/io.h"
 #include "verbs/verbs.h"
+#include "systems/npc.h"
 #include <memory>
 
 // Global flag for winning the game
@@ -1099,8 +1100,27 @@ void initializeWorld() {
     
     // Set up exits for Troll Room
     trollRoom->setExit(Direction::SOUTH, RoomExit(RoomIds::CELLAR));
-    trollRoom->setExit(Direction::EAST, RoomExit(RoomIds::EW_PASSAGE));  // Will need troll flag check
-    trollRoom->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_1));  // Will need troll flag check
+    
+    // East and West exits are blocked by troll until he's defeated
+    // Use conditional exits that check if troll is dead
+    trollRoom->setExit(Direction::EAST, RoomExit::createConditional(
+        RoomIds::EW_PASSAGE,
+        []() {
+            ZObject* troll = Globals::instance().getObject(ObjectIds::TROLL);
+            return !troll || troll->hasFlag(ObjectFlag::DEADBIT) || 
+                   !NPCSystem::isTrollActive();
+        },
+        "The troll blocks your way."
+    ));
+    trollRoom->setExit(Direction::WEST, RoomExit::createConditional(
+        RoomIds::MAZE_1,
+        []() {
+            ZObject* troll = Globals::instance().getObject(ObjectIds::TROLL);
+            return !troll || troll->hasFlag(ObjectFlag::DEADBIT) || 
+                   !NPCSystem::isTrollActive();
+        },
+        "The troll blocks your way."
+    ));
     
     g.registerObject(RoomIds::TROLL_ROOM, std::move(trollRoom));
     
@@ -3589,13 +3609,76 @@ void initializeWorld() {
     thief->addSynonym("thief");
     thief->addSynonym("robber");
     thief->addSynonym("burglar");
+    thief->addAdjective("seedy");
+    thief->addAdjective("sinister");
     thief->setFlag(ObjectFlag::FIGHTBIT);    // Hostile NPC
     thief->setFlag(ObjectFlag::ACTORBIT);    // Is an actor/NPC
     thief->setProperty(P_STRENGTH, 5);       // Combat strength
-    // TODO: Add action handler for thief behavior (stealing, combat, wandering)
+    // Thief action handler - handles combat interactions
+    thief->setAction([]() {
+        auto& g = Globals::instance();
+        
+        // Handle EXAMINE
+        if (g.prsa == V_EXAMINE) {
+            auto& state = NPCSystem::getThiefState();
+            if (state.isAlive) {
+                printLine("The thief is a seedy-looking individual with a large bag. He is armed with a stiletto.");
+            } else {
+                printLine("The thief lies dead on the ground.");
+            }
+            return RTRUE;
+        }
+        
+        // Handle ATTACK/KILL - delegate to NPC combat system
+        if (g.prsa == V_ATTACK || g.prsa == V_KILL) {
+            return NPCSystem::thiefCombat() ? RTRUE : RFALSE;
+        }
+        
+        // Handle GIVE - thief takes anything offered
+        if (g.prsa == V_GIVE) {
+            if (g.prsi && g.prsi->getId() == ObjectIds::THIEF) {
+                ZObject* bag = NPCSystem::getThiefBag();
+                if (bag && g.prso) {
+                    g.prso->moveTo(bag);
+                    printLine("The thief takes the " + g.prso->getDesc() + " and places it in his bag.");
+                    return RTRUE;
+                }
+            }
+        }
+        
+        return RFALSE;
+    });
     // Initial location varies - thief wanders. Start in MAZE_1 for now
     thief->moveTo(g.getObject(RoomIds::MAZE_1));
     g.registerObject(ObjectIds::THIEF, std::move(thief));
+    
+    // Create STILETTO (thief's weapon)
+    auto stiletto = std::make_unique<ZObject>(ObjectIds::STILETTO, "stiletto");
+    stiletto->addSynonym("stiletto");
+    stiletto->addSynonym("knife");
+    stiletto->addAdjective("nasty");
+    stiletto->setFlag(ObjectFlag::TAKEBIT);
+    stiletto->setFlag(ObjectFlag::WEAPONBIT);
+    stiletto->setProperty(P_SIZE, 5);
+    stiletto->setProperty(P_STRENGTH, 4);
+    // Stiletto starts with thief (will be dropped when thief dies)
+    stiletto->moveTo(g.getObject(ObjectIds::THIEF));
+    g.registerObject(ObjectIds::STILETTO, std::move(stiletto));
+    
+    // Create TROLL's AXE
+    auto axe = std::make_unique<ZObject>(ObjectIds::AXE, "bloody axe");
+    axe->addSynonym("axe");
+    axe->addAdjective("bloody");
+    axe->addAdjective("troll's");
+    // Axe is not takeable while troll is alive (troll is holding it)
+    // TAKEBIT will be set when troll dies
+    axe->setFlag(ObjectFlag::WEAPONBIT);
+    axe->setProperty(P_SIZE, 15);
+    axe->setProperty(P_STRENGTH, 7);  // Strong weapon
+    // Axe starts with troll (will be dropped when troll dies)
+    // Initially placed in troll room but not takeable
+    axe->moveTo(g.getObject(RoomIds::TROLL_ROOM));
+    g.registerObject(ObjectIds::AXE, std::move(axe));
     
     // Create TROLL NPC
     auto troll = std::make_unique<ZObject>(ObjectIds::TROLL, "troll");
@@ -3603,7 +3686,8 @@ void initializeWorld() {
     troll->setFlag(ObjectFlag::FIGHTBIT);    // Hostile NPC
     troll->setFlag(ObjectFlag::ACTORBIT);    // Is an actor/NPC
     troll->setProperty(P_STRENGTH, 8);       // Stronger than thief
-    // TODO: Add action handler for troll behavior (blocking bridge, combat)
+    // Add action handler for troll behavior (blocking, combat)
+    troll->setAction(NPCSystem::trollAction);
     // Located at Troll Room initially
     troll->moveTo(g.getObject(RoomIds::TROLL_ROOM));
     g.registerObject(ObjectIds::TROLL, std::move(troll));

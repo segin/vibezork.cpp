@@ -3,6 +3,7 @@
 #include "parser/parser.h"
 #include "verbs/verbs.h"
 #include "world/world.h"
+#include "systems/npc.h"
 #include <iostream>
 #include <map>
 
@@ -147,6 +148,10 @@ void mainLoop1() {
     }
     
     g.moves++;
+    
+    // Process NPC actions (thief wandering, stealing, etc.)
+    NPCSystem::processThiefTurn();
+    NPCSystem::processTrollTurn();
 }
 
 void mainLoop() {
@@ -163,6 +168,8 @@ void mainLoop() {
 
 void initializeGame() {
     initializeWorld();
+    NPCSystem::initializeThief();
+    NPCSystem::initializeTroll();
 }
 
 void go() {

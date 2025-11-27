@@ -1396,7 +1396,7 @@ Implement object-specific and room-specific behaviors.
   - Most treasures have default behavior
   - _Requirements: 38_
 
-- [ ] 42. Implement thief NPC actions
+- [x] 42. Implement thief NPC actions
   - Implement thief wandering behavior
   - Implement thief stealing behavior
   - Implement thief combat behavior
@@ -1404,54 +1404,54 @@ Implement object-specific and room-specific behaviors.
   - Implement thief death behavior
   - _Requirements: 39_
 
-- [ ] 42.1 Implement thief wandering
+- [x] 42.1 Implement thief wandering
   - Thief moves randomly through accessible rooms
   - Appears and disappears
   - Triggered by timer
   - _Requirements: 39, 45_
 
-- [ ] 42.2 Implement thief stealing
+- [x] 42.2 Implement thief stealing
   - Thief steals objects from player
   - Takes treasures preferentially
   - Moves stolen items to treasure room
   - _Requirements: 39_
 
-- [ ] 42.3 Implement thief combat
+- [x] 42.3 Implement thief combat
   - Thief fights back when attacked
   - Uses knife as weapon
   - Can flee when wounded
   - _Requirements: 39, 55_
 
-- [ ] 42.4 Implement thief treasure room
+- [x] 42.4 Implement thief treasure room
   - Thief's lair contains stolen items
   - Special behavior in treasure room
   - _Requirements: 39_
 
-- [ ] 42.5 Implement thief death
+- [x] 42.5 Implement thief death
   - Thief drops all stolen items
   - Thief stops wandering
   - Treasure room becomes accessible
   - _Requirements: 39_
 
-- [ ] 43. Implement troll NPC actions
+- [x] 43. Implement troll NPC actions
   - Implement troll blocking behavior
   - Implement troll combat behavior
   - Implement troll death behavior
   - _Requirements: 40_
 
-- [ ] 43.1 Implement troll blocking
+- [x] 43.1 Implement troll blocking
   - Troll blocks passage at bridge
   - Prevents player from crossing
   - Attacks if player tries to pass
   - _Requirements: 40_
 
-- [ ] 43.2 Implement troll combat
+- [x] 43.2 Implement troll combat
   - Troll fights back when attacked
   - Strong opponent
   - Can be killed with sword
   - _Requirements: 40, 55_
 
-- [ ] 43.3 Implement troll death
+- [x] 43.3 Implement troll death
   - Troll vanishes when killed
   - Bridge becomes passable
   - Troll drops axe
