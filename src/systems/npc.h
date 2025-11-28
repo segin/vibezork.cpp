@@ -34,6 +34,9 @@ ThiefState& getThiefState();
 // Initialize thief system - call during world initialization
 void initializeThief();
 
+// Thief timer callback - called by timer system
+void thiefTimerCallback();
+
 // Process thief actions - call each turn from main loop
 // Returns true if thief did something visible to player
 bool processThiefTurn();

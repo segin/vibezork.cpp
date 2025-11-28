@@ -1600,7 +1600,7 @@ Implement the core game systems that tie everything together.
   - Test repeating timers
   - _Requirements: 44, 92_
 
-- [ ] 48. Implement thief timer (I-THIEF)
+- [x] 48. Implement thief timer (I-THIEF)
   - Register thief movement timer
   - Implement thief movement callback
   - Move thief to random accessible room
@@ -1608,26 +1608,26 @@ Implement the core game systems that tie everything together.
   - Implement thief attacks
   - _Requirements: 45_
 
-- [ ] 48.1 Register thief timer
+- [x] 48.1 Register thief timer
   - Set appropriate interval
   - Enable when game starts
   - Disable when thief is dead
   - _Requirements: 45_
 
-- [ ] 48.2 Implement thief movement
+- [x] 48.2 Implement thief movement
   - Choose random accessible room
   - Move thief to that room
   - Display message if player sees thief
   - _Requirements: 45_
 
-- [ ] 48.3 Implement thief stealing
+- [x] 48.3 Implement thief stealing
   - Check if thief is in same room as player
   - Steal random object from player or room
   - Prefer treasures
   - Move stolen item to treasure room
   - _Requirements: 45_
 
-- [ ] 48.4 Implement thief attacks
+- [x] 48.4 Implement thief attacks
   - Occasionally attack player
   - Use combat system
   - _Requirements: 45, 55_

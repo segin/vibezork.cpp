@@ -4,6 +4,7 @@
 #include "verbs/verbs.h"
 #include "world/world.h"
 #include "systems/npc.h"
+#include "systems/timer.h"
 #include <iostream>
 #include <map>
 
@@ -154,8 +155,10 @@ void mainLoop1() {
     
     g.moves++;
     
-    // Process NPC actions (thief wandering, stealing, etc.)
-    NPCSystem::processThiefTurn();
+    // Process all timers (includes thief, troll, cyclops, lamp, etc.)
+    TimerSystem::tick();
+    
+    // Process NPC actions that aren't timer-based
     NPCSystem::processTrollTurn();
     NPCSystem::processCyclopsTurn();
 }

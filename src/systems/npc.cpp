@@ -4,6 +4,7 @@
 #include "verbs/verbs.h"
 #include "world/rooms.h"
 #include "world/objects.h"
+#include "systems/timer.h"
 #include <algorithm>
 #include <random>
 
@@ -156,6 +157,25 @@ void initializeThief() {
     if (bag && thief) {
         bag->moveTo(thief);
     }
+    
+    // Register thief timer (I-THIEF)
+    // Based on original ZIL: fires every 3-5 turns
+    // We'll use an interval of 4 turns as a middle ground
+    TimerSystem::registerTimer("I-THIEF", 4, thiefTimerCallback, true);
+    TimerSystem::enableTimer("I-THIEF");
+}
+
+void thiefTimerCallback() {
+    // This is called by the timer system every N turns
+    // Process thief actions: wandering, stealing, attacking
+    if (!thiefState.isAlive) {
+        // Thief is dead, disable the timer
+        TimerSystem::disableTimer("I-THIEF");
+        return;
+    }
+    
+    // Call the main thief processing function
+    processThiefTurn();
 }
 
 ObjectId getRandomThiefRoom() {
