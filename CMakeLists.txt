@@ -71,4 +71,8 @@ if(BUILD_TESTS)
     # Timer system tests
     add_executable(timer_system_tests tests/timer_system_tests.cpp ${LIB_SOURCES})
     add_test(NAME TimerSystemTests COMMAND timer_system_tests)
+    
+    # Sword glow tests
+    add_executable(sword_glow_tests tests/sword_glow_tests.cpp ${LIB_SOURCES})
+    add_test(NAME SwordGlowTests COMMAND sword_glow_tests)
 endif()
