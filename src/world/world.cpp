@@ -3888,6 +3888,7 @@ void initializeWorld() {
     sword->setFlag(ObjectFlag::TAKEBIT);
     sword->setFlag(ObjectFlag::WEAPONBIT);
     sword->setProperty(P_SIZE, 30);
+    sword->setProperty(P_STRENGTH, 10);  // High weapon effectiveness
     sword->setAction(swordAction);
     sword->moveTo(g.getObject(RoomIds::LIVING_ROOM));
     g.registerObject(ObjectIds::SWORD, std::move(sword));
@@ -3902,6 +3903,7 @@ void initializeWorld() {
     knife->setFlag(ObjectFlag::TAKEBIT);
     knife->setFlag(ObjectFlag::WEAPONBIT);
     knife->setProperty(P_SIZE, 10);
+    knife->setProperty(P_STRENGTH, 5);  // Medium weapon effectiveness
     knife->moveTo(g.getObject(RoomIds::ATTIC));
     g.registerObject(ObjectIds::KNIFE, std::move(knife));
     

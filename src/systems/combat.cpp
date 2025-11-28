@@ -145,19 +145,26 @@ void CombatManager::processCombatRound() {
 }
 
 int CombatManager::calculateDamage(const Combatant& attacker, const Combatant& defender) {
-    // Base damage calculation
+    // Base damage from attacker strength
     int baseDamage = attacker.strength / 2;
     
-    // Add weapon strength if present
+    // Add weapon effectiveness
     if (attacker.weapon) {
+        // Weapon has STRENGTH property indicating effectiveness
         int weaponStrength = attacker.weapon->getProperty(P_STRENGTH);
         if (weaponStrength > 0) {
             baseDamage += weaponStrength;
         }
+    } else {
+        // Bare hands - low effectiveness (2 points)
+        baseDamage += 2;
     }
     
     // Add some randomness (±25%)
     int variance = baseDamage / 4;
+    if (variance < 1) {
+        variance = 1;
+    }
     int randomFactor = (rand() % (variance * 2 + 1)) - variance;
     int damage = baseDamage + randomFactor;
     
@@ -170,14 +177,18 @@ int CombatManager::calculateDamage(const Combatant& attacker, const Combatant& d
 }
 
 bool CombatManager::attackSucceeds(const Combatant& attacker, const Combatant& defender) {
-    // Calculate hit chance based on weapon effectiveness
+    // Calculate attack power based on strength and weapon
     int attackPower = attacker.strength;
     
     if (attacker.weapon) {
+        // Add weapon effectiveness
         int weaponStrength = attacker.weapon->getProperty(P_STRENGTH);
         if (weaponStrength > 0) {
             attackPower += weaponStrength;
         }
+    } else {
+        // Bare hands - low effectiveness (2 points)
+        attackPower += 2;
     }
     
     int defensePower = defender.strength;

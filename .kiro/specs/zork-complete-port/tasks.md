@@ -1893,7 +1893,7 @@ Implement the core game systems that tie everything together.
   - Test combat rounds
   - _Requirements: 55, 56, 57, 92_
 
-- [ ] 57. Implement weapon effectiveness
+- [x] 57. Implement weapon effectiveness
   - Define weapon strength values
   - Implement weapon lookup
   - Use weapon strength in damage calculation
@@ -1902,14 +1902,14 @@ Implement the core game systems that tie everything together.
   - Bare hands are least effective
   - _Requirements: 56_
 
-- [ ] 57.1 Define weapon properties
+- [x] 57.1 Define weapon properties
   - Set STRENGTH property for weapons
   - Sword: high strength
   - Knife: medium strength
   - Bare hands: low strength
   - _Requirements: 56_
 
-- [ ] 57.2 Implement weapon effectiveness in combat
+- [x] 57.2 Implement weapon effectiveness in combat
   - Look up weapon strength
   - Use in damage calculation
   - Display appropriate messages
