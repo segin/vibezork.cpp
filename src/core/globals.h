@@ -24,6 +24,10 @@ public:
     int loadMax = 100;
     int loadAllowed = 100;
     
+    // Lamp state (Requirement 47)
+    int lampBattery = 330;             // Lamp battery life in turns (starts at 330)
+    bool lampWarned = false;           // Has low battery warning been shown?
+    
     // Display modes
     bool verboseMode = true;           // Full descriptions
     bool briefMode = false;            // Short descriptions for visited rooms

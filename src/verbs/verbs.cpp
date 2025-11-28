@@ -6,6 +6,7 @@
 #include "world/world.h"
 #include "systems/npc.h"
 #include "systems/combat.h"
+#include "systems/lamp.h"
 #include <fstream>
 #include <sstream>
 
@@ -1267,7 +1268,7 @@ bool vLampOn() {
         return RTRUE;
     }
     
-    // Check if lamp has battery/fuel
+    // Check if lamp has battery/fuel (Requirement 47)
     // For the lamp, check if it has been depleted
     if (g.prso->getProperty(P_CAPACITY) == 0) {
         printLine("The lamp has no more power.");
@@ -1283,6 +1284,11 @@ bool vLampOn() {
     // Default LAMP-ON behavior
     // Set ONBIT flag
     g.prso->setFlag(ObjectFlag::ONBIT);
+    
+    // Enable lamp timer if this is the brass lantern (Requirement 47)
+    if (g.prso->getId() == ObjectIds::LAMP) {
+        LampSystem::enableLampTimer();
+    }
     
     // Update room lighting
     // This will be handled by the light system when implemented
@@ -1323,6 +1329,11 @@ bool vLampOff() {
     // Default LAMP-OFF behavior
     // Clear ONBIT flag
     g.prso->clearFlag(ObjectFlag::ONBIT);
+    
+    // Disable lamp timer if this is the brass lantern (Requirement 47)
+    if (g.prso->getId() == ObjectIds::LAMP) {
+        LampSystem::disableLampTimer();
+    }
     
     // Update room lighting
     // This will be handled by the light system when implemented

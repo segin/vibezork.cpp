@@ -1653,29 +1653,29 @@ Implement the core game systems that tie everything together.
   - Check for death
   - _Requirements: 46, 55_
 
-- [ ] 50. Implement lamp timer (I-LANTERN)
+- [x] 50. Implement lamp timer (I-LANTERN)
   - Register lamp battery timer
   - Decrement battery when lamp is on
   - Warn when battery is low
   - Turn off lamp when battery depleted
   - _Requirements: 47_
 
-- [ ] 50.1 Register lamp timer
+- [x] 50.1 Register lamp timer
   - Enable when lamp is turned on
   - Disable when lamp is turned off
   - _Requirements: 47_
 
-- [ ] 50.2 Implement battery drain
+- [x] 50.2 Implement battery drain
   - Decrement battery counter
   - Check battery level
   - _Requirements: 47_
 
-- [ ] 50.3 Implement low battery warning
+- [x] 50.3 Implement low battery warning
   - Warn at specific battery levels
   - "The lamp is getting dim"
   - _Requirements: 47_
 
-- [ ] 50.4 Implement battery depletion
+- [x] 50.4 Implement battery depletion
   - Turn off lamp when battery reaches zero
   - Make lamp unusable
   - Display message

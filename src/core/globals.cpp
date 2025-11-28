@@ -37,4 +37,6 @@ void Globals::reset() {
     moves = 0;
     pCont = false;
     quoteFlag = false;
+    lampBattery = 330;
+    lampWarned = false;
 }
