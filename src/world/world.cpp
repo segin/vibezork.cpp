@@ -3,6 +3,7 @@
 #include "core/io.h"
 #include "verbs/verbs.h"
 #include "systems/npc.h"
+#include "systems/candle.h"
 #include <memory>
 
 // Global flag for winning the game
@@ -368,6 +369,10 @@ bool candlesAction() {
         // Light the candles
         g.prso->setFlag(ObjectFlag::ONBIT);
         printLine("The candles are now lit.");
+        
+        // Enable the candle timer (Requirement 48: Enable when candles are lit)
+        CandleSystem::enableCandleTimer();
+        
         return RTRUE;
     }
     
@@ -381,6 +386,10 @@ bool candlesAction() {
         // Extinguish the candles
         g.prso->clearFlag(ObjectFlag::ONBIT);
         printLine("The candles are now out.");
+        
+        // Disable the candle timer (Requirement 48: Disable when candles are extinguished)
+        CandleSystem::disableCandleTimer();
+        
         return RTRUE;
     }
     

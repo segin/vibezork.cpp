@@ -6,6 +6,7 @@
 #include "systems/npc.h"
 #include "systems/timer.h"
 #include "systems/lamp.h"
+#include "systems/candle.h"
 #include <iostream>
 #include <map>
 
@@ -182,6 +183,7 @@ void initializeGame() {
     NPCSystem::initializeTroll();
     NPCSystem::initializeCyclops();
     LampSystem::initialize();  // Initialize lamp timer (Requirement 47)
+    CandleSystem::initialize();  // Initialize candle timer (Requirement 48)
 }
 
 void go() {

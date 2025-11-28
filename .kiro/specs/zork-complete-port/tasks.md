@@ -1681,29 +1681,29 @@ Implement the core game systems that tie everything together.
   - Display message
   - _Requirements: 47_
 
-- [ ] 51. Implement candle timer (I-CANDLES)
+- [x] 51. Implement candle timer (I-CANDLES)
   - Register candle burning timer
   - Decrement candle duration when lit
   - Warn when candles are nearly gone
   - Remove candles when burned out
   - _Requirements: 48_
 
-- [ ] 51.1 Register candle timer
+- [x] 51.1 Register candle timer
   - Enable when candles are lit
   - Disable when candles burn out
   - _Requirements: 48_
 
-- [ ] 51.2 Implement candle burning
+- [x] 51.2 Implement candle burning
   - Decrement duration counter
   - Check duration level
   - _Requirements: 48_
 
-- [ ] 51.3 Implement candle warnings
+- [x] 51.3 Implement candle warnings
   - Warn when nearly gone
   - "The candles are getting short"
   - _Requirements: 48_
 
-- [ ] 51.4 Implement candle burnout
+- [x] 51.4 Implement candle burnout
   - Remove candles from game
   - Update lighting
   - Display message
