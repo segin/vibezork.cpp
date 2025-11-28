@@ -1798,7 +1798,7 @@ Implement the core game systems that tie everything together.
   - _Requirements: 51, 92_
 
 
-- [ ] 55. Implement score system
+- [x] 55. Implement score system
   - Create ScoreSystem class
   - Implement score tracking
   - Implement move counting
@@ -1806,39 +1806,39 @@ Implement the core game systems that tie everything together.
   - Implement treasure scoring
   - _Requirements: 52, 53, 54, 85_
 
-- [ ] 55.1 Create ScoreSystem class
+- [x] 55.1 Create ScoreSystem class
   - Track current score
   - Track move count
   - Track scored treasures
   - _Requirements: 52, 53_
 
-- [ ] 55.2 Implement score tracking
+- [x] 55.2 Implement score tracking
   - addScore() method
   - getScore() method
   - Maximum score constant (350)
   - _Requirements: 52, 85_
 
-- [ ] 55.3 Implement move counting
+- [x] 55.3 Implement move counting
   - incrementMoves() method
   - getMoves() method
   - Exclude certain commands from count
   - _Requirements: 53_
 
-- [ ] 55.4 Implement rank calculation
+- [x] 55.4 Implement rank calculation
   - Define rank thresholds
   - calculateRank() method
   - getRank() method
   - Ranks: Beginner, Amateur, Novice, etc. up to Master Adventurer
   - _Requirements: 54_
 
-- [ ] 55.5 Implement treasure scoring
+- [x] 55.5 Implement treasure scoring
   - markTreasureScored() method
   - isTreasureScored() method
   - Prevent double-scoring
   - Award points when treasure placed in trophy case
   - _Requirements: 85_
 
-- [ ] 55.6 Write unit tests for score system
+- [x] 55.6 Write unit tests for score system
   - Test score tracking
   - Test move counting
   - Test rank calculation

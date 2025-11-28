@@ -79,4 +79,8 @@ if(BUILD_TESTS)
     # Light system tests
     add_executable(light_system_tests tests/light_system_tests.cpp ${LIB_SOURCES})
     add_test(NAME LightSystemTests COMMAND light_system_tests)
+    
+    # Score system tests
+    add_executable(score_system_tests tests/score_system_tests.cpp ${LIB_SOURCES})
+    add_test(NAME ScoreSystemTests COMMAND score_system_tests)
 endif()
