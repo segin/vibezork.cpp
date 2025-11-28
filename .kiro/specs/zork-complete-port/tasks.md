@@ -1845,7 +1845,7 @@ Implement the core game systems that tie everything together.
   - Test treasure scoring
   - _Requirements: 52, 53, 54, 85, 92_
 
-- [ ] 56. Implement combat system
+- [x] 56. Implement combat system
   - Create CombatSystem class
   - Implement combat state tracking
   - Implement attack calculations
@@ -1853,40 +1853,40 @@ Implement the core game systems that tie everything together.
   - Implement combat resolution
   - _Requirements: 55, 56, 57_
 
-- [ ] 56.1 Create CombatSystem class
+- [x] 56.1 Create CombatSystem class
   - Define Combatant struct
   - Track player and enemy combatants
   - Track combat state
   - _Requirements: 55_
 
-- [ ] 56.2 Implement combat start/end
+- [x] 56.2 Implement combat start/end
   - startCombat() method
   - endCombat() method
   - isInCombat() method
   - _Requirements: 55_
 
-- [ ] 56.3 Implement attack calculation
+- [x] 56.3 Implement attack calculation
   - calculateDamage() method
   - attackSucceeds() method
   - Factor in weapon effectiveness
   - Factor in combatant strength
   - _Requirements: 55, 56_
 
-- [ ] 56.4 Implement damage application
+- [x] 56.4 Implement damage application
   - Apply damage to health
   - Check for death
   - Handle enemy fleeing
   - Handle enemy dropping items
   - _Requirements: 55, 57_
 
-- [ ] 56.5 Implement combat round processing
+- [x] 56.5 Implement combat round processing
   - processCombatRound() method
   - Player attacks enemy
   - Enemy attacks player
   - Display combat messages
   - _Requirements: 55_
 
-- [ ] 56.6 Write unit tests for combat system
+- [x] 56.6 Write unit tests for combat system
   - Test combat start/end
   - Test attack calculations
   - Test damage application

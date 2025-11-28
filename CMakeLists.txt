@@ -83,4 +83,8 @@ if(BUILD_TESTS)
     # Score system tests
     add_executable(score_system_tests tests/score_system_tests.cpp ${LIB_SOURCES})
     add_test(NAME ScoreSystemTests COMMAND score_system_tests)
+    
+    # Combat system tests
+    add_executable(combat_system_tests tests/combat_system_tests.cpp ${LIB_SOURCES})
+    add_test(NAME CombatSystemTests COMMAND combat_system_tests)
 endif()
