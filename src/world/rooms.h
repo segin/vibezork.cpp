@@ -253,3 +253,5 @@ constexpr int M_LOOK = 1;
 constexpr int M_ENTER = 2;
 constexpr int M_END = 3;
 constexpr int M_PRAY = 4;
+constexpr int M_LISTEN = 5;
+constexpr int M_YELL = 6;

@@ -80,6 +80,7 @@ void VerbRegistry::initializeVerbSynonyms() {
     registerVerb(V_SMELL, {"smell", "sniff"});
     registerVerb(V_TOUCH, {"touch"});
     registerVerb(V_RUB, {"rub", "feel", "pat", "pet"});
+    registerVerb(V_YELL, {"yell", "scream", "shout", "holler"});
     
     // Consumption verbs
     registerVerb(V_EAT, {"eat", "consume", "taste", "bite"});
@@ -471,6 +472,10 @@ void VerbRegistry::initializeSyntaxPatterns() {
         Elem objElem(ET::OBJECT);
         registerSyntax(V_LISTEN, SyntaxPattern(V_LISTEN, {Elem(ET::VERB), prep, objElem}));
     }
+    
+    // YELL verb patterns
+    // YELL (no object)
+    registerSyntax(V_YELL, SyntaxPattern(V_YELL, {Elem(ET::VERB)}));
     
     // SMELL verb patterns
     // SMELL (no object)

@@ -90,6 +90,7 @@ constexpr VerbId V_TALK = 120;
 constexpr VerbId V_ASK = 121;
 constexpr VerbId V_TELL = 122;
 constexpr VerbId V_ODYSSEUS = 123;  // Special verb for cyclops puzzle
+constexpr VerbId V_YELL = 124;
 
 // Verb handlers
 namespace Verbs {
@@ -130,6 +131,7 @@ namespace Verbs {
     bool vListen();
     bool vSmell();
     bool vTouch();
+    bool vYell();
     
     // Consumption verbs
     bool vEat();

@@ -39,6 +39,7 @@ std::map<VerbId, std::function<bool()>> verbHandlers = {
     {V_LISTEN, Verbs::vListen},
     {V_SMELL, Verbs::vSmell},
     {V_TOUCH, Verbs::vTouch},
+    {V_YELL, Verbs::vYell},
     {V_EAT, Verbs::vEat},
     {V_DRINK, Verbs::vDrink},
     {V_LAMP_ON, Verbs::vLampOn},

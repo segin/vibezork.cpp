@@ -1118,8 +1118,12 @@ bool vListen() {
     }
     
     // No object specified - listen to the room
-    // Room-specific listening behavior would be handled by room actions
-    // For now, just give default message
+    ZRoom* room = dynamic_cast<ZRoom*>(g.here);
+    if (room) {
+        room->performRoomAction(M_LISTEN);
+    }
+    
+    // Default message if room doesn't handle it
     printLine("You hear nothing unusual.");
     return RTRUE;
 }
@@ -1141,6 +1145,20 @@ bool vSmell() {
     
     // No object specified - smell the room
     printLine("You smell nothing unusual.");
+    return RTRUE;
+}
+
+bool vYell() {
+    auto& g = Globals::instance();
+    
+    // Call room action handler for special yell behavior
+    ZRoom* room = dynamic_cast<ZRoom*>(g.here);
+    if (room) {
+        room->performRoomAction(M_YELL);
+    }
+    
+    // Default message
+    printLine("Aaaarrrrgggghhhh!");
     return RTRUE;
 }
 

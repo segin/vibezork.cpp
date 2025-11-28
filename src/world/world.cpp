@@ -43,6 +43,17 @@ void stoneBarrowAction(int rarg) {
     }
 }
 
+// Maze room action helper - all maze rooms behave similarly
+void mazeRoomAction(int rarg) {
+    if (rarg == M_LOOK) {
+        printLine("This is part of a maze of twisty little passages, all alike.");
+    } else if (rarg == M_LISTEN) {
+        printLine("You hear the sound of your own footsteps echoing confusingly.");
+    } else if (rarg == M_YELL) {
+        printLine("Your shout echoes through the passages, making it even harder to tell where you are.");
+    }
+}
+
 // Object action functions
 bool mailboxAction() {
     auto& g = Globals::instance();
@@ -1715,6 +1726,8 @@ void initializeWorld() {
     roundRoom->setRoomAction([](int rarg) {
         if (rarg == M_LOOK) {
             printLine("This is a circular stone room with passages in all directions. Several of them have unfortunately been blocked by cave-ins.");
+        } else if (rarg == M_LISTEN) {
+            printLine("The round room has strange acoustics. You hear faint echoes from the various passages.");
         }
     });
     
@@ -1738,8 +1751,11 @@ void initializeWorld() {
     loudRoom->setRoomAction([](int rarg) {
         if (rarg == M_LOOK) {
             printLine("This is a large room with a ceiling which cannot be detected from the ground. There is a narrow passage from east to west and a stone stairway leading upward. The room is extremely noisy. In fact, it is difficult to hear yourself think.");
+        } else if (rarg == M_LISTEN) {
+            printLine("The acoustics of the room are such that you hear a loud roar.");
+        } else if (rarg == M_YELL) {
+            printLine("Your shout echoes loudly, amplified by the room's acoustics. The sound is deafening!");
         }
-        // TODO: Add echo action handler for sounds
     });
     
     // Set up exits for Loud Room
@@ -2394,11 +2410,7 @@ void initializeWorld() {
         "This is part of a maze of twisty little passages, all alike."
     );
     maze1->setFlag(ObjectFlag::RLANDBIT);
-    maze1->setRoomAction([](int rarg) {
-        if (rarg == M_LOOK) {
-            printLine("This is part of a maze of twisty little passages, all alike.");
-        }
-    });
+    maze1->setRoomAction(mazeRoomAction);
     g.registerObject(RoomIds::MAZE_1, std::move(maze1));
     
     // Create MAZE_2
@@ -2408,11 +2420,7 @@ void initializeWorld() {
         "This is part of a maze of twisty little passages, all alike."
     );
     maze2->setFlag(ObjectFlag::RLANDBIT);
-    maze2->setRoomAction([](int rarg) {
-        if (rarg == M_LOOK) {
-            printLine("This is part of a maze of twisty little passages, all alike.");
-        }
-    });
+    maze2->setRoomAction(mazeRoomAction);
     g.registerObject(RoomIds::MAZE_2, std::move(maze2));
     
     // Create MAZE_3
@@ -2422,11 +2430,7 @@ void initializeWorld() {
         "This is part of a maze of twisty little passages, all alike."
     );
     maze3->setFlag(ObjectFlag::RLANDBIT);
-    maze3->setRoomAction([](int rarg) {
-        if (rarg == M_LOOK) {
-            printLine("This is part of a maze of twisty little passages, all alike.");
-        }
-    });
+    maze3->setRoomAction(mazeRoomAction);
     g.registerObject(RoomIds::MAZE_3, std::move(maze3));
     
     // Create MAZE_4
@@ -2436,11 +2440,7 @@ void initializeWorld() {
         "This is part of a maze of twisty little passages, all alike."
     );
     maze4->setFlag(ObjectFlag::RLANDBIT);
-    maze4->setRoomAction([](int rarg) {
-        if (rarg == M_LOOK) {
-            printLine("This is part of a maze of twisty little passages, all alike.");
-        }
-    });
+    maze4->setRoomAction(mazeRoomAction);
     g.registerObject(RoomIds::MAZE_4, std::move(maze4));
     
     // Create MAZE_5
@@ -2450,11 +2450,7 @@ void initializeWorld() {
         "This is part of a maze of twisty little passages, all alike."
     );
     maze5->setFlag(ObjectFlag::RLANDBIT);
-    maze5->setRoomAction([](int rarg) {
-        if (rarg == M_LOOK) {
-            printLine("This is part of a maze of twisty little passages, all alike.");
-        }
-    });
+    maze5->setRoomAction(mazeRoomAction);
     g.registerObject(RoomIds::MAZE_5, std::move(maze5));
     
     // Create MAZE_6
@@ -2464,11 +2460,7 @@ void initializeWorld() {
         "This is part of a maze of twisty little passages, all alike."
     );
     maze6->setFlag(ObjectFlag::RLANDBIT);
-    maze6->setRoomAction([](int rarg) {
-        if (rarg == M_LOOK) {
-            printLine("This is part of a maze of twisty little passages, all alike.");
-        }
-    });
+    maze6->setRoomAction(mazeRoomAction);
     g.registerObject(RoomIds::MAZE_6, std::move(maze6));
     
     // Create MAZE_7
@@ -2478,11 +2470,7 @@ void initializeWorld() {
         "This is part of a maze of twisty little passages, all alike."
     );
     maze7->setFlag(ObjectFlag::RLANDBIT);
-    maze7->setRoomAction([](int rarg) {
-        if (rarg == M_LOOK) {
-            printLine("This is part of a maze of twisty little passages, all alike.");
-        }
-    });
+    maze7->setRoomAction(mazeRoomAction);
     g.registerObject(RoomIds::MAZE_7, std::move(maze7));
     
     // Create MAZE_8
@@ -2492,11 +2480,7 @@ void initializeWorld() {
         "This is part of a maze of twisty little passages, all alike."
     );
     maze8->setFlag(ObjectFlag::RLANDBIT);
-    maze8->setRoomAction([](int rarg) {
-        if (rarg == M_LOOK) {
-            printLine("This is part of a maze of twisty little passages, all alike.");
-        }
-    });
+    maze8->setRoomAction(mazeRoomAction);
     g.registerObject(RoomIds::MAZE_8, std::move(maze8));
     
     // Create MAZE_9
@@ -2506,11 +2490,7 @@ void initializeWorld() {
         "This is part of a maze of twisty little passages, all alike."
     );
     maze9->setFlag(ObjectFlag::RLANDBIT);
-    maze9->setRoomAction([](int rarg) {
-        if (rarg == M_LOOK) {
-            printLine("This is part of a maze of twisty little passages, all alike.");
-        }
-    });
+    maze9->setRoomAction(mazeRoomAction);
     g.registerObject(RoomIds::MAZE_9, std::move(maze9));
     
     // Create MAZE_10
@@ -2520,11 +2500,7 @@ void initializeWorld() {
         "This is part of a maze of twisty little passages, all alike."
     );
     maze10->setFlag(ObjectFlag::RLANDBIT);
-    maze10->setRoomAction([](int rarg) {
-        if (rarg == M_LOOK) {
-            printLine("This is part of a maze of twisty little passages, all alike.");
-        }
-    });
+    maze10->setRoomAction(mazeRoomAction);
     g.registerObject(RoomIds::MAZE_10, std::move(maze10));
     
     // Create MAZE_11
@@ -2534,11 +2510,7 @@ void initializeWorld() {
         "This is part of a maze of twisty little passages, all alike."
     );
     maze11->setFlag(ObjectFlag::RLANDBIT);
-    maze11->setRoomAction([](int rarg) {
-        if (rarg == M_LOOK) {
-            printLine("This is part of a maze of twisty little passages, all alike.");
-        }
-    });
+    maze11->setRoomAction(mazeRoomAction);
     g.registerObject(RoomIds::MAZE_11, std::move(maze11));
     
     // Create MAZE_12
@@ -2548,11 +2520,7 @@ void initializeWorld() {
         "This is part of a maze of twisty little passages, all alike."
     );
     maze12->setFlag(ObjectFlag::RLANDBIT);
-    maze12->setRoomAction([](int rarg) {
-        if (rarg == M_LOOK) {
-            printLine("This is part of a maze of twisty little passages, all alike.");
-        }
-    });
+    maze12->setRoomAction(mazeRoomAction);
     g.registerObject(RoomIds::MAZE_12, std::move(maze12));
     
     // Create MAZE_13
@@ -2562,11 +2530,7 @@ void initializeWorld() {
         "This is part of a maze of twisty little passages, all alike."
     );
     maze13->setFlag(ObjectFlag::RLANDBIT);
-    maze13->setRoomAction([](int rarg) {
-        if (rarg == M_LOOK) {
-            printLine("This is part of a maze of twisty little passages, all alike.");
-        }
-    });
+    maze13->setRoomAction(mazeRoomAction);
     g.registerObject(RoomIds::MAZE_13, std::move(maze13));
     
     // Create MAZE_14
@@ -2576,11 +2540,7 @@ void initializeWorld() {
         "This is part of a maze of twisty little passages, all alike."
     );
     maze14->setFlag(ObjectFlag::RLANDBIT);
-    maze14->setRoomAction([](int rarg) {
-        if (rarg == M_LOOK) {
-            printLine("This is part of a maze of twisty little passages, all alike.");
-        }
-    });
+    maze14->setRoomAction(mazeRoomAction);
     g.registerObject(RoomIds::MAZE_14, std::move(maze14));
     
     // Create MAZE_15
@@ -2590,11 +2550,7 @@ void initializeWorld() {
         "This is part of a maze of twisty little passages, all alike."
     );
     maze15->setFlag(ObjectFlag::RLANDBIT);
-    maze15->setRoomAction([](int rarg) {
-        if (rarg == M_LOOK) {
-            printLine("This is part of a maze of twisty little passages, all alike.");
-        }
-    });
+    maze15->setRoomAction(mazeRoomAction);
     g.registerObject(RoomIds::MAZE_15, std::move(maze15));
     
     // Create Grating Room (exit from maze)
@@ -2958,8 +2914,14 @@ void initializeWorld() {
     treasureRoom->setRoomAction([](int rarg) {
         if (rarg == M_LOOK) {
             printLine("This is a large room, whose east wall is solid granite. A number of discarded bags, which crumble at your touch, are scattered about on the floor. There is an exit down a staircase.");
+            // Note: Stolen treasures will be listed here when thief system is active
+        } else if (rarg == M_ENTER) {
+            // Special behavior when entering - thief may be here
+            // This will be fully implemented with the thief timer system
+            printLine("You enter the treasure room cautiously.");
+        } else if (rarg == M_LISTEN) {
+            printLine("You hear nothing unusual.");
         }
-        // M_ENTER action will trigger thief encounter (to be implemented with thief system)
     });
     treasureRoom->setExit(Direction::DOWN, RoomExit(RoomIds::CYCLOPS_ROOM));
     g.registerObject(RoomIds::TREASURE_ROOM, std::move(treasureRoom));
@@ -2979,6 +2941,13 @@ void initializeWorld() {
             printLine("  Abandon every hope all ye who enter here");
             crlf();
             printLine("The gate is open; through it you can see a desolation, with a pile of mangled bodies in one corner. Thousands of voices, lamenting some hideous fate, can be heard.");
+        } else if (rarg == M_LISTEN) {
+            printLine("You hear thousands of voices lamenting their hideous fate.");
+        } else if (rarg == M_PRAY) {
+            printLine("Your prayers are heard, but not answered. The spirits here are beyond salvation.");
+        } else if (rarg == M_ENTER) {
+            // Special behavior when entering - this is where resurrection happens
+            printLine("You pass through the gateway into the Land of the Living Dead.");
         }
     });
     entranceToHades->setExit(Direction::UP, RoomExit(RoomIds::TINY_CAVE));
@@ -3050,6 +3019,10 @@ void initializeWorld() {
     northTemple->setRoomAction([](int rarg) {
         if (rarg == M_LOOK) {
             printLine("This is the north end of a large temple. On the east wall is an ancient inscription, probably a prayer in a long-forgotten language. Below the prayer is a staircase leading down. The west wall is solid granite. The exit to the north end of the room is through huge marble pillars.");
+        } else if (rarg == M_PRAY) {
+            printLine("You offer a prayer to the ancient gods. The temple seems to acknowledge your reverence.");
+        } else if (rarg == M_LISTEN) {
+            printLine("The temple is silent, but you sense a profound peace.");
         }
     });
     northTemple->setExit(Direction::DOWN, RoomExit(RoomIds::EGYPT_ROOM));
@@ -3072,6 +3045,10 @@ void initializeWorld() {
     southTemple->setRoomAction([](int rarg) {
         if (rarg == M_LOOK) {
             printLine("This is the south end of a large temple. In front of you is what appears to be an altar. In one corner is a small hole in the floor which leads into darkness. You probably could not get back up it.");
+        } else if (rarg == M_PRAY) {
+            printLine("You kneel before the altar and pray. A sense of tranquility fills the temple.");
+        } else if (rarg == M_LISTEN) {
+            printLine("The temple is silent except for a faint echo from the hole in the floor.");
         }
     });
     southTemple->setExit(Direction::NORTH, RoomExit(RoomIds::NORTH_TEMPLE));
@@ -3089,6 +3066,10 @@ void initializeWorld() {
     egyptRoom->setRoomAction([](int rarg) {
         if (rarg == M_LOOK) {
             printLine("This is a room which looks like an Egyptian tomb. There is an ascending staircase to the west.");
+        } else if (rarg == M_LISTEN) {
+            printLine("You hear nothing but the silence of the ages.");
+        } else if (rarg == M_PRAY) {
+            printLine("You offer a prayer to the ancient Egyptian gods.");
         }
     });
     egyptRoom->setExit(Direction::WEST, RoomExit(RoomIds::NORTH_TEMPLE));

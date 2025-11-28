@@ -1515,7 +1515,7 @@ Implement object-specific and room-specific behaviors.
   - Implement specific behaviors
   - _Requirements: 42_
 
-- [ ] 46. Implement special room actions
+- [x] 46. Implement special room actions
   - Implement loud room action (echo)
   - Implement round room action
   - Implement entrance to hades action
@@ -1523,34 +1523,34 @@ Implement object-specific and room-specific behaviors.
   - Implement maze room actions
   - _Requirements: 43_
 
-- [ ] 46.1 Implement loud room action
+- [x] 46.1 Implement loud room action
   - Echoes sounds
   - Special LISTEN behavior
   - Special YELL behavior
   - _Requirements: 43_
 
-- [ ] 46.2 Implement round room action
+- [x] 46.2 Implement round room action
   - Special acoustics
   - Multiple exits
   - _Requirements: 43_
 
-- [ ] 46.3 Implement entrance to hades action
+- [x] 46.3 Implement entrance to hades action
   - Resurrection location
   - Special behaviors
   - _Requirements: 43, 59_
 
-- [ ] 46.4 Implement treasure room action
+- [x] 46.4 Implement treasure room action
   - Thief's lair
   - Contains stolen treasures
   - Special access requirements
   - _Requirements: 43_
 
-- [ ] 46.5 Implement maze room actions
+- [x] 46.5 Implement maze room actions
   - Confusing navigation
   - Similar descriptions
   - _Requirements: 43, 84_
 
-- [ ] 46.6 Implement other special room actions
+- [x] 46.6 Implement other special room actions
   - All remaining special rooms from 1actions.zil
   - Implement specific behaviors
   - _Requirements: 43_
