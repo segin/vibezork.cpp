@@ -1485,32 +1485,32 @@ Implement object-specific and room-specific behaviors.
   - Very strong opponent
   - _Requirements: 41, 55_
 
-- [ ] 45. Implement puzzle object actions
+- [x] 45. Implement puzzle object actions
   - Implement boat and pump actions
   - Implement machine puzzle actions
   - Implement mirror actions
   - Implement other puzzle-specific actions
   - _Requirements: 42_
 
-- [ ] 45.1 Implement boat and pump actions
+- [x] 45.1 Implement boat and pump actions
   - Pump inflates and deflates boat
   - Boat must be inflated to use
   - Boat allows water navigation
   - _Requirements: 42, 83_
 
-- [ ] 45.2 Implement machine puzzle actions
+- [x] 45.2 Implement machine puzzle actions
   - Complex button/switch puzzle
   - Multiple states and combinations
   - Produces specific results
   - _Requirements: 42_
 
-- [ ] 45.3 Implement mirror actions
+- [x] 45.3 Implement mirror actions
   - Shows different reflections
   - Special EXAMINE behavior
   - Part of puzzle solution
   - _Requirements: 42_
 
-- [ ] 45.4 Implement other puzzle actions
+- [x] 45.4 Implement other puzzle actions
   - All remaining puzzle objects from 1actions.zil
   - Implement specific behaviors
   - _Requirements: 42_

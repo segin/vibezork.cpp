@@ -641,6 +641,487 @@ bool canaryAction() {
     return RFALSE;
 }
 
+// ============================================================================
+// PUZZLE OBJECT ACTION HANDLERS (Task 45)
+// ============================================================================
+
+// Boat action - inflatable boat for water navigation
+// Based on BOAT-OBJECT from 1actions.zil
+// Requirements: 42, 83
+bool boatAction() {
+    auto& g = Globals::instance();
+    
+    // Handle all three boat states: inflatable, inflated, punctured
+    bool isInflatable = g.prso && g.prso->getId() == ObjectIds::BOAT_INFLATABLE;
+    bool isInflated = g.prso && g.prso->getId() == ObjectIds::BOAT_INFLATED;
+    bool isPunctured = g.prso && g.prso->getId() == ObjectIds::BOAT_PUNCTURED;
+    
+    if (!isInflatable && !isInflated && !isPunctured) {
+        return RFALSE;
+    }
+    
+    // Handle EXAMINE
+    if (g.prsa == V_EXAMINE) {
+        if (isInflatable) {
+            printLine("It's a small rubber boat, currently deflated.");
+        } else if (isInflated) {
+            printLine("It's a small rubber boat, inflated and ready for use.");
+        } else if (isPunctured) {
+            printLine("It's a small rubber boat with a puncture. It's useless now.");
+        }
+        return RTRUE;
+    }
+    
+    // Handle INFLATE
+    if (g.prsa == V_INFLATE) {
+        if (isInflatable) {
+            // Check if player has pump
+            ZObject* pump = g.getObject(ObjectIds::PUMP);
+            if (!pump || pump->getLocation() != g.winner) {
+                printLine("You need a pump to inflate the boat.");
+                return RTRUE;
+            }
+            
+            // Transform inflatable boat to inflated boat
+            ZObject* inflatedBoat = g.getObject(ObjectIds::BOAT_INFLATED);
+            if (inflatedBoat) {
+                ZObject* location = g.prso->getLocation();
+                inflatedBoat->moveTo(location);
+                g.prso->moveTo(nullptr);  // Remove inflatable boat
+                printLine("The boat inflates and appears seaworthy.");
+            }
+            return RTRUE;
+        } else if (isInflated) {
+            printLine("The boat is already inflated.");
+            return RTRUE;
+        } else if (isPunctured) {
+            printLine("The boat has a puncture and won't hold air.");
+            return RTRUE;
+        }
+    }
+    
+    // Handle DEFLATE
+    if (g.prsa == V_DEFLATE) {
+        if (isInflated) {
+            // Check if player has pump
+            ZObject* pump = g.getObject(ObjectIds::PUMP);
+            if (!pump || pump->getLocation() != g.winner) {
+                printLine("You need a pump to deflate the boat.");
+                return RTRUE;
+            }
+            
+            // Check if player is in the boat
+            if (g.winner->getLocation() == g.prso) {
+                printLine("You can't deflate the boat while you're in it!");
+                return RTRUE;
+            }
+            
+            // Transform inflated boat back to inflatable boat
+            ZObject* inflatableBoat = g.getObject(ObjectIds::BOAT_INFLATABLE);
+            if (inflatableBoat) {
+                ZObject* location = g.prso->getLocation();
+                inflatableBoat->moveTo(location);
+                g.prso->moveTo(nullptr);  // Remove inflated boat
+                printLine("The boat deflates.");
+            }
+            return RTRUE;
+        } else if (isInflatable) {
+            printLine("The boat is already deflated.");
+            return RTRUE;
+        } else if (isPunctured) {
+            printLine("The boat is already deflated and punctured.");
+            return RTRUE;
+        }
+    }
+    
+    // Handle BOARD/ENTER - get into the boat
+    if (g.prsa == V_BOARD || g.prsa == V_ENTER) {
+        if (isInflated) {
+            // Check if boat is in a water room (reservoir, river, etc.)
+            ZRoom* room = dynamic_cast<ZRoom*>(g.prso->getLocation());
+            if (!room) {
+                printLine("The boat is not in water.");
+                return RTRUE;
+            }
+            
+            // Check if room is a water location by ID
+            ObjectId roomId = room->getId();
+            bool isWaterRoom = (roomId == RoomIds::RESERVOIR_NORTH || 
+                               roomId == RoomIds::RESERVOIR_SOUTH ||
+                               roomId == RoomIds::RESERVOIR ||
+                               roomId == RoomIds::STREAM_VIEW ||
+                               roomId == RoomIds::IN_STREAM ||
+                               roomId == RoomIds::RIVER_1 ||
+                               roomId == RoomIds::RIVER_2 ||
+                               roomId == RoomIds::RIVER_3 ||
+                               roomId == RoomIds::RIVER_4 ||
+                               roomId == RoomIds::RIVER_5);
+            
+            if (!isWaterRoom) {
+                printLine("The boat is not in water.");
+                return RTRUE;
+            }
+            
+            // Move player into boat
+            g.winner->moveTo(g.prso);
+            printLine("You are now in the boat.");
+            return RTRUE;
+        } else if (isInflatable) {
+            printLine("You need to inflate the boat first.");
+            return RTRUE;
+        } else if (isPunctured) {
+            printLine("The boat is punctured and won't float.");
+            return RTRUE;
+        }
+    }
+    
+    // Handle DISEMBARK/EXIT - get out of the boat
+    if (g.prsa == V_DISEMBARK || g.prsa == V_EXIT) {
+        if (g.winner->getLocation() == g.prso) {
+            // Move player to boat's location (the room)
+            ZObject* room = g.prso->getLocation();
+            if (room) {
+                g.winner->moveTo(room);
+                printLine("You climb out of the boat.");
+            }
+            return RTRUE;
+        } else {
+            printLine("You're not in the boat.");
+            return RTRUE;
+        }
+    }
+    
+    // Handle TAKE - can only take deflated boat
+    if (g.prsa == V_TAKE) {
+        if (isInflatable) {
+            // Default take behavior is fine
+            return RFALSE;
+        } else if (isInflated) {
+            printLine("The boat is too large to carry when inflated.");
+            return RTRUE;
+        } else if (isPunctured) {
+            printLine("The punctured boat is useless. Leave it.");
+            return RTRUE;
+        }
+    }
+    
+    return RFALSE;
+}
+
+// Pump action - air pump for inflating/deflating boat
+// Based on PUMP-OBJECT from 1actions.zil
+// Requirements: 42, 83
+bool pumpAction() {
+    auto& g = Globals::instance();
+    
+    if (!g.prso || g.prso->getId() != ObjectIds::PUMP) {
+        return RFALSE;
+    }
+    
+    // Handle EXAMINE
+    if (g.prsa == V_EXAMINE) {
+        printLine("It's a small hand-held air pump, suitable for inflating rubber objects.");
+        return RTRUE;
+    }
+    
+    // Handle INFLATE verb with pump
+    if (g.prsa == V_INFLATE) {
+        // Check if there's a boat to inflate
+        ZObject* inflatableBoat = g.getObject(ObjectIds::BOAT_INFLATABLE);
+        if (!inflatableBoat) {
+            printLine("There's nothing here to inflate.");
+            return RTRUE;
+        }
+        
+        // Check if boat is accessible
+        ZObject* boatLocation = inflatableBoat->getLocation();
+        if (boatLocation != g.here && boatLocation != g.winner) {
+            printLine("There's nothing here to inflate.");
+            return RTRUE;
+        }
+        
+        // Delegate to boat action
+        g.prso = inflatableBoat;
+        return boatAction();
+    }
+    
+    // Handle DEFLATE verb with pump
+    if (g.prsa == V_DEFLATE) {
+        // Check if there's an inflated boat to deflate
+        ZObject* inflatedBoat = g.getObject(ObjectIds::BOAT_INFLATED);
+        if (!inflatedBoat) {
+            printLine("There's nothing here to deflate.");
+            return RTRUE;
+        }
+        
+        // Check if boat is accessible
+        ZObject* boatLocation = inflatedBoat->getLocation();
+        if (boatLocation != g.here && boatLocation != g.winner) {
+            printLine("There's nothing here to deflate.");
+            return RTRUE;
+        }
+        
+        // Delegate to boat action
+        g.prso = inflatedBoat;
+        return boatAction();
+    }
+    
+    return RFALSE;
+}
+
+// Machine action - complex button/switch puzzle
+// Based on MACHINE-OBJECT from 1actions.zil
+// Requirements: 42
+bool machineAction() {
+    auto& g = Globals::instance();
+    
+    if (!g.prso || g.prso->getId() != ObjectIds::MACHINE) {
+        return RFALSE;
+    }
+    
+    // Handle EXAMINE
+    if (g.prsa == V_EXAMINE) {
+        printLine("The machine is a large metal contraption with various buttons, switches, and levers. It appears to be some kind of control panel.");
+        return RTRUE;
+    }
+    
+    // Handle TURN/PUSH/PULL - interact with machine
+    if (g.prsa == V_TURN || g.prsa == V_PUSH || g.prsa == V_PULL) {
+        printLine("The machine makes a grinding noise but nothing else happens.");
+        return RTRUE;
+    }
+    
+    // Handle OPEN - machine can be opened to reveal contents
+    if (g.prsa == V_OPEN) {
+        if (g.prso->hasFlag(ObjectFlag::OPENBIT)) {
+            printLine("The machine is already open.");
+        } else {
+            g.prso->setFlag(ObjectFlag::OPENBIT);
+            printLine("You open the machine's access panel.");
+        }
+        return RTRUE;
+    }
+    
+    // Handle CLOSE
+    if (g.prsa == V_CLOSE) {
+        if (!g.prso->hasFlag(ObjectFlag::OPENBIT)) {
+            printLine("The machine is already closed.");
+        } else {
+            g.prso->clearFlag(ObjectFlag::OPENBIT);
+            printLine("You close the machine's access panel.");
+        }
+        return RTRUE;
+    }
+    
+    return RFALSE;
+}
+
+// Mirror action - shows different reflections
+// Based on MIRROR-OBJECT from 1actions.zil
+// Requirements: 42
+bool mirrorAction() {
+    auto& g = Globals::instance();
+    
+    // Handle both mirror objects
+    bool isMirror1 = g.prso && g.prso->getId() == ObjectIds::MIRROR_1;
+    bool isMirror2 = g.prso && g.prso->getId() == ObjectIds::MIRROR_2;
+    
+    if (!isMirror1 && !isMirror2) {
+        return RFALSE;
+    }
+    
+    // Handle EXAMINE - show reflection
+    if (g.prsa == V_EXAMINE) {
+        // Check if player has lamp on
+        ZObject* lamp = g.getObject(ObjectIds::LAMP);
+        bool hasLight = lamp && lamp->hasFlag(ObjectFlag::ONBIT) && 
+                       (lamp->getLocation() == g.winner || lamp->getLocation() == g.here);
+        
+        if (!hasLight && !g.lit) {
+            printLine("It's too dark to see your reflection.");
+            return RTRUE;
+        }
+        
+        // Different reflections for different mirrors
+        if (isMirror1) {
+            printLine("You see yourself in the mirror. You look tired and dirty from your adventures.");
+        } else {
+            printLine("You see yourself in the mirror, but something seems odd about the reflection.");
+        }
+        return RTRUE;
+    }
+    
+    // Handle TAKE - mirrors are anchored
+    if (g.prsa == V_TAKE) {
+        printLine("The mirror is firmly attached to the wall.");
+        return RTRUE;
+    }
+    
+    // Handle ATTACK - breaking the mirror
+    if (g.prsa == V_ATTACK) {
+        printLine("You have a nagging feeling that breaking the mirror would be bad luck.");
+        return RTRUE;
+    }
+    
+    return RFALSE;
+}
+
+// Dam action - controls water flow
+// Based on DAM-OBJECT from 1actions.zil
+// Requirements: 42
+bool damAction() {
+    auto& g = Globals::instance();
+    
+    if (!g.prso || g.prso->getId() != ObjectIds::DAM) {
+        return RFALSE;
+    }
+    
+    // Handle EXAMINE
+    if (g.prsa == V_EXAMINE) {
+        printLine("The dam is a massive concrete structure. There is a control panel with various switches and buttons.");
+        return RTRUE;
+    }
+    
+    // Handle OPEN - opening the dam gates
+    if (g.prsa == V_OPEN) {
+        printLine("The dam gates are controlled by the panel in the maintenance room.");
+        return RTRUE;
+    }
+    
+    return RFALSE;
+}
+
+// Bolt action - part of dam puzzle
+// Requirements: 42
+bool boltAction() {
+    auto& g = Globals::instance();
+    
+    if (!g.prso || g.prso->getId() != ObjectIds::BOLT) {
+        return RFALSE;
+    }
+    
+    // Handle EXAMINE
+    if (g.prsa == V_EXAMINE) {
+        printLine("It's a large metal bolt, part of the dam's control mechanism.");
+        return RTRUE;
+    }
+    
+    // Handle TURN - turning the bolt with wrench
+    if (g.prsa == V_TURN) {
+        // Check if player has wrench
+        ZObject* wrench = g.getObject(ObjectIds::WRENCH);
+        if (!wrench || wrench->getLocation() != g.winner) {
+            printLine("You need a wrench to turn the bolt.");
+            return RTRUE;
+        }
+        
+        printLine("You turn the bolt with the wrench. Something clicks inside the mechanism.");
+        return RTRUE;
+    }
+    
+    return RFALSE;
+}
+
+// Bubble action - green bubble puzzle
+// Requirements: 42
+bool bubbleAction() {
+    auto& g = Globals::instance();
+    
+    if (!g.prso || g.prso->getId() != ObjectIds::BUBBLE) {
+        return RFALSE;
+    }
+    
+    // Handle EXAMINE
+    if (g.prsa == V_EXAMINE) {
+        printLine("It's a large green bubble, shimmering and translucent.");
+        return RTRUE;
+    }
+    
+    // Handle TAKE
+    if (g.prsa == V_TAKE) {
+        printLine("The bubble is too fragile to take.");
+        return RTRUE;
+    }
+    
+    // Handle ATTACK/BREAK - popping the bubble
+    if (g.prsa == V_ATTACK) {
+        printLine("The bubble pops with a soft sound and disappears.");
+        g.prso->moveTo(nullptr);  // Remove bubble from game
+        return RTRUE;
+    }
+    
+    return RFALSE;
+}
+
+// Button actions - machine control buttons
+// Requirements: 42
+bool buttonAction() {
+    auto& g = Globals::instance();
+    
+    bool isYellow = g.prso && g.prso->getId() == ObjectIds::YELLOW_BUTTON;
+    bool isBrown = g.prso && g.prso->getId() == ObjectIds::BROWN_BUTTON;
+    bool isRed = g.prso && g.prso->getId() == ObjectIds::RED_BUTTON;
+    bool isBlue = g.prso && g.prso->getId() == ObjectIds::BLUE_BUTTON;
+    
+    if (!isYellow && !isBrown && !isRed && !isBlue) {
+        return RFALSE;
+    }
+    
+    // Handle EXAMINE
+    if (g.prsa == V_EXAMINE) {
+        if (isYellow) {
+            printLine("A yellow button on the control panel.");
+        } else if (isBrown) {
+            printLine("A brown button on the control panel.");
+        } else if (isRed) {
+            printLine("A red button on the control panel.");
+        } else if (isBlue) {
+            printLine("A blue button on the control panel.");
+        }
+        return RTRUE;
+    }
+    
+    // Handle PUSH - pressing the button
+    if (g.prsa == V_PUSH) {
+        if (isYellow) {
+            printLine("You press the yellow button. A light flashes.");
+        } else if (isBrown) {
+            printLine("You press the brown button. You hear a grinding noise.");
+        } else if (isRed) {
+            printLine("You press the red button. A siren sounds briefly.");
+        } else if (isBlue) {
+            printLine("You press the blue button. Nothing obvious happens.");
+        }
+        return RTRUE;
+    }
+    
+    return RFALSE;
+}
+
+// Gunk action - vitreous slag
+// Requirements: 42
+bool gunkAction() {
+    auto& g = Globals::instance();
+    
+    if (!g.prso || g.prso->getId() != ObjectIds::GUNK) {
+        return RFALSE;
+    }
+    
+    // Handle EXAMINE
+    if (g.prsa == V_EXAMINE) {
+        printLine("It's a pile of vitreous slag, a glassy substance left over from some industrial process.");
+        return RTRUE;
+    }
+    
+    // Handle TAKE
+    if (g.prsa == V_TAKE) {
+        printLine("The gunk is too hot and sticky to handle.");
+        return RTRUE;
+    }
+    
+    return RFALSE;
+}
+
 void initializeWorld() {
     auto& g = Globals::instance();
     
@@ -3540,9 +4021,54 @@ void initializeWorld() {
     pump->setFlag(ObjectFlag::TAKEBIT);
     pump->setFlag(ObjectFlag::TOOLBIT);
     pump->setProperty(P_SIZE, 8);
-    // TODO: Add action handler for inflating/deflating boat
+    pump->setAction(pumpAction);
     pump->moveTo(g.getObject(RoomIds::RESERVOIR_NORTH));
     g.registerObject(ObjectIds::PUMP, std::move(pump));
+    
+    // Create BOAT_INFLATABLE (Deflated rubber boat)
+    auto boatInflatable = std::make_unique<ZObject>(ObjectIds::BOAT_INFLATABLE, "pile of plastic");
+    boatInflatable->addSynonym("boat");
+    boatInflatable->addSynonym("raft");
+    boatInflatable->addSynonym("pile");
+    boatInflatable->addSynonym("plastic");
+    boatInflatable->addAdjective("rubber");
+    boatInflatable->addAdjective("deflated");
+    boatInflatable->addAdjective("small");
+    boatInflatable->setFlag(ObjectFlag::TAKEBIT);
+    boatInflatable->setFlag(ObjectFlag::BURNBIT);  // Can be burned
+    boatInflatable->setProperty(P_SIZE, 10);
+    boatInflatable->setAction(boatAction);
+    boatInflatable->moveTo(g.getObject(RoomIds::RESERVOIR_SOUTH));
+    g.registerObject(ObjectIds::BOAT_INFLATABLE, std::move(boatInflatable));
+    
+    // Create BOAT_INFLATED (Inflated rubber boat)
+    auto boatInflated = std::make_unique<ZObject>(ObjectIds::BOAT_INFLATED, "rubber boat");
+    boatInflated->addSynonym("boat");
+    boatInflated->addSynonym("raft");
+    boatInflated->addAdjective("rubber");
+    boatInflated->addAdjective("inflated");
+    boatInflated->addAdjective("small");
+    boatInflated->setFlag(ObjectFlag::CONTBIT);    // Can hold player
+    boatInflated->setFlag(ObjectFlag::VEHBIT);     // Is a vehicle
+    boatInflated->setFlag(ObjectFlag::OPENBIT);    // Open container
+    boatInflated->setProperty(P_SIZE, 50);
+    boatInflated->setProperty(P_CAPACITY, 100);
+    boatInflated->setAction(boatAction);
+    // Starts not in game - created when inflatable boat is inflated
+    g.registerObject(ObjectIds::BOAT_INFLATED, std::move(boatInflated));
+    
+    // Create BOAT_PUNCTURED (Punctured rubber boat)
+    auto boatPunctured = std::make_unique<ZObject>(ObjectIds::BOAT_PUNCTURED, "punctured boat");
+    boatPunctured->addSynonym("boat");
+    boatPunctured->addSynonym("raft");
+    boatPunctured->addAdjective("rubber");
+    boatPunctured->addAdjective("punctured");
+    boatPunctured->addAdjective("damaged");
+    boatPunctured->setFlag(ObjectFlag::TRYTAKEBIT);  // Can't be taken
+    boatPunctured->setProperty(P_SIZE, 30);
+    boatPunctured->setAction(boatAction);
+    // Starts not in game - created if boat is punctured
+    g.registerObject(ObjectIds::BOAT_PUNCTURED, std::move(boatPunctured));
     
     // Create BOTTLE (Glass bottle - container and tool)
     auto bottle = std::make_unique<ZObject>(ObjectIds::BOTTLE, "glass bottle");
@@ -3558,6 +4084,129 @@ void initializeWorld() {
     bottle->setAction(bottleAction);
     bottle->moveTo(g.getObject(RoomIds::KITCHEN));
     g.registerObject(ObjectIds::BOTTLE, std::move(bottle));
+    
+    // ===== PUZZLE OBJECTS (Task 45) =====
+    
+    // Create MACHINE (Control panel puzzle)
+    auto machine = std::make_unique<ZObject>(ObjectIds::MACHINE, "machine");
+    machine->addSynonym("machine");
+    machine->addSynonym("panel");
+    machine->addSynonym("controls");
+    machine->addSynonym("contraption");
+    machine->addAdjective("control");
+    machine->addAdjective("metal");
+    machine->addAdjective("large");
+    machine->setFlag(ObjectFlag::TRYTAKEBIT);  // Can't be taken
+    machine->setFlag(ObjectFlag::CONTBIT);     // Can contain things
+    machine->setProperty(P_SIZE, 100);
+    machine->setProperty(P_CAPACITY, 20);
+    machine->setAction(machineAction);
+    machine->moveTo(g.getObject(RoomIds::MACHINE_ROOM));
+    g.registerObject(ObjectIds::MACHINE, std::move(machine));
+    
+    // Create MIRROR_1 (First mirror)
+    auto mirror1 = std::make_unique<ZObject>(ObjectIds::MIRROR_1, "mirror");
+    mirror1->addSynonym("mirror");
+    mirror1->addSynonym("glass");
+    mirror1->addAdjective("large");
+    mirror1->setFlag(ObjectFlag::TRYTAKEBIT);  // Can't be taken
+    mirror1->setFlag(ObjectFlag::NDESCBIT);    // No automatic description
+    mirror1->setAction(mirrorAction);
+    mirror1->moveTo(g.getObject(RoomIds::MIRROR_ROOM_1));
+    g.registerObject(ObjectIds::MIRROR_1, std::move(mirror1));
+    
+    // Create MIRROR_2 (Second mirror)
+    auto mirror2 = std::make_unique<ZObject>(ObjectIds::MIRROR_2, "mirror");
+    mirror2->addSynonym("mirror");
+    mirror2->addSynonym("glass");
+    mirror2->addAdjective("large");
+    mirror2->setFlag(ObjectFlag::TRYTAKEBIT);  // Can't be taken
+    mirror2->setFlag(ObjectFlag::NDESCBIT);    // No automatic description
+    mirror2->setAction(mirrorAction);
+    mirror2->moveTo(g.getObject(RoomIds::MIRROR_ROOM_2));
+    g.registerObject(ObjectIds::MIRROR_2, std::move(mirror2));
+    
+    // Create DAM (Dam structure)
+    auto dam = std::make_unique<ZObject>(ObjectIds::DAM, "dam");
+    dam->addSynonym("dam");
+    dam->addSynonym("structure");
+    dam->addAdjective("concrete");
+    dam->addAdjective("massive");
+    dam->setFlag(ObjectFlag::TRYTAKEBIT);  // Can't be taken
+    dam->setFlag(ObjectFlag::NDESCBIT);
+    dam->setAction(damAction);
+    dam->moveTo(g.getObject(RoomIds::DAM_ROOM));
+    g.registerObject(ObjectIds::DAM, std::move(dam));
+    
+    // Create BOLT (Metal bolt for dam puzzle)
+    auto bolt = std::make_unique<ZObject>(ObjectIds::BOLT, "bolt");
+    bolt->addSynonym("bolt");
+    bolt->addSynonym("nut");
+    bolt->addAdjective("metal");
+    bolt->addAdjective("large");
+    bolt->setFlag(ObjectFlag::TRYTAKEBIT);  // Can't be taken
+    bolt->setFlag(ObjectFlag::TURNBIT);     // Can be turned
+    bolt->setAction(boltAction);
+    bolt->moveTo(g.getObject(RoomIds::MAINTENANCE_ROOM));
+    g.registerObject(ObjectIds::BOLT, std::move(bolt));
+    
+    // Create BUBBLE (Green bubble)
+    auto bubble = std::make_unique<ZObject>(ObjectIds::BUBBLE, "bubble");
+    bubble->addSynonym("bubble");
+    bubble->addAdjective("green");
+    bubble->addAdjective("large");
+    bubble->setFlag(ObjectFlag::TRYTAKEBIT);  // Can't be taken
+    bubble->setAction(bubbleAction);
+    // Bubble starts not in game - appears in certain puzzle conditions
+    g.registerObject(ObjectIds::BUBBLE, std::move(bubble));
+    
+    // Create YELLOW_BUTTON
+    auto yellowButton = std::make_unique<ZObject>(ObjectIds::YELLOW_BUTTON, "yellow button");
+    yellowButton->addSynonym("button");
+    yellowButton->addAdjective("yellow");
+    yellowButton->setFlag(ObjectFlag::TRYTAKEBIT);  // Can't be taken
+    yellowButton->setAction(buttonAction);
+    yellowButton->moveTo(g.getObject(RoomIds::MACHINE_ROOM));
+    g.registerObject(ObjectIds::YELLOW_BUTTON, std::move(yellowButton));
+    
+    // Create BROWN_BUTTON
+    auto brownButton = std::make_unique<ZObject>(ObjectIds::BROWN_BUTTON, "brown button");
+    brownButton->addSynonym("button");
+    brownButton->addAdjective("brown");
+    brownButton->setFlag(ObjectFlag::TRYTAKEBIT);  // Can't be taken
+    brownButton->setAction(buttonAction);
+    brownButton->moveTo(g.getObject(RoomIds::MACHINE_ROOM));
+    g.registerObject(ObjectIds::BROWN_BUTTON, std::move(brownButton));
+    
+    // Create RED_BUTTON
+    auto redButton = std::make_unique<ZObject>(ObjectIds::RED_BUTTON, "red button");
+    redButton->addSynonym("button");
+    redButton->addAdjective("red");
+    redButton->setFlag(ObjectFlag::TRYTAKEBIT);  // Can't be taken
+    redButton->setAction(buttonAction);
+    redButton->moveTo(g.getObject(RoomIds::MACHINE_ROOM));
+    g.registerObject(ObjectIds::RED_BUTTON, std::move(redButton));
+    
+    // Create BLUE_BUTTON
+    auto blueButton = std::make_unique<ZObject>(ObjectIds::BLUE_BUTTON, "blue button");
+    blueButton->addSynonym("button");
+    blueButton->addAdjective("blue");
+    blueButton->setFlag(ObjectFlag::TRYTAKEBIT);  // Can't be taken
+    blueButton->setAction(buttonAction);
+    blueButton->moveTo(g.getObject(RoomIds::MACHINE_ROOM));
+    g.registerObject(ObjectIds::BLUE_BUTTON, std::move(blueButton));
+    
+    // Create GUNK (Vitreous slag)
+    auto gunk = std::make_unique<ZObject>(ObjectIds::GUNK, "vitreous slag");
+    gunk->addSynonym("gunk");
+    gunk->addSynonym("slag");
+    gunk->addSynonym("pile");
+    gunk->addAdjective("vitreous");
+    gunk->addAdjective("glassy");
+    gunk->setFlag(ObjectFlag::TRYTAKEBIT);  // Can't be taken
+    gunk->setAction(gunkAction);
+    gunk->moveTo(g.getObject(RoomIds::MACHINE_ROOM));
+    g.registerObject(ObjectIds::GUNK, std::move(gunk));
     
 
     // ===== SCENERY OBJECTS =====
