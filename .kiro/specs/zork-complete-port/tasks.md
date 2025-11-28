@@ -1562,7 +1562,7 @@ Implement object-specific and room-specific behaviors.
 
 Implement the core game systems that tie everything together.
 
-- [ ] 47. Implement timer system foundation
+- [x] 47. Implement timer system foundation
   - Create TimerSystem class
   - Implement timer registration
   - Implement timer enable/disable
@@ -1570,30 +1570,30 @@ Implement the core game systems that tie everything together.
   - Support one-shot and repeating timers
   - _Requirements: 44_
 
-- [ ] 47.1 Create TimerSystem class structure
+- [x] 47.1 Create TimerSystem class structure
   - Define Timer struct with interval, counter, callback
   - Implement timer storage (map by name)
   - _Requirements: 44_
 
-- [ ] 47.2 Implement timer registration
+- [x] 47.2 Implement timer registration
   - registerTimer() method
   - Support interval and callback
   - Support repeating vs one-shot
   - _Requirements: 44_
 
-- [ ] 47.3 Implement timer control
+- [x] 47.3 Implement timer control
   - enableTimer() and disableTimer() methods
   - Check enabled flag before firing
   - _Requirements: 44_
 
-- [ ] 47.4 Implement timer tick
+- [x] 47.4 Implement timer tick
   - Called from main loop each turn
   - Decrement counters
   - Fire callbacks when counter reaches zero
   - Reset repeating timers
   - _Requirements: 44_
 
-- [ ] 47.5 Write unit tests for timer system
+- [x] 47.5 Write unit tests for timer system
   - Test timer registration
   - Test timer firing
   - Test enable/disable

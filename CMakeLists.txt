@@ -67,4 +67,8 @@ if(BUILD_TESTS)
     # Meta-game verb tests
     add_executable(meta_game_verb_tests tests/meta_game_verb_tests.cpp ${LIB_SOURCES})
     add_test(NAME MetaGameVerbTests COMMAND meta_game_verb_tests)
+    
+    # Timer system tests
+    add_executable(timer_system_tests tests/timer_system_tests.cpp ${LIB_SOURCES})
+    add_test(NAME TimerSystemTests COMMAND timer_system_tests)
 endif()
