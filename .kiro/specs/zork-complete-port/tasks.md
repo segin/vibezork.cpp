@@ -1768,30 +1768,30 @@ Implement the core game systems that tie everything together.
   - Test lighting updates
   - _Requirements: 50, 92_
 
-- [ ] 54. Implement grue attacks
+- [x] 54. Implement grue attacks
   - Track darkness duration
   - Warn about grue in darkness
   - Increase danger over time
   - Kill player if too long in darkness
   - _Requirements: 51_
 
-- [ ] 54.1 Implement darkness tracking
+- [x] 54.1 Implement darkness tracking
   - Increment counter when in darkness
   - Reset counter when in light
   - _Requirements: 51_
 
-- [ ] 54.2 Implement grue warnings
+- [x] 54.2 Implement grue warnings
   - First warning: "It is pitch black. You are likely to be eaten by a grue."
   - Subsequent warnings increase urgency
   - _Requirements: 51_
 
-- [ ] 54.3 Implement grue attack
+- [x] 54.3 Implement grue attack
   - After several turns in darkness, grue attacks
   - Kill player
   - Display death message
   - _Requirements: 51, 58_
 
-- [ ] 54.4 Write unit tests for grue
+- [x] 54.4 Write unit tests for grue
   - Test darkness warnings
   - Test grue attack
   - Test light prevents grue

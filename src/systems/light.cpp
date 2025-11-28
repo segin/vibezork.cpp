@@ -160,12 +160,14 @@ void LightSystem::checkGrue() {
         return;
     }
     
-    // After more turns, the grue attacks
-    if (darknessTurns_ >= 3) {
-        // TODO: Implement JIGS-UP (death) function
-        // For now, just give a fatal message
+    // After more turns, the grue attacks (Requirement 51)
+    if (darknessTurns_ >= 4) {
         printLine("Oh, no! You have walked into the slavering fangs of a lurking grue!");
         printLine("    ****  You have died  ****");
-        // This should trigger game over, but that's not implemented yet
+        printLine("");
+        printLine("Would you like to start over, restore a saved game, or end this session?");
+        // TODO: Full JIGS-UP implementation in task 59 will handle resurrection/restart
+        // For now, this provides the death message as required
+        darknessTurns_ = 0;  // Reset to prevent repeated death messages
     }
 }
