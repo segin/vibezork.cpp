@@ -1915,32 +1915,32 @@ Implement the core game systems that tie everything together.
   - Display appropriate messages
   - _Requirements: 56_
 
-- [ ] 58. Implement enemy behavior
+- [x] 58. Implement enemy behavior
   - Implement enemy attack logic
   - Implement enemy strength variation
   - Implement enemy fleeing
   - Implement enemy death
   - _Requirements: 57_
 
-- [ ] 58.1 Implement enemy attacks
+- [x] 58.1 Implement enemy attacks
   - Enemy attacks player during combat
   - Use enemy strength in calculation
   - Display attack messages
   - _Requirements: 57_
 
-- [ ] 58.2 Implement enemy strength
+- [x] 58.2 Implement enemy strength
   - Troll is stronger than thief
   - Cyclops is very strong
   - Set STRENGTH property appropriately
   - _Requirements: 57_
 
-- [ ] 58.3 Implement enemy fleeing
+- [x] 58.3 Implement enemy fleeing
   - Enemy flees when badly wounded
   - Move to adjacent room
   - End combat
   - _Requirements: 57_
 
-- [ ] 58.4 Implement enemy death
+- [x] 58.4 Implement enemy death
   - Set DEADBIT flag
   - Drop carried items
   - Remove from game or make inactive

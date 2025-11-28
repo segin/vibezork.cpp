@@ -24,11 +24,31 @@ void CombatManager::startCombat(ZObject* enemy, ZObject* weapon) {
     player_ = Combatant(g.winner, playerHealth, weapon);
     
     // Initialize enemy combatant
-    int enemyHealth = enemy->getProperty(P_STRENGTH);
-    if (enemyHealth == 0) {
-        enemyHealth = 10;  // Default enemy health
+    // Enemy health is based on STRENGTH property
+    int enemyStrength = enemy->getProperty(P_STRENGTH);
+    if (enemyStrength == 0) {
+        enemyStrength = 5;  // Default enemy strength
     }
-    enemy_ = Combatant(enemy, enemyHealth, nullptr);
+    
+    // Health is proportional to strength
+    // Thief: STRENGTH 2 -> 10 HP
+    // Troll: STRENGTH 2 -> 10 HP  
+    // Cyclops: STRENGTH 10000 -> very high HP (special case)
+    int enemyHealth = enemyStrength * 5;
+    if (enemyHealth > 100) {
+        enemyHealth = 100;  // Cap at reasonable value
+    }
+    
+    // Find enemy's weapon
+    ZObject* enemyWeapon = nullptr;
+    for (auto* item : enemy->getContents()) {
+        if (item->hasFlag(ObjectFlag::WEAPONBIT)) {
+            enemyWeapon = item;
+            break;
+        }
+    }
+    
+    enemy_ = Combatant(enemy, enemyHealth, enemyWeapon);
     
     inCombat_ = true;
     
@@ -146,22 +166,23 @@ void CombatManager::processCombatRound() {
 
 int CombatManager::calculateDamage(const Combatant& attacker, const Combatant& defender) {
     // Base damage from attacker strength
-    int baseDamage = attacker.strength / 2;
+    // Stronger enemies deal more damage
+    int baseDamage = attacker.strength;
     
     // Add weapon effectiveness
     if (attacker.weapon) {
         // Weapon has STRENGTH property indicating effectiveness
         int weaponStrength = attacker.weapon->getProperty(P_STRENGTH);
         if (weaponStrength > 0) {
-            baseDamage += weaponStrength;
+            baseDamage += weaponStrength * 2;
         }
     } else {
-        // Bare hands - low effectiveness (2 points)
-        baseDamage += 2;
+        // Bare hands - low effectiveness
+        baseDamage += 1;
     }
     
-    // Add some randomness (±25%)
-    int variance = baseDamage / 4;
+    // Add some randomness (±30%)
+    int variance = baseDamage / 3;
     if (variance < 1) {
         variance = 1;
     }
@@ -221,10 +242,12 @@ void CombatManager::applyDamage(Combatant& target, int damage) {
 }
 
 bool CombatManager::shouldEnemyFlee(const Combatant& enemy) {
-    // Enemy flees if badly wounded (below 25% health)
-    if (enemy.health < enemy.maxHealth / 4) {
-        // 50% chance to flee each round when badly wounded
-        return (rand() % 100) < 50;
+    // Enemy flees if badly wounded (below 30% health)
+    // Based on ZIL WINNING? function - enemies flee when losing badly
+    if (enemy.health < enemy.maxHealth * 3 / 10) {
+        // Higher chance to flee when more wounded
+        int fleeChance = 40 + ((enemy.maxHealth - enemy.health) * 20 / enemy.maxHealth);
+        return (rand() % 100) < fleeChance;
     }
     return false;
 }
@@ -234,13 +257,17 @@ void CombatManager::handleEnemyFlee() {
         return;
     }
     
-    printLine("The " + enemy_->object->getDesc() + " flees in terror!");
+    // Enemy flees - based on ZIL thief/troll behavior
+    printLine("Your opponent, determining discretion to be the better part of valor,");
+    printLine("decides to terminate this little contretemps. With a rueful nod,");
+    printLine("the " + enemy_->object->getDesc() + " steps backward into the gloom and disappears.");
     
-    // For now, just mark the enemy as having fled
-    // In a full implementation, we would move the enemy to an adjacent room
-    // but that requires more complex room navigation logic
+    // Clear FIGHTBIT so enemy won't attack again immediately
+    enemy_->object->clearFlag(ObjectFlag::FIGHTBIT);
+    
+    // Make enemy invisible (fled from combat)
+    // In full implementation, would move to adjacent room
     enemy_->object->setFlag(ObjectFlag::INVISIBLE);
-    printLine("The " + enemy_->object->getDesc() + " escapes into the shadows!");
 }
 
 void CombatManager::handleDeath(Combatant& combatant) {
@@ -248,16 +275,41 @@ void CombatManager::handleDeath(Combatant& combatant) {
         return;
     }
     
+    auto& g = Globals::instance();
+    
     // Mark as dead
     combatant.object->setFlag(ObjectFlag::DEADBIT);
     
     // Remove FIGHTBIT so it can't be attacked again
     combatant.object->clearFlag(ObjectFlag::FIGHTBIT);
     
-    // Drop all carried items
+    // Drop all carried items to current location
+    auto* location = combatant.object->getLocation();
+    if (!location) {
+        location = g.here;
+    }
+    
     auto contents = combatant.object->getContents();
     for (auto* item : contents) {
-        item->moveTo(combatant.object->getLocation());
+        if (location) {
+            item->moveTo(location);
+            // Make items visible and accessible
+            item->clearFlag(ObjectFlag::NDESCBIT);
+            if (item->hasFlag(ObjectFlag::WEAPONBIT)) {
+                // Weapons become available again
+                printLine("The " + item->getDesc() + " falls to the ground.");
+            }
+        }
+    }
+    
+    // Based on ZIL: enemy disappears in sinister fog
+    if (combatant.object != g.winner) {
+        printLine("Almost as soon as the " + combatant.object->getDesc() + 
+                  " breathes his last breath, a cloud of sinister black fog envelops him,");
+        printLine("and when the fog lifts, the carcass has disappeared.");
+        
+        // Remove enemy from game
+        combatant.object->setFlag(ObjectFlag::INVISIBLE);
     }
 }
 
