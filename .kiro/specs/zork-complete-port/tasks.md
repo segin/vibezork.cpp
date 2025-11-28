@@ -1709,24 +1709,24 @@ Implement the core game systems that tie everything together.
   - Display message
   - _Requirements: 48_
 
-- [ ] 52. Implement sword glow timer (I-SWORD)
+- [x] 52. Implement sword glow timer (I-SWORD)
   - Register sword glow check timer
   - Check for nearby enemies
   - Make sword glow when enemies near
   - Stop glow when enemies leave
   - _Requirements: 49_
 
-- [ ] 52.1 Register sword glow timer
+- [x] 52.1 Register sword glow timer
   - Enable when player has sword
   - Check periodically
   - _Requirements: 49_
 
-- [ ] 52.2 Implement enemy proximity check
+- [x] 52.2 Implement enemy proximity check
   - Check current room for enemies
   - Check adjacent rooms for enemies
   - _Requirements: 49_
 
-- [ ] 52.3 Implement sword glow
+- [x] 52.3 Implement sword glow
   - Set glow flag when enemies near
   - Clear glow flag when enemies leave
   - Display messages for state changes

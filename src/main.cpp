@@ -7,6 +7,7 @@
 #include "systems/timer.h"
 #include "systems/lamp.h"
 #include "systems/candle.h"
+#include "systems/sword.h"
 #include <iostream>
 #include <map>
 
@@ -184,6 +185,7 @@ void initializeGame() {
     NPCSystem::initializeCyclops();
     LampSystem::initialize();  // Initialize lamp timer (Requirement 47)
     CandleSystem::initialize();  // Initialize candle timer (Requirement 48)
+    SwordSystem::initialize();  // Initialize sword glow timer (Requirement 49)
 }
 
 void go() {
