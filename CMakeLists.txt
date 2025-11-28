@@ -75,4 +75,8 @@ if(BUILD_TESTS)
     # Sword glow tests
     add_executable(sword_glow_tests tests/sword_glow_tests.cpp ${LIB_SOURCES})
     add_test(NAME SwordGlowTests COMMAND sword_glow_tests)
+    
+    # Light system tests
+    add_executable(light_system_tests tests/light_system_tests.cpp ${LIB_SOURCES})
+    add_test(NAME LightSystemTests COMMAND light_system_tests)
 endif()

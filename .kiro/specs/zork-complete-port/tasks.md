@@ -1732,7 +1732,7 @@ Implement the core game systems that tie everything together.
   - Display messages for state changes
   - _Requirements: 49_
 
-- [ ] 53. Implement light and darkness system
+- [x] 53. Implement light and darkness system
   - Create LightSystem class
   - Implement room lighting checks
   - Implement light source tracking
@@ -1740,29 +1740,29 @@ Implement the core game systems that tie everything together.
   - Integrate with main loop
   - _Requirements: 50_
 
-- [ ] 53.1 Create LightSystem class
+- [x] 53.1 Create LightSystem class
   - Track light sources
   - Track room lighting state
   - _Requirements: 50_
 
-- [ ] 53.2 Implement isRoomLit() method
+- [x] 53.2 Implement isRoomLit() method
   - Check if room has ONBIT flag (naturally lit)
   - Check for light sources in room
   - Check for light sources in player inventory
   - Return true if any light present
   - _Requirements: 50_
 
-- [ ] 53.3 Implement hasLightSource() method
+- [x] 53.3 Implement hasLightSource() method
   - Check player inventory for lit light sources
   - Check current room for lit light sources
   - _Requirements: 50_
 
-- [ ] 53.4 Implement updateLighting() method
+- [x] 53.4 Implement updateLighting() method
   - Called when light sources change
   - Update room descriptions based on lighting
   - _Requirements: 50_
 
-- [ ] 53.5 Write unit tests for light system
+- [x] 53.5 Write unit tests for light system
   - Test room lighting checks
   - Test light source detection
   - Test lighting updates
