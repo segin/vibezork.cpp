@@ -1,4 +1,6 @@
 #include "globals.h"
+#include "systems/combat.h"
+#include "systems/timer.h"
 
 Globals& Globals::instance() {
     static Globals inst;
@@ -15,6 +17,14 @@ ZObject* Globals::getObject(ObjectId id) {
 }
 
 void Globals::reset() {
+    // End any active combat
+    if (CombatSystem::isInCombat()) {
+        CombatSystem::endCombat();
+    }
+    
+    // Clear all timers
+    TimerSystem::clear();
+    
     objects_.clear();
     here = nullptr;
     winner = nullptr;

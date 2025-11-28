@@ -1632,7 +1632,7 @@ Implement the core game systems that tie everything together.
   - Use combat system
   - _Requirements: 45, 55_
 
-- [ ] 49. Implement combat timer (I-FIGHT)
+- [x] 49. Implement combat timer (I-FIGHT)
   - Register combat round timer
   - Implement combat round callback
   - Process one round of combat
@@ -1640,12 +1640,12 @@ Implement the core game systems that tie everything together.
   - End combat when appropriate
   - _Requirements: 46_
 
-- [ ] 49.1 Register combat timer
+- [x] 49.1 Register combat timer
   - Enable when combat starts
   - Disable when combat ends
   - _Requirements: 46_
 
-- [ ] 49.2 Implement combat round processing
+- [x] 49.2 Implement combat round processing
   - Player attacks enemy
   - Enemy attacks player
   - Calculate damage

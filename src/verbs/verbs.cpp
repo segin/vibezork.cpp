@@ -5,6 +5,7 @@
 #include "world/objects.h"
 #include "world/world.h"
 #include "systems/npc.h"
+#include "systems/combat.h"
 #include <fstream>
 #include <sstream>
 
@@ -1514,40 +1515,20 @@ bool vAttack() {
         }
     }
     
-    if (!weapon) {
-        printLine("You have no weapon.");
+    // Check if already in combat
+    if (CombatSystem::isInCombat()) {
+        // Already fighting - the combat timer will handle rounds
+        printLine("You're already in combat!");
         return RTRUE;
     }
     
-    // Simple combat: calculate damage based on weapon strength
-    int weaponStrength = weapon->getProperty(P_STRENGTH);
-    if (weaponStrength == 0) {
-        weaponStrength = 1;  // Default weapon strength
-    }
+    // Start turn-based combat using the combat system
+    // This will register the I-FIGHT timer to process combat rounds
+    CombatSystem::startCombat(g.prso, weapon);
     
-    int enemyStrength = g.prso->getProperty(P_STRENGTH);
-    if (enemyStrength == 0) {
-        enemyStrength = 5;  // Default enemy strength
-    }
-    
-    // Simple combat resolution
-    if (weaponStrength >= enemyStrength) {
-        printLine("You strike the " + g.prso->getDesc() + " with the " + weapon->getDesc() + "!");
-        printLine("The " + g.prso->getDesc() + " is defeated!");
-        
-        // Mark enemy as dead
-        g.prso->setFlag(ObjectFlag::DEADBIT);
-        
-        // Remove FIGHTBIT so it can't be attacked again
-        g.prso->clearFlag(ObjectFlag::FIGHTBIT);
-    } else {
-        printLine("You swing at the " + g.prso->getDesc() + " but miss!");
-        printLine("The " + g.prso->getDesc() + " counterattacks!");
-        
-        // Enemy counterattack - for now just a message
-        // Full combat system would track health and damage
-        printLine("You are wounded!");
-    }
+    // Process the first combat round immediately
+    // (subsequent rounds will be handled by the I-FIGHT timer)
+    CombatSystem::processCombatRound();
     
     return RTRUE;
 }
