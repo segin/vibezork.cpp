@@ -84,6 +84,12 @@ public:
     // Get timer count (for debugging)
     size_t getTimerCount() const { return timers_.size(); }
     
+    // Get all timers (for serialization)
+    const std::unordered_map<std::string, Timer>& getAllTimers() const { return timers_; }
+    
+    // Set timer state (for deserialization)
+    void setTimerState(std::string_view name, bool enabled, int counter);
+    
 private:
     TimerManager() = default;
     TimerManager(const TimerManager&) = delete;

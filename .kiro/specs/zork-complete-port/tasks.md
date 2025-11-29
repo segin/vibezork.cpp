@@ -1997,19 +1997,19 @@ Implement the core game systems that tie everything together.
   - Force restart or quit
   - _Requirements: 59_
 
-- [ ] 61. Implement save game system
+- [x] 61. Implement save game system
   - Create SaveSystem class
   - Implement game state serialization
   - Write to file
   - Handle errors gracefully
   - _Requirements: 60_
 
-- [ ] 61.1 Create SaveSystem class
+- [x] 61.1 Create SaveSystem class
   - Define save file format
   - Implement serialization methods
   - _Requirements: 60_
 
-- [ ] 61.2 Implement state serialization
+- [x] 61.2 Implement state serialization
   - Serialize player location and inventory
   - Serialize all object locations and states
   - Serialize all flags and properties
@@ -2017,13 +2017,13 @@ Implement the core game systems that tie everything together.
   - Serialize timer states
   - _Requirements: 60_
 
-- [ ] 61.3 Implement file writing
+- [x] 61.3 Implement file writing
   - Write serialized state to file
   - Handle file I/O errors
   - Display success/error messages
   - _Requirements: 60_
 
-- [ ] 61.4 Write unit tests for save system
+- [x] 61.4 Write unit tests for save system
   - Test serialization
   - Test file writing
   - Test error handling

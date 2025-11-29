@@ -45,6 +45,11 @@ public:
     void setAction(ActionFunc func) { action_ = func; }
     bool performAction() { return action_ ? action_() : false; }
     
+    // Serialization support (for save/restore system)
+    uint32_t getAllFlags() const { return flags_; }
+    void setAllFlags(uint32_t flags) { flags_ = flags; }
+    const std::map<PropertyId, int>& getAllProperties() const { return properties_; }
+    
 private:
     ObjectId id_;
     std::string desc_;

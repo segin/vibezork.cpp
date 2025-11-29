@@ -121,5 +121,14 @@ void TimerManager::clear() {
     timers_.clear();
 }
 
+void TimerManager::setTimerState(std::string_view name, bool enabled, int counter) {
+    std::string key(name);
+    auto it = timers_.find(key);
+    if (it != timers_.end()) {
+        it->second.enabled = enabled;
+        it->second.counter = counter;
+    }
+}
+
 } // namespace TimerSystem
 

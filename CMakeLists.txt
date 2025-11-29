@@ -91,4 +91,8 @@ if(BUILD_TESTS)
     # Death system tests
     add_executable(death_system_tests tests/death_system_tests.cpp ${LIB_SOURCES})
     add_test(NAME DeathSystemTests COMMAND death_system_tests)
+    
+    # Save system tests
+    add_executable(save_system_tests tests/save_system_tests.cpp ${LIB_SOURCES})
+    add_test(NAME SaveSystemTests COMMAND save_system_tests)
 endif()
