@@ -1,4 +1,5 @@
 #include "light.h"
+#include "death.h"
 #include "../core/globals.h"
 #include "../core/object.h"
 #include "../core/io.h"
@@ -160,14 +161,11 @@ void LightSystem::checkGrue() {
         return;
     }
     
-    // After more turns, the grue attacks (Requirement 51)
+    // After more turns, the grue attacks (Requirement 51, 58.4)
     if (darknessTurns_ >= 4) {
-        printLine("Oh, no! You have walked into the slavering fangs of a lurking grue!");
-        printLine("    ****  You have died  ****");
-        printLine("");
-        printLine("Would you like to start over, restore a saved game, or end this session?");
-        // TODO: Full JIGS-UP implementation in task 59 will handle resurrection/restart
-        // For now, this provides the death message as required
+        // Player eaten by grue - use death system
+        DeathSystem::jigsUp("Oh, no! You have walked into the slavering fangs of a lurking grue!", 
+                           DeathSystem::DeathCause::GRUE);
         darknessTurns_ = 0;  // Reset to prevent repeated death messages
     }
 }

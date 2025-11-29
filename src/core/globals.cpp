@@ -1,6 +1,7 @@
 #include "globals.h"
 #include "systems/combat.h"
 #include "systems/timer.h"
+#include "systems/death.h"
 
 Globals& Globals::instance() {
     static Globals inst;
@@ -24,6 +25,9 @@ void Globals::reset() {
     
     // Clear all timers
     TimerSystem::clear();
+    
+    // Reset death system
+    DeathSystem::reset();
     
     objects_.clear();
     here = nullptr;

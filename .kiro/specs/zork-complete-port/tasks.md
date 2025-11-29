@@ -1947,27 +1947,27 @@ Implement the core game systems that tie everything together.
   - Display death message
   - _Requirements: 57_
 
-- [ ] 59. Implement death and game over
+- [x] 59. Implement death and game over
   - Implement JIGS-UP function
   - Display death messages
   - Offer resurrection or restart
   - Track death count
   - _Requirements: 58_
 
-- [ ] 59.1 Implement JIGS-UP function
+- [x] 59.1 Implement JIGS-UP function
   - Called when player dies
   - Display appropriate death message
   - Offer options (resurrect, restart, quit)
   - _Requirements: 58_
 
-- [ ] 59.2 Implement death scenarios
+- [x] 59.2 Implement death scenarios
   - Combat death
   - Grue death
   - Falling death
   - Other death scenarios from original
   - _Requirements: 58_
 
-- [ ] 59.3 Implement death tracking
+- [x] 59.3 Implement death tracking
   - Increment death counter
   - Limit resurrections based on deaths
   - _Requirements: 58_

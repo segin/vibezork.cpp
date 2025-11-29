@@ -1,5 +1,6 @@
 #include "combat.h"
 #include "timer.h"
+#include "death.h"
 #include "core/globals.h"
 #include "core/io.h"
 #include <cstdlib>
@@ -98,8 +99,8 @@ void CombatManager::processCombatRound() {
     
     // Check if combatants are still alive
     if (!player_->isAlive()) {
-        printLine("You have been defeated!");
-        handleDeath(*player_);
+        // Player died in combat - use death system (Requirement 58.4)
+        DeathSystem::jigsUp("You have been defeated in combat!", DeathSystem::DeathCause::COMBAT);
         endCombat();
         return;
     }
@@ -154,8 +155,8 @@ void CombatManager::processCombatRound() {
         
         // Check if player died
         if (!player_->isAlive()) {
-            printLine("You have been defeated!");
-            handleDeath(*player_);
+            // Player died in combat - use death system (Requirement 58.4)
+            DeathSystem::jigsUp("You have been defeated in combat!", DeathSystem::DeathCause::COMBAT);
             endCombat();
             return;
         }
