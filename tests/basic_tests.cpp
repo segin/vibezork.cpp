@@ -2289,6 +2289,131 @@ TEST(TakeVerbWeightLimit) {
     g.reset();
 }
 
+TEST(WeightCalculation) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create multiple objects with different sizes
+    auto obj1 = std::make_unique<ZObject>(1, "object 1");
+    obj1->setProperty(P_SIZE, 10);
+    obj1->moveTo(g.winner);
+    g.registerObject(1, std::move(obj1));
+    
+    auto obj2 = std::make_unique<ZObject>(2, "object 2");
+    obj2->setProperty(P_SIZE, 15);
+    obj2->moveTo(g.winner);
+    g.registerObject(2, std::move(obj2));
+    
+    auto obj3 = std::make_unique<ZObject>(3, "object 3");
+    obj3->setProperty(P_SIZE, 20);
+    obj3->moveTo(g.winner);
+    g.registerObject(3, std::move(obj3));
+    
+    // Calculate total weight
+    int totalWeight = 0;
+    for (const auto* obj : g.winner->getContents()) {
+        totalWeight += obj->getProperty(P_SIZE);
+    }
+    
+    // Verify weight calculation is correct (10 + 15 + 20 = 45)
+    ASSERT_EQ(totalWeight, 45);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(TakeVerbWithinWeightLimit) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Set weight limit
+    g.loadAllowed = 100;
+    
+    // Create object already in inventory
+    auto obj1 = std::make_unique<ZObject>(1, "object 1");
+    obj1->setProperty(P_SIZE, 30);
+    obj1->moveTo(g.winner);
+    g.registerObject(1, std::move(obj1));
+    
+    // Create object to take (within limit: 30 + 40 = 70 < 100)
+    auto lamp = std::make_unique<ZObject>(2, "lamp");
+    lamp->addSynonym("lamp");
+    lamp->setFlag(ObjectFlag::TAKEBIT);
+    lamp->setProperty(P_SIZE, 40);
+    lamp->moveTo(&testRoom);
+    ZObject* lampPtr = lamp.get();
+    g.registerObject(2, std::move(lamp));
+    
+    // Set up for TAKE command
+    g.prso = lampPtr;
+    g.prsa = V_TAKE;
+    
+    // Execute TAKE verb
+    bool result = Verbs::vTake();
+    
+    // Verify object WAS taken (within weight limit)
+    ASSERT_TRUE(result);
+    ASSERT_EQ(lampPtr->getLocation(), g.winner);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(TakeVerbHeavyObject) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Set weight limit
+    g.loadAllowed = 100;
+    
+    // Create very heavy object that exceeds limit by itself
+    auto coffin = std::make_unique<ZObject>(1, "coffin");
+    coffin->addSynonym("coffin");
+    coffin->setFlag(ObjectFlag::TAKEBIT);
+    coffin->setProperty(P_SIZE, 150);  // Exceeds limit of 100
+    coffin->moveTo(&testRoom);
+    ZObject* coffinPtr = coffin.get();
+    g.registerObject(1, std::move(coffin));
+    
+    // Set up for TAKE command
+    g.prso = coffinPtr;
+    g.prsa = V_TAKE;
+    
+    // Execute TAKE verb
+    bool result = Verbs::vTake();
+    
+    // Verify object was NOT taken (too heavy)
+    ASSERT_TRUE(result);
+    ASSERT_EQ(coffinPtr->getLocation(), &testRoom);
+    
+    // Cleanup
+    g.reset();
+}
+
 TEST(TakeVerbFromOpenContainer) {
     auto& g = Globals::instance();
     

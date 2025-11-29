@@ -3435,6 +3435,7 @@ void initializeWorld() {
     nest->setFlag(ObjectFlag::OPENBIT);
     nest->setFlag(ObjectFlag::BURNBIT);
     nest->setFlag(ObjectFlag::SEARCHBIT);
+    nest->setProperty(P_SIZE, 5);  // Requirement 63.1
     nest->setProperty(P_CAPACITY, 20);
     // TODO: Add action handler
     nest->moveTo(g.getObject(RoomIds::UP_A_TREE));

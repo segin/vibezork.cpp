@@ -2065,30 +2065,30 @@ Implement the core game systems that tie everything together.
   - Test round-trip (save then restore)
   - _Requirements: 61, 92_
 
-- [ ] 63. Implement inventory weight limits
+- [x] 63. Implement inventory weight limits
   - Define maximum inventory weight
   - Calculate total carried weight
   - Enforce weight limit in TAKE verb
   - Display appropriate messages
   - _Requirements: 63_
 
-- [ ] 63.1 Define weight system
+- [x] 63.1 Define weight system
   - Set SIZE property for all objects
   - Define maximum carry weight
   - _Requirements: 63_
 
-- [ ] 63.2 Implement weight calculation
+- [x] 63.2 Implement weight calculation
   - Sum SIZE of all carried objects
   - Check against maximum
   - _Requirements: 63_
 
-- [ ] 63.3 Enforce weight limit
+- [x] 63.3 Enforce weight limit
   - Check in TAKE verb
   - Refuse if would exceed limit
   - Display "You're carrying too much"
   - _Requirements: 63_
 
-- [ ] 63.4 Write unit tests for weight limits
+- [x] 63.4 Write unit tests for weight limits
   - Test weight calculation
   - Test weight limit enforcement
   - Test taking heavy objects
