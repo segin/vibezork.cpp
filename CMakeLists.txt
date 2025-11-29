@@ -87,4 +87,8 @@ if(BUILD_TESTS)
     # Combat system tests
     add_executable(combat_system_tests tests/combat_system_tests.cpp ${LIB_SOURCES})
     add_test(NAME CombatSystemTests COMMAND combat_system_tests)
+    
+    # Death system tests
+    add_executable(death_system_tests tests/death_system_tests.cpp ${LIB_SOURCES})
+    add_test(NAME DeathSystemTests COMMAND death_system_tests)
 endif()
