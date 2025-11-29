@@ -1972,26 +1972,26 @@ Implement the core game systems that tie everything together.
   - Limit resurrections based on deaths
   - _Requirements: 58_
 
-- [ ] 60. Implement resurrection mechanic
+- [x] 60. Implement resurrection mechanic
   - Move player to Entrance to Hades
   - Scatter player's inventory
   - Limit number of resurrections
   - Make resurrection unavailable after multiple deaths
   - _Requirements: 59_
 
-- [ ] 60.1 Implement resurrection offer
+- [x] 60.1 Implement resurrection offer
   - Display resurrection option after death
   - Accept player's choice
   - _Requirements: 59_
 
-- [ ] 60.2 Implement resurrection process
+- [x] 60.2 Implement resurrection process
   - Move player to Entrance to Hades
   - Scatter inventory items
   - Restore player health
   - Continue game
   - _Requirements: 59_
 
-- [ ] 60.3 Implement resurrection limits
+- [x] 60.3 Implement resurrection limits
   - Track number of resurrections
   - Deny resurrection after limit
   - Force restart or quit

@@ -14,12 +14,19 @@ namespace DeathSystem {
 static int deathCount_ = 0;
 static bool dead_ = false;
 static bool alwaysLit_ = false;  // After resurrection, player can see in dark
+static bool testMode_ = false;   // Disable interactive prompts for testing
 
 // Initialize death system
 void initialize() {
     deathCount_ = 0;
     dead_ = false;
     alwaysLit_ = false;
+    testMode_ = false;
+}
+
+// Set test mode (disables interactive prompts for testing)
+void setTestMode(bool enabled) {
+    testMode_ = enabled;
 }
 
 // Get death count (Requirement 58.5)
@@ -123,6 +130,114 @@ static void killInterrupts() {
     }
 }
 
+// Offer resurrection to player (Requirement 59.1)
+// Returns true if player accepts, false if they decline
+bool offerResurrection() {
+    auto& g = Globals::instance();
+    
+    // In test mode, automatically accept resurrection
+    if (testMode_) {
+        return true;
+    }
+    
+    // Check if player has visited South Temple (determines resurrection type)
+    auto* southTemple = g.getObject(RoomIds::SOUTH_TEMPLE);
+    bool visitedTemple = southTemple && southTemple->hasFlag(ObjectFlag::TOUCHBIT);
+    
+    if (visitedTemple) {
+        // Offer full resurrection at Entrance to Hades
+        printLine("As you take your last breath, you feel relieved of your burdens. The");
+        printLine("feeling passes as you find yourself before the gates of Hell, where");
+        printLine("the spirits jeer at you and deny you entry.  Your senses are");
+        printLine("disturbed.  The objects in the dungeon appear indistinct, bleached of");
+        printLine("color, even unreal.");
+        printLine("");
+        print("Do you wish to be resurrected? (Y/N) ");
+        
+        std::string response;
+        std::getline(std::cin, response);
+        
+        // Convert to lowercase for comparison
+        for (auto& c : response) {
+            c = std::tolower(c);
+        }
+        
+        return response == "y" || response == "yes";
+    } else {
+        // Offer simple resurrection in forest
+        printLine("Now, let's take a look here...");
+        printLine("Well, you probably deserve another chance.  I can't quite fix you");
+        printLine("up completely, but you can't have everything.");
+        printLine("");
+        print("Do you wish to continue? (Y/N) ");
+        
+        std::string response;
+        std::getline(std::cin, response);
+        
+        // Convert to lowercase for comparison
+        for (auto& c : response) {
+            c = std::tolower(c);
+        }
+        
+        return response == "y" || response == "yes";
+    }
+}
+
+// Perform resurrection (Requirement 59.2, 59.3, 59.4)
+// Moves player to Entrance to Hades
+// Scatters inventory
+// Restores player health
+void performResurrection() {
+    auto& g = Globals::instance();
+    
+    // Check if player has visited South Temple (determines resurrection type)
+    auto* southTemple = g.getObject(RoomIds::SOUTH_TEMPLE);
+    bool visitedTemple = southTemple && southTemple->hasFlag(ObjectFlag::TOUCHBIT);
+    
+    if (visitedTemple) {
+        // Full resurrection at Entrance to Hades (Requirement 59.3)
+        // Mark as dead (ghost mode)
+        dead_ = true;
+        alwaysLit_ = true;  // Can see in darkness as a ghost
+        
+        // Set troll flag (troll disappears after player dies)
+        auto* troll = g.getObject(ObjectIds::TROLL);
+        if (troll) {
+            troll->setFlag(ObjectFlag::INVISIBLE);
+        }
+        
+        // Move to Entrance to Hades
+        auto* hades = g.getObject(RoomIds::ENTRANCE_TO_HADES);
+        if (hades && g.winner) {
+            g.winner->moveTo(hades);
+            g.here = hades;
+        }
+    } else {
+        // Simple resurrection in forest
+        // Move to Forest-1
+        auto* forest = g.getObject(RoomIds::FOREST_1);
+        if (forest && g.winner) {
+            g.winner->moveTo(forest);
+            g.here = forest;
+        }
+    }
+    
+    // Clear trap door touch bit
+    auto* trapDoor = g.getObject(ObjectIds::TRAP_DOOR);
+    if (trapDoor) {
+        trapDoor->clearFlag(ObjectFlag::TOUCHBIT);
+    }
+    
+    // Scatter inventory (Requirement 59.4)
+    randomizeObjects();
+    
+    // Kill all timers
+    killInterrupts();
+    
+    // Clear parser continuation flag
+    g.pCont = false;
+}
+
 // Main death function (Requirement 58.1, 58.2, 58.3)
 // Based on ZIL JIGS-UP routine
 void jigsUp(std::string_view deathMessage, DeathCause cause) {
@@ -163,9 +278,12 @@ void jigsUp(std::string_view deathMessage, DeathCause cause) {
         }
     }
     
-    // Check if resurrection is available (Requirement 59.2)
+    // Increment death counter (Requirement 58.5)
+    deathCount_++;
+    
+    // Check if resurrection is available (Requirement 59.2, 59.5)
     if (!canResurrect()) {
-        // Too many deaths - game over
+        // Too many deaths - game over (Requirement 59.5)
         printLine("You clearly are a suicidal maniac.  We don't allow psychotics in the");
         printLine("cave, since they may harm other adventurers.  Your remains will be");
         printLine("installed in the Land of the Living Dead, where your fellow");
@@ -175,83 +293,15 @@ void jigsUp(std::string_view deathMessage, DeathCause cause) {
         return;
     }
     
-    // Increment death counter (Requirement 58.5)
-    deathCount_++;
-    
-    // Check if player has visited South Temple (determines resurrection type)
-    auto* southTemple = g.getObject(RoomIds::SOUTH_TEMPLE);
-    bool visitedTemple = southTemple && southTemple->hasFlag(ObjectFlag::TOUCHBIT);
-    
-    if (visitedTemple) {
-        // Full resurrection at Entrance to Hades (Requirement 59.1, 59.3)
-        printLine("As you take your last breath, you feel relieved of your burdens. The");
-        printLine("feeling passes as you find yourself before the gates of Hell, where");
-        printLine("the spirits jeer at you and deny you entry.  Your senses are");
-        printLine("disturbed.  The objects in the dungeon appear indistinct, bleached of");
-        printLine("color, even unreal.");
-        printLine("");
-        
-        // Mark as dead (ghost mode)
-        dead_ = true;
-        alwaysLit_ = true;  // Can see in darkness as a ghost
-        
-        // Set troll flag (troll disappears after player dies)
-        auto* troll = g.getObject(ObjectIds::TROLL);
-        if (troll) {
-            troll->setFlag(ObjectFlag::INVISIBLE);
-        }
-        
-        // Move to Entrance to Hades
-        auto* hades = g.getObject(RoomIds::ENTRANCE_TO_HADES);
-        if (hades && g.winner) {
-            g.winner->moveTo(hades);
-            g.here = hades;
-        }
+    // Offer resurrection (Requirement 59.1)
+    if (offerResurrection()) {
+        // Player accepted resurrection
+        performResurrection();
     } else {
-        // Simple resurrection in forest (Requirement 59.1)
-        printLine("Now, let's take a look here...");
-        printLine("Well, you probably deserve another chance.  I can't quite fix you");
-        printLine("up completely, but you can't have everything.");
+        // Player declined resurrection
         printLine("");
-        
-        // Move to Forest-1
-        auto* forest = g.getObject(RoomIds::FOREST_1);
-        if (forest && g.winner) {
-            g.winner->moveTo(forest);
-            g.here = forest;
-        }
+        printLine("Very well. The game is over.");
     }
-    
-    // Clear trap door touch bit
-    auto* trapDoor = g.getObject(ObjectIds::TRAP_DOOR);
-    if (trapDoor) {
-        trapDoor->clearFlag(ObjectFlag::TOUCHBIT);
-    }
-    
-    // Scatter inventory (Requirement 59.4)
-    randomizeObjects();
-    
-    // Kill all timers
-    killInterrupts();
-    
-    // Clear parser continuation flag
-    g.pCont = false;
-}
-
-// Perform resurrection (Requirement 59)
-void resurrect() {
-    auto& g = Globals::instance();
-    
-    if (!dead_) {
-        return;
-    }
-    
-    // Resurrection happens automatically in jigsUp
-    // This function is for explicit resurrection requests
-    dead_ = false;
-    alwaysLit_ = false;
-    
-    printLine("You have been resurrected!");
 }
 
 // Reset death state for new game

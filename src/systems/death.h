@@ -22,6 +22,9 @@ enum class DeathCause {
 // Initialize death system
 void initialize();
 
+// Set test mode (disables interactive prompts for testing)
+void setTestMode(bool enabled);
+
 // Main death function (Requirement 58.1)
 // Called when player dies
 // Displays death message, offers resurrection or restart
@@ -36,10 +39,15 @@ bool isDead();
 // Check if resurrection is available (Requirement 59.2)
 bool canResurrect();
 
-// Perform resurrection (Requirement 59)
+// Offer resurrection to player (Requirement 59.1)
+// Returns true if player accepts, false if they decline
+bool offerResurrection();
+
+// Perform resurrection (Requirement 59.2, 59.3, 59.4)
 // Moves player to Entrance to Hades
 // Scatters inventory
-void resurrect();
+// Restores player health
+void performResurrection();
 
 // Reset death state for new game
 void reset();

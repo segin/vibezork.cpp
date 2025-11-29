@@ -9,6 +9,7 @@
 TEST(DeathCountTracking) {
     // Reset systems
     DeathSystem::reset();
+    DeathSystem::setTestMode(true);
     ScoreSystem::instance().reset();
     
     // Initial death count should be 0
@@ -27,6 +28,7 @@ TEST(DeathCountTracking) {
 TEST(ResurrectionLimit) {
     // Reset systems
     DeathSystem::reset();
+    DeathSystem::setTestMode(true);
     ScoreSystem::instance().reset();
     
     // Can resurrect initially
@@ -44,6 +46,7 @@ TEST(ResurrectionLimit) {
 TEST(ScorePenalty) {
     // Reset systems
     DeathSystem::reset();
+    DeathSystem::setTestMode(true);
     ScoreSystem::instance().reset();
     
     // Set initial score
@@ -58,6 +61,7 @@ TEST(ScorePenalty) {
 TEST(DeathCauses) {
     // Reset systems
     DeathSystem::reset();
+    DeathSystem::setTestMode(true);
     ScoreSystem::instance().reset();
     
     // Test combat death
@@ -66,6 +70,7 @@ TEST(DeathCauses) {
     
     // Reset for next test
     DeathSystem::reset();
+    DeathSystem::setTestMode(true);
     
     // Test grue death
     DeathSystem::jigsUp("Eaten by grue", DeathSystem::DeathCause::GRUE);
@@ -73,6 +78,7 @@ TEST(DeathCauses) {
     
     // Reset for next test
     DeathSystem::reset();
+    DeathSystem::setTestMode(true);
     
     // Test falling death
     DeathSystem::jigsUp("Fell to death", DeathSystem::DeathCause::FALLING);
@@ -82,6 +88,7 @@ TEST(DeathCauses) {
 TEST(DeathReset) {
     // Reset systems
     DeathSystem::reset();
+    DeathSystem::setTestMode(true);
     ScoreSystem::instance().reset();
     
     // Cause some deaths
