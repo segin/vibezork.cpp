@@ -2094,32 +2094,32 @@ Implement the core game systems that tie everything together.
   - Test taking heavy objects
   - _Requirements: 63, 92_
 
-- [ ] 64. Implement container capacity limits
+- [x] 64. Implement container capacity limits
   - Set CAPACITY property for containers
   - Calculate total size in container
   - Enforce capacity in PUT verb
   - Display appropriate messages
   - _Requirements: 64_
 
-- [ ] 64.1 Set container capacities
+- [x] 64.1 Set container capacities
   - Set CAPACITY property for all containers
   - Trophy case: large capacity
   - Mailbox: small capacity
   - Other containers: appropriate capacities
   - _Requirements: 64_
 
-- [ ] 64.2 Implement capacity calculation
+- [x] 64.2 Implement capacity calculation
   - Sum SIZE of objects in container
   - Check against CAPACITY
   - _Requirements: 64_
 
-- [ ] 64.3 Enforce capacity limit
+- [x] 64.3 Enforce capacity limit
   - Check in PUT verb
   - Refuse if would exceed capacity
   - Display "There's no room"
   - _Requirements: 64_
 
-- [ ] 64.4 Write unit tests for capacity limits
+- [x] 64.4 Write unit tests for capacity limits
   - Test capacity calculation
   - Test capacity enforcement
   - Test putting large objects in small containers

@@ -12,6 +12,21 @@
 
 namespace Verbs {
 
+// Helper function to calculate total weight (size) of an object and all its contents recursively
+// This matches the WEIGHT function from ZIL (Requirement 64.2)
+static int calculateWeight(const ZObject* obj) {
+    if (!obj) return 0;
+    
+    int weight = obj->getProperty(P_SIZE);
+    
+    // Add weight of all contents recursively
+    for (const auto* content : obj->getContents()) {
+        weight += calculateWeight(content);
+    }
+    
+    return weight;
+}
+
 bool vLook() {
     auto& g = Globals::instance();
     if (g.here) {
@@ -928,26 +943,29 @@ bool vPut() {
     }
     
     // Check container capacity (Requirement 64)
+    // ZIL formula: (WEIGHT(container) + WEIGHT(object) - SIZE(container)) > CAPACITY(container)
+    // This means the net contents (excluding the container's own size) must fit within capacity
     int capacity = g.prsi->getProperty(P_CAPACITY);
     if (capacity == 0) {
         capacity = 100;  // Default capacity if not specified
     }
     
-    // Calculate current contents size
-    int currentSize = 0;
-    for (const auto* obj : g.prsi->getContents()) {
-        currentSize += obj->getProperty(P_SIZE);
-    }
+    // Calculate weight of container (including all nested contents)
+    int containerWeight = calculateWeight(g.prsi);
     
-    // Get object size
-    int objectSize = g.prso->getProperty(P_SIZE);
-    if (objectSize == 0) {
-        objectSize = 5;  // Default size if not specified
+    // Calculate weight of object to be added (including all nested contents)
+    int objectWeight = calculateWeight(g.prso);
+    
+    // Get container's own size
+    int containerSize = g.prsi->getProperty(P_SIZE);
+    if (containerSize == 0) {
+        containerSize = 10;  // Default size if not specified
     }
     
     // Check if adding this object would exceed capacity
-    if (currentSize + objectSize > capacity) {
-        printLine("There's no room in the " + g.prsi->getDesc() + ".");
+    // Formula: (containerWeight + objectWeight - containerSize) > capacity
+    if (containerWeight + objectWeight - containerSize > capacity) {
+        printLine("There's no room.");
         return RTRUE;
     }
     

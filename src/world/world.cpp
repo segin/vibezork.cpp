@@ -3377,7 +3377,7 @@ void initializeWorld() {
     bag->setFlag(ObjectFlag::TAKEBIT);
     bag->setFlag(ObjectFlag::CONTBIT);
     bag->setFlag(ObjectFlag::OPENBIT);     // Initially open
-    bag->setProperty(P_CAPACITY, 100);     // Large capacity
+    bag->setProperty(P_CAPACITY, 100);     // Large capacity (thief's bag)
     bag->setProperty(P_SIZE, 20);
     bag->setAction(bagAction);
     // Initially with thief - will be placed when thief is created
@@ -3453,6 +3453,7 @@ void initializeWorld() {
     toolChest->setFlag(ObjectFlag::OPENBIT);
     toolChest->setFlag(ObjectFlag::TRYTAKEBIT);  // Cannot be taken
     toolChest->setFlag(ObjectFlag::SACREDBIT);
+    toolChest->setProperty(P_CAPACITY, 40);  // Moderate capacity for tools
     // TODO: Add action handler
     // Will be placed in Maintenance Room when that room is created
     

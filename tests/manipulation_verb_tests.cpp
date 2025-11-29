@@ -322,7 +322,8 @@ TEST(PutVerbClosedContainer) {
 }
 
 TEST(PutVerbCapacityLimit) {
-    // Test capacity limits
+    // Test capacity limits (Requirement 64)
+    // ZIL formula: (WEIGHT(container) + WEIGHT(object) - SIZE(container)) > CAPACITY
     auto& g = Globals::instance();
     
     // Create test room
@@ -340,7 +341,8 @@ TEST(PutVerbCapacityLimit) {
     bag->addSynonym("bag");
     bag->setFlag(ObjectFlag::CONTBIT);
     bag->setFlag(ObjectFlag::OPENBIT);
-    bag->setProperty(2, 10);  // P_CAPACITY = 10
+    bag->setProperty(P_CAPACITY, 10);  // Capacity = 10
+    bag->setProperty(P_SIZE, 3);       // Bag itself weighs 3
     bag->moveTo(g.here);
     ZObject* bagPtr = bag.get();
     g.registerObject(1, std::move(bag));
@@ -349,15 +351,20 @@ TEST(PutVerbCapacityLimit) {
     auto coin = std::make_unique<ZObject>(2, "coin");
     coin->addSynonym("coin");
     coin->setFlag(ObjectFlag::TAKEBIT);
-    coin->setProperty(1, 5);  // P_SIZE = 5
+    coin->setProperty(P_SIZE, 5);  // Coin weighs 5
     coin->moveTo(bagPtr);
     g.registerObject(2, std::move(coin));
     
     // Create large item in player inventory
+    // Formula: (bagWeight + rockWeight - bagSize) > capacity
+    // bagWeight = 3 (bag) + 5 (coin) = 8
+    // rockWeight = 8
+    // bagSize = 3
+    // (8 + 8 - 3) = 13 > 10, so this should fail
     auto rock = std::make_unique<ZObject>(3, "rock");
     rock->addSynonym("rock");
     rock->setFlag(ObjectFlag::TAKEBIT);
-    rock->setProperty(1, 8);  // P_SIZE = 8 (5 + 8 = 13 > 10)
+    rock->setProperty(P_SIZE, 8);  // Rock weighs 8
     rock->moveTo(g.winner);
     ZObject* rockPtr = rock.get();
     g.registerObject(3, std::move(rock));
@@ -374,7 +381,135 @@ TEST(PutVerbCapacityLimit) {
     // Verify rock is still in player inventory (not moved)
     ASSERT_EQ(rockPtr->getLocation(), g.winner);
     
-    // Should display "There's no room in the bag." message
+    // Should display "There's no room." message
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(PutVerbCapacityWithNestedContainers) {
+    // Test capacity calculation with nested containers (Requirement 64)
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto testRoom = std::make_unique<ZRoom>(100, "Test Room", "A test room.");
+    g.here = testRoom.get();
+    g.registerObject(100, std::move(testRoom));
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create outer container (sack)
+    auto sack = std::make_unique<ZObject>(1, "sack");
+    sack->addSynonym("sack");
+    sack->setFlag(ObjectFlag::CONTBIT);
+    sack->setFlag(ObjectFlag::OPENBIT);
+    sack->setProperty(P_CAPACITY, 20);
+    sack->setProperty(P_SIZE, 5);
+    sack->moveTo(g.here);
+    ZObject* sackPtr = sack.get();
+    g.registerObject(1, std::move(sack));
+    
+    // Create inner container (box) inside sack
+    auto box = std::make_unique<ZObject>(2, "box");
+    box->addSynonym("box");
+    box->setFlag(ObjectFlag::CONTBIT);
+    box->setFlag(ObjectFlag::OPENBIT);
+    box->setFlag(ObjectFlag::TAKEBIT);
+    box->setProperty(P_CAPACITY, 10);
+    box->setProperty(P_SIZE, 3);
+    box->moveTo(sackPtr);
+    ZObject* boxPtr = box.get();
+    g.registerObject(2, std::move(box));
+    
+    // Create item inside box
+    auto gem = std::make_unique<ZObject>(3, "gem");
+    gem->addSynonym("gem");
+    gem->setFlag(ObjectFlag::TAKEBIT);
+    gem->setProperty(P_SIZE, 2);
+    gem->moveTo(boxPtr);
+    g.registerObject(3, std::move(gem));
+    
+    // Create item to add to sack
+    // sackWeight = 5 (sack) + 3 (box) + 2 (gem) = 10
+    // coinWeight = 12
+    // sackSize = 5
+    // (10 + 12 - 5) = 17 <= 20, so this should succeed
+    auto coin = std::make_unique<ZObject>(4, "coin");
+    coin->addSynonym("coin");
+    coin->setFlag(ObjectFlag::TAKEBIT);
+    coin->setProperty(P_SIZE, 12);
+    coin->moveTo(g.winner);
+    ZObject* coinPtr = coin.get();
+    g.registerObject(4, std::move(coin));
+    
+    // Set up verb context
+    g.prso = coinPtr;
+    g.prsi = sackPtr;
+    g.prsa = V_PUT;
+    
+    // Test PUT verb - should succeed
+    bool result = Verbs::vPut();
+    ASSERT_TRUE(result);
+    
+    // Verify coin was moved to sack
+    ASSERT_EQ(coinPtr->getLocation(), sackPtr);
+    
+    // Cleanup
+    g.reset();
+}
+
+TEST(PutVerbCapacityExactFit) {
+    // Test putting an object that exactly fills remaining capacity (Requirement 64)
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto testRoom = std::make_unique<ZRoom>(100, "Test Room", "A test room.");
+    g.here = testRoom.get();
+    g.registerObject(100, std::move(testRoom));
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Create container
+    auto chest = std::make_unique<ZObject>(1, "chest");
+    chest->addSynonym("chest");
+    chest->setFlag(ObjectFlag::CONTBIT);
+    chest->setFlag(ObjectFlag::OPENBIT);
+    chest->setProperty(P_CAPACITY, 10);
+    chest->setProperty(P_SIZE, 5);
+    chest->moveTo(g.here);
+    ZObject* chestPtr = chest.get();
+    g.registerObject(1, std::move(chest));
+    
+    // Create item that exactly fits
+    // chestWeight = 5
+    // itemWeight = 10
+    // chestSize = 5
+    // (5 + 10 - 5) = 10 <= 10, so this should succeed (exact fit)
+    auto item = std::make_unique<ZObject>(2, "item");
+    item->addSynonym("item");
+    item->setFlag(ObjectFlag::TAKEBIT);
+    item->setProperty(P_SIZE, 10);
+    item->moveTo(g.winner);
+    ZObject* itemPtr = item.get();
+    g.registerObject(2, std::move(item));
+    
+    // Set up verb context
+    g.prso = itemPtr;
+    g.prsi = chestPtr;
+    g.prsa = V_PUT;
+    
+    // Test PUT verb - should succeed
+    bool result = Verbs::vPut();
+    ASSERT_TRUE(result);
+    
+    // Verify item was moved to chest
+    ASSERT_EQ(itemPtr->getLocation(), chestPtr);
     
     // Cleanup
     g.reset();
