@@ -95,4 +95,16 @@ if(BUILD_TESTS)
     # Save system tests
     add_executable(save_system_tests tests/save_system_tests.cpp ${LIB_SOURCES})
     add_test(NAME SaveSystemTests COMMAND save_system_tests)
+    
+    # Object system tests
+    add_executable(object_system_tests tests/object_system_tests.cpp ${LIB_SOURCES})
+    add_test(NAME ObjectSystemTests COMMAND object_system_tests)
+    
+    # Parser comprehensive tests
+    add_executable(parser_comprehensive_tests tests/parser_comprehensive_tests.cpp ${LIB_SOURCES})
+    add_test(NAME ParserComprehensiveTests COMMAND parser_comprehensive_tests)
+    
+    # Verb edge case tests
+    add_executable(verb_edge_case_tests tests/verb_edge_case_tests.cpp ${LIB_SOURCES})
+    add_test(NAME VerbEdgeCaseTests COMMAND verb_edge_case_tests)
 endif()

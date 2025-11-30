@@ -2174,7 +2174,7 @@ Implement the core game systems that tie everything together.
 
 Comprehensive testing and final polish to ensure quality.
 
-- [ ] 66. Create comprehensive unit test suite
+- [x] 66. Create comprehensive unit test suite
   - Test object system thoroughly
   - Test parser thoroughly
   - Test all verb handlers
@@ -2182,14 +2182,14 @@ Comprehensive testing and final polish to ensure quality.
   - Achieve 90%+ code coverage
   - _Requirements: 92_
 
-- [ ] 66.1 Expand object system tests
+- [x] 66.1 Expand object system tests
   - Test all flag operations
   - Test all property operations
   - Test containment operations
   - Test object creation and destruction
   - _Requirements: 92_
 
-- [ ] 66.2 Expand parser tests
+- [x] 66.2 Expand parser tests
   - Test all tokenization cases
   - Test all verb recognition
   - Test all object recognition
@@ -2197,14 +2197,14 @@ Comprehensive testing and final polish to ensure quality.
   - Test all special features
   - _Requirements: 92_
 
-- [ ] 66.3 Expand verb tests
+- [x] 66.3 Expand verb tests
   - Test all verb handlers
   - Test pre-verb checks
   - Test error cases
   - Test edge cases
   - _Requirements: 92_
 
-- [ ] 66.4 Expand system tests
+- [x] 66.4 Expand system tests
   - Test timer system
   - Test score system
   - Test combat system
