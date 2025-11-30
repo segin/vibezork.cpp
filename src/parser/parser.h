@@ -2,9 +2,10 @@
 #include "core/types.h"
 #include "world/rooms.h"
 #include <string>
+#include <string_view>
 #include <vector>
-#include <map>
-#include <set>
+#include <unordered_map>
+#include <unordered_set>
 #include <optional>
 
 // Forward declaration
@@ -61,7 +62,7 @@ public:
 private:
     void initializeVerbsAndDirections();
     void tokenize(const std::string& input, std::vector<std::string>& tokens);
-    VerbId findVerb(const std::string& word);
+    VerbId findVerb(const std::string& word) const;
     ZObject* findObject(const std::string& word);
     Direction* findDirection(const std::string& word);
     
@@ -89,9 +90,10 @@ private:
     std::vector<ZObject*> findAllApplicableObjects(VerbId verb) const;
     std::string replaceOopsWord(const std::string& original, const std::string& replacement);
     
-    std::map<std::string, VerbId> verbSynonyms_;
-    std::set<std::string> prepositions_;
-    std::map<std::string, Direction> directions_;
+    // Using unordered containers for O(1) lookup
+    std::unordered_map<std::string, VerbId> verbSynonyms_;
+    std::unordered_set<std::string> prepositions_;
+    std::unordered_map<std::string, Direction> directions_;
     VerbRegistry* verbRegistry_;  // Optional registry for advanced validation
     
     // Special command state

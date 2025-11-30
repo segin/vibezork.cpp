@@ -39,12 +39,24 @@ void ZObject::moveTo(ZObject* location) {
     }
 }
 
+void ZObject::addSynonym(const std::string& syn) {
+    synonyms_.push_back(syn);
+    synonymSet_.insert(syn);  // O(1) lookup cache
+}
+
+void ZObject::addAdjective(const std::string& adj) {
+    adjectives_.push_back(adj);
+    adjectiveSet_.insert(adj);  // O(1) lookup cache
+}
+
 bool ZObject::hasSynonym(const std::string& word) const {
-    return std::find(synonyms_.begin(), synonyms_.end(), word) != synonyms_.end();
+    // O(1) lookup using hash set instead of O(n) linear search
+    return synonymSet_.find(word) != synonymSet_.end();
 }
 
 bool ZObject::hasAdjective(const std::string& word) const {
-    return std::find(adjectives_.begin(), adjectives_.end(), word) != adjectives_.end();
+    // O(1) lookup using hash set instead of O(n) linear search
+    return adjectiveSet_.find(word) != adjectiveSet_.end();
 }
 
 void ZObject::setText(const std::string& text) {

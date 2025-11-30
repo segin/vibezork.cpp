@@ -134,7 +134,7 @@ void Parser::tokenize(const std::string& input, std::vector<std::string>& tokens
     }
 }
 
-VerbId Parser::findVerb(const std::string& word) {
+VerbId Parser::findVerb(const std::string& word) const {
     auto it = verbSynonyms_.find(word);
     return it != verbSynonyms_.end() ? it->second : 0;
 }

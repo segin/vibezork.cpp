@@ -2,7 +2,7 @@
 #include "types.h"
 #include "object.h"
 #include <memory>
-#include <map>
+#include <unordered_map>
 
 // Global game state
 class Globals {
@@ -37,15 +37,15 @@ public:
     bool pCont = false;
     bool quoteFlag = false;
     
-    // Object registry
+    // Object registry - using unordered_map for O(1) lookup
     void registerObject(ObjectId id, std::unique_ptr<ZObject> obj);
     ZObject* getObject(ObjectId id);
-    const std::map<ObjectId, std::unique_ptr<ZObject>>& getAllObjects() const { return objects_; }
+    const std::unordered_map<ObjectId, std::unique_ptr<ZObject>>& getAllObjects() const { return objects_; }
     
     // Reset for testing
     void reset();
     
 private:
     Globals() = default;
-    std::map<ObjectId, std::unique_ptr<ZObject>> objects_;
+    std::unordered_map<ObjectId, std::unique_ptr<ZObject>> objects_;
 };

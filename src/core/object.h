@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <unordered_set>
 #include <functional>
 
 class ZObject {
@@ -38,8 +39,8 @@ public:
     // Identification
     ObjectId getId() const { return id_; }
     const std::string& getDesc() const { return desc_; }
-    void addSynonym(const std::string& syn) { synonyms_.push_back(syn); }
-    void addAdjective(const std::string& adj) { adjectives_.push_back(adj); }
+    void addSynonym(const std::string& syn);
+    void addAdjective(const std::string& adj);
     const std::vector<std::string>& getSynonyms() const { return synonyms_; }
     const std::vector<std::string>& getAdjectives() const { return adjectives_; }
     bool hasSynonym(const std::string& word) const;
@@ -60,6 +61,8 @@ private:
     std::string desc_;
     std::vector<std::string> synonyms_;
     std::vector<std::string> adjectives_;
+    std::unordered_set<std::string> synonymSet_;     // O(1) lookup cache
+    std::unordered_set<std::string> adjectiveSet_;   // O(1) lookup cache
     uint32_t flags_ = 0;
     std::map<PropertyId, int> properties_;
     std::string text_;  // For readable objects

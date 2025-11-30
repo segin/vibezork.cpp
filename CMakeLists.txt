@@ -123,4 +123,8 @@ if(BUILD_TESTS)
     # Unwinnable state tests (Task 70.3)
     add_executable(unwinnable_state_tests tests/unwinnable_state_tests.cpp ${LIB_SOURCES})
     add_test(NAME UnwinnableStateTests COMMAND unwinnable_state_tests)
+    
+    # Performance tests (Task 71)
+    add_executable(performance_tests tests/performance_tests.cpp ${LIB_SOURCES})
+    add_test(NAME PerformanceTests COMMAND performance_tests)
 endif()
