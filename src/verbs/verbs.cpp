@@ -1212,13 +1212,14 @@ bool vPush() {
     }
     
     // Call object action handler first
-    // This allows objects to override default behavior
     if (g.prso->performAction()) {
         return RTRUE;
     }
     
-    // Default: Nothing happens
-    printLine("Nothing obvious happens.");
+    // Authentic ZIL V-PUSH uses HACK-HACK
+    print("Pushing the ");
+    print(g.prso->getDesc());
+    printLine(" isn't notably useful.");
     return RTRUE;
 }
 
@@ -1233,14 +1234,12 @@ bool vPull() {
     }
     
     // Call object action handler first
-    // This allows objects to override default behavior
     if (g.prso->performAction()) {
         return RTRUE;
     }
     
-    // Default: Nothing happens
-    printLine("Nothing obvious happens.");
-    return RTRUE;
+    // V-PULL redirects to V-MOVE in ZIL
+    return vMove();
 }
 
 bool vMove() {
@@ -1644,29 +1643,21 @@ bool vPray() {
         room->performRoomAction(M_PRAY);
     }
     
-    // Default: Prayers are not answered
-    printLine("Your prayers are not answered.");
+    // Authentic ZIL V-PRAY default
+    printLine("If you pray enough, your prayers may be answered.");
     return RTRUE;
 }
 
 bool vExorcise() {
     auto& g = Globals::instance();
     
-    // Check if object is specified
-    if (!g.prso) {
-        printLine("What do you want to exorcise?");
-        getGlobalParser().setOrphanDirect(V_EXORCISE, "exorcise");
+    // Call object action handler first if object specified
+    if (g.prso && g.prso->performAction()) {
         return RTRUE;
     }
     
-    // Call object action handler first
-    // This allows objects to override default behavior
-    if (g.prso->performAction()) {
-        return RTRUE;
-    }
-    
-    // Default: Nothing happens
-    printLine("Nothing happens.");
+    // Authentic ZIL V-EXORCISE
+    printLine("What a bizarre concept!");
     return RTRUE;
 }
 
@@ -1681,13 +1672,14 @@ bool vWave() {
     }
     
     // Call object action handler first
-    // This allows objects to override default behavior
     if (g.prso->performAction()) {
         return RTRUE;
     }
     
-    // Default: Nothing happens
-    printLine("You wave the " + g.prso->getDesc() + " around.");
+    // Authentic ZIL V-WAVE uses HACK-HACK
+    print("Waving the ");
+    print(g.prso->getDesc());
+    printLine(" isn't notably useful.");
     return RTRUE;
 }
 
@@ -1702,13 +1694,14 @@ bool vRub() {
     }
     
     // Call object action handler first
-    // This allows objects to override default behavior
     if (g.prso->performAction()) {
         return RTRUE;
     }
     
-    // Default: Nothing happens
-    printLine("Rubbing the " + g.prso->getDesc() + " has no effect.");
+    // Authentic ZIL V-RUB uses HACK-HACK
+    print("Fiddling with the ");
+    print(g.prso->getDesc());
+    printLine(" isn't notably useful.");
     return RTRUE;
 }
 
@@ -1723,13 +1716,12 @@ bool vRing() {
     }
     
     // Call object action handler first
-    // This allows objects to override default behavior (e.g., bell)
     if (g.prso->performAction()) {
         return RTRUE;
     }
     
-    // Default: Can't ring that
-    printLine("You can't ring that.");
+    // Authentic ZIL V-RING
+    printLine("How, exactly, can you ring that?");
     return RTRUE;
 }
 
@@ -1807,54 +1799,33 @@ bool vThrow() {
         return RTRUE;
     }
     
-    // Check if target is specified
-    if (!g.prsi) {
-        printLine("What do you want to throw it at?");
-        getGlobalParser().setOrphanIndirect(V_THROW, g.prso, "at");
-        return RTRUE;
-    }
-    
-    // Check if object is in inventory or accessible
-    ZObject* objLocation = g.prso->getLocation();
-    if (objLocation != g.winner && objLocation != g.here) {
-        printLine("You don't have that.");
-        return RTRUE;
-    }
-    
     // Call object action handler first
-    // This allows objects to have custom throw behavior
     if (g.prso->performAction()) {
         return RTRUE;
     }
     
-    // Default THROW behavior
-    // Calculate throw damage based on object size
-    int objectSize = g.prso->getProperty(P_SIZE);
-    if (objectSize == 0) {
-        objectSize = 5;  // Default size
+    // Authentic ZIL V-THROW - drop the object first
+    g.prso->moveTo(g.here);
+    
+    // Check if throwing at self
+    if (g.prsi == g.winner) {
+        print("A terrific throw! The ");
+        print(g.prso->getDesc());
+        printLine(" hits you squarely in the head. Normally, this wouldn't do much damage, but by incredible mischance, you fall over backwards trying to duck, and break your neck, justice being swift and merciful in the Great Underground Empire.");
+        // This should trigger death - for now just return
+        return RTRUE;
     }
     
-    // Check if target is an NPC
-    if (g.prsi->hasFlag(ObjectFlag::FIGHTBIT)) {
-        int enemyStrength = g.prsi->getProperty(P_STRENGTH);
-        if (enemyStrength == 0) {
-            enemyStrength = 5;
-        }
-        
-        if (objectSize >= enemyStrength / 2) {
-            printLine("You throw the " + g.prso->getDesc() + " at the " + g.prsi->getDesc() + "!");
-            printLine("It hits! The " + g.prsi->getDesc() + " is stunned!");
-        } else {
-            printLine("You throw the " + g.prso->getDesc() + " at the " + g.prsi->getDesc() + ".");
-            printLine("It bounces off harmlessly.");
-        }
+    // Check if throwing at an actor
+    if (g.prsi && g.prsi->hasFlag(ObjectFlag::ACTORBIT)) {
+        print("The ");
+        print(g.prsi->getDesc());
+        print(" ducks as the ");
+        print(g.prso->getDesc());
+        printLine(" flies by and crashes to the ground.");
     } else {
-        printLine("You throw the " + g.prso->getDesc() + " at the " + g.prsi->getDesc() + ".");
-        printLine("Nothing interesting happens.");
+        printLine("Thrown.");
     }
-    
-    // Move object to target's location
-    g.prso->moveTo(g.prsi->getLocation());
     
     return RTRUE;
 }
@@ -1869,21 +1840,15 @@ bool vSwing() {
         return RTRUE;
     }
     
-    // Check if object is a weapon
-    if (!g.prso->hasFlag(ObjectFlag::WEAPONBIT)) {
-        printLine("That's not a weapon.");
-        return RTRUE;
-    }
-    
-    // Check if target is specified
+    // Authentic ZIL V-SWING
     if (!g.prsi) {
-        // No target - just swing the weapon
-        printLine("You swing the " + g.prso->getDesc() + " around.");
+        // No target - just swing
+        printLine("Whoosh!");
         return RTRUE;
     }
     
-    // Target specified - similar to ATTACK
-    // Temporarily set prso to target and prsi to weapon
+    // Target specified - perform attack with swapped objects
+    // SWING weapon AT target -> ATTACK target WITH weapon
     ZObject* weapon = g.prso;
     ZObject* target = g.prsi;
     g.prso = target;
