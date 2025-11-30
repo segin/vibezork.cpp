@@ -1,6 +1,7 @@
 #include "verbs.h"
 #include "core/globals.h"
 #include "core/io.h"
+#include "parser/parser.h"
 #include "world/rooms.h"
 #include "world/objects.h"
 #include "world/world.h"
@@ -881,6 +882,7 @@ bool vRead() {
         
         if (readableObjects.empty()) {
             printLine("What do you want to read?");
+            getGlobalParser().setOrphanDirect(V_READ, "read");
             return RTRUE;
         }
         
@@ -890,6 +892,7 @@ bool vRead() {
             print("(" + g.prso->getDesc() + ")\n");
         } else {
             printLine("What do you want to read?");
+            getGlobalParser().setOrphanDirect(V_READ, "read");
             return RTRUE;
         }
     }

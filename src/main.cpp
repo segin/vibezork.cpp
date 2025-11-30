@@ -74,8 +74,8 @@ std::map<VerbId, std::function<bool()>> verbHandlers = {
     {V_ODYSSEUS, Verbs::vOdysseus}
 };
 
-// Global parser instance to maintain state across turns
-static Parser globalParser;
+// Use global parser from parser_instance.cpp
+// Parser& getGlobalParser() is declared in parser.h
 
 void mainLoop1() {
     auto& g = Globals::instance();
@@ -103,7 +103,7 @@ void mainLoop1() {
     }
     
     // Parse the command
-    ParsedCommand cmd = globalParser.parse(input);
+    ParsedCommand cmd = getGlobalParser().parse(input);
     
     // Handle parse errors (Requirement 73)
     if (cmd.verb == 0) {

@@ -7,6 +7,12 @@
 #include <set>
 #include <optional>
 
+// Forward declaration
+class Parser;
+
+// Global parser accessor (defined in main.cpp)
+Parser& getGlobalParser();
+
 struct ParsedCommand {
     VerbId verb = 0;
     ZObject* directObj = nullptr;
@@ -39,6 +45,12 @@ public:
     void setLastUnknownWord(const std::string& word);
     std::string_view getLastUnknownWord() const;
     void clearLastUnknownWord();
+    
+    // Orphan (incomplete command) support
+    void setOrphanDirect(VerbId verb, const std::string& verbWord);
+    void setOrphanIndirect(VerbId verb, ZObject* directObj, const std::string& prep);
+    void clearOrphan();
+    bool isOrphaned() const { return orphanFlag_; }
     
     // Public for testing
     std::vector<ZObject*> findObjects(const std::vector<std::string>& words, size_t startIdx = 0);
@@ -86,4 +98,12 @@ private:
     std::vector<ZObject*> lastObjects_;
     std::string lastUnknownWord_;
     bool hadUnknownWordLastTurn_ = false;
+    
+    // Orphan (incomplete command) state - for continuation parsing
+    bool orphanFlag_ = false;           // P-OFLAG: true if last command was incomplete
+    VerbId orphanVerb_ = 0;             // The verb from the incomplete command
+    std::string orphanPreposition_;     // Preposition if any
+    bool orphanNeedsDirect_ = true;     // True if missing direct object
+    bool orphanNeedsIndirect_ = false;  // True if missing indirect object
+    ZObject* orphanDirectObj_ = nullptr; // Direct object if already specified
 };

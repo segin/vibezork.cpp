@@ -569,6 +569,33 @@ std::string Parser::replaceOopsWord(const std::string& original, const std::stri
     return result;
 }
 
+void Parser::setOrphanDirect(VerbId verb, const std::string& verbWord) {
+    orphanFlag_ = true;
+    orphanVerb_ = verb;
+    orphanNeedsDirect_ = true;
+    orphanNeedsIndirect_ = false;
+    orphanDirectObj_ = nullptr;
+    orphanPreposition_.clear();
+}
+
+void Parser::setOrphanIndirect(VerbId verb, ZObject* directObj, const std::string& prep) {
+    orphanFlag_ = true;
+    orphanVerb_ = verb;
+    orphanNeedsDirect_ = false;
+    orphanNeedsIndirect_ = true;
+    orphanDirectObj_ = directObj;
+    orphanPreposition_ = prep;
+}
+
+void Parser::clearOrphan() {
+    orphanFlag_ = false;
+    orphanVerb_ = 0;
+    orphanNeedsDirect_ = true;
+    orphanNeedsIndirect_ = false;
+    orphanDirectObj_ = nullptr;
+    orphanPreposition_.clear();
+}
+
 ParsedCommand Parser::parse(const std::string& input) {
     ParsedCommand cmd;
     
@@ -580,6 +607,7 @@ ParsedCommand Parser::parse(const std::string& input) {
             return cmd;
         }
         // Re-parse the last command
+        orphanFlag_ = false;  // Clear orphan state for AGAIN
         return parse(lastCommand_);
     }
     
@@ -610,6 +638,58 @@ ParsedCommand Parser::parse(const std::string& input) {
         return cmd;
     }
     
+    // Check if we're continuing from an orphaned (incomplete) command
+    if (orphanFlag_) {
+        // Try to merge this input with the previous incomplete command
+        // First, check if this is a new verb (user is starting fresh)
+        VerbId newVerb = findVerb(cmd.words[0]);
+        Direction* newDir = findDirection(cmd.words[0]);
+        
+        if (newVerb != 0 || newDir) {
+            // User started a new command, abandon the orphan
+            orphanFlag_ = false;
+        } else {
+            // Try to use this input as the missing object
+            auto matches = findObjects(cmd.words, 0);
+            if (!matches.empty()) {
+                // Successfully found an object - complete the orphaned command
+                cmd.verb = orphanVerb_;
+                
+                if (orphanNeedsDirect_) {
+                    cmd.directObj = matches.size() == 1
+                        ? matches[0]
+                        : disambiguate(matches, cmd.words.back());
+                    if (cmd.directObj) {
+                        setLastObject(cmd.directObj);
+                    }
+                } else if (orphanNeedsIndirect_) {
+                    cmd.directObj = orphanDirectObj_;
+                    cmd.indirectObj = matches.size() == 1
+                        ? matches[0]
+                        : disambiguate(matches, cmd.words.back());
+                }
+                
+                orphanFlag_ = false;
+                // Save the completed command for AGAIN
+                lastCommand_ = input;  // This isn't quite right but works for now
+                return cmd;
+            } else {
+                // Couldn't find an object - check for unknown word
+                for (const auto& word : cmd.words) {
+                    if (word != "the" && word != "a" && word != "an") {
+                        setLastUnknownWord(word);
+                        printLine("I don't know the word \"" + word + "\".");
+                        orphanFlag_ = false;
+                        return cmd;
+                    }
+                }
+                printLine("I don't see that here.");
+                orphanFlag_ = false;
+                return cmd;
+            }
+        }
+    }
+    
     // Save this command for AGAIN (but not if it's AGAIN itself)
     if (!isAgainCommand(cmd.words) && !isOopsCommand(cmd.words)) {
         lastCommand_ = input;
@@ -621,6 +701,7 @@ ParsedCommand Parser::parse(const std::string& input) {
         cmd.isDirection = true;
         cmd.direction = *dir;
         cmd.verb = V_WALK;
+        orphanFlag_ = false;
         return cmd;
     }
     
