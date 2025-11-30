@@ -14,33 +14,64 @@ void printDesc(const ZObject* obj) {
 }
 
 void print(const std::string& str) {
-    std::istringstream iss(str);
+    // Process string character by character, preserving explicit newlines
+    // while still doing word wrapping for long lines
     std::string word;
-    bool firstWord = true;
     
-    while (iss >> word) {
-        int wordLen = word.length();
+    for (size_t i = 0; i < str.length(); ++i) {
+        char c = str[i];
         
-        // Check if we need to wrap
-        if (currentColumn > 0 && currentColumn + wordLen + 1 > WRAP_WIDTH) {
+        if (c == '\n') {
+            // Output any pending word first
+            if (!word.empty()) {
+                if (currentColumn > 0 && currentColumn + word.length() + 1 > WRAP_WIDTH) {
+                    std::cout << '\n';
+                    currentColumn = 0;
+                }
+                if (currentColumn > 0) {
+                    std::cout << ' ';
+                    currentColumn++;
+                }
+                std::cout << word;
+                currentColumn += word.length();
+                word.clear();
+            }
+            // Output the newline
+            std::cout << '\n';
+            currentColumn = 0;
+        } else if (c == ' ' || c == '\t') {
+            // End of word - output it
+            if (!word.empty()) {
+                if (currentColumn > 0 && currentColumn + word.length() + 1 > WRAP_WIDTH) {
+                    std::cout << '\n';
+                    currentColumn = 0;
+                }
+                if (currentColumn > 0) {
+                    std::cout << ' ';
+                    currentColumn++;
+                }
+                std::cout << word;
+                currentColumn += word.length();
+                word.clear();
+            }
+        } else {
+            // Add character to current word
+            word += c;
+        }
+    }
+    
+    // Output any remaining word
+    if (!word.empty()) {
+        if (currentColumn > 0 && currentColumn + word.length() + 1 > WRAP_WIDTH) {
             std::cout << '\n';
             currentColumn = 0;
         }
-        
-        // Add space before word (except at start of line)
         if (currentColumn > 0) {
             std::cout << ' ';
             currentColumn++;
         }
-        
         std::cout << word;
-        currentColumn += wordLen;
-    }
-    
-    // Handle trailing whitespace and newlines in original string
-    if (!str.empty() && str.back() == '\n') {
-        std::cout << '\n';
-        currentColumn = 0;
+        currentColumn += word.length();
     }
 }
 
