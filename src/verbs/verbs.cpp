@@ -129,11 +129,12 @@ bool vInventory() {
 }
 
 bool vQuit() {
-    // Remind player to save (Requirement 70.5)
-    printLine("Your progress will be lost if you haven't saved.");
+    // Authentic Zork: V-QUIT from gverbs.zil
+    // First show score
+    vScore();
     
-    // Ask for confirmation (Requirement 70.1)
-    printLine("Do you really want to quit? (yes/no)");
+    // Ask for confirmation - authentic message
+    print("Do you wish to leave the game? (Y is affirmative): ");
     std::string response = readLine();
     
     // Convert to lowercase for comparison
@@ -141,15 +142,13 @@ bool vQuit() {
         c = std::tolower(c);
     }
     
-    // Accept Y/N or YES/NO (Requirement 70.4)
+    // Accept Y/YES
     if (response == "yes" || response == "y") {
-        // Player confirms (Requirement 70.2)
-        printLine("Thanks for playing!");
         exit(0);
     }
     
-    // Player declines (Requirement 70.3)
-    printLine("Okay, continuing game.");
+    // Player declines - authentic response
+    printLine("Ok.");
     return RTRUE;
 }
 
@@ -165,9 +164,9 @@ bool vTake() {
         return RTRUE;
     }
     
-    // Check if object is already in inventory
+    // Check if object is already in inventory - authentic ZIL: PRE-TAKE
     if (g.prso->getLocation() == g.winner) {
-        printLine("You already have that.");
+        printLine("You already have that!");
         return RTRUE;
     }
     
@@ -293,42 +292,20 @@ bool vExamine() {
         return RTRUE;
     }
     
-    // Display detailed object description
-    printLine(g.prso->getDesc());
+    // Authentic ZIL V-EXAMINE logic:
+    // 1. If object has P?TEXT, print it
+    // 2. Else if container or door, do V-LOOK-INSIDE
+    // 3. Else "There's nothing special about the [object]."
     
-    // Show object state
-    // Check if it's a container
-    if (g.prso->hasFlag(ObjectFlag::CONTBIT)) {
-        if (g.prso->hasFlag(ObjectFlag::OPENBIT)) {
-            const auto& contents = g.prso->getContents();
-            if (contents.empty()) {
-                printLine("The " + g.prso->getDesc() + " is empty.");
-            } else {
-                printLine("The " + g.prso->getDesc() + " contains:");
-                for (const auto* obj : contents) {
-                    print("  ");
-                    printLine(obj->getDesc());
-                }
-            }
-        } else {
-            printLine("The " + g.prso->getDesc() + " is closed.");
-        }
-    }
-    
-    // Check if it's a light source
-    if (g.prso->hasFlag(ObjectFlag::LIGHTBIT)) {
-        if (g.prso->hasFlag(ObjectFlag::ONBIT)) {
-            printLine("The " + g.prso->getDesc() + " is on.");
-        } else {
-            printLine("The " + g.prso->getDesc() + " is off.");
-        }
-    }
-    
-    // Check if it's locked
-    if (g.prso->hasFlag(ObjectFlag::DOORBIT) || g.prso->hasFlag(ObjectFlag::CONTBIT)) {
-        if (g.prso->hasFlag(ObjectFlag::LOCKEDBIT)) {
-            printLine("The " + g.prso->getDesc() + " is locked.");
-        }
+    if (g.prso->hasText()) {
+        printLine(g.prso->getText());
+    } else if (g.prso->hasFlag(ObjectFlag::CONTBIT) || g.prso->hasFlag(ObjectFlag::DOORBIT)) {
+        // Delegate to look-inside behavior
+        return vLookInside();
+    } else {
+        print("There's nothing special about the ");
+        print(g.prso->getDesc());
+        printLine(".");
     }
     
     return RTRUE;
@@ -370,20 +347,28 @@ bool vOpen() {
         return RTRUE;
     }
     
-    // Default OPEN behavior
-    // Set OPENBIT flag
+    // Default OPEN behavior - authentic ZIL V-OPEN
     g.prso->setFlag(ObjectFlag::OPENBIT);
+    g.prso->setFlag(ObjectFlag::TOUCHBIT);
     
-    // Display contents if any
+    // Display contents if any - authentic formatting
     const auto& contents = g.prso->getContents();
-    if (!contents.empty()) {
-        printLine("Opening the " + g.prso->getDesc() + " reveals:");
-        for (const auto* obj : contents) {
-            print("  ");
-            printLine(obj->getDesc());
-        }
-    } else {
+    if (contents.empty() || g.prso->hasFlag(ObjectFlag::TRANSBIT)) {
+        // Empty or transparent container
         printLine("Opened.");
+    } else {
+        // Has contents - "Opening the X reveals Y."
+        print("Opening the ");
+        print(g.prso->getDesc());
+        print(" reveals ");
+        // Print contents inline
+        bool first = true;
+        for (const auto* obj : contents) {
+            if (!first) print(", ");
+            print(obj->getDesc());
+            first = false;
+        }
+        printLine(".");
     }
     
     return RTRUE;
@@ -392,8 +377,6 @@ bool vOpen() {
 bool vClose() {
     auto& g = Globals::instance();
     
-    // PRE-CLOSE checks (Requirement 23, 34)
-    
     // Check if object is specified
     if (!g.prso) {
         printLine("What do you want to close?");
@@ -401,28 +384,40 @@ bool vClose() {
         return RTRUE;
     }
     
-    // Verify object has CONTBIT flag (is a container)
-    if (!g.prso->hasFlag(ObjectFlag::CONTBIT)) {
-        printLine("You can't close that.");
+    // Authentic ZIL V-CLOSE logic
+    // Must have CONTBIT or DOORBIT, and not be a surface with 0 capacity
+    if (!g.prso->hasFlag(ObjectFlag::CONTBIT) && !g.prso->hasFlag(ObjectFlag::DOORBIT)) {
+        print("You must tell me how to do that to a ");
+        print(g.prso->getDesc());
+        printLine(".");
         return RTRUE;
     }
     
     // Check if already closed
     if (!g.prso->hasFlag(ObjectFlag::OPENBIT)) {
-        printLine("It's already closed.");
+        printLine("It is already closed.");
         return RTRUE;
     }
     
-    // Call object action handler first (Requirement 23)
-    // This allows objects to override default behavior
+    // Call object action handler first
     if (g.prso->performAction()) {
         return RTRUE;
     }
     
     // Default CLOSE behavior
-    // Clear OPENBIT flag
     g.prso->clearFlag(ObjectFlag::OPENBIT);
-    printLine("Closed.");
+    
+    // Different message for doors vs containers
+    if (g.prso->hasFlag(ObjectFlag::DOORBIT)) {
+        print("The ");
+        print(g.prso->getDesc());
+        printLine(" is now closed.");
+    } else {
+        printLine("Closed.");
+    }
+    
+    // Check if closing this made the room dark
+    // (authentic ZIL checks LIT? after closing)
     
     return RTRUE;
 }
@@ -496,10 +491,8 @@ bool vLock() {
         return RTRUE;
     }
     
-    // Default LOCK behavior
-    // Set LOCKEDBIT flag
-    g.prso->setFlag(ObjectFlag::LOCKEDBIT);
-    printLine("Locked.");
+    // Default LOCK behavior - authentic ZIL V-LOCK just says this
+    printLine("It doesn't seem to work.");
     
     return RTRUE;
 }
@@ -567,26 +560,16 @@ bool vUnlock() {
         return RTRUE;
     }
     
-    // Default UNLOCK behavior
-    // Clear LOCKEDBIT flag
-    g.prso->clearFlag(ObjectFlag::LOCKEDBIT);
-    printLine("Unlocked.");
+    // Default UNLOCK behavior - authentic ZIL V-UNLOCK calls V-LOCK
+    // which just says "It doesn't seem to work."
+    printLine("It doesn't seem to work.");
     
     return RTRUE;
 }
 
 bool vWalk() {
-    auto& g = Globals::instance();
-    ZRoom* currentRoom = dynamic_cast<ZRoom*>(g.here);
-    
-    if (!currentRoom) {
-        printLine("You can't go that way.");
-        return RTRUE;
-    }
-    
-    // Direction is stored in parser state - for now just say can't go
-    // Full implementation would check parser for direction
-    printLine("You can't go that way.");
+    // Bare "go" without direction - authentic Zork response
+    printLine("Use compass directions for movement.");
     return RTRUE;
 }
 
@@ -983,30 +966,60 @@ bool vLookInside() {
         return RTRUE;
     }
     
-    // Check if object is a container
-    if (!g.prso->hasFlag(ObjectFlag::CONTBIT)) {
-        printLine("The " + g.prso->getDesc() + " isn't a container.");
-        return RTRUE;
-    }
-    
-    // Check if container is open or transparent
-    if (!g.prso->hasFlag(ObjectFlag::OPENBIT) && !g.prso->hasFlag(ObjectFlag::TRANSBIT)) {
-        printLine("The " + g.prso->getDesc() + " is closed.");
-        return RTRUE;
-    }
-    
-    // List contents of container
-    const auto& contents = g.prso->getContents();
-    if (contents.empty()) {
-        printLine("The " + g.prso->getDesc() + " is empty.");
-    } else {
-        printLine("The " + g.prso->getDesc() + " contains:");
-        for (const auto* obj : contents) {
-            print("  ");
-            printLine(obj->getDesc());
+    // Authentic ZIL V-LOOK-INSIDE logic
+    if (g.prso->hasFlag(ObjectFlag::DOORBIT)) {
+        // Door handling
+        if (g.prso->hasFlag(ObjectFlag::OPENBIT)) {
+            print("The ");
+            print(g.prso->getDesc());
+            printLine(" is open, but I can't tell what's beyond it.");
+        } else {
+            print("The ");
+            print(g.prso->getDesc());
+            printLine(" is closed.");
         }
+        return RTRUE;
     }
     
+    if (g.prso->hasFlag(ObjectFlag::CONTBIT)) {
+        // Actor check - "There is nothing special to be seen."
+        if (g.prso->hasFlag(ObjectFlag::ACTORBIT)) {
+            printLine("There is nothing special to be seen.");
+            return RTRUE;
+        }
+        
+        // Check if we can see inside (open or transparent)
+        bool canSeeInside = g.prso->hasFlag(ObjectFlag::OPENBIT) || 
+                           g.prso->hasFlag(ObjectFlag::TRANSBIT);
+        
+        if (canSeeInside) {
+            const auto& contents = g.prso->getContents();
+            if (contents.empty()) {
+                print("The ");
+                print(g.prso->getDesc());
+                printLine(" is empty.");
+            } else {
+                // Print contents
+                print("The ");
+                print(g.prso->getDesc());
+                printLine(" contains:");
+                for (const auto* obj : contents) {
+                    print("  ");
+                    printLine(obj->getDesc());
+                }
+            }
+        } else {
+            print("The ");
+            print(g.prso->getDesc());
+            printLine(" is closed.");
+        }
+        return RTRUE;
+    }
+    
+    // Not a container or door
+    print("You can't look inside a ");
+    print(g.prso->getDesc());
+    printLine(".");
     return RTRUE;
 }
 
@@ -1025,12 +1038,20 @@ bool vSearch() {
         return RTRUE;
     }
     
-    // Similar to LOOK-INSIDE but more thorough
-    // Check if object is a container
+    // Authentic ZIL V-SEARCH: "You find nothing unusual."
+    printLine("You find nothing unusual.");
+    return RTRUE;
+}
+
+bool vSearchOld() {
+    // Keeping old implementation for reference - can be removed
+    auto& g = Globals::instance();
+    
     if (g.prso->hasFlag(ObjectFlag::CONTBIT)) {
-        // SEARCH can reveal contents even if closed (but not locked)
         if (g.prso->hasFlag(ObjectFlag::LOCKEDBIT)) {
-            printLine("The " + g.prso->getDesc() + " is locked.");
+            print("The ");
+            print(g.prso->getDesc());
+            printLine(" is locked.");
             return RTRUE;
         }
         
@@ -1233,13 +1254,20 @@ bool vMove() {
     }
     
     // Call object action handler first
-    // This allows objects to override default behavior
     if (g.prso->performAction()) {
         return RTRUE;
     }
     
-    // Default: Nothing happens
-    printLine("Nothing obvious happens.");
+    // Authentic ZIL V-MOVE
+    if (g.prso->hasFlag(ObjectFlag::TAKEBIT)) {
+        print("Moving the ");
+        print(g.prso->getDesc());
+        printLine(" reveals nothing.");
+    } else {
+        print("You can't move the ");
+        print(g.prso->getDesc());
+        printLine(".");
+    }
     return RTRUE;
 }
 
@@ -1263,18 +1291,21 @@ bool vTie() {
     }
     
     // Call object action handlers
-    // First check if direct object has special TIE behavior
     if (g.prso->performAction()) {
         return RTRUE;
     }
-    
-    // Then check if indirect object has special TIE behavior
     if (g.prsi->performAction()) {
         return RTRUE;
     }
     
-    // Default: Can't tie that
-    printLine("You can't tie that.");
+    // Authentic ZIL V-TIE
+    if (g.prsi == g.winner) {
+        printLine("You can't tie anything to yourself.");
+    } else {
+        print("You can't tie the ");
+        print(g.prso->getDesc());
+        printLine(" to that.");
+    }
     return RTRUE;
 }
 
@@ -1293,8 +1324,8 @@ bool vUntie() {
         return RTRUE;
     }
     
-    // Default: It's not tied
-    printLine("It's not tied.");
+    // Authentic ZIL V-UNTIE
+    printLine("This cannot be tied, so it cannot be untied!");
     return RTRUE;
 }
 
@@ -1308,8 +1339,10 @@ bool vListen() {
             return RTRUE;
         }
         
-        // Default for object
-        printLine("You hear nothing unusual.");
+        // Authentic ZIL V-LISTEN
+        print("The ");
+        print(g.prso->getDesc());
+        printLine(" makes no sound.");
         return RTRUE;
     }
     
@@ -1319,7 +1352,7 @@ bool vListen() {
         room->performRoomAction(M_LISTEN);
     }
     
-    // Default message if room doesn't handle it
+    // Default - no specific message for room listening in ZIL
     printLine("You hear nothing unusual.");
     return RTRUE;
 }
@@ -1334,8 +1367,10 @@ bool vSmell() {
             return RTRUE;
         }
         
-        // Default for object
-        printLine("You smell nothing unusual.");
+        // Authentic ZIL V-SMELL
+        print("It smells like a ");
+        print(g.prso->getDesc());
+        printLine(".");
         return RTRUE;
     }
     
@@ -1390,24 +1425,36 @@ bool vEat() {
         return RTRUE;
     }
     
-    // Check if object has FOODBIT flag
-    if (!g.prso->hasFlag(ObjectFlag::FOODBIT)) {
-        printLine("That's not edible.");
+    // Authentic ZIL V-EAT logic
+    if (g.prso->hasFlag(ObjectFlag::FOODBIT)) {
+        // Check if player is holding it
+        if (g.prso->getLocation() != g.winner && 
+            (!g.prso->getLocation() || g.prso->getLocation()->getLocation() != g.winner)) {
+            printLine("You're not holding that.");
+            return RTRUE;
+        }
+        
+        // Call object action handler first
+        if (g.prso->performAction()) {
+            return RTRUE;
+        }
+        
+        // Remove and print message
+        g.prso->moveTo(nullptr);
+        printLine("Thank you very much. It really hit the spot.");
         return RTRUE;
     }
     
-    // Call object action handler first
-    // This allows objects to override default behavior
-    if (g.prso->performAction()) {
-        return RTRUE;
+    // Not food - check if drinkable
+    if (g.prso->hasFlag(ObjectFlag::DRINKBIT)) {
+        // Redirect to drink
+        return vDrink();
     }
     
-    // Default EAT behavior
-    // Remove object from game (consumed)
-    g.prso->moveTo(nullptr);
-    
-    printLine("Thank you very much. It really hit the spot.");
-    
+    // Neither food nor drink
+    print("I don't think that the ");
+    print(g.prso->getDesc());
+    printLine(" would agree with you.");
     return RTRUE;
 }
 
@@ -1421,24 +1468,24 @@ bool vDrink() {
         return RTRUE;
     }
     
-    // Check if object has DRINKBIT flag
-    if (!g.prso->hasFlag(ObjectFlag::DRINKBIT)) {
-        printLine("That's not drinkable.");
+    // Authentic ZIL - V-DRINK calls V-EAT
+    // But check DRINKBIT specifically
+    if (g.prso->hasFlag(ObjectFlag::DRINKBIT)) {
+        // Call object action handler first
+        if (g.prso->performAction()) {
+            return RTRUE;
+        }
+        
+        // Remove and print message
+        g.prso->moveTo(nullptr);
+        printLine("Thank you very much. I was rather thirsty (from all this talking, probably).");
         return RTRUE;
     }
     
-    // Call object action handler first
-    // This allows objects to override default behavior
-    if (g.prso->performAction()) {
-        return RTRUE;
-    }
-    
-    // Default DRINK behavior
-    // Remove object from game (consumed)
-    g.prso->moveTo(nullptr);
-    
-    printLine("Thank you very much. It really hit the spot.");
-    
+    // Not drinkable
+    print("I don't think that the ");
+    print(g.prso->getDesc());
+    printLine(" would agree with you.");
     return RTRUE;
 }
 
@@ -1698,53 +1745,48 @@ bool vAttack() {
         return RTRUE;
     }
     
-    // Check if target is attackable (has FIGHTBIT flag)
-    if (!g.prso->hasFlag(ObjectFlag::FIGHTBIT)) {
-        printLine("You can't attack that.");
+    // Authentic ZIL V-ATTACK logic
+    // Check if target is an actor
+    if (!g.prso->hasFlag(ObjectFlag::ACTORBIT)) {
+        print("I've known strange people, but fighting a ");
+        print(g.prso->getDesc());
+        printLine("?");
         return RTRUE;
     }
     
-    // Check if we're in a sacred room (no fighting allowed)
-    if (g.here && g.here->hasFlag(ObjectFlag::SACREDBIT)) {
-        printLine("A mysterious force prevents you from attacking here.");
+    // Check for weapon - must have one
+    if (!g.prsi) {
+        print("Trying to attack a ");
+        print(g.prso->getDesc());
+        printLine(" with your bare hands is suicidal.");
+        return RTRUE;
+    }
+    
+    // Check if holding the weapon
+    if (g.prsi->getLocation() != g.winner) {
+        print("You aren't even holding the ");
+        print(g.prsi->getDesc());
+        printLine(".");
+        return RTRUE;
+    }
+    
+    // Check if it's actually a weapon
+    if (!g.prsi->hasFlag(ObjectFlag::WEAPONBIT)) {
+        print("Trying to attack the ");
+        print(g.prso->getDesc());
+        print(" with a ");
+        print(g.prsi->getDesc());
+        printLine(" is suicidal.");
         return RTRUE;
     }
     
     // Call object action handler first
-    // This allows NPCs to have custom combat behavior
     if (g.prso->performAction()) {
         return RTRUE;
     }
     
-    // Default ATTACK behavior
-    // Check for weapon
-    ZObject* weapon = nullptr;
-    if (g.prsi) {
-        // Weapon specified with "ATTACK X WITH Y"
-        weapon = g.prsi;
-    } else {
-        // Look for weapon in inventory
-        for (auto* obj : g.winner->getContents()) {
-            if (obj->hasFlag(ObjectFlag::WEAPONBIT)) {
-                weapon = obj;
-                break;
-            }
-        }
-    }
-    
-    // Check if already in combat
-    if (CombatSystem::isInCombat()) {
-        // Already fighting - the combat timer will handle rounds
-        printLine("You're already in combat!");
-        return RTRUE;
-    }
-    
-    // Start turn-based combat using the combat system
-    // This will register the I-FIGHT timer to process combat rounds
-    CombatSystem::startCombat(g.prso, weapon);
-    
-    // Process the first combat round immediately
-    // (subsequent rounds will be handled by the I-FIGHT timer)
+    // Start combat using the combat system
+    CombatSystem::startCombat(g.prso, g.prsi);
     CombatSystem::processCombatRound();
     
     return RTRUE;
