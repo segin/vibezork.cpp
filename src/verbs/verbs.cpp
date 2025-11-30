@@ -2385,4 +2385,56 @@ bool vOdysseus() {
     return NPCSystem::handleOdysseus() ? RTRUE : RFALSE;
 }
 
+// Easter eggs / special words - authentic ZIL responses
+
+bool vHello() {
+    auto& g = Globals::instance();
+    
+    // If object specified, greet that object
+    if (g.prso) {
+        if (g.prso->hasFlag(ObjectFlag::ACTORBIT)) {
+            print("The ");
+            print(g.prso->getDesc());
+            printLine(" bows his head to you in greeting.");
+        } else {
+            print("It's a well known fact that only schizophrenics say \"Hello\" to a ");
+            print(g.prso->getDesc());
+            printLine(".");
+        }
+        return RTRUE;
+    }
+    
+    // No object - generic hello responses
+    // ZIL has a PICK-ONE from HELLOS table
+    static const char* hellos[] = {
+        "Hello.",
+        "Good day.",
+        "Nice weather we've been having lately.",
+        "Goodbye."
+    };
+    static int helloIdx = 0;
+    printLine(hellos[helloIdx % 4]);
+    helloIdx++;
+    return RTRUE;
+}
+
+bool vZork() {
+    // Authentic ZIL V-ZORK
+    printLine("At your service!");
+    return RTRUE;
+}
+
+bool vPlugh() {
+    // Authentic ZIL V-ADVENT (handles PLUGH and XYZZY)
+    // Reference to Colossal Cave Adventure
+    printLine("A hollow voice says \"Fool.\"");
+    return RTRUE;
+}
+
+bool vFrobozz() {
+    // Authentic ZIL V-FROBOZZ
+    printLine("The FROBOZZ Corporation created, owns, and operates this dungeon.");
+    return RTRUE;
+}
+
 } // namespace Verbs

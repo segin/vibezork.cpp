@@ -9,6 +9,10 @@
 #include <stdexcept>
 
 Parser::Parser() : verbRegistry_(nullptr) {
+    initializeVerbsAndDirections();
+}
+
+void Parser::initializeVerbsAndDirections() {
     // Initialize verb synonyms (from gsyntax.zil)
     verbSynonyms_["take"] = V_TAKE;
     verbSynonyms_["get"] = V_TAKE;
@@ -35,6 +39,14 @@ Parser::Parser() : verbRegistry_(nullptr) {
     verbSynonyms_["brief"] = V_BRIEF;
     verbSynonyms_["superbrief"] = V_SUPERBRIEF;
     verbSynonyms_["super"] = V_SUPERBRIEF;
+    
+    // Easter eggs / special words
+    verbSynonyms_["hello"] = V_HELLO;
+    verbSynonyms_["hi"] = V_HELLO;
+    verbSynonyms_["zork"] = V_ZORK;
+    verbSynonyms_["plugh"] = V_PLUGH;
+    verbSynonyms_["xyzzy"] = V_PLUGH;
+    verbSynonyms_["frobozz"] = V_FROBOZZ;
     
     // Directions
     directions_["north"] = Direction::NORTH;
@@ -94,88 +106,7 @@ Parser::Parser() : verbRegistry_(nullptr) {
 }
 
 Parser::Parser(VerbRegistry* registry) : verbRegistry_(registry) {
-    // Initialize verb synonyms (from gsyntax.zil)
-    verbSynonyms_["take"] = V_TAKE;
-    verbSynonyms_["get"] = V_TAKE;
-    verbSynonyms_["drop"] = V_DROP;
-    verbSynonyms_["put"] = V_PUT;
-    verbSynonyms_["look"] = V_LOOK;
-    verbSynonyms_["l"] = V_LOOK;
-    verbSynonyms_["examine"] = V_EXAMINE;
-    verbSynonyms_["read"] = V_READ;
-    verbSynonyms_["open"] = V_OPEN;
-    verbSynonyms_["close"] = V_CLOSE;
-    verbSynonyms_["inventory"] = V_INVENTORY;
-    verbSynonyms_["i"] = V_INVENTORY;
-    verbSynonyms_["go"] = V_WALK;
-    verbSynonyms_["attack"] = V_ATTACK;
-    verbSynonyms_["kill"] = V_KILL;
-    verbSynonyms_["quit"] = V_QUIT;
-    verbSynonyms_["q"] = V_QUIT;
-    
-    // Meta-game verbs
-    verbSynonyms_["score"] = V_SCORE;
-    verbSynonyms_["diagnose"] = V_DIAGNOSE;
-    verbSynonyms_["verbose"] = V_VERBOSE;
-    verbSynonyms_["brief"] = V_BRIEF;
-    verbSynonyms_["superbrief"] = V_SUPERBRIEF;
-    verbSynonyms_["super"] = V_SUPERBRIEF;
-    
-    // Directions
-    directions_["north"] = Direction::NORTH;
-    directions_["n"] = Direction::NORTH;
-    directions_["south"] = Direction::SOUTH;
-    directions_["s"] = Direction::SOUTH;
-    directions_["east"] = Direction::EAST;
-    directions_["e"] = Direction::EAST;
-    directions_["west"] = Direction::WEST;
-    directions_["w"] = Direction::WEST;
-    directions_["ne"] = Direction::NE;
-    directions_["northeast"] = Direction::NE;
-    directions_["nw"] = Direction::NW;
-    directions_["northwest"] = Direction::NW;
-    directions_["se"] = Direction::SE;
-    directions_["southeast"] = Direction::SE;
-    directions_["sw"] = Direction::SW;
-    directions_["southwest"] = Direction::SW;
-    directions_["up"] = Direction::UP;
-    directions_["u"] = Direction::UP;
-    directions_["down"] = Direction::DOWN;
-    directions_["d"] = Direction::DOWN;
-    
-    // Prepositions (from gsyntax.zil)
-    // Core prepositions
-    prepositions_.insert("with");
-    prepositions_.insert("using");
-    prepositions_.insert("through");
-    prepositions_.insert("thru");
-    
-    prepositions_.insert("in");
-    prepositions_.insert("inside");
-    prepositions_.insert("into");
-    
-    prepositions_.insert("on");
-    prepositions_.insert("onto");
-    
-    prepositions_.insert("under");
-    prepositions_.insert("underneath");
-    prepositions_.insert("beneath");
-    prepositions_.insert("below");
-    
-    // Additional prepositions used in syntax patterns
-    prepositions_.insert("to");
-    prepositions_.insert("at");
-    prepositions_.insert("from");
-    prepositions_.insert("for");
-    prepositions_.insert("about");
-    prepositions_.insert("off");
-    prepositions_.insert("out");
-    prepositions_.insert("over");
-    prepositions_.insert("across");
-    prepositions_.insert("behind");
-    prepositions_.insert("around");
-    prepositions_.insert("down");
-    prepositions_.insert("up");
+    initializeVerbsAndDirections();
 }
 
 void Parser::tokenize(const std::string& input, std::vector<std::string>& tokens) {

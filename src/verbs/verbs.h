@@ -92,6 +92,12 @@ constexpr VerbId V_TELL = 122;
 constexpr VerbId V_ODYSSEUS = 123;  // Special verb for cyclops puzzle
 constexpr VerbId V_YELL = 124;
 
+// Easter eggs / special words
+constexpr VerbId V_HELLO = 130;
+constexpr VerbId V_ZORK = 131;
+constexpr VerbId V_PLUGH = 132;  // Also XYZZY - Adventure reference
+constexpr VerbId V_FROBOZZ = 133;
+
 // Verb handlers
 namespace Verbs {
     bool vLook();
@@ -174,6 +180,12 @@ namespace Verbs {
     bool vAsk();
     bool vTell();
     bool vOdysseus();
+    
+    // Easter eggs / special words
+    bool vHello();
+    bool vZork();
+    bool vPlugh();  // Also handles XYZZY
+    bool vFrobozz();
     
     // Helper for special movement
     bool trySpecialMovement(int verbId, Direction dir);

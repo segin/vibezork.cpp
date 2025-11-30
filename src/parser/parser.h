@@ -59,6 +59,7 @@ public:
     std::optional<size_t> findPrepositionIndex(const std::vector<std::string>& tokens) const;
     
 private:
+    void initializeVerbsAndDirections();
     void tokenize(const std::string& input, std::vector<std::string>& tokens);
     VerbId findVerb(const std::string& word);
     ZObject* findObject(const std::string& word);
