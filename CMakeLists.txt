@@ -107,4 +107,8 @@ if(BUILD_TESTS)
     # Verb edge case tests
     add_executable(verb_edge_case_tests tests/verb_edge_case_tests.cpp ${LIB_SOURCES})
     add_test(NAME VerbEdgeCaseTests COMMAND verb_edge_case_tests)
+    
+    # Integration tests
+    add_executable(integration_tests tests/integration_tests.cpp ${LIB_SOURCES})
+    add_test(NAME IntegrationTests COMMAND integration_tests)
 endif()

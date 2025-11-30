@@ -2212,33 +2212,33 @@ Comprehensive testing and final polish to ensure quality.
   - Test save/restore system
   - _Requirements: 92_
 
-- [ ] 67. Create integration test suite
+- [x] 67. Create integration test suite
   - Test complete command sequences
   - Test puzzle solutions
   - Test NPC interactions
   - Test game state transitions
   - _Requirements: 93_
 
-- [ ] 67.1 Test command sequences
+- [x] 67.1 Test command sequences
   - Test multi-step actions
   - Test state changes
   - Test object interactions
   - _Requirements: 93_
 
-- [ ] 67.2 Test puzzle solutions
+- [x] 67.2 Test puzzle solutions
   - Test each major puzzle
   - Verify solutions work
   - Test alternative approaches
   - _Requirements: 93, 97_
 
-- [ ] 67.3 Test NPC interactions
+- [x] 67.3 Test NPC interactions
   - Test thief behavior
   - Test troll behavior
   - Test cyclops behavior
   - Test combat scenarios
   - _Requirements: 93_
 
-- [ ] 67.4 Test game state persistence
+- [x] 67.4 Test game state persistence
   - Test save and restore
   - Test restart
   - Test state consistency
