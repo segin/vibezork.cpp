@@ -170,8 +170,13 @@ bool vTake() {
         return RTRUE;
     }
     
-    // Check TRYTAKEBIT flag (anchored objects cannot be taken)
+    // Call object action handler FIRST for TRYTAKEBIT objects
+    // This allows objects like mailbox to give custom "anchored" messages
     if (g.prso->hasFlag(ObjectFlag::TRYTAKEBIT)) {
+        if (g.prso->performAction()) {
+            return RTRUE;
+        }
+        // Default message if no custom handler
         printLine("You can't take that.");
         return RTRUE;
     }
@@ -323,8 +328,14 @@ bool vOpen() {
         return RTRUE;
     }
     
-    // Verify object has CONTBIT flag (is a container)
-    if (!g.prso->hasFlag(ObjectFlag::CONTBIT)) {
+    // Call object action handler first (Requirement 23)
+    // This allows objects like doors/windows to override default behavior
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Verify object has CONTBIT or DOORBIT flag (is openable)
+    if (!g.prso->hasFlag(ObjectFlag::CONTBIT) && !g.prso->hasFlag(ObjectFlag::DOORBIT)) {
         printLine("You can't open that.");
         return RTRUE;
     }
@@ -338,12 +349,6 @@ bool vOpen() {
     // Check if locked
     if (g.prso->hasFlag(ObjectFlag::LOCKEDBIT)) {
         printLine("The " + g.prso->getDesc() + " is locked.");
-        return RTRUE;
-    }
-    
-    // Call object action handler first (Requirement 23)
-    // This allows objects to override default behavior
-    if (g.prso->performAction()) {
         return RTRUE;
     }
     

@@ -142,12 +142,69 @@ bool forestAction() {
     return RFALSE;
 }
 
+// Global flag to track if window has been opened (per ZIL KITCHEN-WINDOW-FLAG)
+static bool kitchenWindowOpened = false;
+
 bool kitchenWindowAction() {
     auto& g = Globals::instance();
-    if (g.prsa == V_EXAMINE) {
-        printLine("The window is slightly ajar, but not enough to allow entry.");
+    ZObject* window = g.getObject(ObjectIds::KITCHEN_WINDOW);
+    
+    if (g.prsa == V_OPEN) {
+        if (window && window->hasFlag(ObjectFlag::OPENBIT)) {
+            printLine("The window is already open.");
+        } else {
+            if (window) window->setFlag(ObjectFlag::OPENBIT);
+            kitchenWindowOpened = true;
+            printLine("With great effort, you open the window far enough to allow entry.");
+        }
         return RTRUE;
     }
+    
+    if (g.prsa == V_CLOSE) {
+        if (window && !window->hasFlag(ObjectFlag::OPENBIT)) {
+            printLine("The window is already closed.");
+        } else {
+            if (window) window->clearFlag(ObjectFlag::OPENBIT);
+            printLine("The window closes (more easily than it opened).");
+        }
+        return RTRUE;
+    }
+    
+    if (g.prsa == V_EXAMINE) {
+        if (!kitchenWindowOpened) {
+            printLine("The window is slightly ajar, but not enough to allow entry.");
+        } else if (window && window->hasFlag(ObjectFlag::OPENBIT)) {
+            printLine("The window is open.");
+        } else {
+            printLine("The window is closed.");
+        }
+        return RTRUE;
+    }
+    
+    if (g.prsa == V_LOOK_INSIDE) {
+        if (g.here && g.here->getId() == RoomIds::KITCHEN) {
+            printLine("You can see a clear area leading towards a forest.");
+        } else {
+            printLine("You can see what appears to be a kitchen.");
+        }
+        return RTRUE;
+    }
+    
+    // Handle ENTER/WALK THROUGH window
+    if (g.prsa == V_ENTER || g.prsa == V_WALK || g.prsa == V_BOARD) {
+        if (window && window->hasFlag(ObjectFlag::OPENBIT)) {
+            // Move through the window
+            if (g.here && g.here->getId() == RoomIds::KITCHEN) {
+                Verbs::vWalkDir(Direction::EAST);
+            } else {
+                Verbs::vWalkDir(Direction::WEST);
+            }
+        } else {
+            printLine("The window is not open far enough.");
+        }
+        return RTRUE;
+    }
+    
     return RFALSE;
 }
 

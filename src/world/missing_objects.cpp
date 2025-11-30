@@ -251,6 +251,22 @@ void initializeMissingObjects() {
     boardedWindow->setFlag(ObjectFlag::NDESCBIT);
     g.registerObject(ObjectIds::BOARDED_WINDOW, std::move(boardedWindow));
     
+    // KITCHEN_WINDOW - in Behind House (the small window which is slightly ajar)
+    // Per ZIL: starts slightly ajar but not open enough for entry
+    auto kitchenWindow = std::make_unique<ZObject>(ObjectIds::KITCHEN_WINDOW, "small window");
+    kitchenWindow->addSynonym("window");
+    kitchenWindow->addAdjective("small");
+    kitchenWindow->addAdjective("kitchen");
+    kitchenWindow->setFlag(ObjectFlag::NDESCBIT);
+    kitchenWindow->setFlag(ObjectFlag::DOORBIT);
+    // Note: NOT setting OPENBIT initially - window is "slightly ajar" but not open for entry
+    kitchenWindow->setAction(kitchenWindowAction);
+    kitchenWindow->moveTo(g.getObject(RoomIds::BEHIND_HOUSE));
+    g.registerObject(ObjectIds::KITCHEN_WINDOW, std::move(kitchenWindow));
+    
+    // Also add kitchen window to Kitchen room (it's visible from both sides)
+    // We'll handle this via global objects in the room
+    
     // LADDER - global for rooms with ladders
     auto ladder = std::make_unique<ZObject>(ObjectIds::LADDER, "wooden ladder");
     ladder->addSynonym("ladder");

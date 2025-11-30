@@ -3,6 +3,8 @@
 #include "core/globals.h"
 #include "core/io.h"
 #include "verbs/verbs.h"
+#include "world/objects.h"
+#include "world/rooms.h"
 #include <algorithm>
 #include <cctype>
 #include <sstream>
@@ -188,6 +190,16 @@ int Parser::getLocationPriority(ZObject* obj) const {
 }
 
 bool Parser::isObjectVisible(ZObject* obj) const {
+    auto& g = Globals::instance();
+    
+    // Special case: Kitchen window is visible from both Behind House and Kitchen
+    if (obj->getId() == ObjectIds::KITCHEN_WINDOW) {
+        if (g.here && (g.here->getId() == RoomIds::BEHIND_HOUSE || 
+                       g.here->getId() == RoomIds::KITCHEN)) {
+            return true;
+        }
+    }
+    
     // Objects with priority > 0 are visible
     return getLocationPriority(obj) > 0;
 }
@@ -541,6 +553,83 @@ void Parser::clearOrphan() {
     orphanPreposition_.clear();
 }
 
+// Helper to check if a verb requires a direct object
+bool verbRequiresObject(VerbId verb) {
+    // Verbs that require an object (based on ZIL gsyntax.zil)
+    switch (verb) {
+        case V_TAKE: case V_DROP: case V_PUT: case V_GIVE:
+        case V_EXAMINE: case V_READ: case V_LOOK_INSIDE: case V_SEARCH:
+        case V_OPEN: case V_CLOSE: case V_LOCK: case V_UNLOCK:
+        case V_ATTACK: case V_KILL: case V_THROW:
+        case V_LAMP_ON: case V_LAMP_OFF:
+        case V_TURN: case V_PUSH: case V_PULL: case V_MOVE:
+        case V_TIE: case V_UNTIE:
+        case V_EAT: case V_DRINK:
+        case V_INFLATE: case V_DEFLATE:
+        case V_WAVE: case V_RUB: case V_RING:
+        case V_CLIMB_UP: case V_CLIMB_DOWN: case V_CLIMB_ON:
+        case V_BOARD: case V_DISEMBARK:
+            return true;
+        default:
+            return false;
+    }
+}
+
+// Helper to get verb name for orphan prompt
+std::string getVerbName(VerbId verb) {
+    switch (verb) {
+        case V_TAKE: return "take";
+        case V_DROP: return "drop";
+        case V_PUT: return "put";
+        case V_GIVE: return "give";
+        case V_EXAMINE: return "examine";
+        case V_READ: return "read";
+        case V_LOOK_INSIDE: return "look in";
+        case V_SEARCH: return "search";
+        case V_OPEN: return "open";
+        case V_CLOSE: return "close";
+        case V_LOCK: return "lock";
+        case V_UNLOCK: return "unlock";
+        case V_ATTACK: return "attack";
+        case V_KILL: return "kill";
+        case V_THROW: return "throw";
+        case V_LAMP_ON: return "turn on";
+        case V_LAMP_OFF: return "turn off";
+        case V_TURN: return "turn";
+        case V_PUSH: return "push";
+        case V_PULL: return "pull";
+        case V_MOVE: return "move";
+        case V_TIE: return "tie";
+        case V_UNTIE: return "untie";
+        case V_EAT: return "eat";
+        case V_DRINK: return "drink";
+        case V_INFLATE: return "inflate";
+        case V_DEFLATE: return "deflate";
+        case V_WAVE: return "wave";
+        case V_RUB: return "rub";
+        case V_RING: return "ring";
+        case V_CLIMB_UP: return "climb up";
+        case V_CLIMB_DOWN: return "climb down";
+        case V_CLIMB_ON: return "climb on";
+        case V_BOARD: return "board";
+        case V_DISEMBARK: return "disembark";
+        default: return "do that to";
+    }
+}
+
+// Check if a word is a known noun/adjective (exists in vocabulary)
+bool Parser::isKnownObjectWord(const std::string& word) const {
+    auto& g = Globals::instance();
+    
+    // Check all objects for this word as a synonym or adjective
+    for (const auto& [id, objPtr] : g.getAllObjects()) {
+        if (objPtr->hasSynonym(word) || objPtr->hasAdjective(word)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 ParsedCommand Parser::parse(const std::string& input) {
     ParsedCommand cmd;
     
@@ -798,15 +887,39 @@ ParsedCommand Parser::parse(const std::string& input) {
                         setLastObject(cmd.directObj);
                     }
                 } else if (!objWords.empty()) {
-                    // Check if any word is unknown
+                    // No visible object found - check if word is known or unknown
+                    bool foundUnknown = false;
+                    std::string objectNoun;
+                    
                     for (const auto& word : objWords) {
-                        if (word != "the" && word != "a" && word != "an" && 
-                            !isPreposition(word)) {
-                            // This might be an unknown word
+                        if (word == "the" || word == "a" || word == "an" || isPreposition(word)) {
+                            continue;
+                        }
+                        
+                        if (!isKnownObjectWord(word)) {
+                            // Unknown word - save for OOPS
                             setLastUnknownWord(word);
+                            printLine("I don't know the word \"" + word + "\".");
+                            cmd.verb = 0;  // Mark as failed
+                            foundUnknown = true;
+                            break;
+                        } else {
+                            // Known word but object not visible
+                            objectNoun = word;
                         }
                     }
+                    
+                    if (!foundUnknown && !objectNoun.empty()) {
+                        // Word is known but object not here
+                        printLine("You can't see any " + objectNoun + " here!");
+                        cmd.verb = 0;  // Mark as failed
+                    }
                 }
+            } else if (verbRequiresObject(cmd.verb)) {
+                // Verb requires object but none given - ask for it (orphaning)
+                printLine("What do you want to " + getVerbName(cmd.verb) + "?");
+                setOrphanDirect(cmd.verb, cmd.words[0]);
+                cmd.verb = 0;  // Mark as incomplete, wait for next input
             }
         }
     }

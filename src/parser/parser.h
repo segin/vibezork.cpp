@@ -85,6 +85,7 @@ private:
     bool isAgainCommand(const std::vector<std::string>& tokens) const;
     bool isOopsCommand(const std::vector<std::string>& tokens) const;
     bool isPronoun(const std::string& word) const;
+    bool isKnownObjectWord(const std::string& word) const;
     std::vector<ZObject*> findAllApplicableObjects(VerbId verb) const;
     std::string replaceOopsWord(const std::string& original, const std::string& replacement);
     
