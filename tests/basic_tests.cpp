@@ -8,6 +8,28 @@
 #include "../src/parser/verb_registry.h"
 #include "../src/parser/parser.h"
 #include "../src/verbs/verbs.h"
+#include <sstream>
+#include <iostream>
+
+// Capture output for testing
+class OutputCapture {
+public:
+    OutputCapture() : old_cout(std::cout.rdbuf()) {
+        std::cout.rdbuf(buffer.rdbuf());
+    }
+    
+    ~OutputCapture() {
+        std::cout.rdbuf(old_cout);
+    }
+    
+    std::string getOutput() const {
+        return buffer.str();
+    }
+    
+private:
+    std::stringstream buffer;
+    std::streambuf* old_cout;
+};
 
 // Test object system
 TEST(ObjectCreation) {
@@ -2143,6 +2165,256 @@ TEST(NPCCreationThief) {
     ASSERT_TRUE(thief->hasSynonym("thief"));
     ASSERT_TRUE(thief->hasSynonym("robber"));
     ASSERT_TRUE(thief->hasSynonym("burglar"));
+    
+    // Cleanup
+    g.reset();
+}
+
+// Description Mode Tests - Task 65.6
+
+// Test verbose mode displays full description every time (Requirement 65)
+TEST(VerboseModeFullDescription) {
+    auto& g = Globals::instance();
+    
+    // Create test room with long description
+    auto room = std::make_unique<ZRoom>(100, "Test Room", "This is a detailed description of the test room.");
+    ZRoom* roomPtr = room.get();
+    g.registerObject(100, std::move(room));
+    g.here = roomPtr;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Set verbose mode
+    g.verboseMode = true;
+    g.briefMode = false;
+    g.superbriefMode = false;
+    
+    // First visit - should show full description
+    OutputCapture capture1;
+    Verbs::vLook();
+    std::string output1 = capture1.getOutput();
+    ASSERT_CONTAINS(output1, "detailed description");
+    
+    // Mark as visited
+    ASSERT_TRUE(roomPtr->hasFlag(ObjectFlag::TOUCHBIT));
+    
+    // Second visit - should still show full description in verbose mode
+    OutputCapture capture2;
+    Verbs::vLook();
+    std::string output2 = capture2.getOutput();
+    ASSERT_CONTAINS(output2, "detailed description");
+    
+    // Cleanup
+    g.reset();
+}
+
+// Test brief mode shows short description for visited rooms (Requirement 66)
+TEST(BriefModeVisitedRoom) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto room = std::make_unique<ZRoom>(100, "Test Room", "This is a detailed description of the test room.");
+    ZRoom* roomPtr = room.get();
+    g.registerObject(100, std::move(room));
+    g.here = roomPtr;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Set brief mode
+    g.verboseMode = false;
+    g.briefMode = true;
+    g.superbriefMode = false;
+    
+    // First visit - should show full description
+    roomPtr->clearFlag(ObjectFlag::TOUCHBIT);
+    OutputCapture capture1;
+    Verbs::vLook();
+    std::string output1 = capture1.getOutput();
+    ASSERT_CONTAINS(output1, "detailed description");
+    
+    // Mark as visited
+    ASSERT_TRUE(roomPtr->hasFlag(ObjectFlag::TOUCHBIT));
+    
+    // Second visit - should show short description (just room name)
+    OutputCapture capture2;
+    Verbs::vLook();
+    std::string output2 = capture2.getOutput();
+    ASSERT_CONTAINS(output2, "Test Room");
+    
+    // Cleanup
+    g.reset();
+}
+
+// Test brief mode shows full description for unvisited rooms (Requirement 66)
+TEST(BriefModeUnvisitedRoom) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto room = std::make_unique<ZRoom>(100, "Test Room", "This is a detailed description of the test room.");
+    ZRoom* roomPtr = room.get();
+    g.registerObject(100, std::move(room));
+    g.here = roomPtr;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Set brief mode
+    g.verboseMode = false;
+    g.briefMode = true;
+    g.superbriefMode = false;
+    
+    // Ensure room is not visited
+    roomPtr->clearFlag(ObjectFlag::TOUCHBIT);
+    ASSERT_FALSE(roomPtr->hasFlag(ObjectFlag::TOUCHBIT));
+    
+    // First visit - should show full description
+    OutputCapture capture;
+    Verbs::vLook();
+    std::string output = capture.getOutput();
+    ASSERT_CONTAINS(output, "detailed description");
+    
+    // Room should now be marked as visited
+    ASSERT_TRUE(roomPtr->hasFlag(ObjectFlag::TOUCHBIT));
+    
+    // Cleanup
+    g.reset();
+}
+
+// Test superbrief mode shows only room name (Requirement 67)
+TEST(SuperbriefModeRoomName) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto room = std::make_unique<ZRoom>(100, "Test Room", "This is a detailed description of the test room.");
+    ZRoom* roomPtr = room.get();
+    g.registerObject(100, std::move(room));
+    g.here = roomPtr;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Set superbrief mode
+    g.verboseMode = false;
+    g.briefMode = false;
+    g.superbriefMode = true;
+    
+    // Look - should show only room name
+    OutputCapture capture;
+    Verbs::vLook();
+    std::string output = capture.getOutput();
+    ASSERT_CONTAINS(output, "Test Room");
+    
+    // Cleanup
+    g.reset();
+}
+
+// Test superbrief mode omits object lists (Requirement 67)
+TEST(SuperbriefModeOmitsObjects) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto room = std::make_unique<ZRoom>(100, "Test Room", "This is a detailed description of the test room.");
+    ZRoom* roomPtr = room.get();
+    g.registerObject(100, std::move(room));
+    g.here = roomPtr;
+    
+    // Create object in room
+    auto lamp = std::make_unique<ZObject>(200, "brass lantern");
+    ZObject* lampPtr = lamp.get();
+    g.registerObject(200, std::move(lamp));
+    lampPtr->moveTo(roomPtr);
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Set superbrief mode
+    g.verboseMode = false;
+    g.briefMode = false;
+    g.superbriefMode = true;
+    
+    // Look - should NOT list objects
+    OutputCapture capture;
+    Verbs::vLook();
+    std::string output = capture.getOutput();
+    ASSERT_CONTAINS(output, "Test Room");
+    // In superbrief mode, objects should not be listed
+    // The output should be minimal
+    
+    // Cleanup
+    g.reset();
+}
+
+// Test mode switching affects room display (Requirement 65, 66, 67)
+TEST(ModeSwitchingAffectsDisplay) {
+    auto& g = Globals::instance();
+    
+    // Create test room
+    auto room = std::make_unique<ZRoom>(100, "Test Room", "This is a detailed description of the test room.");
+    ZRoom* roomPtr = room.get();
+    g.registerObject(100, std::move(room));
+    g.here = roomPtr;
+    
+    // Create player
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.registerObject(999, std::move(player));
+    
+    // Start in verbose mode
+    g.verboseMode = true;
+    g.briefMode = false;
+    g.superbriefMode = false;
+    
+    // Look in verbose mode
+    OutputCapture capture1;
+    Verbs::vLook();
+    std::string output1 = capture1.getOutput();
+    ASSERT_CONTAINS(output1, "detailed description");
+    
+    // Switch to brief mode
+    Verbs::vBrief();
+    ASSERT_TRUE(g.briefMode);
+    
+    // Look in brief mode (room is now visited)
+    OutputCapture capture2;
+    Verbs::vLook();
+    std::string output2 = capture2.getOutput();
+    ASSERT_CONTAINS(output2, "Test Room");
+    
+    // Switch to superbrief mode
+    Verbs::vSuperbrief();
+    ASSERT_TRUE(g.superbriefMode);
+    
+    // Look in superbrief mode
+    OutputCapture capture3;
+    Verbs::vLook();
+    std::string output3 = capture3.getOutput();
+    ASSERT_CONTAINS(output3, "Test Room");
+    
+    // Cleanup
+    g.reset();
+}
+
+// Test default mode is verbose (Requirement 65.5)
+TEST(DefaultModeIsVerbose) {
+    auto& g = Globals::instance();
+    g.reset();
+    
+    // After reset, verbose mode should be default
+    ASSERT_TRUE(g.verboseMode);
+    ASSERT_FALSE(g.briefMode);
+    ASSERT_FALSE(g.superbriefMode);
     
     // Cleanup
     g.reset();

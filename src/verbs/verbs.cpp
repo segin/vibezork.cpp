@@ -29,25 +29,65 @@ static int calculateWeight(const ZObject* obj) {
 
 bool vLook() {
     auto& g = Globals::instance();
-    if (g.here) {
-        // Call room action with M-LOOK
-        ZRoom* room = dynamic_cast<ZRoom*>(g.here);
+    if (!g.here) {
+        return RTRUE;
+    }
+    
+    ZRoom* room = dynamic_cast<ZRoom*>(g.here);
+    
+    // Superbrief mode: only room name (Requirement 67)
+    if (g.superbriefMode) {
+        printLine(g.here->getDesc());
+        return RTRUE;
+    }
+    
+    // Determine if we should show full description
+    bool showFullDesc = false;
+    
+    if (g.verboseMode) {
+        // Verbose mode: always show full description (Requirement 65)
+        showFullDesc = true;
+    } else if (g.briefMode) {
+        // Brief mode: full description for unvisited rooms, short for visited (Requirement 66)
+        showFullDesc = !g.here->hasFlag(ObjectFlag::TOUCHBIT);
+    }
+    
+    // Mark room as visited
+    g.here->setFlag(ObjectFlag::TOUCHBIT);
+    
+    // Display room description
+    if (showFullDesc) {
+        // Show full description
         if (room) {
-            room->performRoomAction(M_LOOK);
+            if (room->hasRoomAction()) {
+                // Room has custom action handler - let it handle display
+                room->performRoomAction(M_LOOK);
+            } else {
+                // No custom action - display long description
+                if (!room->getLongDesc().empty()) {
+                    printLine(room->getLongDesc());
+                } else {
+                    printLine(g.here->getDesc());
+                }
+            }
         } else {
             printLine(g.here->getDesc());
         }
-        
-        // List visible objects in room
-        const auto& contents = g.here->getContents();
-        for (const auto* obj : contents) {
-            if (!obj->hasFlag(ObjectFlag::NDESCBIT) && !obj->hasFlag(ObjectFlag::INVISIBLE)) {
-                print("There is ");
-                print(obj->getDesc());
-                printLine(" here.");
-            }
+    } else {
+        // Brief mode for visited room: just show room name
+        printLine(g.here->getDesc());
+    }
+    
+    // List visible objects in room (not in superbrief mode)
+    const auto& contents = g.here->getContents();
+    for (const auto* obj : contents) {
+        if (!obj->hasFlag(ObjectFlag::NDESCBIT) && !obj->hasFlag(ObjectFlag::INVISIBLE)) {
+            print("There is ");
+            print(obj->getDesc());
+            printLine(" here.");
         }
     }
+    
     return RTRUE;
 }
 

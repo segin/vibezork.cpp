@@ -2125,7 +2125,7 @@ Implement the core game systems that tie everything together.
   - Test putting large objects in small containers
   - _Requirements: 64, 92_
 
-- [ ] 65. Implement description modes (verbose, brief, superbrief)
+- [x] 65. Implement description modes (verbose, brief, superbrief)
   - Implement mode tracking
   - Implement verbose mode behavior
   - Implement brief mode behavior
@@ -2133,35 +2133,35 @@ Implement the core game systems that tie everything together.
   - Integrate with room descriptions
   - _Requirements: 65, 66, 67_
 
-- [ ] 65.1 Implement mode tracking
+- [x] 65.1 Implement mode tracking
   - Track current mode in Globals
   - Default to verbose mode
   - _Requirements: 65_
 
-- [ ] 65.2 Implement verbose mode
+- [x] 65.2 Implement verbose mode
   - Display full room description every time
   - Display all objects
   - Display all exits
   - _Requirements: 65_
 
-- [ ] 65.3 Implement brief mode
+- [x] 65.3 Implement brief mode
   - Display full description for unvisited rooms
   - Display short description for visited rooms
   - Display objects and exits
   - _Requirements: 66_
 
-- [ ] 65.4 Implement superbrief mode
+- [x] 65.4 Implement superbrief mode
   - Display only room name
   - Omit object lists
   - Omit exit lists
   - _Requirements: 67_
 
-- [ ] 65.5 Integrate with room display
+- [x] 65.5 Integrate with room display
   - Check mode when displaying room
   - Format output accordingly
   - _Requirements: 65, 66, 67_
 
-- [ ] 65.6 Write unit tests for description modes
+- [x] 65.6 Write unit tests for description modes
   - Test verbose mode
   - Test brief mode
   - Test superbrief mode

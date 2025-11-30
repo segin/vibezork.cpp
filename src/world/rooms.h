@@ -241,6 +241,7 @@ public:
     using RoomActionFunc = std::function<void(int)>;
     void setRoomAction(RoomActionFunc func) { roomAction_ = func; }
     void performRoomAction(int arg) { if (roomAction_) roomAction_(arg); }
+    bool hasRoomAction() const { return roomAction_ != nullptr; }
     
 private:
     std::string longDesc_;
