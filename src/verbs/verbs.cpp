@@ -84,8 +84,8 @@ bool vLook() {
                 // Use custom long description
                 printLine(obj->getLongDesc());
             } else {
-                // Default description
-                print("There is ");
+                // Default description with proper article
+                print("There is a ");
                 print(obj->getDesc());
                 printLine(" here.");
             }
