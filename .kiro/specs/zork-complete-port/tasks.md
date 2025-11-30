@@ -2276,7 +2276,7 @@ Comprehensive testing and final polish to ensure quality.
   - _Requirements: 94, 96, 97_
 
 
-- [ ] 69. Verify text output fidelity
+- [x] 69. Verify text output fidelity
   - Compare all text output to original
   - Verify punctuation and capitalization
   - Verify line breaks and spacing
@@ -2308,14 +2308,14 @@ Comprehensive testing and final polish to ensure quality.
   - Fix any discrepancies
   - _Requirements: 71, 73_
 
-- [ ] 70. Verify puzzle solvability
+- [x] 70. Verify puzzle solvability
   - Test each puzzle solution
   - Verify no unwinnable states
   - Verify sufficient clues
   - Verify multiple solution paths where appropriate
   - _Requirements: 97_
 
-- [ ] 70.1 Test major puzzles
+- [x] 70.1 Test major puzzles
   - Troll bridge puzzle
   - Cyclops puzzle
   - Machine puzzle
@@ -2323,13 +2323,13 @@ Comprehensive testing and final polish to ensure quality.
   - All other major puzzles
   - _Requirements: 97_
 
-- [ ] 70.2 Test treasure collection
+- [x] 70.2 Test treasure collection
   - Verify all treasures are accessible
   - Verify all treasures can be scored
   - Verify 350 points achievable
   - _Requirements: 97, 96_
 
-- [ ] 70.3 Test for unwinnable states
+- [x] 70.3 Test for unwinnable states
   - Verify no actions create unwinnable state
   - Test edge cases
   - Test unusual action sequences

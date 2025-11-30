@@ -111,4 +111,16 @@ if(BUILD_TESTS)
     # Integration tests
     add_executable(integration_tests tests/integration_tests.cpp ${LIB_SOURCES})
     add_test(NAME IntegrationTests COMMAND integration_tests)
+    
+    # Puzzle solvability tests (Task 70.1)
+    add_executable(puzzle_solvability_tests tests/puzzle_solvability_tests.cpp ${LIB_SOURCES})
+    add_test(NAME PuzzleSolvabilityTests COMMAND puzzle_solvability_tests)
+    
+    # Treasure collection tests (Task 70.2)
+    add_executable(treasure_collection_tests tests/treasure_collection_tests.cpp ${LIB_SOURCES})
+    add_test(NAME TreasureCollectionTests COMMAND treasure_collection_tests)
+    
+    # Unwinnable state tests (Task 70.3)
+    add_executable(unwinnable_state_tests tests/unwinnable_state_tests.cpp ${LIB_SOURCES})
+    add_test(NAME UnwinnableStateTests COMMAND unwinnable_state_tests)
 endif()
