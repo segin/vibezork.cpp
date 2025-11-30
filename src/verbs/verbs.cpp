@@ -55,6 +55,9 @@ bool vLook() {
     // Mark room as visited
     g.here->setFlag(ObjectFlag::TOUCHBIT);
     
+    // Always print room name first (Requirement 71 - text output fidelity)
+    printLine(g.here->getDesc());
+    
     // Display room description
     if (showFullDesc) {
         // Show full description
@@ -66,16 +69,9 @@ bool vLook() {
                 // No custom action - display long description
                 if (!room->getLongDesc().empty()) {
                     printLine(room->getLongDesc());
-                } else {
-                    printLine(g.here->getDesc());
                 }
             }
-        } else {
-            printLine(g.here->getDesc());
         }
-    } else {
-        // Brief mode for visited room: just show room name
-        printLine(g.here->getDesc());
     }
     
     // List visible objects in room (not in superbrief mode)
