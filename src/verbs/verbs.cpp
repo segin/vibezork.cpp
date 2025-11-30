@@ -56,7 +56,8 @@ bool vLook() {
     g.here->setFlag(ObjectFlag::TOUCHBIT);
     
     // Always print room name first (Requirement 71 - text output fidelity)
-    printLine(g.here->getDesc());
+    print(g.here->getDesc());
+    crlf();
     
     // Display room description
     if (showFullDesc) {
@@ -78,9 +79,29 @@ bool vLook() {
     const auto& contents = g.here->getContents();
     for (const auto* obj : contents) {
         if (!obj->hasFlag(ObjectFlag::NDESCBIT) && !obj->hasFlag(ObjectFlag::INVISIBLE)) {
-            print("There is ");
-            print(obj->getDesc());
-            printLine(" here.");
+            if (obj->hasLongDesc()) {
+                // Use custom long description
+                printLine(obj->getLongDesc());
+            } else {
+                // Default description
+                print("There is ");
+                print(obj->getDesc());
+                printLine(" here.");
+            }
+            
+            // If object is an open container, show contents
+            if (obj->hasFlag(ObjectFlag::CONTBIT) && obj->hasFlag(ObjectFlag::OPENBIT)) {
+                const auto& objContents = obj->getContents();
+                if (!objContents.empty()) {
+                    print("The ");
+                    print(obj->getDesc());
+                    printLine(" contains:");
+                    for (const auto* item : objContents) {
+                        print("  ");
+                        printLine(item->getDesc());
+                    }
+                }
+            }
         }
     }
     
@@ -823,8 +844,54 @@ bool vRead() {
     
     // Check if object is specified
     if (!g.prso) {
-        printLine("Read what?");
-        return RTRUE;
+        // Look for readable objects in scope
+        std::vector<ZObject*> readableObjects;
+        
+        // Check current room
+        for (const auto* obj : g.here->getContents()) {
+            if (obj->hasFlag(ObjectFlag::READBIT) && !obj->hasFlag(ObjectFlag::INVISIBLE)) {
+                readableObjects.push_back(const_cast<ZObject*>(obj));
+            }
+        }
+        
+        // Check inventory
+        for (const auto* obj : g.winner->getContents()) {
+            if (obj->hasFlag(ObjectFlag::READBIT)) {
+                readableObjects.push_back(const_cast<ZObject*>(obj));
+            }
+        }
+        
+        // Check open containers in room and inventory
+        auto checkContainer = [&](ZObject* container) {
+            if (container->hasFlag(ObjectFlag::CONTBIT) && container->hasFlag(ObjectFlag::OPENBIT)) {
+                for (const auto* obj : container->getContents()) {
+                    if (obj->hasFlag(ObjectFlag::READBIT)) {
+                        readableObjects.push_back(const_cast<ZObject*>(obj));
+                    }
+                }
+            }
+        };
+        
+        for (const auto* obj : g.here->getContents()) {
+            checkContainer(const_cast<ZObject*>(obj));
+        }
+        for (const auto* obj : g.winner->getContents()) {
+            checkContainer(const_cast<ZObject*>(obj));
+        }
+        
+        if (readableObjects.empty()) {
+            printLine("What do you want to read?");
+            return RTRUE;
+        }
+        
+        if (readableObjects.size() == 1) {
+            // Implicit object selection
+            g.prso = readableObjects[0];
+            print("(" + g.prso->getDesc() + ")\n");
+        } else {
+            printLine("What do you want to read?");
+            return RTRUE;
+        }
     }
     
     // Check if object has READBIT flag
@@ -837,6 +904,54 @@ bool vRead() {
     if (!g.prso->hasText()) {
         printLine("There is nothing written on the " + g.prso->getDesc() + ".");
         return RTRUE;
+    }
+    
+    // Check if player is holding the object
+    if (g.prso->getLocation() != g.winner) {
+        // Check if object can be taken
+        if (!g.prso->hasFlag(ObjectFlag::TAKEBIT) || g.prso->hasFlag(ObjectFlag::TRYTAKEBIT)) {
+            printLine("You can't take that.");
+            return RTRUE;
+        }
+        
+        // Check if object is accessible
+        ZObject* objLocation = g.prso->getLocation();
+        bool accessible = false;
+        
+        if (objLocation == g.here) {
+            accessible = true;
+        } else if (objLocation && objLocation->hasFlag(ObjectFlag::CONTBIT) && 
+                   objLocation->hasFlag(ObjectFlag::OPENBIT)) {
+            ZObject* containerLocation = objLocation->getLocation();
+            if (containerLocation == g.here || containerLocation == g.winner) {
+                accessible = true;
+            }
+        }
+        
+        if (!accessible) {
+            printLine("You can't see any such thing.");
+            return RTRUE;
+        }
+        
+        // Check inventory weight limit
+        int currentWeight = 0;
+        for (const auto* obj : g.winner->getContents()) {
+            currentWeight += obj->getProperty(P_SIZE);
+        }
+        
+        int objectSize = g.prso->getProperty(P_SIZE);
+        if (objectSize == 0) {
+            objectSize = 5;
+        }
+        
+        if (currentWeight + objectSize > g.loadAllowed) {
+            printLine("You're carrying too much.");
+            return RTRUE;
+        }
+        
+        // Implicit TAKE
+        print("(Taken)\n");
+        g.prso->moveTo(g.winner);
     }
     
     // Display the text

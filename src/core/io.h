@@ -2,14 +2,12 @@
 #include <string>
 #include <iostream>
 
-// Output functions (ZIL TELL macro equivalents)
-inline void print(const std::string& str) {
-    std::cout << str;
-}
+// Word wrapping configuration
+constexpr int WRAP_WIDTH = 80;
 
-inline void printLine(const std::string& str) {
-    std::cout << str << std::endl;
-}
+// Output functions (ZIL TELL macro equivalents)
+void print(const std::string& str);
+void printLine(const std::string& str);
 
 inline void crlf() {
     std::cout << std::endl;

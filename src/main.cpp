@@ -80,7 +80,7 @@ static Parser globalParser;
 void mainLoop1() {
     auto& g = Globals::instance();
     
-    std::cout << "> ";
+    std::cout << "\n> ";
     std::string input = readLine();
     
     // Handle empty input gracefully (Requirement 72.1)

@@ -627,7 +627,14 @@ ParsedCommand Parser::parse(const std::string& input) {
     // Check for verb
     cmd.verb = findVerb(cmd.words[0]);
     if (cmd.verb == 0) {
-        // Unknown verb - save for OOPS
+        // Check if it might be an object name (user typed just an object without a verb)
+        auto matches = findObjects(cmd.words, 0);
+        if (!matches.empty()) {
+            printLine("I don't understand that sentence.");
+            return cmd;
+        }
+        
+        // Unknown word - save for OOPS
         setLastUnknownWord(cmd.words[0]);
         printLine("I don't know the word \"" + cmd.words[0] + "\".");
         return cmd;

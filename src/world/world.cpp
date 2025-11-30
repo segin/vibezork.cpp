@@ -3231,6 +3231,7 @@ void initializeWorld() {
         "WELCOME TO ZORK!\n\n"
         "ZORK is a game of adventure, danger, and low cunning. In it you will explore some of the most amazing territory ever seen by mortals. No computer should be without one!"
     );
+    leaflet->setLongDesc("A small leaflet is on the ground.");
     leaflet->moveTo(g.getObject(OBJ_MAILBOX));  // Initially in mailbox
     
     g.registerObject(ObjectIds::ADVERTISEMENT, std::move(leaflet));
@@ -3365,9 +3366,34 @@ void initializeWorld() {
     sack->setProperty(P_CAPACITY, 9);
     sack->setProperty(P_SIZE, 9);
     sack->setAction(sackAction);
+    sack->setLongDesc("On the table is an elongated brown sack, smelling of hot peppers.");
     sack->moveTo(g.getObject(RoomIds::KITCHEN));  // On kitchen table
     
     g.registerObject(ObjectIds::SACK, std::move(sack));
+    
+    // Create LUNCH (Hot pepper sandwich) - food item inside sack
+    auto lunch = std::make_unique<ZObject>(ObjectIds::LUNCH, "lunch");
+    lunch->addSynonym("lunch");
+    lunch->addSynonym("sandwich");
+    lunch->addSynonym("pepper");
+    lunch->addAdjective("hot");
+    lunch->addAdjective("pepper");
+    lunch->setFlag(ObjectFlag::TAKEBIT);
+    lunch->setFlag(ObjectFlag::FOODBIT);
+    lunch->setProperty(P_SIZE, 4);
+    lunch->setLongDesc("A hot pepper sandwich is here.");
+    lunch->moveTo(g.getObject(ObjectIds::SACK));  // Inside the sack
+    g.registerObject(ObjectIds::LUNCH, std::move(lunch));
+    
+    // Create GARLIC (Clove of garlic) - food item inside sack
+    auto garlic = std::make_unique<ZObject>(ObjectIds::GARLIC, "clove of garlic");
+    garlic->addSynonym("garlic");
+    garlic->addSynonym("clove");
+    garlic->setFlag(ObjectFlag::TAKEBIT);
+    garlic->setFlag(ObjectFlag::FOODBIT);
+    garlic->setProperty(P_SIZE, 2);
+    garlic->moveTo(g.getObject(ObjectIds::SACK));  // Inside the sack
+    g.registerObject(ObjectIds::GARLIC, std::move(garlic));
     
     // Create BAG (Large bag - thief's bag) - portable container
     auto bag = std::make_unique<ZObject>(ObjectIds::BAG, "large bag");
@@ -3598,6 +3624,7 @@ void initializeWorld() {
     brokenEgg->setProperty(P_SIZE, 5);
     brokenEgg->setProperty(P_CAPACITY, 6);
     brokenEgg->setText("There is a somewhat ruined egg here.");
+    brokenEgg->setLongDesc("There is a somewhat ruined egg here.");
     // Broken egg starts nowhere - created when egg is damaged
     g.registerObject(ObjectIds::BROKEN_EGG, std::move(brokenEgg));
     
@@ -3661,14 +3688,16 @@ void initializeWorld() {
     g.registerObject(ObjectIds::BAUBLE, std::move(bauble));
     
     // Create CHALICE (Chalice)
-    auto chalice = std::make_unique<ZObject>(ObjectIds::CHALICE, "chalice");
+    auto chalice = std::make_unique<ZObject>(ObjectIds::CHALICE, "silver chalice");
     chalice->addSynonym("chalice");
     chalice->addSynonym("goblet");
     chalice->addSynonym("grail");
+    chalice->addAdjective("silver");
     chalice->setFlag(ObjectFlag::TAKEBIT);
     chalice->setProperty(P_VALUE, 10);
     chalice->setProperty(P_TVALUE, 10);
     chalice->setProperty(P_SIZE, 10);
+    chalice->setLongDesc("There is a silver chalice, intricately engraved, here.");
     chalice->moveTo(g.getObject(RoomIds::TREASURE_ROOM));
     g.registerObject(ObjectIds::CHALICE, std::move(chalice));
     
@@ -3697,6 +3726,7 @@ void initializeWorld() {
     jewels->setProperty(P_VALUE, 5);
     jewels->setProperty(P_TVALUE, 5);
     jewels->setProperty(P_SIZE, 10);
+    jewels->setLongDesc("There is an old trunk here, bulging with assorted jewels.");
     jewels->moveTo(g.getObject(RoomIds::TREASURE_ROOM));
     g.registerObject(ObjectIds::JEWELS, std::move(jewels));
     
@@ -3712,6 +3742,7 @@ void initializeWorld() {
     coins->setProperty(P_VALUE, 5);
     coins->setProperty(P_TVALUE, 5);
     coins->setProperty(P_SIZE, 10);
+    coins->setLongDesc("An old leather bag, bulging with coins, is here.");
     coins->moveTo(g.getObject(RoomIds::MAZE_11));
     g.registerObject(ObjectIds::COINS, std::move(coins));
     
@@ -3725,6 +3756,7 @@ void initializeWorld() {
     diamond->setProperty(P_VALUE, 10);
     diamond->setProperty(P_TVALUE, 10);
     diamond->setProperty(P_SIZE, 5);
+    diamond->setLongDesc("There is an enormous diamond (perfectly cut) here.");
     diamond->moveTo(g.getObject(RoomIds::EAST_OF_CHASM));
     g.registerObject(ObjectIds::DIAMOND, std::move(diamond));
     
@@ -3756,6 +3788,7 @@ void initializeWorld() {
     painting->setProperty(P_SIZE, 15);
     painting->setAction(paintingAction);
     painting->setText("Fortunately, there is still one chance for you to be a vandal, for on the far wall is a painting of unparalleled beauty.");
+    painting->setLongDesc("A painting by a neglected genius is here.");
     painting->moveTo(g.getObject(RoomIds::GALLERY));
     g.registerObject(ObjectIds::PAINTING, std::move(painting));
     
@@ -3775,6 +3808,7 @@ void initializeWorld() {
     coffin->setProperty(P_SIZE, 55);
     coffin->setProperty(P_CAPACITY, 35);
     coffin->setAction(coffinAction);
+    coffin->setLongDesc("The solid-gold coffin used for the burial of Ramses II is here.");
     coffin->moveTo(g.getObject(RoomIds::EGYPT_ROOM));
     g.registerObject(ObjectIds::COFFIN, std::move(coffin));
     
@@ -3789,6 +3823,7 @@ void initializeWorld() {
     jade->setProperty(P_VALUE, 5);
     jade->setProperty(P_TVALUE, 5);
     jade->setProperty(P_SIZE, 3);
+    jade->setLongDesc("There is an exquisite jade figurine here.");
     jade->moveTo(g.getObject(RoomIds::MAZE_15));
     g.registerObject(ObjectIds::JADE, std::move(jade));
     
@@ -3815,6 +3850,7 @@ void initializeWorld() {
     bar->setProperty(P_VALUE, 10);
     bar->setProperty(P_TVALUE, 10);
     bar->setProperty(P_SIZE, 10);
+    bar->setLongDesc("On the ground is a large platinum bar.");
     bar->moveTo(g.getObject(RoomIds::LOUD_ROOM));
     g.registerObject(ObjectIds::BAR, std::move(bar));
     
@@ -3870,6 +3906,7 @@ void initializeWorld() {
     sceptre->setProperty(P_VALUE, 4);
     sceptre->setProperty(P_TVALUE, 6);
     sceptre->setProperty(P_SIZE, 8);
+    sceptre->setLongDesc("An ornamented sceptre, tapering to a sharp point, is here.");
     sceptre->moveTo(g.getObject(RoomIds::EGYPT_ROOM));
     g.registerObject(ObjectIds::SCEPTRE, std::move(sceptre));
     
@@ -3922,6 +3959,7 @@ void initializeWorld() {
     lamp->setProperty(P_SIZE, 15);
     lamp->setProperty(P_STRENGTH, 100);  // Battery level (0-100)
     lamp->setAction(lampAction);
+    lamp->setLongDesc("There is a brass lantern (battery-powered) here.");
     lamp->moveTo(g.getObject(RoomIds::LIVING_ROOM));
     g.registerObject(ObjectIds::LAMP, std::move(lamp));
     
@@ -3952,6 +3990,7 @@ void initializeWorld() {
     match->setProperty(P_SIZE, 2);
     match->setProperty(P_STRENGTH, 5);  // Number of matches remaining
     match->setAction(matchesAction);
+    match->setLongDesc("There is a matchbook whose cover says \"Visit Beautiful FCD#3\" here.");
     match->moveTo(g.getObject(RoomIds::DAM_LOBBY));
     g.registerObject(ObjectIds::MATCH, std::move(match));
     
@@ -4032,6 +4071,7 @@ void initializeWorld() {
     boatInflatable->setFlag(ObjectFlag::BURNBIT);  // Can be burned
     boatInflatable->setProperty(P_SIZE, 10);
     boatInflatable->setAction(boatAction);
+    boatInflatable->setLongDesc("There is a folded pile of plastic here which has a small valve attached.");
     boatInflatable->moveTo(g.getObject(RoomIds::RESERVOIR_SOUTH));
     g.registerObject(ObjectIds::BOAT_INFLATABLE, std::move(boatInflatable));
     
@@ -4076,8 +4116,19 @@ void initializeWorld() {
     bottle->setProperty(P_SIZE, 8);
     bottle->setProperty(P_CAPACITY, 4);
     bottle->setAction(bottleAction);
+    bottle->setLongDesc("A bottle is sitting on the table.");
     bottle->moveTo(g.getObject(RoomIds::KITCHEN));
     g.registerObject(ObjectIds::BOTTLE, std::move(bottle));
+    
+    // Create WATER (Water in bottle)
+    auto water = std::make_unique<ZObject>(ObjectIds::WATER, "quantity of water");
+    water->addSynonym("water");
+    water->addSynonym("quantity");
+    water->addAdjective("clear");
+    water->setFlag(ObjectFlag::TAKEBIT);
+    water->setProperty(P_SIZE, 4);
+    water->moveTo(g.getObject(ObjectIds::BOTTLE));  // Initially in bottle
+    g.registerObject(ObjectIds::WATER, std::move(water));
     
     // ===== PUZZLE OBJECTS (Task 45) =====
     
@@ -4328,6 +4379,7 @@ void initializeWorld() {
         
         return RFALSE;
     });
+    thief->setLongDesc("There is a suspicious-looking individual, holding a large bag, leaning against one wall. He is armed with a deadly stiletto.");
     // Initial location varies - thief wanders. Start in MAZE_1 for now
     thief->moveTo(g.getObject(RoomIds::MAZE_1));
     g.registerObject(ObjectIds::THIEF, std::move(thief));
@@ -4368,6 +4420,7 @@ void initializeWorld() {
     troll->setProperty(P_STRENGTH, 8);       // Stronger than thief
     // Add action handler for troll behavior (blocking, combat)
     troll->setAction(NPCSystem::trollAction);
+    troll->setLongDesc("A nasty-looking troll, brandishing a bloody axe, blocks all passages out of the room.");
     // Located at Troll Room initially
     troll->moveTo(g.getObject(RoomIds::TROLL_ROOM));
     g.registerObject(ObjectIds::TROLL, std::move(troll));

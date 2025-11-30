@@ -20,6 +20,11 @@ public:
     const std::string& getText() const;
     bool hasText() const;
     
+    // Long description (for room display)
+    void setLongDesc(const std::string& ldesc) { longDesc_ = ldesc; }
+    const std::string& getLongDesc() const { return longDesc_; }
+    bool hasLongDesc() const { return !longDesc_.empty(); }
+    
     // Flag operations
     void setFlag(ObjectFlag flag);
     void clearFlag(ObjectFlag flag);
@@ -58,6 +63,7 @@ private:
     uint32_t flags_ = 0;
     std::map<PropertyId, int> properties_;
     std::string text_;  // For readable objects
+    std::string longDesc_;  // Long description for room display
     ZObject* location_ = nullptr;
     std::vector<ZObject*> contents_;
     ActionFunc action_;
