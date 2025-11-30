@@ -4,3 +4,6 @@
 
 // Initialize all rooms and objects
 void initializeWorld();
+
+// Initialize missing objects (called after initializeWorld)
+void initializeMissingObjects();
