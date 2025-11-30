@@ -48,6 +48,20 @@ void Parser::initializeVerbsAndDirections() {
     verbSynonyms_["xyzzy"] = V_PLUGH;
     verbSynonyms_["frobozz"] = V_FROBOZZ;
     
+    // Additional common verbs
+    verbSynonyms_["wait"] = V_WAIT;
+    verbSynonyms_["z"] = V_WAIT;
+    verbSynonyms_["swim"] = V_SWIM;
+    verbSynonyms_["bathe"] = V_SWIM;
+    verbSynonyms_["wade"] = V_SWIM;
+    verbSynonyms_["back"] = V_BACK;
+    verbSynonyms_["jump"] = V_JUMP;
+    verbSynonyms_["leap"] = V_JUMP;
+    verbSynonyms_["curse"] = V_CURSE;
+    verbSynonyms_["damn"] = V_CURSE;
+    verbSynonyms_["shit"] = V_CURSE;
+    verbSynonyms_["fuck"] = V_CURSE;
+    
     // Directions
     directions_["north"] = Direction::NORTH;
     directions_["n"] = Direction::NORTH;

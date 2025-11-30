@@ -98,6 +98,13 @@ constexpr VerbId V_ZORK = 131;
 constexpr VerbId V_PLUGH = 132;  // Also XYZZY - Adventure reference
 constexpr VerbId V_FROBOZZ = 133;
 
+// Additional common verbs
+constexpr VerbId V_WAIT = 140;
+constexpr VerbId V_SWIM = 141;
+constexpr VerbId V_BACK = 142;
+constexpr VerbId V_JUMP = 143;
+constexpr VerbId V_CURSE = 144;
+
 // Verb handlers
 namespace Verbs {
     bool vLook();
@@ -186,6 +193,13 @@ namespace Verbs {
     bool vZork();
     bool vPlugh();  // Also handles XYZZY
     bool vFrobozz();
+    
+    // Additional common verbs
+    bool vWait();
+    bool vSwim();
+    bool vBack();
+    bool vJump();
+    bool vCurse();
     
     // Helper for special movement
     bool trySpecialMovement(int verbId, Direction dir);

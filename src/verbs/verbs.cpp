@@ -2437,4 +2437,55 @@ bool vFrobozz() {
     return RTRUE;
 }
 
+// Additional common verbs - authentic ZIL responses
+
+bool vWait() {
+    // Authentic ZIL V-WAIT - passes time
+    printLine("Time passes...");
+    // In full implementation, this would call CLOCKER multiple times
+    return RTRUE;
+}
+
+bool vSwim() {
+    // Authentic ZIL V-SWIM
+    printLine("Go jump in a lake!");
+    return RTRUE;
+}
+
+bool vBack() {
+    // Authentic ZIL V-BACK
+    printLine("Sorry, my memory is poor. Please give a direction.");
+    return RTRUE;
+}
+
+bool vJump() {
+    // Authentic ZIL V-LEAP/V-SKIP responses
+    static const char* responses[] = {
+        "Very good. Now you can go to the second grade.",
+        "Are you enjoying yourself?",
+        "Wheeeeeeeeee!!!!!",
+        "Do you expect me to applaud?"
+    };
+    static int idx = 0;
+    printLine(responses[idx % 4]);
+    idx++;
+    return RTRUE;
+}
+
+bool vCurse() {
+    auto& g = Globals::instance();
+    
+    // Authentic ZIL V-CURSES
+    if (g.prso) {
+        if (g.prso->hasFlag(ObjectFlag::ACTORBIT)) {
+            printLine("Insults of this nature won't help you.");
+        } else {
+            printLine("What a loony!");
+        }
+    } else {
+        printLine("Such language in a high-class establishment like this!");
+    }
+    return RTRUE;
+}
+
 } // namespace Verbs
