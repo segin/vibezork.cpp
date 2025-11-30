@@ -2244,7 +2244,7 @@ Comprehensive testing and final polish to ensure quality.
   - Test state consistency
   - _Requirements: 93_
 
-- [ ] 68. Create transcript-based tests
+- [x] 68. Create transcript-based tests
   - Extract commands from MIT transcript
   - Create test cases from transcript
   - Verify output matches expected
@@ -2284,25 +2284,25 @@ Comprehensive testing and final polish to ensure quality.
   - Verify success messages
   - _Requirements: 71, 98_
 
-- [ ] 69.1 Audit room descriptions
+- [x] 69.1 Audit room descriptions
   - Compare all room descriptions to original
   - Verify exact text match
   - Fix any discrepancies
   - _Requirements: 71_
 
-- [ ] 69.2 Audit object descriptions
+- [x] 69.2 Audit object descriptions
   - Compare all object descriptions to original
   - Verify exact text match
   - Fix any discrepancies
   - _Requirements: 71_
 
-- [ ] 69.3 Audit verb messages
+- [x] 69.3 Audit verb messages
   - Compare all verb output to original
   - Verify exact text match
   - Fix any discrepancies
   - _Requirements: 71_
 
-- [ ] 69.4 Audit error messages
+- [x] 69.4 Audit error messages
   - Compare all error messages to original
   - Verify exact text match
   - Fix any discrepancies
