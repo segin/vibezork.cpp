@@ -160,7 +160,8 @@ bool vTake() {
     
     // Check if object is specified
     if (!g.prso) {
-        printLine("Take what?");
+        printLine("What do you want to take?");
+        getGlobalParser().setOrphanDirect(V_TAKE, "take");
         return RTRUE;
     }
     
@@ -248,7 +249,8 @@ bool vDrop() {
     
     // Check if object is specified
     if (!g.prso) {
-        printLine("Drop what?");
+        printLine("What do you want to drop?");
+        getGlobalParser().setOrphanDirect(V_DROP, "drop");
         return RTRUE;
     }
     
@@ -281,7 +283,8 @@ bool vExamine() {
     
     // Check if object is specified
     if (!g.prso) {
-        printLine("Examine what?");
+        printLine("What do you want to examine?");
+        getGlobalParser().setOrphanDirect(V_EXAMINE, "examine");
         return RTRUE;
     }
     
@@ -338,7 +341,8 @@ bool vOpen() {
     
     // Check if object is specified
     if (!g.prso) {
-        printLine("Open what?");
+        printLine("What do you want to open?");
+        getGlobalParser().setOrphanDirect(V_OPEN, "open");
         return RTRUE;
     }
     
@@ -392,7 +396,8 @@ bool vClose() {
     
     // Check if object is specified
     if (!g.prso) {
-        printLine("Close what?");
+        printLine("What do you want to close?");
+        getGlobalParser().setOrphanDirect(V_CLOSE, "close");
         return RTRUE;
     }
     
@@ -429,13 +434,15 @@ bool vLock() {
     
     // Check if object is specified
     if (!g.prso) {
-        printLine("Lock what?");
+        printLine("What do you want to lock?");
+        getGlobalParser().setOrphanDirect(V_LOCK, "lock");
         return RTRUE;
     }
     
     // Check if key is specified
     if (!g.prsi) {
-        printLine("Lock it with what?");
+        printLine("What do you want to lock it with?");
+        getGlobalParser().setOrphanIndirect(V_LOCK, g.prso, "with");
         return RTRUE;
     }
     
@@ -504,13 +511,15 @@ bool vUnlock() {
     
     // Check if object is specified
     if (!g.prso) {
-        printLine("Unlock what?");
+        printLine("What do you want to unlock?");
+        getGlobalParser().setOrphanDirect(V_UNLOCK, "unlock");
         return RTRUE;
     }
     
     // Check if key is specified
     if (!g.prsi) {
-        printLine("Unlock it with what?");
+        printLine("What do you want to unlock it with?");
+        getGlobalParser().setOrphanIndirect(V_UNLOCK, g.prso, "with");
         return RTRUE;
     }
     
@@ -749,7 +758,8 @@ bool vEnter() {
         return RTRUE;
     }
     
-    printLine("Enter what?");
+    printLine("What do you want to enter?");
+    getGlobalParser().setOrphanDirect(V_ENTER, "enter");
     return RTRUE;
 }
 
@@ -817,7 +827,8 @@ bool vBoard() {
         return RTRUE;
     }
     
-    printLine("Board what?");
+    printLine("What do you want to board?");
+    getGlobalParser().setOrphanDirect(V_BOARD, "board");
     return RTRUE;
 }
 
@@ -967,7 +978,8 @@ bool vLookInside() {
     
     // Check if object is specified
     if (!g.prso) {
-        printLine("Look inside what?");
+        printLine("What do you want to look inside?");
+        getGlobalParser().setOrphanDirect(V_LOOK_INSIDE, "look inside");
         return RTRUE;
     }
     
@@ -1003,7 +1015,8 @@ bool vSearch() {
     
     // Check if object is specified
     if (!g.prso) {
-        printLine("Search what?");
+        printLine("What do you want to search?");
+        getGlobalParser().setOrphanDirect(V_SEARCH, "search");
         return RTRUE;
     }
     
@@ -1046,13 +1059,15 @@ bool vPut() {
     
     // Check if direct object is specified
     if (!g.prso) {
-        printLine("Put what?");
+        printLine("What do you want to put?");
+        getGlobalParser().setOrphanDirect(V_PUT, "put");
         return RTRUE;
     }
     
     // Check if indirect object is specified
     if (!g.prsi) {
-        printLine("Put it in what?");
+        printLine("What do you want to put it in?");
+        getGlobalParser().setOrphanIndirect(V_PUT, g.prso, "in");
         return RTRUE;
     }
     
@@ -1149,7 +1164,8 @@ bool vTurn() {
     
     // Check if object is specified
     if (!g.prso) {
-        printLine("Turn what?");
+        printLine("What do you want to turn?");
+        getGlobalParser().setOrphanDirect(V_TURN, "turn");
         return RTRUE;
     }
     
@@ -1169,7 +1185,8 @@ bool vPush() {
     
     // Check if object is specified
     if (!g.prso) {
-        printLine("Push what?");
+        printLine("What do you want to push?");
+        getGlobalParser().setOrphanDirect(V_PUSH, "push");
         return RTRUE;
     }
     
@@ -1189,7 +1206,8 @@ bool vPull() {
     
     // Check if object is specified
     if (!g.prso) {
-        printLine("Pull what?");
+        printLine("What do you want to pull?");
+        getGlobalParser().setOrphanDirect(V_PULL, "pull");
         return RTRUE;
     }
     
@@ -1209,7 +1227,8 @@ bool vMove() {
     
     // Check if object is specified
     if (!g.prso) {
-        printLine("Move what?");
+        printLine("What do you want to move?");
+        getGlobalParser().setOrphanDirect(V_MOVE, "move");
         return RTRUE;
     }
     
@@ -1231,13 +1250,15 @@ bool vTie() {
     
     // Check if object is specified
     if (!g.prso) {
-        printLine("Tie what?");
+        printLine("What do you want to tie?");
+        getGlobalParser().setOrphanDirect(V_TIE, "tie");
         return RTRUE;
     }
     
     // Check if indirect object is specified (tie X to Y)
     if (!g.prsi) {
-        printLine("Tie it to what?");
+        printLine("What do you want to tie it to?");
+        getGlobalParser().setOrphanIndirect(V_TIE, g.prso, "to");
         return RTRUE;
     }
     
@@ -1262,7 +1283,8 @@ bool vUntie() {
     
     // Check if object is specified
     if (!g.prso) {
-        printLine("Untie what?");
+        printLine("What do you want to untie?");
+        getGlobalParser().setOrphanDirect(V_UNTIE, "untie");
         return RTRUE;
     }
     
@@ -1341,7 +1363,8 @@ bool vTouch() {
     
     // Check if object is specified
     if (!g.prso) {
-        printLine("Touch what?");
+        printLine("What do you want to touch?");
+        getGlobalParser().setOrphanDirect(V_TOUCH, "touch");
         return RTRUE;
     }
     
@@ -1362,7 +1385,8 @@ bool vEat() {
     
     // Check if object is specified
     if (!g.prso) {
-        printLine("Eat what?");
+        printLine("What do you want to eat?");
+        getGlobalParser().setOrphanDirect(V_EAT, "eat");
         return RTRUE;
     }
     
@@ -1392,7 +1416,8 @@ bool vDrink() {
     
     // Check if object is specified
     if (!g.prso) {
-        printLine("Drink what?");
+        printLine("What do you want to drink?");
+        getGlobalParser().setOrphanDirect(V_DRINK, "drink");
         return RTRUE;
     }
     
@@ -1424,7 +1449,8 @@ bool vLampOn() {
     
     // Check if object is specified
     if (!g.prso) {
-        printLine("Turn on what?");
+        printLine("What do you want to turn on?");
+        getGlobalParser().setOrphanDirect(V_LAMP_ON, "turn on");
         return RTRUE;
     }
     
@@ -1476,7 +1502,8 @@ bool vLampOff() {
     
     // Check if object is specified
     if (!g.prso) {
-        printLine("Turn off what?");
+        printLine("What do you want to turn off?");
+        getGlobalParser().setOrphanDirect(V_LAMP_OFF, "turn off");
         return RTRUE;
     }
     
@@ -1523,7 +1550,8 @@ bool vInflate() {
     
     // Check if object is specified
     if (!g.prso) {
-        printLine("Inflate what?");
+        printLine("What do you want to inflate?");
+        getGlobalParser().setOrphanDirect(V_INFLATE, "inflate");
         return RTRUE;
     }
     
@@ -1543,7 +1571,8 @@ bool vDeflate() {
     
     // Check if object is specified
     if (!g.prso) {
-        printLine("Deflate what?");
+        printLine("What do you want to deflate?");
+        getGlobalParser().setOrphanDirect(V_DEFLATE, "deflate");
         return RTRUE;
     }
     
@@ -1578,7 +1607,8 @@ bool vExorcise() {
     
     // Check if object is specified
     if (!g.prso) {
-        printLine("Exorcise what?");
+        printLine("What do you want to exorcise?");
+        getGlobalParser().setOrphanDirect(V_EXORCISE, "exorcise");
         return RTRUE;
     }
     
@@ -1598,7 +1628,8 @@ bool vWave() {
     
     // Check if object is specified
     if (!g.prso) {
-        printLine("Wave what?");
+        printLine("What do you want to wave?");
+        getGlobalParser().setOrphanDirect(V_WAVE, "wave");
         return RTRUE;
     }
     
@@ -1618,7 +1649,8 @@ bool vRub() {
     
     // Check if object is specified
     if (!g.prso) {
-        printLine("Rub what?");
+        printLine("What do you want to rub?");
+        getGlobalParser().setOrphanDirect(V_RUB, "rub");
         return RTRUE;
     }
     
@@ -1638,7 +1670,8 @@ bool vRing() {
     
     // Check if object is specified
     if (!g.prso) {
-        printLine("Ring what?");
+        printLine("What do you want to ring?");
+        getGlobalParser().setOrphanDirect(V_RING, "ring");
         return RTRUE;
     }
     
@@ -1660,7 +1693,8 @@ bool vAttack() {
     
     // Check if target is specified
     if (!g.prso) {
-        printLine("Attack what?");
+        printLine("What do you want to attack?");
+        getGlobalParser().setOrphanDirect(V_ATTACK, "attack");
         return RTRUE;
     }
     
@@ -1726,13 +1760,15 @@ bool vThrow() {
     
     // Check if object is specified
     if (!g.prso) {
-        printLine("Throw what?");
+        printLine("What do you want to throw?");
+        getGlobalParser().setOrphanDirect(V_THROW, "throw");
         return RTRUE;
     }
     
     // Check if target is specified
     if (!g.prsi) {
-        printLine("Throw it at what?");
+        printLine("What do you want to throw it at?");
+        getGlobalParser().setOrphanIndirect(V_THROW, g.prso, "at");
         return RTRUE;
     }
     
@@ -1786,7 +1822,8 @@ bool vSwing() {
     
     // Check if object is specified
     if (!g.prso) {
-        printLine("Swing what?");
+        printLine("What do you want to swing?");
+        getGlobalParser().setOrphanDirect(V_SWING, "swing");
         return RTRUE;
     }
     
