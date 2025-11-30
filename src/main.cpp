@@ -71,7 +71,18 @@ std::map<VerbId, std::function<bool()>> verbHandlers = {
     {V_TALK, Verbs::vTalk},
     {V_ASK, Verbs::vAsk},
     {V_TELL, Verbs::vTell},
-    {V_ODYSSEUS, Verbs::vOdysseus}
+    {V_ODYSSEUS, Verbs::vOdysseus},
+    // Easter eggs / special words
+    {V_HELLO, Verbs::vHello},
+    {V_ZORK, Verbs::vZork},
+    {V_PLUGH, Verbs::vPlugh},
+    {V_FROBOZZ, Verbs::vFrobozz},
+    // Additional common verbs
+    {V_WAIT, Verbs::vWait},
+    {V_SWIM, Verbs::vSwim},
+    {V_BACK, Verbs::vBack},
+    {V_JUMP, Verbs::vJump},
+    {V_CURSE, Verbs::vCurse}
 };
 
 // Use global parser from parser_instance.cpp
