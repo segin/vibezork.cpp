@@ -8,6 +8,22 @@
 #include <unordered_set>
 #include <functional>
 
+/**
+ * @brief Core game object class (mirrors ZIL <OBJECT> definition)
+ * 
+ * ZObject represents all game entities including items, NPCs, and scenery.
+ * Each object has:
+ * - Unique ID and description
+ * - Synonyms and adjectives for parser matching
+ * - Flags (TAKEBIT, OPENBIT, etc.) for state and capabilities
+ * - Properties (SIZE, CAPACITY, VALUE, etc.) for numeric attributes
+ * - Location tracking for containment hierarchy
+ * - Optional action handler for object-specific behavior
+ * 
+ * ZRoom extends this class for room-specific functionality.
+ * 
+ * @see ZIL equivalent: <OBJECT> definitions in 1DUNGEON.ZIL
+ */
 class ZObject {
 public:
     ZObject(ObjectId id, std::string_view desc);

@@ -4,18 +4,31 @@
 #include <memory>
 #include <unordered_map>
 
-// Global game state
+/**
+ * @brief Global game state singleton (mirrors ZIL global variables)
+ * 
+ * This class manages all global game state including:
+ * - Current location and actor (HERE, WINNER from ZIL)
+ * - Parser results (PRSO, PRSI, PRSA)
+ * - Game progress (score, moves)
+ * - Display mode settings
+ * - Object registry for all game entities
+ * 
+ * Access via Globals::instance() singleton pattern.
+ * 
+ * @see ZIL equivalent: GGLOBALS.ZIL global variables
+ */
 class Globals {
 public:
     static Globals& instance();
     
-    // Core objects
-    ZObject* here = nullptr;           // Current room
-    ZObject* winner = nullptr;         // Current actor (usually ADVENTURER)
-    ZObject* player = nullptr;         // Player object
-    ZObject* prso = nullptr;           // Direct object
-    ZObject* prsi = nullptr;           // Indirect object
-    VerbId prsa = 0;                   // Current verb
+    // Core objects (ZIL: global variables in GGLOBALS.ZIL)
+    ZObject* here = nullptr;           ///< Current room (ZIL: ,HERE)
+    ZObject* winner = nullptr;         ///< Current actor, usually player (ZIL: ,WINNER)
+    ZObject* player = nullptr;         ///< Player object (ZIL: ,ADVENTURER)
+    ZObject* prso = nullptr;           ///< Parser Result Subject Object - direct object (ZIL: ,PRSO)
+    ZObject* prsi = nullptr;           ///< Parser Result Subject Indirect - indirect object (ZIL: ,PRSI)
+    VerbId prsa = 0;                   ///< Parser Result Subject Action - current verb (ZIL: ,PRSA)
     
     // Game state
     bool lit = false;                  // Is current room lit?

@@ -6,8 +6,20 @@
 #include <map>
 #include <functional>
 
-// Room ID Constants
-// Organized by area with numeric ranges to group related rooms
+/**
+ * @brief Room ID Constants
+ * 
+ * Organized by area with numeric ranges to group related rooms:
+ * - 1000-1009: Exterior (house surroundings)
+ * - 1010-1019: Forest areas
+ * - 1020-1039: House interior
+ * - 1040-1069: Underground passages
+ * - 1070-1099: Maze sections
+ * - 1100-1139: Special areas (Hades, Temple, etc.)
+ * - 1120-1149: Reservoir and river areas
+ * 
+ * @see ZIL equivalent: Room definitions in 1DUNGEON.ZIL
+ */
 namespace RoomIds {
     // Exterior Area (1000-1009)
     constexpr ObjectId WEST_OF_HOUSE = 1000;
@@ -155,13 +167,22 @@ enum class Direction {
     UP, DOWN, IN, OUT
 };
 
-// Exit type enumeration
+/**
+ * @brief Exit type enumeration for room connections
+ * 
+ * Determines how exits are processed during navigation:
+ * - NORMAL: Standard directional movement (N, S, E, W, etc.)
+ * - DOOR: Requires door object to be open (checks OPENBIT)
+ * - SPECIAL: Requires specific verb (CLIMB, ENTER, etc.)
+ * - CONDITIONAL: Requires custom game state condition
+ * - ONE_WAY: Can only travel in one direction (no return)
+ */
 enum class ExitType {
-    NORMAL,        // Standard directional exit
-    DOOR,          // Door that can be opened/closed/locked
-    SPECIAL,       // Requires special verb (CLIMB, ENTER, etc.)
-    CONDITIONAL,   // Requires game state condition
-    ONE_WAY        // Can only travel in one direction
+    NORMAL,        ///< Standard directional exit
+    DOOR,          ///< Door that can be opened/closed/locked
+    SPECIAL,       ///< Requires special verb (CLIMB, ENTER, etc.)
+    CONDITIONAL,   ///< Requires game state condition
+    ONE_WAY        ///< Can only travel in one direction
 };
 
 // Room exit structure
@@ -229,26 +250,55 @@ struct RoomExit {
     static RoomExit createRequiresPuzzle(ObjectId target, std::function<bool()> puzzleSolved, std::string_view msg = "Something blocks your way.");
 };
 
+/**
+ * @brief Room class extending ZObject with exits and room actions
+ * 
+ * ZRoom represents locations in the game world. Each room has:
+ * - Short description (inherited from ZObject)
+ * - Long description for detailed room text
+ * - Exits in various directions (N, S, E, W, UP, DOWN, etc.)
+ * - Optional room action handler for special behaviors
+ * 
+ * Room actions are triggered with action codes:
+ * - M_LOOK (1): Display room description
+ * - M_ENTER (2): Player entering room
+ * - M_END (3): End of turn processing
+ * - M_PRAY (4): Prayer action in room
+ * - M_LISTEN (5): Listen action in room
+ * - M_YELL (6): Yell action in room
+ * 
+ * @see ZIL equivalent: <ROOM> definitions in 1DUNGEON.ZIL
+ */
 class ZRoom : public ZObject {
 public:
     ZRoom(ObjectId id, std::string_view desc, std::string_view longDesc);
     
+    /// Set an exit in the specified direction
     void setExit(Direction dir, const RoomExit& exit);
+    
+    /// Get exit for direction (returns nullptr if no exit)
     RoomExit* getExit(Direction dir);
     const RoomExit* getExit(Direction dir) const;
     
+    /// Get the long description for room display
     const std::string& getLongDesc() const { return longDesc_; }
     
-    // Room action handler (M-LOOK, etc.)
+    /// Room action handler type (receives action code like M_LOOK)
     using RoomActionFunc = std::function<void(int)>;
+    
+    /// Set the room's action handler
     void setRoomAction(RoomActionFunc func) { roomAction_ = func; }
+    
+    /// Execute room action with given action code
     void performRoomAction(int arg) { if (roomAction_) roomAction_(arg); }
+    
+    /// Check if room has an action handler
     bool hasRoomAction() const { return roomAction_ != nullptr; }
     
 private:
-    std::string longDesc_;
-    std::map<Direction, RoomExit> exits_;
-    RoomActionFunc roomAction_;
+    std::string longDesc_;                    ///< Full room description
+    std::map<Direction, RoomExit> exits_;     ///< Exits by direction
+    RoomActionFunc roomAction_;               ///< Optional action handler
 };
 
 // Room action arguments (from ZIL)

@@ -2,7 +2,28 @@
 #include "core/types.h"
 #include "world/rooms.h"
 
-// Verb IDs (from gsyntax.zil)
+/**
+ * @brief Verb ID Constants (from gsyntax.zil)
+ * 
+ * Organized by category with numeric ranges:
+ * - 1-19: Meta-game commands (SCORE, SAVE, QUIT, etc.)
+ * - 20-29: Manipulation verbs (TAKE, DROP, PUT, GIVE)
+ * - 30-39: Examination verbs (LOOK, EXAMINE, READ, SEARCH)
+ * - 40-49: Container operations (OPEN, CLOSE, LOCK, UNLOCK)
+ * - 50-59: Movement verbs (WALK, ENTER, EXIT, CLIMB)
+ * - 60-69: Combat verbs (ATTACK, KILL, THROW, SWING)
+ * - 70-79: Light source verbs (LAMP-ON, LAMP-OFF)
+ * - 80-89: Object manipulation (TURN, PUSH, PULL, MOVE)
+ * - 90-99: Interaction verbs (TIE, UNTIE, LISTEN, SMELL, TOUCH)
+ * - 100-109: Consumption verbs (EAT, DRINK)
+ * - 110-119: Special actions (INFLATE, DEFLATE, PRAY, WAVE)
+ * - 120-129: Communication verbs (TALK, ASK, TELL)
+ * - 130-139: Easter eggs (HELLO, ZORK, PLUGH, FROBOZZ)
+ * - 140+: Additional common verbs (WAIT, SWIM, JUMP)
+ * 
+ * @see ZIL equivalent: Verb definitions in GSYNTAX.ZIL
+ */
+
 // Game commands
 constexpr VerbId V_VERBOSE = 1;
 constexpr VerbId V_BRIEF = 2;

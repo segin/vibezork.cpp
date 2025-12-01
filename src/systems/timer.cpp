@@ -1,3 +1,20 @@
+/**
+ * @file timer.cpp
+ * @brief Timer/interrupt system implementation
+ * 
+ * Implements the game's timer system based on ZIL's GCLOCK.ZIL.
+ * Timers are used for:
+ * - Lamp battery drain (I-LANTERN)
+ * - Candle burning (I-CANDLES)
+ * - Sword glow checking (I-SWORD)
+ * - Thief movement (I-THIEF)
+ * - Combat rounds (I-FIGHT)
+ * - Various puzzle timers
+ * 
+ * Each timer has an interval, counter, and callback. The tick()
+ * method is called once per turn from the main loop.
+ */
+
 #include "timer.h"
 #include <algorithm>
 
