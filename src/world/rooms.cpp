@@ -1,6 +1,7 @@
 #include "rooms.h"
+#include "core/globals.h"
 
-ZRoom::ZRoom(ObjectId id, const std::string& desc, const std::string& longDesc)
+ZRoom::ZRoom(ObjectId id, std::string_view desc, std::string_view longDesc)
     : ZObject(id, desc), longDesc_(longDesc) {}
 
 void ZRoom::setExit(Direction dir, const RoomExit& exit) {
@@ -12,9 +13,12 @@ RoomExit* ZRoom::getExit(Direction dir) {
     return it != exits_.end() ? &it->second : nullptr;
 }
 
-#include "core/globals.h"
+const RoomExit* ZRoom::getExit(Direction dir) const {
+    auto it = exits_.find(dir);
+    return it != exits_.end() ? &it->second : nullptr;
+}
 
-RoomExit RoomExit::createRequiresItem(ObjectId target, ObjectId requiredItem, const std::string& msg) {
+RoomExit RoomExit::createRequiresItem(ObjectId target, ObjectId requiredItem, std::string_view msg) {
     RoomExit exit;
     exit.targetRoom = target;
     exit.type = ExitType::CONDITIONAL;
@@ -35,7 +39,7 @@ RoomExit RoomExit::createRequiresItem(ObjectId target, ObjectId requiredItem, co
     return exit;
 }
 
-RoomExit RoomExit::createRequiresFlag(ObjectId target, ObjectId objId, ObjectFlag flag, const std::string& msg) {
+RoomExit RoomExit::createRequiresFlag(ObjectId target, ObjectId objId, ObjectFlag flag, std::string_view msg) {
     RoomExit exit;
     exit.targetRoom = target;
     exit.type = ExitType::CONDITIONAL;
@@ -48,11 +52,11 @@ RoomExit RoomExit::createRequiresFlag(ObjectId target, ObjectId objId, ObjectFla
     return exit;
 }
 
-RoomExit RoomExit::createRequiresPuzzle(ObjectId target, std::function<bool()> puzzleSolved, const std::string& msg) {
+RoomExit RoomExit::createRequiresPuzzle(ObjectId target, std::function<bool()> puzzleSolved, std::string_view msg) {
     RoomExit exit;
     exit.targetRoom = target;
     exit.type = ExitType::CONDITIONAL;
     exit.message = msg;
-    exit.condition = puzzleSolved;
+    exit.condition = std::move(puzzleSolved);
     return exit;
 }

@@ -13,7 +13,7 @@ void printDesc(const ZObject* obj) {
     }
 }
 
-void print(const std::string& str) {
+void print(std::string_view str) {
     // Process string character by character, preserving explicit newlines
     // while still doing word wrapping for long lines
     std::string word;
@@ -75,7 +75,7 @@ void print(const std::string& str) {
     }
 }
 
-void printLine(const std::string& str) {
+void printLine(std::string_view str) {
     print(str);
     std::cout << std::endl;
     currentColumn = 0;

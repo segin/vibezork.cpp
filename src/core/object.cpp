@@ -1,7 +1,7 @@
 #include "object.h"
 #include <algorithm>
 
-ZObject::ZObject(ObjectId id, const std::string& desc)
+ZObject::ZObject(ObjectId id, std::string_view desc)
     : id_(id), desc_(desc) {}
 
 void ZObject::setProperty(PropertyId prop, int value) {
@@ -39,27 +39,27 @@ void ZObject::moveTo(ZObject* location) {
     }
 }
 
-void ZObject::addSynonym(const std::string& syn) {
-    synonyms_.push_back(syn);
-    synonymSet_.insert(syn);  // O(1) lookup cache
+void ZObject::addSynonym(std::string_view syn) {
+    synonyms_.emplace_back(syn);
+    synonymSet_.emplace(syn);  // O(1) lookup cache
 }
 
-void ZObject::addAdjective(const std::string& adj) {
-    adjectives_.push_back(adj);
-    adjectiveSet_.insert(adj);  // O(1) lookup cache
+void ZObject::addAdjective(std::string_view adj) {
+    adjectives_.emplace_back(adj);
+    adjectiveSet_.emplace(adj);  // O(1) lookup cache
 }
 
-bool ZObject::hasSynonym(const std::string& word) const {
+bool ZObject::hasSynonym(std::string_view word) const {
     // O(1) lookup using hash set instead of O(n) linear search
-    return synonymSet_.find(word) != synonymSet_.end();
+    return synonymSet_.find(std::string(word)) != synonymSet_.end();
 }
 
-bool ZObject::hasAdjective(const std::string& word) const {
+bool ZObject::hasAdjective(std::string_view word) const {
     // O(1) lookup using hash set instead of O(n) linear search
-    return adjectiveSet_.find(word) != adjectiveSet_.end();
+    return adjectiveSet_.find(std::string(word)) != adjectiveSet_.end();
 }
 
-void ZObject::setText(const std::string& text) {
+void ZObject::setText(std::string_view text) {
     text_ = text;
 }
 

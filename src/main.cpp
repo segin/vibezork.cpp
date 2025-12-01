@@ -141,9 +141,8 @@ void mainLoop1() {
             // Display what we're doing
             print(obj->getDesc() + ": ");
             
-            // Execute the verb
-            auto it = verbHandlers.find(cmd.verb);
-            if (it != verbHandlers.end()) {
+            // Execute the verb (C++17 if with initializer)
+            if (auto it = verbHandlers.find(cmd.verb); it != verbHandlers.end()) {
                 it->second();
             } else {
                 printLine("That verb is not implemented yet.");
@@ -158,9 +157,8 @@ void mainLoop1() {
     if (cmd.isDirection) {
         Verbs::vWalkDir(cmd.direction);
     } else {
-        // Execute verb handler
-        auto it = verbHandlers.find(cmd.verb);
-        if (it != verbHandlers.end()) {
+        // Execute verb handler (C++17 if with initializer)
+        if (auto it = verbHandlers.find(cmd.verb); it != verbHandlers.end()) {
             it->second();
         } else {
             printLine("That verb is not implemented yet.");

@@ -2,6 +2,7 @@
 #include "types.h"
 #include "flags.h"
 #include <string>
+#include <string_view>
 #include <vector>
 #include <map>
 #include <unordered_set>
@@ -9,7 +10,7 @@
 
 class ZObject {
 public:
-    ZObject(ObjectId id, const std::string& desc);
+    ZObject(ObjectId id, std::string_view desc);
     virtual ~ZObject() = default;
     
     // Property accessors
@@ -17,12 +18,12 @@ public:
     int getProperty(PropertyId prop) const;
     
     // Text property accessors
-    void setText(const std::string& text);
+    void setText(std::string_view text);
     const std::string& getText() const;
     bool hasText() const;
     
     // Long description (for room display)
-    void setLongDesc(const std::string& ldesc) { longDesc_ = ldesc; }
+    void setLongDesc(std::string_view ldesc) { longDesc_ = ldesc; }
     const std::string& getLongDesc() const { return longDesc_; }
     bool hasLongDesc() const { return !longDesc_.empty(); }
     
@@ -39,12 +40,12 @@ public:
     // Identification
     ObjectId getId() const { return id_; }
     const std::string& getDesc() const { return desc_; }
-    void addSynonym(const std::string& syn);
-    void addAdjective(const std::string& adj);
+    void addSynonym(std::string_view syn);
+    void addAdjective(std::string_view adj);
     const std::vector<std::string>& getSynonyms() const { return synonyms_; }
     const std::vector<std::string>& getAdjectives() const { return adjectives_; }
-    bool hasSynonym(const std::string& word) const;
-    bool hasAdjective(const std::string& word) const;
+    bool hasSynonym(std::string_view word) const;
+    bool hasAdjective(std::string_view word) const;
     
     // Action handler
     using ActionFunc = std::function<bool()>;

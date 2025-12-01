@@ -28,6 +28,33 @@ static int calculateWeight(const ZObject* obj) {
     return weight;
 }
 
+// Helper function to check if an object is accessible to the player
+// An object is accessible if it's in the current room, player inventory,
+// or in an open container in either location
+static bool isObjectAccessible(const ZObject* obj) {
+    if (!obj) return false;
+    
+    auto& g = Globals::instance();
+    ZObject* location = obj->getLocation();
+    
+    // In inventory
+    if (location == g.winner) return true;
+    
+    // In current room
+    if (location == g.here) return true;
+    
+    // In an open container in room or inventory
+    if (location && location->hasFlag(ObjectFlag::CONTBIT) && 
+        location->hasFlag(ObjectFlag::OPENBIT)) {
+        ZObject* containerLocation = location->getLocation();
+        if (containerLocation == g.here || containerLocation == g.winner) {
+            return true;
+        }
+    }
+    
+    return false;
+}
+
 bool vLook() {
     auto& g = Globals::instance();
     if (!g.here) {
@@ -188,27 +215,7 @@ bool vTake() {
     }
     
     // Check if object is accessible (must be in current room, inventory, or open container)
-    ZObject* objLocation = g.prso->getLocation();
-    bool accessible = false;
-    
-    if (objLocation == g.here) {
-        // Object is in current room
-        accessible = true;
-    } else if (objLocation == g.winner) {
-        // Object is already in inventory (handled above)
-        accessible = true;
-    } else if (objLocation) {
-        // Check if object is in an open container in the room or inventory
-        if (objLocation->hasFlag(ObjectFlag::CONTBIT) && 
-            objLocation->hasFlag(ObjectFlag::OPENBIT)) {
-            ZObject* containerLocation = objLocation->getLocation();
-            if (containerLocation == g.here || containerLocation == g.winner) {
-                accessible = true;
-            }
-        }
-    }
-    
-    if (!accessible) {
+    if (!isObjectAccessible(g.prso)) {
         printLine("You can't see any such thing.");
         return RTRUE;
     }
@@ -459,27 +466,7 @@ bool vLock() {
     }
     
     // Verify player has the key (must be in inventory or accessible)
-    ZObject* keyLocation = g.prsi->getLocation();
-    bool hasKey = false;
-    
-    if (keyLocation == g.winner) {
-        // Key is in inventory
-        hasKey = true;
-    } else if (keyLocation == g.here) {
-        // Key is in current room
-        hasKey = true;
-    } else if (keyLocation) {
-        // Check if key is in an open container in the room or inventory
-        if (keyLocation->hasFlag(ObjectFlag::CONTBIT) && 
-            keyLocation->hasFlag(ObjectFlag::OPENBIT)) {
-            ZObject* containerLocation = keyLocation->getLocation();
-            if (containerLocation == g.here || containerLocation == g.winner) {
-                hasKey = true;
-            }
-        }
-    }
-    
-    if (!hasKey) {
+    if (!isObjectAccessible(g.prsi)) {
         printLine("You don't have that.");
         return RTRUE;
     }
@@ -528,27 +515,7 @@ bool vUnlock() {
     }
     
     // Verify player has the key (must be in inventory or accessible)
-    ZObject* keyLocation = g.prsi->getLocation();
-    bool hasKey = false;
-    
-    if (keyLocation == g.winner) {
-        // Key is in inventory
-        hasKey = true;
-    } else if (keyLocation == g.here) {
-        // Key is in current room
-        hasKey = true;
-    } else if (keyLocation) {
-        // Check if key is in an open container in the room or inventory
-        if (keyLocation->hasFlag(ObjectFlag::CONTBIT) && 
-            keyLocation->hasFlag(ObjectFlag::OPENBIT)) {
-            ZObject* containerLocation = keyLocation->getLocation();
-            if (containerLocation == g.here || containerLocation == g.winner) {
-                hasKey = true;
-            }
-        }
-    }
-    
-    if (!hasKey) {
+    if (!isObjectAccessible(g.prsi)) {
         printLine("You don't have that.");
         return RTRUE;
     }

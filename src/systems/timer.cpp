@@ -30,34 +30,26 @@ void TimerManager::registerTimer(std::string_view name, int interval,
 }
 
 void TimerManager::enableTimer(std::string_view name) {
-    std::string key(name);
-    auto it = timers_.find(key);
-    if (it != timers_.end()) {
+    if (auto it = timers_.find(std::string(name)); it != timers_.end()) {
         it->second.enabled = true;
     }
 }
 
 void TimerManager::disableTimer(std::string_view name) {
-    std::string key(name);
-    auto it = timers_.find(key);
-    if (it != timers_.end()) {
+    if (auto it = timers_.find(std::string(name)); it != timers_.end()) {
         it->second.enabled = false;
     }
 }
 
 bool TimerManager::isTimerEnabled(std::string_view name) const {
-    std::string key(name);
-    auto it = timers_.find(key);
-    if (it != timers_.end()) {
+    if (auto it = timers_.find(std::string(name)); it != timers_.end()) {
         return it->second.enabled;
     }
     return false;
 }
 
 void TimerManager::resetTimer(std::string_view name) {
-    std::string key(name);
-    auto it = timers_.find(key);
-    if (it != timers_.end()) {
+    if (auto it = timers_.find(std::string(name)); it != timers_.end()) {
         it->second.counter = it->second.interval;
     }
 }
@@ -65,9 +57,7 @@ void TimerManager::resetTimer(std::string_view name) {
 void TimerManager::queueTimer(std::string_view name, int ticks) {
     // Based on QUEUE routine in GCLOCK.ZIL
     // Sets the timer's counter to a specific value
-    std::string key(name);
-    auto it = timers_.find(key);
-    if (it != timers_.end()) {
+    if (auto it = timers_.find(std::string(name)); it != timers_.end()) {
         it->second.counter = ticks;
     }
 }
@@ -122,9 +112,7 @@ void TimerManager::clear() {
 }
 
 void TimerManager::setTimerState(std::string_view name, bool enabled, int counter) {
-    std::string key(name);
-    auto it = timers_.find(key);
-    if (it != timers_.end()) {
+    if (auto it = timers_.find(std::string(name)); it != timers_.end()) {
         it->second.enabled = enabled;
         it->second.counter = counter;
     }

@@ -2,6 +2,7 @@
 #include "core/types.h"
 #include "core/object.h"
 #include <string>
+#include <string_view>
 #include <map>
 #include <functional>
 
@@ -178,8 +179,8 @@ struct RoomExit {
     std::string specialMessage;  // Message when wrong verb is used
     
     RoomExit() = default;
-    RoomExit(ObjectId target) : targetRoom(target) {}
-    RoomExit(const std::string& msg) : message(msg) {}
+    explicit RoomExit(ObjectId target) : targetRoom(target) {}
+    explicit RoomExit(std::string_view msg) : message(msg) {}
     
     // Door exit constructor
     static RoomExit createDoor(ObjectId target, ObjectId door) {
@@ -191,7 +192,7 @@ struct RoomExit {
     }
     
     // Special movement exit constructor
-    static RoomExit createSpecial(ObjectId target, int verb, const std::string& msg = "") {
+    static RoomExit createSpecial(ObjectId target, int verb, std::string_view msg = "") {
         RoomExit exit;
         exit.targetRoom = target;
         exit.requiredVerb = verb;
@@ -201,10 +202,10 @@ struct RoomExit {
     }
     
     // Conditional exit constructor
-    static RoomExit createConditional(ObjectId target, std::function<bool()> cond, const std::string& msg = "") {
+    static RoomExit createConditional(ObjectId target, std::function<bool()> cond, std::string_view msg = "") {
         RoomExit exit;
         exit.targetRoom = target;
-        exit.condition = cond;
+        exit.condition = std::move(cond);
         exit.type = ExitType::CONDITIONAL;
         exit.message = msg;
         return exit;
@@ -219,21 +220,22 @@ struct RoomExit {
     }
     
     // Helper: Create exit that requires player to have an item
-    static RoomExit createRequiresItem(ObjectId target, ObjectId requiredItem, const std::string& msg = "You need something to proceed.");
+    static RoomExit createRequiresItem(ObjectId target, ObjectId requiredItem, std::string_view msg = "You need something to proceed.");
     
     // Helper: Create exit that requires a flag to be set on an object
-    static RoomExit createRequiresFlag(ObjectId target, ObjectId obj, ObjectFlag flag, const std::string& msg = "You can't go that way.");
+    static RoomExit createRequiresFlag(ObjectId target, ObjectId obj, ObjectFlag flag, std::string_view msg = "You can't go that way.");
     
     // Helper: Create exit that requires a puzzle to be solved (generic condition)
-    static RoomExit createRequiresPuzzle(ObjectId target, std::function<bool()> puzzleSolved, const std::string& msg = "Something blocks your way.");
+    static RoomExit createRequiresPuzzle(ObjectId target, std::function<bool()> puzzleSolved, std::string_view msg = "Something blocks your way.");
 };
 
 class ZRoom : public ZObject {
 public:
-    ZRoom(ObjectId id, const std::string& desc, const std::string& longDesc);
+    ZRoom(ObjectId id, std::string_view desc, std::string_view longDesc);
     
     void setExit(Direction dir, const RoomExit& exit);
     RoomExit* getExit(Direction dir);
+    const RoomExit* getExit(Direction dir) const;
     
     const std::string& getLongDesc() const { return longDesc_; }
     

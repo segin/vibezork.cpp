@@ -127,24 +127,27 @@ std::optional<VerbId> VerbRegistry::lookupVerb(std::string_view word) const {
     std::transform(lowerWord.begin(), lowerWord.end(), 
                   lowerWord.begin(), ::tolower);
     
-    auto it = verbMap_.find(lowerWord);
-    if (it != verbMap_.end()) {
+    // C++17 if with initializer
+    if (auto it = verbMap_.find(lowerWord); it != verbMap_.end()) {
         return it->second;
     }
     return std::nullopt;
 }
 
 const std::vector<SyntaxPattern>& VerbRegistry::getSyntaxPatterns(VerbId verbId) const {
-    auto it = syntaxMap_.find(verbId);
-    if (it != syntaxMap_.end()) {
+    // C++17 if with initializer
+    if (auto it = syntaxMap_.find(verbId); it != syntaxMap_.end()) {
         return it->second;
     }
     return emptyPatterns_;
 }
 
 bool VerbRegistry::hasPatterns(VerbId verbId) const {
-    auto it = syntaxMap_.find(verbId);
-    return it != syntaxMap_.end() && !it->second.empty();
+    // C++17 if with initializer
+    if (auto it = syntaxMap_.find(verbId); it != syntaxMap_.end()) {
+        return !it->second.empty();
+    }
+    return false;
 }
 
 std::vector<VerbId> VerbRegistry::getAllVerbs() const {
