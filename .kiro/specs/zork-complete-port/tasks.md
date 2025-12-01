@@ -2470,7 +2470,7 @@ N
   - Document design decisions
   - _Requirements: 95_
 
-- [-] 76. Final integration testing
+- [x] 76. Final integration testing
   - Run complete test suite
   - Fix any failing tests
   - Verify all requirements met
@@ -2494,7 +2494,7 @@ N
   - Verify output matches original
   - _Requirements: 94_
 
-- [-] 76.4 Manual playthrough
+- [x] 76.4 Manual playthrough
   - Play through complete game
   - Verify all features work
   - Verify game is winnable
