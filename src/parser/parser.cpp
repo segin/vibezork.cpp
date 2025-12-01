@@ -42,6 +42,12 @@ void Parser::initializeVerbsAndDirections() {
     verbSynonyms_["superbrief"] = V_SUPERBRIEF;
     verbSynonyms_["super"] = V_SUPERBRIEF;
     
+    // Game control verbs
+    verbSynonyms_["save"] = V_SAVE;
+    verbSynonyms_["restore"] = V_RESTORE;
+    verbSynonyms_["restart"] = V_RESTART;
+    verbSynonyms_["version"] = V_VERSION;
+    
     // Easter eggs / special words
     verbSynonyms_["hello"] = V_HELLO;
     verbSynonyms_["hi"] = V_HELLO;

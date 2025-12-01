@@ -2364,21 +2364,21 @@ Comprehensive testing and final polish to ensure quality.
   - Ensure all commands respond in <10ms
   - _Requirements: 86_
 
-- [-] 72. Memory leak detection
+- [x] 72. Memory leak detection
   - Run valgrind or similar tool
   - Fix any memory leaks
   - Verify proper cleanup
   - Test save/restore for leaks
   - _Requirements: 87_
 
-- [-] 72.1 Test for memory leaks
+- [x] 72.1 Test for memory leaks
   - Run memory leak detection tools
   - Test normal gameplay
   - Test save/restore
   - Test restart
   - _Requirements: 87_
 
-- [ ] 72.2 Fix identified leaks
+- [x] 72.2 Fix identified leaks
   - Fix any memory leaks found
   - Verify smart pointer usage
   - Verify RAII compliance
