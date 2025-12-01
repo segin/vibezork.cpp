@@ -749,6 +749,23 @@ ParsedCommand Parser::parse(const std::string& input) {
             return cmd;
         }
         
+        // Check if the word is a known object word (even if not visible)
+        // This gives a better error message than "I don't know the word"
+        bool isKnownWord = false;
+        for (const auto& word : cmd.words) {
+            if (word != "the" && word != "a" && word != "an" && 
+                !isPreposition(word) && isKnownObjectWord(word)) {
+                isKnownWord = true;
+                break;
+            }
+        }
+        
+        if (isKnownWord) {
+            // Word is known but no verb was given
+            printLine("I don't understand that sentence.");
+            return cmd;
+        }
+        
         // Unknown word - save for OOPS
         setLastUnknownWord(cmd.words[0]);
         printLine("I don't know the word \"" + cmd.words[0] + "\".");

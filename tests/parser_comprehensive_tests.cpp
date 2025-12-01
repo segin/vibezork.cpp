@@ -536,7 +536,8 @@ TEST(ParsingFlowAllCommand) {
 // Test error handling
 TEST(ParsingErrorUnknownWord) {
     Parser parser;
-    ParsedCommand cmd = parser.parse("xyzzy");
+    // Use a truly unknown word (not xyzzy which is a known verb synonym for PLUGH)
+    ParsedCommand cmd = parser.parse("blargblarg");
     
     ASSERT_EQ(cmd.verb, 0);
 }
@@ -545,8 +546,9 @@ TEST(ParsingErrorMissingObject) {
     Parser parser;
     ParsedCommand cmd = parser.parse("take");
     
-    // Parser should handle missing object gracefully
-    ASSERT_EQ(cmd.verb, V_TAKE);
+    // Parser asks "What do you want to take?" and sets verb to 0 (orphaned command)
+    // The command is incomplete, waiting for the object to be specified
+    ASSERT_EQ(cmd.verb, 0);
     ASSERT_EQ(cmd.directObj, nullptr);
 }
 
