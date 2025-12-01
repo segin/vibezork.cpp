@@ -20,6 +20,9 @@ public:
     // Warns player about grue and potentially kills them
     static void checkGrue();
     
+    // Reset light system state (for testing and new games)
+    static void reset();
+    
 private:
     static int darknessTurns_;      // Turns spent in darkness
     static bool warnedAboutGrue_;   // Has player been warned?

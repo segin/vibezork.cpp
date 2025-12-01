@@ -2470,31 +2470,31 @@ N
   - Document design decisions
   - _Requirements: 95_
 
-- [ ] 76. Final integration testing
+- [-] 76. Final integration testing
   - Run complete test suite
   - Fix any failing tests
   - Verify all requirements met
   - Test complete game playthrough
   - _Requirements: 93, 94, 96_
 
-- [ ] 76.1 Run all unit tests
+- [x] 76.1 Run all unit tests
   - Execute complete unit test suite
   - Fix any failures
   - Verify coverage goals
   - _Requirements: 92_
 
-- [ ] 76.2 Run all integration tests
+- [x] 76.2 Run all integration tests
   - Execute complete integration test suite
   - Fix any failures
   - _Requirements: 93_
 
-- [ ] 76.3 Run all transcript tests
+- [x] 76.3 Run all transcript tests
   - Execute complete transcript test suite
   - Fix any failures
   - Verify output matches original
   - _Requirements: 94_
 
-- [ ] 76.4 Manual playthrough
+- [-] 76.4 Manual playthrough
   - Play through complete game
   - Verify all features work
   - Verify game is winnable

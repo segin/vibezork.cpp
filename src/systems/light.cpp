@@ -169,3 +169,9 @@ void LightSystem::checkGrue() {
         darknessTurns_ = 0;  // Reset to prevent repeated death messages
     }
 }
+
+// Reset light system state
+void LightSystem::reset() {
+    darknessTurns_ = 0;
+    warnedAboutGrue_ = false;
+}

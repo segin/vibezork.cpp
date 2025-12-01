@@ -12,6 +12,7 @@
 #include "../src/systems/combat.h"
 #include "../src/systems/light.h"
 #include "../src/systems/save.h"
+#include "../src/systems/death.h"
 #include <memory>
 #include <iostream>
 
@@ -21,10 +22,13 @@ public:
     IntegrationHelper() {
         auto& g = Globals::instance();
         g.reset();
+        DeathSystem::setTestMode(true);  // Disable interactive prompts
+        LightSystem::reset();  // Reset darkness counter
         initializeWorld();
     }
     
     ~IntegrationHelper() {
+        DeathSystem::setTestMode(false);
         Globals::instance().reset();
     }
 };
@@ -36,6 +40,12 @@ TEST(CommandSequenceTakeAndDrop) {
     
     auto* lamp = g.getObject(ObjectIds::LAMP);
     ASSERT_TRUE(lamp != nullptr);
+    
+    // Move player to Living Room where the lamp is
+    auto* livingRoom = g.getObject(RoomIds::LIVING_ROOM);
+    ASSERT_TRUE(livingRoom != nullptr);
+    g.here = livingRoom;
+    if (g.winner) g.winner->moveTo(livingRoom);
     
     g.prso = lamp;
     g.prsa = V_TAKE;
@@ -78,6 +88,15 @@ TEST(CommandSequencePutInContainer) {
     ASSERT_TRUE(lamp != nullptr);
     ASSERT_TRUE(trophyCase != nullptr);
     
+    // Move player to Living Room where the lamp and trophy case are
+    auto* livingRoom = g.getObject(RoomIds::LIVING_ROOM);
+    ASSERT_TRUE(livingRoom != nullptr);
+    g.here = livingRoom;
+    if (g.winner) g.winner->moveTo(livingRoom);
+    
+    // Open trophy case first
+    trophyCase->setFlag(ObjectFlag::OPENBIT);
+    
     g.prso = lamp;
     g.prsa = V_TAKE;
     Verbs::vTake();
@@ -95,6 +114,12 @@ TEST(CommandSequenceLightManagement) {
     
     auto* lamp = g.getObject(ObjectIds::LAMP);
     ASSERT_TRUE(lamp != nullptr);
+    
+    // Move player to Living Room where the lamp is
+    auto* livingRoom = g.getObject(RoomIds::LIVING_ROOM);
+    ASSERT_TRUE(livingRoom != nullptr);
+    g.here = livingRoom;
+    if (g.winner) g.winner->moveTo(livingRoom);
     
     g.prso = lamp;
     g.prsa = V_TAKE;
@@ -155,6 +180,12 @@ TEST(GameStateSaveRestore) {
     
     auto* lamp = g.getObject(ObjectIds::LAMP);
     ASSERT_TRUE(lamp != nullptr);
+    
+    // Move player to Living Room where the lamp is
+    auto* livingRoom = g.getObject(RoomIds::LIVING_ROOM);
+    ASSERT_TRUE(livingRoom != nullptr);
+    g.here = livingRoom;
+    if (g.winner) g.winner->moveTo(livingRoom);
     
     g.prso = lamp;
     g.prsa = V_TAKE;

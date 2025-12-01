@@ -1,5 +1,6 @@
 #include "test_framework.h"
 #include "../src/systems/light.h"
+#include "../src/systems/death.h"
 #include "../src/core/globals.h"
 #include "../src/core/object.h"
 #include "../src/world/world.h"
@@ -193,6 +194,8 @@ TEST(update_lighting_dark) {
 TEST(grue_first_warning) {
     auto& g = Globals::instance();
     g.reset();
+    DeathSystem::setTestMode(true);
+    LightSystem::reset();  // Reset darkness counter
     
     // Create a dark room
     auto room = std::make_unique<ZObject>(1, "dark room");
@@ -207,12 +210,15 @@ TEST(grue_first_warning) {
     
     // Test passes if no crash occurs
     ASSERT_TRUE(true);
+    DeathSystem::setTestMode(false);
 }
 
 // Test: Multiple turns in darkness escalate warnings (Requirement 51)
 TEST(grue_escalating_warnings) {
     auto& g = Globals::instance();
     g.reset();
+    DeathSystem::setTestMode(true);
+    LightSystem::reset();  // Reset darkness counter
     
     // Create a dark room
     auto room = std::make_unique<ZObject>(1, "dark room");
@@ -228,12 +234,17 @@ TEST(grue_escalating_warnings) {
     
     // Test passes if no crash occurs
     ASSERT_TRUE(true);
+    DeathSystem::setTestMode(false);
 }
 
 // Test: Grue attacks after several turns in darkness (Requirement 51)
 TEST(grue_attack) {
     auto& g = Globals::instance();
     g.reset();
+    
+    // Enable test mode to avoid interactive prompts
+    DeathSystem::setTestMode(true);
+    LightSystem::reset();  // Reset darkness counter
     
     // Create a dark room
     auto room = std::make_unique<ZObject>(1, "dark room");
@@ -250,12 +261,17 @@ TEST(grue_attack) {
     
     // Test passes if no crash occurs (death message displayed)
     ASSERT_TRUE(true);
+    
+    // Reset test mode
+    DeathSystem::setTestMode(false);
 }
 
 // Test: Light prevents grue attack (Requirement 51)
 TEST(light_prevents_grue) {
     auto& g = Globals::instance();
     g.reset();
+    DeathSystem::setTestMode(true);
+    LightSystem::reset();  // Reset darkness counter
     
     // Create a dark room
     auto room = std::make_unique<ZObject>(1, "dark room");
@@ -288,12 +304,15 @@ TEST(light_prevents_grue) {
     
     // Test passes if no crash occurs and no death message
     ASSERT_TRUE(true);
+    DeathSystem::setTestMode(false);
 }
 
 // Test: Darkness counter resets when entering light (Requirement 51)
 TEST(darkness_counter_resets) {
     auto& g = Globals::instance();
     g.reset();
+    DeathSystem::setTestMode(true);
+    LightSystem::reset();  // Reset darkness counter
     
     // Create a dark room
     auto room = std::make_unique<ZObject>(1, "dark room");
@@ -316,6 +335,7 @@ TEST(darkness_counter_resets) {
     
     // Test passes if no crash occurs
     ASSERT_TRUE(true);
+    DeathSystem::setTestMode(false);
 }
 
 int main() {

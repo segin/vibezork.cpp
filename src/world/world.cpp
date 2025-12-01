@@ -4016,7 +4016,8 @@ void initializeWorld() {
     lamp->setFlag(ObjectFlag::LIGHTBIT);
     // Lamp starts off - player must turn it on
     lamp->setProperty(P_SIZE, 15);
-    lamp->setProperty(P_STRENGTH, 100);  // Battery level (0-100)
+    lamp->setProperty(P_CAPACITY, 330);  // Battery level - about 330 turns of light
+    lamp->setProperty(P_STRENGTH, 100);  // Weapon strength if used as weapon
     lamp->setAction(lampAction);
     lamp->setLongDesc("There is a brass lantern (battery-powered) here.");
     lamp->moveTo(g.getObject(RoomIds::LIVING_ROOM));

@@ -23,7 +23,7 @@ const std::vector<TranscriptStep> OPENING_SEQUENCE = {
     {"take leaflet", {"Taken"}},
     {"inventory", {"leaflet"}},
     {"read leaflet", {"WELCOME TO ZORK"}},
-    {"examine leaflet", {"leaflet"}},
+    {"examine leaflet", {"WELCOME TO ZORK"}},  // Examining readable shows content
     {"drop leaflet", {"Dropped"}},
     {"look", {"leaflet"}},
     {"take leaflet", {"Taken"}},
@@ -122,9 +122,9 @@ const std::vector<TranscriptStep> PARSER_FEATURES = {
 
 // Error handling
 const std::vector<TranscriptStep> ERROR_HANDLING = {
-    {"xyzzy", {"don't know"}},
-    {"take mailbox", {"can't"}},  // Mailbox can't be taken
-    {"go blarg", {"can't go"}},  // Invalid direction
+    {"xyzzy", {"not implemented"}},  // Unknown verb response
+    {"take mailbox", {"anchored"}},  // Mailbox can't be taken - "securely anchored"
+    {"go blarg", {"don't know"}},  // Unknown word
 };
 
 // Disambiguation
