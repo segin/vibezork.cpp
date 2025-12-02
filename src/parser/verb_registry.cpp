@@ -649,8 +649,30 @@ void VerbRegistry::initializeSyntaxPatterns() {
         registerSyntax(V_ENTER, SyntaxPattern(V_ENTER, {Elem(ET::VERB), objElem}));
     }
     
+    // GO IN / GO INSIDE / GO INTO -> ENTER (ZIL compatibility)
+    {
+        Elem goVerb(ET::VERB);  // matches "go"
+        Elem inPrep(ET::PREPOSITION, {"in", "inside", "into"});
+        registerSyntax(V_ENTER, SyntaxPattern(V_ENTER, {goVerb, inPrep}));
+    }
+    
+    // GO IN OBJECT -> ENTER OBJECT
+    {
+        Elem goVerb(ET::VERB);
+        Elem inPrep(ET::PREPOSITION, {"in", "inside", "into"});
+        Elem objElem(ET::OBJECT);
+        registerSyntax(V_ENTER, SyntaxPattern(V_ENTER, {goVerb, inPrep, objElem}));
+    }
+    
     // EXIT (no object)
     registerSyntax(V_EXIT, SyntaxPattern(V_EXIT, {Elem(ET::VERB)}));
+    
+    // GO OUT / GO OUTSIDE -> EXIT (ZIL compatibility)
+    {
+        Elem goVerb(ET::VERB);  // matches "go"
+        Elem outPrep(ET::PREPOSITION, {"out", "outside"});
+        registerSyntax(V_EXIT, SyntaxPattern(V_EXIT, {goVerb, outPrep}));
+    }
     
     // CLIMB UP OBJECT
     {

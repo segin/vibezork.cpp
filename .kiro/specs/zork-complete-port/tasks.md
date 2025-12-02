@@ -2494,7 +2494,7 @@ N
   - Verify output matches original
   - _Requirements: 94_
 
-- [x] 76.4 Manual playthrough
+- [ ] 76.4 Manual playthrough
   - Play through complete game
   - Verify all features work
   - Verify game is winnable

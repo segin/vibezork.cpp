@@ -1543,6 +1543,7 @@ void initializeWorld() {
     // Set up exits for Kitchen
     kitchen->setExit(Direction::WEST, RoomExit(RoomIds::LIVING_ROOM));
     kitchen->setExit(Direction::EAST, RoomExit(ROOM_EAST_OF_HOUSE));  // Through window
+    kitchen->setExit(Direction::OUT, RoomExit(ROOM_EAST_OF_HOUSE));   // Through window (go out)
     kitchen->setExit(Direction::UP, RoomExit(RoomIds::ATTIC));
     kitchen->setExit(Direction::DOWN, RoomExit("Only Santa Claus climbs down chimneys."));
     

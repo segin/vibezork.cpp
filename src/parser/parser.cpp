@@ -91,6 +91,10 @@ void Parser::initializeVerbsAndDirections() {
     directions_["u"] = Direction::UP;
     directions_["down"] = Direction::DOWN;
     directions_["d"] = Direction::DOWN;
+    directions_["in"] = Direction::IN;
+    directions_["inside"] = Direction::IN;
+    directions_["out"] = Direction::OUT;
+    directions_["outside"] = Direction::OUT;
     
     // Prepositions (from gsyntax.zil)
     // Core prepositions
@@ -776,6 +780,18 @@ ParsedCommand Parser::parse(const std::string& input) {
         setLastUnknownWord(cmd.words[0]);
         printLine("I don't know the word \"" + cmd.words[0] + "\".");
         return cmd;
+    }
+    
+    // Special handling for "go <direction>" (e.g., "go in", "go out", "go north")
+    // Per ZIL: GO IN = ENTER, GO OUT = EXIT
+    if (cmd.verb == V_WALK && cmd.words.size() >= 2) {
+        Direction* dir = findDirection(cmd.words[1]);
+        if (dir) {
+            cmd.isDirection = true;
+            cmd.direction = *dir;
+            orphanFlag_ = false;
+            return cmd;
+        }
     }
     
     // Check for "all" keyword
