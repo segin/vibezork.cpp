@@ -1,5 +1,6 @@
-// Missing objects from ZIL 1dungeon.zil
-// This file adds objects that were not yet implemented in world.cpp
+// Supplementary object initialization from ZIL 1dungeon.zil
+// This file adds additional objects and fixes object properties/placements
+// Called at the end of initializeWorld() in world_init.cpp
 
 #include "world.h"
 #include "objects.h"
@@ -749,20 +750,20 @@ void fixObjectValues() {
         lamp->clearFlag(ObjectFlag::ONBIT);  // Starts off
     }
     
-    // Fix SWORD (ZIL: SIZE 30, TVALUE 0 - not a treasure)
+    // Fix SWORD (ZIL: SIZE 30, TVALUE 0 - not a treasure, but IS takeable)
     ZObject* sword = g.getObject(ObjectIds::SWORD);
     if (sword) {
         sword->setProperty(P_SIZE, 30);
         sword->setProperty(P_TVALUE, 0);
-        sword->setFlag(ObjectFlag::TRYTAKEBIT);
+        // Note: TAKEBIT is already set in world.cpp, don't set TRYTAKEBIT (that's for anchored objects)
     }
     
-    // Fix ROPE (ZIL: SIZE 10, SACREDBIT, TRYTAKEBIT)
+    // Fix ROPE (ZIL: SIZE 10, SACREDBIT - rope IS takeable)
     ZObject* rope = g.getObject(ObjectIds::ROPE);
     if (rope) {
         rope->setProperty(P_SIZE, 10);
         rope->setFlag(ObjectFlag::SACREDBIT);
-        rope->setFlag(ObjectFlag::TRYTAKEBIT);
+        // Note: TAKEBIT is already set in world.cpp, don't set TRYTAKEBIT (that's for anchored objects)
     }
     
     // Fix AXE (ZIL: SIZE 25, NDESCBIT, starts with troll)
