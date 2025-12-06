@@ -2,7 +2,7 @@
 // Replaces the messy world_init.cpp + missing_objects.cpp pattern
 #pragma once
 
-// Forward declarations for all initialization functions
+// Forward declarations for object initialization functions
 void initializeTreasures();
 void initializeTools();
 void initializeContainers();
@@ -14,7 +14,16 @@ void initializeSpecialObjects();
 void initializeScenery();
 void initializePlayer();
 
-// Master initialization function - call this to create all objects
+// Forward declarations for room initialization functions
+void initializeExteriorRooms();
+void initializeHouseRooms();
+void initializeUndergroundRooms();
+void initializeMazeRooms();
+void initializeSpecialRooms();
+void initializeRiverRooms();
+void initializeMineRooms();
+
+// Master initialization function - call this to create all objects and rooms
 inline void initializeAllObjects() {
     // Order matters: containers before items that go in them
     initializeContainers();
@@ -27,4 +36,15 @@ inline void initializeAllObjects() {
     initializeScenery();
     initializeNPCs();
     initializePlayer();
+}
+
+// Master room initialization function
+inline void initializeAllRooms() {
+    initializeExteriorRooms();
+    initializeHouseRooms();
+    initializeUndergroundRooms();
+    initializeMazeRooms();
+    initializeSpecialRooms();
+    initializeRiverRooms();
+    initializeMineRooms();
 }
