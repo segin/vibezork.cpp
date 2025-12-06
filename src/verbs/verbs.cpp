@@ -699,22 +699,31 @@ bool trySpecialMovement(int verbId, Direction dir) {
 bool vEnter() {
     auto& g = Globals::instance();
     
-    // Try ENTER as special movement in all directions
-    // Priority: IN, then cardinal directions
+    // Try ENTER as special movement first
     if (trySpecialMovement(V_ENTER, Direction::IN)) return RTRUE;
-    if (trySpecialMovement(V_ENTER, Direction::NORTH)) return RTRUE;
-    if (trySpecialMovement(V_ENTER, Direction::SOUTH)) return RTRUE;
-    if (trySpecialMovement(V_ENTER, Direction::EAST)) return RTRUE;
-    if (trySpecialMovement(V_ENTER, Direction::WEST)) return RTRUE;
+    
+    // Try regular IN direction (e.g., entering through window)
+    ZRoom* currentRoom = dynamic_cast<ZRoom*>(g.here);
+    if (currentRoom) {
+        RoomExit* inExit = currentRoom->getExit(Direction::IN);
+        if (inExit && inExit->type == ExitType::NORMAL) {
+            return vWalkDir(Direction::IN);
+        }
+    }
     
     // If PRSO is set, try to enter that object
     if (g.prso) {
+        // Check if it's a vehicle
+        if (g.prso->hasFlag(ObjectFlag::VEHBIT)) {
+            g.winner->moveTo(g.prso);
+            printLine("You are now in the " + g.prso->getDesc() + ".");
+            return RTRUE;
+        }
         printLine("You can't enter that.");
         return RTRUE;
     }
     
-    printLine("What do you want to enter?");
-    getGlobalParser().setOrphanDirect(V_ENTER, "enter");
+    printLine("You can't go that way.");
     return RTRUE;
 }
 
@@ -1061,6 +1070,12 @@ bool vPut() {
     if (!g.prsi) {
         printLine("What do you want to put it in?");
         getGlobalParser().setOrphanIndirect(V_PUT, g.prso, "in");
+        return RTRUE;
+    }
+    
+    // Call indirect object's action handler first (ZIL behavior)
+    // This allows special objects like GROUND to intercept PUT
+    if (g.prsi->performAction()) {
         return RTRUE;
     }
     

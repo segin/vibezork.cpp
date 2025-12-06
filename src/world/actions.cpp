@@ -142,6 +142,67 @@ bool forestAction() {
     return RFALSE;
 }
 
+// Rug action - handles MOVE/PUSH to reveal trap door (ZIL: RUG-FCN)
+bool rugAction() {
+    auto& g = Globals::instance();
+    
+    if (g.prsa == V_TAKE) {
+        printLine("The rug is extremely heavy and cannot be carried.");
+        return RTRUE;
+    }
+    
+    if (g.prsa == V_MOVE || g.prsa == V_PUSH || g.prsa == V_PULL) {
+        if (g.rugMoved) {
+            printLine("Having moved the carpet previously, you find it impossible to move it again.");
+        } else {
+            printLine("With a great effort, the rug is moved to one side of the room, revealing the dusty cover of a closed trap door.");
+            // Reveal the trap door
+            if (auto* trapDoor = g.getObject(ObjectIds::TRAP_DOOR)) {
+                trapDoor->clearFlag(ObjectFlag::INVISIBLE);
+            }
+            g.rugMoved = true;
+        }
+        return RTRUE;
+    }
+    
+    if (g.prsa == V_EXAMINE || g.prsa == V_LOOK_INSIDE) {
+        if (!g.rugMoved) {
+            printLine("Underneath the rug is a closed trap door. As you drop the corner of the rug, the trap door is once again concealed from view.");
+        } else {
+            printLine("The rug is lying on one side of the room.");
+        }
+        return RTRUE;
+    }
+    
+    return RFALSE;
+}
+
+// Ground action - handles PUT X ON GROUND -> DROP (ZIL: GROUND-FUNCTION)
+bool groundAction() {
+    auto& g = Globals::instance();
+    
+    // PUT X ON/IN GROUND -> DROP X
+    if ((g.prsa == V_PUT || g.prsa == V_PUT_ON) && g.prsi && 
+        g.prsi->getId() == ObjectIds::GROUND) {
+        // Redirect to DROP
+        g.prsa = V_DROP;
+        g.prsi = nullptr;
+        return Verbs::vDrop();
+    }
+    
+    if (g.prsa == V_DIG) {
+        printLine("The ground is too hard for digging here.");
+        return RTRUE;
+    }
+    
+    if (g.prsa == V_EXAMINE) {
+        printLine("There's nothing special about the ground.");
+        return RTRUE;
+    }
+    
+    return RFALSE;
+}
+
 // Global flag to track if window has been opened (per ZIL KITCHEN-WINDOW-FLAG)
 static bool kitchenWindowOpened = false;
 

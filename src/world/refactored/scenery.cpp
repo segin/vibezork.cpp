@@ -61,6 +61,14 @@ void initializeScenery() {
     });
 
     
+    // WINDOW - Generic window
+    createObject({
+        .id = WINDOW,
+        .desc = "window",
+        .synonyms = {"window", "windows"},
+        .flags = {ObjectFlag::TRYTAKEBIT, ObjectFlag::NDESCBIT}
+    });
+    
     // BOARDED_WINDOW - Boarded window on house
     createObject({
         .id = BOARDED_WINDOW,

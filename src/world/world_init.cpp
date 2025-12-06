@@ -27,6 +27,8 @@ bool bottleAction();
 bool whiteHouseAction();
 bool boardAction();
 bool forestAction();
+bool rugAction();
+bool groundAction();
 bool kitchenWindowAction();
 bool swordAction();
 bool lampAction();
@@ -2466,6 +2468,18 @@ void initializeWorld() {
     
     g.registerObject(OBJ_KITCHEN_WINDOW, std::move(kitchenWindow));
     
+    // Create Ground global object (ZIL: GROUND in GLOBAL-OBJECTS)
+    // Handles PUT X ON GROUND -> DROP X
+    auto ground = std::make_unique<ZObject>(ObjectIds::GROUND, "ground");
+    ground->addSynonym("ground");
+    ground->addSynonym("floor");
+    ground->addSynonym("dirt");
+    ground->addSynonym("sand");
+    ground->setFlag(ObjectFlag::NDESCBIT);
+    ground->setFlag(ObjectFlag::INVISIBLE);
+    ground->setAction(groundAction);
+    g.registerObject(ObjectIds::GROUND, std::move(ground));
+    
     // Create Adventurer object (Task 24.1: Initialize player state)
     auto adventurer = std::make_unique<ZObject>(OBJ_ADVENTURER, "adventurer");
     adventurer->addSynonym("adventurer");
@@ -3242,6 +3256,7 @@ void initializeWorld() {
     rug->addAdjective("large");
     rug->setFlag(ObjectFlag::TRYTAKEBIT);
     rug->setFlag(ObjectFlag::NDESCBIT);
+    rug->setAction(rugAction);
     rug->moveTo(g.getObject(RoomIds::LIVING_ROOM));
     g.registerObject(ObjectIds::RUG, std::move(rug));
     

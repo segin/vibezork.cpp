@@ -132,6 +132,7 @@ constexpr ObjectId PRAYER = 537;
 constexpr ObjectId CLIMBABLE_CLIFF = 538;
 constexpr ObjectId WHITE_CLIFF = 539;
 constexpr ObjectId CONTROL_PANEL = 540;
+constexpr ObjectId GROUND = 541;      // Global ground object (for PUT X ON GROUND)
 
 // ============================================================================
 // SPECIAL PUZZLE OBJECTS (600-649)

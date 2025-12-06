@@ -41,6 +41,9 @@ public:
     int lampBattery = 330;             // Lamp battery life in turns (starts at 330)
     bool lampWarned = false;           // Has low battery warning been shown?
     
+    // Puzzle state flags
+    bool rugMoved = false;             // Has the rug been moved to reveal trap door?
+    
     // Display modes
     bool verboseMode = true;           // Full descriptions
     bool briefMode = false;            // Short descriptions for visited rooms

@@ -56,6 +56,75 @@ void Parser::initializeVerbsAndDirections() {
     verbSynonyms_["xyzzy"] = V_PLUGH;
     verbSynonyms_["frobozz"] = V_FROBOZZ;
     
+    // Manipulation verbs
+    verbSynonyms_["move"] = V_MOVE;
+    verbSynonyms_["push"] = V_PUSH;
+    verbSynonyms_["press"] = V_PUSH;
+    verbSynonyms_["pull"] = V_PULL;
+    verbSynonyms_["tug"] = V_PULL;
+    verbSynonyms_["yank"] = V_PULL;
+    verbSynonyms_["turn"] = V_TURN;
+    verbSynonyms_["rotate"] = V_TURN;
+    verbSynonyms_["twist"] = V_TURN;
+    
+    // Movement verbs
+    verbSynonyms_["enter"] = V_ENTER;
+    verbSynonyms_["exit"] = V_EXIT;
+    verbSynonyms_["leave"] = V_EXIT;
+    verbSynonyms_["climb"] = V_CLIMB_UP;
+    verbSynonyms_["board"] = V_BOARD;
+    verbSynonyms_["disembark"] = V_DISEMBARK;
+    
+    // Interaction verbs
+    verbSynonyms_["tie"] = V_TIE;
+    verbSynonyms_["fasten"] = V_TIE;
+    verbSynonyms_["untie"] = V_UNTIE;
+    verbSynonyms_["unfasten"] = V_UNTIE;
+    verbSynonyms_["listen"] = V_LISTEN;
+    verbSynonyms_["smell"] = V_SMELL;
+    verbSynonyms_["sniff"] = V_SMELL;
+    verbSynonyms_["touch"] = V_TOUCH;
+    verbSynonyms_["feel"] = V_RUB;
+    verbSynonyms_["rub"] = V_RUB;
+    verbSynonyms_["yell"] = V_YELL;
+    verbSynonyms_["shout"] = V_YELL;
+    verbSynonyms_["scream"] = V_YELL;
+    
+    // Consumption verbs
+    verbSynonyms_["eat"] = V_EAT;
+    verbSynonyms_["consume"] = V_EAT;
+    verbSynonyms_["drink"] = V_DRINK;
+    
+    // Light verbs
+    verbSynonyms_["light"] = V_LAMP_ON;
+    verbSynonyms_["extinguish"] = V_LAMP_OFF;
+    verbSynonyms_["douse"] = V_LAMP_OFF;
+    
+    // Special action verbs
+    verbSynonyms_["inflate"] = V_INFLATE;
+    verbSynonyms_["deflate"] = V_DEFLATE;
+    verbSynonyms_["pray"] = V_PRAY;
+    verbSynonyms_["wave"] = V_WAVE;
+    verbSynonyms_["ring"] = V_RING;
+    verbSynonyms_["dig"] = V_DIG;
+    verbSynonyms_["burn"] = V_BURN;
+    verbSynonyms_["fill"] = V_FILL;
+    
+    // Combat verbs
+    verbSynonyms_["throw"] = V_THROW;
+    verbSynonyms_["hurl"] = V_THROW;
+    verbSynonyms_["toss"] = V_THROW;
+    verbSynonyms_["swing"] = V_SWING;
+    
+    // Communication verbs
+    verbSynonyms_["talk"] = V_TALK;
+    verbSynonyms_["speak"] = V_TALK;
+    verbSynonyms_["say"] = V_TALK;
+    verbSynonyms_["ask"] = V_ASK;
+    verbSynonyms_["tell"] = V_TELL;
+    verbSynonyms_["odysseus"] = V_ODYSSEUS;
+    verbSynonyms_["ulysses"] = V_ODYSSEUS;
+    
     // Additional common verbs
     verbSynonyms_["wait"] = V_WAIT;
     verbSynonyms_["z"] = V_WAIT;
@@ -208,6 +277,12 @@ bool Parser::isObjectVisible(ZObject* obj) const {
                        g.here->getId() == RoomIds::KITCHEN)) {
             return true;
         }
+    }
+    
+    // Global objects are always visible (GROUND, GRUE, etc.)
+    // These are objects that exist everywhere conceptually
+    if (obj->getId() == ObjectIds::GROUND) {
+        return true;
     }
     
     // Objects with priority > 0 are visible
