@@ -1,6 +1,6 @@
-# PsyMP3 Agent Directives
+# vibezork.cpp Agent Directives
 
-This file provides guidance for AI agents working on the PsyMP3 codebase.
+This file provides guidance for AI agents working on the vibezork.cpp codebase.
 
 ## Steering Documents
 
@@ -13,9 +13,8 @@ These steering documents are the authoritative source for project conventions an
 
 ## Quick Reference
 
-- **Build**: `make -j8`
-- **Test**: `make check`
-- **Reconfigure**: `autoreconf -fi && ./configure [options]`
+- **Build**: `cmake --build build -j$(nproc)`
+- **Test**: `ctest --test-dir build`
 
 ## Additional Notes
 
