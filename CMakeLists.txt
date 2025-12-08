@@ -124,8 +124,9 @@ if(BUILD_TESTS)
     add_executable(complex_syntax_tests tests/complex_syntax_tests.cpp ${LIB_SOURCES})
     add_test(NAME ComplexSyntaxTests COMMAND complex_syntax_tests)
 
-
-    
+    # Game Command Tests
+    add_executable(game_command_tests tests/game_command_tests.cpp ${LIB_SOURCES})
+    add_test(NAME GameCommandTests COMMAND game_command_tests)
     
     # Integration tests
     add_executable(integration_tests tests/integration_tests.cpp ${LIB_SOURCES})
