@@ -36,6 +36,8 @@ constexpr VerbId V_RESTORE = 8;
 constexpr VerbId V_SAVE = 9;
 constexpr VerbId V_SCORE = 10;
 constexpr VerbId V_VERSION = 11;
+constexpr VerbId V_SCRIPT = 12;
+constexpr VerbId V_UNSCRIPT = 13;
 
 // Real verbs - manipulation
 constexpr VerbId V_TAKE = 20;
@@ -202,6 +204,8 @@ namespace Verbs {
     bool vRestore();
     bool vRestart();
     bool vVersion();
+    bool vScript();
+    bool vUnscript();
     
     // Communication verbs
     bool vTalk();

@@ -48,6 +48,7 @@ public:
     bool verboseMode = true;           // Full descriptions
     bool briefMode = false;            // Short descriptions for visited rooms
     bool superbriefMode = false;       // Minimal descriptions
+    bool scripting = false;            // Transcript output enabled
     
     // Parser state
     bool pCont = false;

@@ -48,4 +48,5 @@ void Globals::reset() {
     verboseMode = true;
     briefMode = false;
     superbriefMode = false;
+    scripting = false;
 }

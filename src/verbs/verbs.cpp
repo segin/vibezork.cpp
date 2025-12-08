@@ -2289,6 +2289,28 @@ bool vVersion() {
     return RTRUE;
 }
 
+bool vScript() {
+    auto& g = Globals::instance();
+    if (g.scripting) {
+        printLine("Scripting is already on.");
+        return RTRUE;
+    }
+    g.scripting = true;
+    printLine("Scripting initiated.");
+    return RTRUE;
+}
+
+bool vUnscript() {
+    auto& g = Globals::instance();
+    if (!g.scripting) {
+        printLine("Scripting is already off.");
+        return RTRUE;
+    }
+    g.scripting = false;
+    printLine("Scripting ended.");
+    return RTRUE;
+}
+
 // Communication Verbs
 
 bool vTalk() {

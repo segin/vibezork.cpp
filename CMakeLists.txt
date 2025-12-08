@@ -111,6 +111,11 @@ if(BUILD_TESTS)
     # Inventory tests
     add_executable(inventory_tests tests/inventory_tests.cpp ${LIB_SOURCES})
     add_test(NAME InventoryTests COMMAND inventory_tests)
+
+    # Meta-game additional tests
+    add_executable(meta_game_additional_tests tests/meta_game_additional_tests.cpp ${LIB_SOURCES})
+    add_test(NAME MetaGameAdditionalTests COMMAND meta_game_additional_tests)
+    
     
     # Integration tests
     add_executable(integration_tests tests/integration_tests.cpp ${LIB_SOURCES})
