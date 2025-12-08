@@ -120,6 +120,11 @@ if(BUILD_TESTS)
     add_executable(synonym_tests tests/synonym_tests.cpp ${LIB_SOURCES})
     add_test(NAME SynonymTests COMMAND synonym_tests)
 
+    # Complex syntax tests
+    add_executable(complex_syntax_tests tests/complex_syntax_tests.cpp ${LIB_SOURCES})
+    add_test(NAME ComplexSyntaxTests COMMAND complex_syntax_tests)
+
+
     
     
     # Integration tests
