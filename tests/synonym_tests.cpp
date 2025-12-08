@@ -223,10 +223,21 @@ TEST(RegistrySynonyms) {
     check(V_FILL, {"fill"});
 
     // Communication
-    check(V_TALK, {"talk", "speak", "say"});
+    check(V_TALK, {"talk", "speak"});
     check(V_ASK, {"ask"});
     check(V_TELL, {"tell"});
+    check(V_TELL, {"tell"});
     check(V_ODYSSEUS, {"odysseus", "ulysses"});
+
+    // ZIL Audit High Priority
+    check(V_MUNG, {"destroy", "damage", "break", "block", "smash"});
+    check(V_WEAR, {"wear"});
+    check(V_FIND, {"find", "where", "seek"});
+    check(V_LEAP, {"leap", "dive"});
+    check(V_SAY, {"say"});
+    check(V_KICK, {"kick"});
+    check(V_BREATHE, {"breathe"});
+    check(V_RAPE, {"rape", "molest"});
 
     // Easter Eggs / Misc
     check(V_WAIT, {"wait"}); // zswait

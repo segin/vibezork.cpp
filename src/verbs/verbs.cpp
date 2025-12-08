@@ -2561,4 +2561,46 @@ bool vCurse() {
     return RTRUE;
 }
 
+// New ZIL Audit Verbs implementation
+bool vMung() {
+    printLine("Trying to destroy things is a waste of time.");
+    return RTRUE;
+}
+
+bool vWear() {
+    printLine("You can't wear that!");
+    return RTRUE;
+}
+
+bool vFind() {
+    print("You can't see any ");
+    if (Globals::instance().prso) print(Globals::instance().prso->getDesc());
+    printLine(" here.");
+    return RTRUE;
+}
+
+bool vLeap() {
+    return vJump(); // Share logic with JUMP
+}
+
+bool vSay() {
+    printLine("Talking to yourself is a sign of impending mental collapse.");
+    return RTRUE;
+}
+
+bool vKick() {
+    printLine("Violence isn't the answer to this one.");
+    return RTRUE;
+}
+
+bool vBreathe() {
+    printLine("How can you breathe that?");
+    return RTRUE;
+}
+
+bool vRape() {
+    printLine("What a loony!");
+    return RTRUE;
+}
+
 } // namespace Verbs

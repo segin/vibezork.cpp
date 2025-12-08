@@ -122,11 +122,22 @@ constexpr VerbId V_PLUGH = 132;  // Also XYZZY - Adventure reference
 constexpr VerbId V_FROBOZZ = 133;
 
 // Additional common verbs
+// Additional common verbs
 constexpr VerbId V_WAIT = 140;
 constexpr VerbId V_SWIM = 141;
 constexpr VerbId V_BACK = 142;
 constexpr VerbId V_JUMP = 143;
-constexpr VerbId V_CURSE = 144;
+constexpr VerbId V_CURSE = 144; // Should be V_CURSES in ZIL, used as CURSE here
+
+// New ZIL Audit Verbs
+constexpr VerbId V_MUNG = 150;      // Destroy/Damage
+constexpr VerbId V_WEAR = 151;      // Wear/Put on
+constexpr VerbId V_FIND = 152;      // Find/Where
+constexpr VerbId V_LEAP = 153;      // Jump/Leap
+constexpr VerbId V_SAY = 154;       // Say/Talk
+constexpr VerbId V_KICK = 155;      // Kick
+constexpr VerbId V_BREATHE = 156;   // Blow in
+constexpr VerbId V_RAPE = 157;      // Refusal
 
 // Verb handlers
 namespace Verbs {
@@ -145,6 +156,15 @@ namespace Verbs {
     bool vClose();
     bool vLock();
     bool vUnlock();
+    // New handlers
+    bool vMung();
+    bool vWear();
+    bool vFind();
+    bool vLeap();
+    bool vSay();
+    bool vKick();
+    bool vBreathe();
+    bool vRape();
     bool vWalk();
     bool vWalkDir(Direction dir);
     

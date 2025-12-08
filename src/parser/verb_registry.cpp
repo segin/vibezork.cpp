@@ -42,6 +42,19 @@ void VerbRegistry::initializeVerbSynonyms() {
     registerVerb(V_SEARCH, {"search"});
     
     // Container operations
+    registerVerb(V_JUMP, {"jump"});
+    registerVerb(V_CURSE, {"curse", "damn"});
+    
+    // ZIL Audit Verbs
+    registerVerb(V_MUNG, {"destroy", "damage", "break", "block", "smash"});
+    registerVerb(V_WEAR, {"wear"});
+    registerVerb(V_FIND, {"find", "where", "seek"});
+    registerVerb(V_LEAP, {"leap", "dive"});
+    registerVerb(V_SAY, {"say"});
+    registerVerb(V_KICK, {"kick"});
+    // V_BREATHE is usually "blow in", handled by syntax. Register "breathe" as synonym just in case.
+    registerVerb(V_BREATHE, {"breathe"});
+    registerVerb(V_RAPE, {"rape", "molest"});
     registerVerb(V_OPEN, {"open"});
     registerVerb(V_CLOSE, {"close"});
     registerVerb(V_LOCK, {"lock"});
@@ -114,8 +127,18 @@ void VerbRegistry::initializeVerbSynonyms() {
     registerVerb(V_WAIT, {"wait", "z"});
     registerVerb(V_SWIM, {"swim"});
     registerVerb(V_BACK, {"back"});
-    registerVerb(V_JUMP, {"jump", "leap", "skip", "hop"});
-    registerVerb(V_CURSE, {"curse", "shit", "fuck", "damn"});
+    registerVerb(V_JUMP, {"jump"});
+    registerVerb(V_CURSE, {"curse", "damn", "shit", "fuck"}); // Combined
+    
+    // ZIL Audit Verbs
+    registerVerb(V_MUNG, {"destroy", "damage", "break", "block", "smash"});
+    registerVerb(V_WEAR, {"wear"});
+    registerVerb(V_FIND, {"find", "where", "seek"});
+    registerVerb(V_LEAP, {"leap", "dive", "skip", "hop"}); // Moved skip/hop here
+    registerVerb(V_SAY, {"say"});
+    registerVerb(V_KICK, {"kick"});
+    registerVerb(V_BREATHE, {"breathe"});
+    registerVerb(V_RAPE, {"rape", "molest"});
 }
 
 void VerbRegistry::registerVerb(VerbId verbId, std::vector<std::string> synonyms) {
@@ -764,5 +787,52 @@ void VerbRegistry::initializeSyntaxPatterns() {
         Elem prep(ET::PREPOSITION, {"at"});
         Elem obj2(ET::OBJECT, ObjectFlag::ACTORBIT);
         registerSyntax(V_SWING, SyntaxPattern(V_SWING, {Elem(ET::VERB), obj1, prep, obj2}));
+    }
+
+    // ZIL Audit Syntax Patterns
+    
+    // DESTROY / MUNG
+    {
+        Elem objElem(ET::OBJECT);
+        registerSyntax(V_MUNG, SyntaxPattern(V_MUNG, {Elem(ET::VERB), objElem}));
+    }
+    
+    // WEAR
+    {
+        Elem objElem(ET::OBJECT);
+        registerSyntax(V_WEAR, SyntaxPattern(V_WEAR, {Elem(ET::VERB), objElem}));
+    }
+    
+    // FIND
+    {
+        Elem objElem(ET::OBJECT);
+        registerSyntax(V_FIND, SyntaxPattern(V_FIND, {Elem(ET::VERB), objElem}));
+    }
+    
+    // LEAP (no object)
+    registerSyntax(V_LEAP, SyntaxPattern(V_LEAP, {Elem(ET::VERB)}));
+    
+    // SAY (no object - special handling usually, assumes text follows? Parser handles quotes separately?)
+    // For now, SAY -> V_SAY
+    registerSyntax(V_SAY, SyntaxPattern(V_SAY, {Elem(ET::VERB)}));
+    
+    // KICK
+    {
+        Elem objElem(ET::OBJECT);
+        registerSyntax(V_KICK, SyntaxPattern(V_KICK, {Elem(ET::VERB), objElem}));
+    }
+    
+    // BREATHE / BLOW IN
+    {
+        Elem blow(ET::VERB); // blow
+        Elem in(ET::PREPOSITION, {"in"});
+        Elem obj(ET::OBJECT);
+        registerSyntax(V_BREATHE, SyntaxPattern(V_BREATHE, {blow, in, obj}));
+    }
+    
+    // RAPE
+    {
+        Elem objElem(ET::OBJECT, ObjectFlag::ACTORBIT);
+        registerSyntax(V_RAPE, SyntaxPattern(V_RAPE, {Elem(ET::VERB), objElem}));
     }
 }
