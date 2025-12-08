@@ -140,6 +140,7 @@ namespace Verbs {
     bool vRead();
     bool vLookInside();
     bool vSearch();
+    bool vGive();
     bool vOpen();
     bool vClose();
     bool vLock();

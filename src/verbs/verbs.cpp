@@ -714,7 +714,7 @@ bool trySpecialMovement(int verbId, Direction dir) {
     if (newRoom) {
         g.here = newRoom;
         g.winner->moveTo(newRoom);
-        Verbs::vLook();
+
     }
     
     return true;
@@ -1408,20 +1408,60 @@ bool vTouch() {
     
     // Check if object is specified
     if (!g.prso) {
-        printLine("What do you want to touch?");
-        getGlobalParser().setOrphanDirect(V_TOUCH, "touch");
-        return RTRUE;
+         printLine("Touch what?");
+         return RTRUE;
     }
     
-    // Call object action handler first
+    // Call object action handler
     if (g.prso->performAction()) {
         return RTRUE;
     }
     
-    // Default: You feel nothing unusual
-    printLine("You feel nothing unusual.");
+    // ZIL default
+    if (g.prso->hasFlag(ObjectFlag::ACTORBIT)) {
+         print("The ");
+         print(g.prso->getDesc());
+         printLine(" dislikes being touched.");
+         return RTRUE;
+    }
+    
+    print("You feel nothing unexpected as you touch the ");
+    print(g.prso->getDesc());
+    printLine(".");
     return RTRUE;
 }
+
+bool vGive() {
+    auto& g = Globals::instance();
+    
+    // Check if player has the object being given
+    if (g.prso->getLocation() != g.winner) {
+        printLine("You're not holding that!");
+        return RTRUE;
+    }
+    
+    // Check if recipient is valid (PRSI is set via syntax `GIVE OBJ TO OBJ`)
+    if (!g.prsi) {
+        printLine("Give it to whom?");
+        return RTRUE;
+    }
+    
+    // Interact with recipient (PRSI) via M-GIVE action
+    // In Zork, giving to an actor triggers their action handler with M-GIVE logic
+    // We simulate this by calling performAction() on PRSI.
+    // The action handler (e.g., Troll, Cyclops) checks for M-GIVE.
+    // If PRSI performs action, it handled the gift (accepted/refused).
+    if (g.prsi->performAction()) {
+        return RTRUE;
+    }
+    
+    // Default if recipient doesn't handle M-GIVE
+    print("The ");
+    print(g.prsi->getDesc());
+    printLine(" refuses it politely.");
+    return RTRUE;
+}
+
 
 // Consumption Verbs (Requirement 28)
 
@@ -1458,7 +1498,7 @@ bool vEat() {
     // Not food - check if drinkable
     if (g.prso->hasFlag(ObjectFlag::DRINKBIT)) {
         // Redirect to drink
-        return vDrink();
+        return Verbs::vDrink();
     }
     
     // Neither food nor drink
@@ -2244,7 +2284,7 @@ bool vRestore() {
     printLine("Game restored.");
     
     // Show current location
-    vLook();
+    Verbs::vLook();
     
     return RTRUE;
 }
@@ -2291,7 +2331,7 @@ bool vRestart() {
     crlf();
     
     // Show starting location
-    vLook();
+    Verbs::vLook();
     
     return RTRUE;
 }
