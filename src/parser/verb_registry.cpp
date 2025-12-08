@@ -139,6 +139,13 @@ void VerbRegistry::initializeVerbSynonyms() {
     registerVerb(V_KICK, {"kick"});
     registerVerb(V_BREATHE, {"breathe"});
     registerVerb(V_RAPE, {"rape", "molest"});
+    
+    // Movement Batch
+    registerVerb(V_STAND, {"stand"});
+    registerVerb(V_ALARM, {"wake", "awake", "surprise", "startle"});
+    registerVerb(V_LAUNCH, {"launch"});
+    // V_WALK_AROUND and V_WALK_TO are handled by syntax under V_WALK ("walk")
+    // See initializeSyntaxPatterns mappings
 }
 
 void VerbRegistry::registerVerb(VerbId verbId, std::vector<std::string> synonyms) {
@@ -834,5 +841,74 @@ void VerbRegistry::initializeSyntaxPatterns() {
     {
         Elem objElem(ET::OBJECT, ObjectFlag::ACTORBIT);
         registerSyntax(V_RAPE, SyntaxPattern(V_RAPE, {Elem(ET::VERB), objElem}));
+    }
+
+    // Movement Batch Syntaxes
+    
+    // CLIMB OBJECT -> V_CLIMB_FOO
+    {
+        Elem objElem(ET::OBJECT, ObjectFlag::CLIMBBIT);
+        registerSyntax(V_CLIMB_UP, SyntaxPattern(V_CLIMB_FOO, {Elem(ET::VERB), objElem}));
+        registerSyntax(V_CLIMB_DOWN, SyntaxPattern(V_CLIMB_FOO, {Elem(ET::VERB), objElem})); // Map synonyms
+        registerSyntax(V_CLIMB_ON, SyntaxPattern(V_CLIMB_FOO, {Elem(ET::VERB), objElem}));   // Map synonyms
+    }
+    
+    // CLIMB WITH/THROUGH -> V_THROUGH
+    {
+        Elem prep(ET::PREPOSITION, {"with", "through", "thru"});
+        Elem objElem(ET::OBJECT);
+        registerSyntax(V_CLIMB_UP, SyntaxPattern(V_THROUGH, {Elem(ET::VERB), prep, objElem}));
+    }
+    
+    // ENTER OBJECT -> V_THROUGH
+    {
+        Elem objElem(ET::OBJECT);
+        registerSyntax(V_ENTER, SyntaxPattern(V_THROUGH, {Elem(ET::VERB), objElem}));
+    }
+    
+    // STAND [UP] / STAND ON OBJECT (V-STAND not ideal for ON, but ZIL says STAND UP OBJ = V-STAND)
+    // ZIL: STAND = V-STAND. STAND UP OBJ = V-STAND.
+    registerSyntax(V_STAND, SyntaxPattern(V_STAND, {Elem(ET::VERB)}));
+    {
+        Elem prep(ET::PREPOSITION, {"up"});
+        Elem objElem(ET::OBJECT); // FIND RMUNGBIT in ZIL?
+        registerSyntax(V_STAND, SyntaxPattern(V_STAND, {Elem(ET::VERB), prep, objElem}));
+        registerSyntax(V_STAND, SyntaxPattern(V_STAND, {Elem(ET::VERB), prep})); // STAND UP
+    }
+    
+    // ALARM / WAKE
+    {
+        Elem objElem(ET::OBJECT, ObjectFlag::ACTORBIT);
+        registerSyntax(V_ALARM, SyntaxPattern(V_ALARM, {Elem(ET::VERB), objElem}));
+        
+        Elem prep(ET::PREPOSITION, {"up"});
+        registerSyntax(V_ALARM, SyntaxPattern(V_ALARM, {Elem(ET::VERB), prep, objElem})); // WAKE UP OBJ
+    }
+    
+    // WALK AROUND
+    {
+        Elem prep(ET::PREPOSITION, {"around"});
+        Elem objElem(ET::OBJECT);
+        registerSyntax(V_WALK, SyntaxPattern(V_WALK_AROUND, {Elem(ET::VERB), prep, objElem}));
+    }
+    
+    // WALK TO
+    {
+        Elem prep(ET::PREPOSITION, {"to"});
+        Elem objElem(ET::OBJECT);
+        registerSyntax(V_WALK, SyntaxPattern(V_WALK_TO, {Elem(ET::VERB), prep, objElem}));
+    }
+    
+    // WALK THROUGH/WITH/ON -> V_THROUGH
+    {
+        Elem prep(ET::PREPOSITION, {"through", "thru", "with", "in", "on"}); // ZIL: WALK IN/WITH/ON = V-THROUGH
+        Elem objElem(ET::OBJECT);
+        registerSyntax(V_WALK, SyntaxPattern(V_THROUGH, {Elem(ET::VERB), prep, objElem}));
+    }
+    
+    // LAUNCH
+    {
+        Elem objElem(ET::OBJECT, ObjectFlag::VEHBIT);
+        registerSyntax(V_LAUNCH, SyntaxPattern(V_LAUNCH, {Elem(ET::VERB), objElem}));
     }
 }

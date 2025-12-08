@@ -238,6 +238,11 @@ TEST(RegistrySynonyms) {
     check(V_KICK, {"kick"});
     check(V_BREATHE, {"breathe"});
     check(V_RAPE, {"rape", "molest"});
+    
+    // Movement Batch Verification
+    check(V_STAND, {"stand"});
+    check(V_ALARM, {"wake", "awake", "surprise", "startle"});
+    check(V_LAUNCH, {"launch"});
 
     // Easter Eggs / Misc
     check(V_WAIT, {"wait"}); // zswait

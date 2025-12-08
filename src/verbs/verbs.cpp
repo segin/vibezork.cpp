@@ -2603,4 +2603,66 @@ bool vRape() {
     return RTRUE;
 }
 
+
+// Phase 10.3 Batch 1: Movement & Positioning
+
+bool vClimbFoo() {
+    auto& g = Globals::instance();
+    if (g.prso && g.prso->hasFlag(ObjectFlag::CLIMBBIT)) {
+        print("Climbing the ");
+        print(g.prso->getDesc());
+        printLine(" doesn't get you anywhere.");
+        return RTRUE;
+    }
+    printLine("You can't climb that.");
+    return RTRUE;
+}
+
+bool vThrough() {
+    auto& g = Globals::instance();
+    if (g.prso) {
+         if (g.prso->hasFlag(ObjectFlag::VEHBIT)) {
+             printLine("You should use 'BOARD' to enter a vehicle."); 
+             return RTRUE;
+         }
+         print("You hit your head against the ");
+         print(g.prso->getDesc());
+         printLine(" as you attempt this feat.");
+         return RTRUE;
+    }
+    return RTRUE;
+}
+
+bool vStand() {
+    printLine("You are already standing.");
+    return RTRUE;
+}
+
+bool vAlarm() {
+    print("The ");
+    if (Globals::instance().prso) print(Globals::instance().prso->getDesc());
+    printLine(" isn't sleeping.");
+    return RTRUE;
+}
+
+bool vWalkAround() {
+    printLine("Use compass directions for movement.");
+    return RTRUE;
+}
+
+bool vWalkTo() {
+    printLine("You should use a direction.");
+    return RTRUE;
+}
+
+bool vLaunch() {
+    auto& g = Globals::instance();
+    if (g.prso && g.prso->hasFlag(ObjectFlag::VEHBIT)) {
+        printLine("You can't launch that.");
+    } else {
+        printLine("That's not a vehicle!");
+    }
+    return RTRUE;
+}
+
 } // namespace Verbs

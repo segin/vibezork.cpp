@@ -139,6 +139,16 @@ constexpr VerbId V_KICK = 155;      // Kick
 constexpr VerbId V_BREATHE = 156;   // Blow in
 constexpr VerbId V_RAPE = 157;      // Refusal
 
+// Phase 10.3 Batch 1: Movement & Positioning
+constexpr VerbId V_CLIMB_FOO = 160;   // Climb Object
+constexpr VerbId V_THROUGH = 161;     // Enter/Through logic
+constexpr VerbId V_STAND = 162;       // Stand up
+constexpr VerbId V_ALARM = 163;       // Wake up
+constexpr VerbId V_WALK_AROUND = 164; // Walk around
+constexpr VerbId V_WALK_TO = 165;     // Walk to
+constexpr VerbId V_LAUNCH = 166;      // Launch (vehicle)
+constexpr VerbId V_LAND = 167;        // Land (vehicle - if needed, or Disembark aliases)
+
 // Verb handlers
 namespace Verbs {
     bool vLook();
@@ -165,6 +175,14 @@ namespace Verbs {
     bool vKick();
     bool vBreathe();
     bool vRape();
+    // Batch 1: Movement
+    bool vClimbFoo();
+    bool vThrough();
+    bool vStand();
+    bool vAlarm();
+    bool vWalkAround();
+    bool vWalkTo();
+    bool vLaunch();
     bool vWalk();
     bool vWalkDir(Direction dir);
     
