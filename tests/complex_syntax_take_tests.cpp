@@ -130,6 +130,50 @@ TEST(TakeFromWrongSourceFailure) {
     ASSERT_EQ(ballPtr->getLocation(), g.here); // Should remain in room
 }
 
+TEST(TakeFromClosedTransparentFailure) {
+    auto& g = Globals::instance();
+    g.reset();
+    
+    // Create Player
+    auto player = std::make_unique<ZObject>(1, "player");
+    player->setFlag(ObjectFlag::ACTORBIT);
+    g.winner = player.get();
+    g.player = player.get();
+    g.registerObject(1, std::move(player));
+    
+    auto room = std::make_unique<ZRoom>(100, "Test Room", "Desc");
+    g.here = room.get();
+    g.registerObject(100, std::move(room));
+    
+    // Create Glass Box (Transparent, Closed)
+    auto glassBox = std::make_unique<ZObject>(300, "glass_box");
+    glassBox->setFlag(ObjectFlag::CONTBIT);
+    // OPENBIT NOT set
+    glassBox->setFlag(ObjectFlag::TRANSBIT);
+    glassBox->moveTo(g.here);
+    ZObject* boxPtr = glassBox.get();
+    g.registerObject(300, std::move(glassBox));
+    
+    // Create Diamond inside Box
+    auto diamond = std::make_unique<ZObject>(301, "diamond");
+    diamond->setFlag(ObjectFlag::TAKEBIT);
+    diamond->moveTo(boxPtr);
+    ZObject* diamondPtr = diamond.get();
+    g.registerObject(301, std::move(diamond));
+    
+    // "take diamond from glass_box"
+    g.prso = diamondPtr;
+    g.prsi = boxPtr;
+    
+    startCapture();
+    Verbs::vTake();
+    std::string output = stopCapture();
+    
+    // Should FAIL because box is closed (even if transparent)
+    ASSERT_CONTAINS(output, "isn't open");
+    ASSERT_EQ(diamondPtr->getLocation(), boxPtr); // Should remain in box
+}
+
 int main() {
     std::cout << "Running Take Syntax Tests\n";
     auto results = TestFramework::instance().runAll();

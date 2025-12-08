@@ -211,9 +211,9 @@ bool vTake() {
         
         // Verify source is accessible (open container or surface)
         // If it's a closed opaque container, we shouldn't be able to take from it
+        // Note: TRANSBIT (transparent) allows looking inside, but NOT taking out if closed!
         if (!g.prsi->hasFlag(ObjectFlag::OPENBIT) && 
-            !g.prsi->hasFlag(ObjectFlag::SURFACEBIT) && 
-            !g.prsi->hasFlag(ObjectFlag::TRANSBIT)) {
+            !g.prsi->hasFlag(ObjectFlag::SURFACEBIT)) {
              print("The ");
              print(g.prsi->getDesc());
              printLine(" isn't open.");
