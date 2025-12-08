@@ -2,8 +2,8 @@
 // Eliminates boilerplate and ensures objects are created correctly from the start
 #pragma once
 
-#include "../objects.h"
-#include "../rooms.h"
+#include "objects.h"
+#include "rooms.h"
 #include "core/object.h"
 #include "core/globals.h"
 #include <memory>

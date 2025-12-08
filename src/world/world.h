@@ -5,8 +5,5 @@
 // Initialize all rooms and objects
 void initializeWorld();
 
-// Initialize missing objects (called after initializeWorld)
-void initializeMissingObjects();
-
-// Object action handlers (declared here for use in missing_objects.cpp)
+// Object action handlers
 bool kitchenWindowAction();

@@ -2,6 +2,7 @@
 #include "world.h"
 #include "objects.h"
 #include "rooms.h"
+#include "world_objects.h"
 #include "core/globals.h"
 #include "core/io.h"
 #include "verbs/verbs.h"
@@ -3405,5 +3406,5 @@ void initializeWorld() {
     g.moves = 0;
     
     // Initialize additional objects from missing_objects.cpp
-    initializeMissingObjects();
+    // (No longer needed - all objects now in refactored initialization)
 }

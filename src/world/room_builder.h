@@ -2,7 +2,7 @@
 // Eliminates boilerplate and ensures rooms are created correctly from the start
 #pragma once
 
-#include "../rooms.h"
+#include "rooms.h"
 #include "core/globals.h"
 #include <memory>
 #include <string>
@@ -74,6 +74,6 @@ inline ZRoom* createRoom(const RoomDef& def) {
     }
     
     ZRoom* ptr = room.get();
-    g.registerRoom(def.id, std::move(room));
+    g.registerObject(def.id, std::move(room));
     return ptr;
 }

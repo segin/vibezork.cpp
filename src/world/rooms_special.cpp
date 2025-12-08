@@ -2,7 +2,7 @@
 // Values sourced directly from ZIL 1dungeon.zil
 
 #include "room_builder.h"
-#include "systems/npc_system.h"
+#include "systems/npc.h"
 
 void initializeSpecialRooms() {
     using namespace RoomIds;

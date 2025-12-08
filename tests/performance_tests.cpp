@@ -98,7 +98,6 @@ void initializeForPerformanceTest() {
     auto& g = Globals::instance();
     g.reset();
     initializeWorld();
-    initializeMissingObjects();
     NPCSystem::initializeThief();
     NPCSystem::initializeTroll();
     NPCSystem::initializeCyclops();

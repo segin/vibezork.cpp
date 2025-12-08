@@ -59,7 +59,7 @@ void initializeTreasures() {
         .capacity = 35,
         .value = 10,
         .tvalue = 15,
-        .location = RoomIds::EGYPTIAN_ROOM
+        .location = RoomIds::EGYPT_ROOM
     });
 
     

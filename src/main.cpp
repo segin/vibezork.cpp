@@ -189,7 +189,6 @@ void mainLoop() {
 
 void initializeGame() {
     initializeWorld();
-    initializeMissingObjects();  // Add missing objects from ZIL
     NPCSystem::initializeThief();
     NPCSystem::initializeTroll();
     NPCSystem::initializeCyclops();

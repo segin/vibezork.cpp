@@ -2,7 +2,6 @@
 // Values sourced directly from ZIL 1dungeon.zil
 
 #include "object_builder.h"
-#include "systems/npc_system.h"
 
 void initializeNPCs() {
     using namespace ObjectIds;
