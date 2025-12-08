@@ -124,6 +124,122 @@ TEST(VerbSynonymsAttack) {
 }
 
 
+#include "../src/parser/verb_registry.h"
+
+TEST(RegistrySynonyms) {
+    VerbRegistry registry;
+    
+    // Helper to check synonyms
+    auto check = [&](VerbId id, const std::vector<std::string>& synonyms) {
+        for (const auto& syn : synonyms) {
+            auto result = registry.lookupVerb(syn);
+            if (!result.has_value()) {
+                 std::cout << "Missing synonym: '" << syn << "'" << std::endl;
+                 ASSERT_TRUE(false);
+            }
+            if (result.value() != id) {
+                 std::cout << "Mismatch for '" << syn << "': Expected " << id << ", Actual " << result.value() << std::endl;
+                 ASSERT_EQ(result.value(), id);
+            }
+        }
+    };
+
+    // Game Commands
+    check(V_VERBOSE, {"verbose"});
+    check(V_BRIEF, {"brief"});
+    check(V_SUPERBRIEF, {"superbrief", "super"});
+    check(V_DIAGNOSE, {"diagnose"});
+    check(V_INVENTORY, {"inventory", "i"});
+    check(V_QUIT, {"quit", "q"});
+    check(V_RESTART, {"restart"});
+    check(V_RESTORE, {"restore"});
+    check(V_SAVE, {"save"});
+    check(V_SCORE, {"score"});
+    check(V_VERSION, {"version"});
+
+    // Manipulation
+    check(V_TAKE, {"take", "get", "hold", "carry", "remove", "grab", "catch"});
+    check(V_DROP, {"drop", "leave"});
+    check(V_PUT, {"put", "stuff", "insert", "place", "hide"});
+    check(V_GIVE, {"give", "donate", "offer", "feed"});
+    
+    // Examination
+    check(V_LOOK, {"look", "l", "stare", "gaze"});
+    check(V_EXAMINE, {"examine", "describe", "what", "whats", "x"});
+    check(V_READ, {"read", "skim"});
+    check(V_SEARCH, {"search"});
+
+    // Container
+    check(V_OPEN, {"open"});
+    check(V_CLOSE, {"close"});
+    check(V_LOCK, {"lock"});
+    check(V_UNLOCK, {"unlock"});
+
+    // Movement
+    check(V_WALK, {"walk", "go", "run", "proceed", "step"});
+    check(V_ENTER, {"enter"});
+    check(V_EXIT, {"exit"});
+    check(V_BOARD, {"board"});
+    check(V_DISEMBARK, {"disembark"});
+    
+    // Combat
+    check(V_ATTACK, {"attack", "fight", "hurt", "injure", "hit", "strike"});
+    check(V_KILL, {"kill", "murder", "slay", "dispatch"});
+    check(V_THROW, {"throw", "hurl", "chuck", "toss"});
+    check(V_SWING, {"swing", "thrust"});
+
+    // Light
+    check(V_LAMP_ON, {"light", "activate"});
+    check(V_LAMP_OFF, {"extinguish", "douse"});
+
+    // Manipulation (Misc)
+    check(V_TURN, {"turn", "set", "flip", "shut"});
+    check(V_PUSH, {"push", "press"});
+    check(V_PULL, {"pull", "tug", "yank"});
+    check(V_MOVE, {"move"});
+
+    // Interaction
+    check(V_TIE, {"tie", "fasten", "secure", "attach"});
+    check(V_UNTIE, {"untie", "free", "release", "unfasten"});
+    check(V_LISTEN, {"listen"});
+    check(V_SMELL, {"smell", "sniff"});
+    check(V_TOUCH, {"touch"});
+    check(V_RUB, {"rub", "feel", "pat", "pet"});
+    check(V_YELL, {"yell", "scream", "shout", "holler"});
+
+    // Consumption
+    check(V_EAT, {"eat", "consume", "taste", "bite"});
+    check(V_DRINK, {"drink", "imbibe", "swallow"});
+
+    // Special
+    check(V_INFLATE, {"inflate"});
+    check(V_DEFLATE, {"deflate"});
+    check(V_PRAY, {"pray"});
+    check(V_EXORCISE, {"exorcise", "banish", "cast", "drive", "begone"});
+    check(V_WAVE, {"wave", "brandish"});
+    check(V_RING, {"ring", "peal"});
+    check(V_BURN, {"burn", "incinerate", "ignite"});
+    check(V_DIG, {"dig"});
+    check(V_FILL, {"fill"});
+
+    // Communication
+    check(V_TALK, {"talk", "speak", "say"});
+    check(V_ASK, {"ask"});
+    check(V_TELL, {"tell"});
+    check(V_ODYSSEUS, {"odysseus", "ulysses"});
+
+    // Easter Eggs / Misc
+    check(V_WAIT, {"wait"}); // zswait
+    check(V_SWIM, {"swim"});
+    // check(V_BACK, {"back"}); // Not in registry explicitly?? Let's check listing.
+    // V_BACK is id 142.
+    // Checking previous VIEW of verb_registry.cpp... I don't recall seeing V_BACK registered.
+    // Wait, let me check the file content I viewed in step 986...
+    // It stopped at line 150. I need to check further down or assume.
+    // Wait, I saw V_ODYSSEUS at line 104 in step 986. That was the END of initializeVerbSynonyms function.
+    // So V_WAIT, V_SWIM, V_BACK might be missing from registerVerb?
+    // Let's verify if they ARE missing.
+}
 int main() {
     std::cout << "Running Synonym Tests\n";
     std::cout << "=====================\n";

@@ -38,7 +38,7 @@ void VerbRegistry::initializeVerbSynonyms() {
     registerVerb(V_LOOK, {"look", "l", "stare", "gaze"});
     registerVerb(V_EXAMINE, {"examine", "describe", "what", "whats", "x"});
     registerVerb(V_READ, {"read", "skim"});
-    registerVerb(V_LOOK_INSIDE, {"look"});  // "look in/inside" handled by syntax
+    // registerVerb(V_LOOK_INSIDE, {"look"});  // "look in/inside" handled by syntax under V_LOOK
     registerVerb(V_SEARCH, {"search"});
     
     // Container operations
@@ -51,9 +51,11 @@ void VerbRegistry::initializeVerbSynonyms() {
     registerVerb(V_WALK, {"walk", "go", "run", "proceed", "step"});
     registerVerb(V_ENTER, {"enter"});
     registerVerb(V_EXIT, {"exit"});
-    registerVerb(V_CLIMB_UP, {"climb"});  // "climb up" handled by syntax
-    registerVerb(V_CLIMB_DOWN, {"climb"});  // "climb down" handled by syntax
-    registerVerb(V_CLIMB_ON, {"climb", "sit"});  // "climb on" handled by syntax
+    // registerVerb(V_CLIMB_UP, {"climb"});  // "climb up" handled by syntax
+    // registerVerb(V_CLIMB_DOWN, {"climb"});  // "climb down" handled by syntax
+    // registerVerb(V_CLIMB_ON, {"climb", "sit"});  // "climb on" handled by syntax
+    registerVerb(V_CLIMB_UP, {"climb"}); // Default climb -> V_CLIMB_UP
+    registerVerb(V_CLIMB_ON, {"sit"});   // Sit -> V_CLIMB_ON (or V_SIT if exists, but ZIL maps sit to climb-on)
     registerVerb(V_BOARD, {"board"});
     registerVerb(V_DISEMBARK, {"disembark"});
     
@@ -102,6 +104,18 @@ void VerbRegistry::initializeVerbSynonyms() {
     registerVerb(V_ASK, {"ask"});
     registerVerb(V_TELL, {"tell"});
     registerVerb(V_ODYSSEUS, {"odysseus", "ulysses"});  // Special verb for cyclops puzzle
+    
+    // Easter eggs / Misc / Additional common verbs
+    registerVerb(V_HELLO, {"hello", "hi"});
+    registerVerb(V_ZORK, {"zork"});
+    registerVerb(V_PLUGH, {"plugh", "xyzzy"});
+    registerVerb(V_FROBOZZ, {"frobozz"});
+    
+    registerVerb(V_WAIT, {"wait", "z"});
+    registerVerb(V_SWIM, {"swim"});
+    registerVerb(V_BACK, {"back"});
+    registerVerb(V_JUMP, {"jump", "leap", "skip", "hop"});
+    registerVerb(V_CURSE, {"curse", "shit", "fuck", "damn"});
 }
 
 void VerbRegistry::registerVerb(VerbId verbId, std::vector<std::string> synonyms) {
@@ -302,6 +316,7 @@ void VerbRegistry::initializeSyntaxPatterns() {
         Elem prep(ET::PREPOSITION, {"in", "inside"});
         Elem objElem(ET::OBJECT);
         registerSyntax(V_LOOK_INSIDE, SyntaxPattern(V_LOOK_INSIDE, {Elem(ET::VERB), prep, objElem}));
+        registerSyntax(V_LOOK, SyntaxPattern(V_LOOK_INSIDE, {Elem(ET::VERB), prep, objElem})); // Look In support
     }
     
     // READ verb patterns
@@ -408,6 +423,7 @@ void VerbRegistry::initializeSyntaxPatterns() {
         Elem prep(ET::PREPOSITION, {"on"});
         Elem objElem(ET::OBJECT, ObjectFlag::LIGHTBIT);
         registerSyntax(V_LAMP_ON, SyntaxPattern(V_LAMP_ON, {Elem(ET::VERB), prep, objElem}));
+        registerSyntax(V_TURN, SyntaxPattern(V_LAMP_ON, {Elem(ET::VERB), prep, objElem})); // Turn On support
     }
     
     // LAMP-OFF verb patterns
@@ -422,6 +438,7 @@ void VerbRegistry::initializeSyntaxPatterns() {
         Elem prep(ET::PREPOSITION, {"off"});
         Elem objElem(ET::OBJECT, ObjectFlag::ONBIT);
         registerSyntax(V_LAMP_OFF, SyntaxPattern(V_LAMP_OFF, {Elem(ET::VERB), prep, objElem}));
+        registerSyntax(V_TURN, SyntaxPattern(V_LAMP_OFF, {Elem(ET::VERB), prep, objElem})); // Turn Off support
     }
     
     // TURN verb patterns
@@ -673,6 +690,8 @@ void VerbRegistry::initializeSyntaxPatterns() {
         Elem goVerb(ET::VERB);  // matches "go"
         Elem inPrep(ET::PREPOSITION, {"in", "inside", "into"});
         registerSyntax(V_ENTER, SyntaxPattern(V_ENTER, {goVerb, inPrep}));
+        registerSyntax(V_WALK, SyntaxPattern(V_ENTER, {goVerb, inPrep})); // Go In support
+        registerSyntax(V_TAKE, SyntaxPattern(V_ENTER, {goVerb, inPrep})); // Get In support
     }
     
     // GO IN OBJECT -> ENTER OBJECT
@@ -681,6 +700,8 @@ void VerbRegistry::initializeSyntaxPatterns() {
         Elem inPrep(ET::PREPOSITION, {"in", "inside", "into"});
         Elem objElem(ET::OBJECT);
         registerSyntax(V_ENTER, SyntaxPattern(V_ENTER, {goVerb, inPrep, objElem}));
+        registerSyntax(V_WALK, SyntaxPattern(V_ENTER, {goVerb, inPrep, objElem})); // Go In Object support
+        registerSyntax(V_TAKE, SyntaxPattern(V_ENTER, {goVerb, inPrep, objElem})); // Get In Object support
     }
     
     // EXIT (no object)
@@ -691,6 +712,8 @@ void VerbRegistry::initializeSyntaxPatterns() {
         Elem goVerb(ET::VERB);  // matches "go"
         Elem outPrep(ET::PREPOSITION, {"out", "outside"});
         registerSyntax(V_EXIT, SyntaxPattern(V_EXIT, {goVerb, outPrep}));
+        registerSyntax(V_WALK, SyntaxPattern(V_EXIT, {goVerb, outPrep})); // Go Out support
+        registerSyntax(V_TAKE, SyntaxPattern(V_EXIT, {goVerb, outPrep})); // Get Out support
     }
     
     // CLIMB UP OBJECT
@@ -705,6 +728,7 @@ void VerbRegistry::initializeSyntaxPatterns() {
         Elem prep(ET::PREPOSITION, {"down"});
         Elem objElem(ET::OBJECT, ObjectFlag::CLIMBBIT);
         registerSyntax(V_CLIMB_DOWN, SyntaxPattern(V_CLIMB_DOWN, {Elem(ET::VERB), prep, objElem}));
+        registerSyntax(V_CLIMB_UP, SyntaxPattern(V_CLIMB_DOWN, {Elem(ET::VERB), prep, objElem})); // Climb Down support
     }
     
     // CLIMB ON OBJECT
@@ -712,6 +736,7 @@ void VerbRegistry::initializeSyntaxPatterns() {
         Elem prep(ET::PREPOSITION, {"on"});
         Elem objElem(ET::OBJECT);
         registerSyntax(V_CLIMB_ON, SyntaxPattern(V_CLIMB_ON, {Elem(ET::VERB), prep, objElem}));
+        registerSyntax(V_CLIMB_UP, SyntaxPattern(V_CLIMB_ON, {Elem(ET::VERB), prep, objElem})); // Climb On support
     }
     
     // BOARD OBJECT (FIND VEHBIT)
