@@ -135,6 +135,10 @@ if(BUILD_TESTS)
     # Complex Syntax Give Tests
     add_executable(complex_syntax_give_tests tests/complex_syntax_give_tests.cpp ${LIB_SOURCES})
     add_test(NAME ComplexSyntaxGiveTests COMMAND complex_syntax_give_tests)
+
+    # Complex Syntax Attack Tests
+    add_executable(complex_syntax_attack_tests tests/complex_syntax_attack_tests.cpp ${LIB_SOURCES})
+    add_test(NAME ComplexSyntaxAttackTests COMMAND complex_syntax_attack_tests)
     
     # Integration tests
     add_executable(integration_tests tests/integration_tests.cpp ${LIB_SOURCES})

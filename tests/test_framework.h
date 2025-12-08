@@ -62,6 +62,10 @@ private:
     if ((str).find(substr) == std::string::npos) \
         throw std::runtime_error("String does not contain: " + std::string(substr))
 
+#define ASSERT_NOT_CONTAINS(str, substr) \
+    if ((str).find(substr) != std::string::npos) \
+        throw std::runtime_error("String contains forbidden: " + std::string(substr))
+
 // Test registration macro
 #define TEST(name) \
     void test_##name(); \
