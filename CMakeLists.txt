@@ -108,6 +108,10 @@ if(BUILD_TESTS)
     add_executable(verb_edge_case_tests tests/verb_edge_case_tests.cpp ${LIB_SOURCES})
     add_test(NAME VerbEdgeCaseTests COMMAND verb_edge_case_tests)
     
+    # Inventory tests
+    add_executable(inventory_tests tests/inventory_tests.cpp ${LIB_SOURCES})
+    add_test(NAME InventoryTests COMMAND inventory_tests)
+    
     # Integration tests
     add_executable(integration_tests tests/integration_tests.cpp ${LIB_SOURCES})
     add_test(NAME IntegrationTests COMMAND integration_tests)
