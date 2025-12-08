@@ -140,6 +140,10 @@ if(BUILD_TESTS)
     add_executable(complex_syntax_attack_tests tests/complex_syntax_attack_tests.cpp ${LIB_SOURCES})
     add_test(NAME ComplexSyntaxAttackTests COMMAND complex_syntax_attack_tests)
     
+    # Complex Syntax Unlock Tests
+    add_executable(complex_syntax_unlock_tests tests/complex_syntax_unlock_tests.cpp ${LIB_SOURCES})
+    add_test(NAME ComplexSyntaxUnlockTests COMMAND complex_syntax_unlock_tests)
+    
     # Integration tests
     add_executable(integration_tests tests/integration_tests.cpp ${LIB_SOURCES})
     add_test(NAME IntegrationTests COMMAND integration_tests)
