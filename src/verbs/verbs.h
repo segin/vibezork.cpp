@@ -167,6 +167,19 @@ constexpr VerbId V_SQUEEZE = 183;
 constexpr VerbId V_WIND = 184;
 constexpr VerbId V_TIE_UP = 185; // Syntax TIE UP
 
+// Phase 10.3 Batch 3: Interactions
+constexpr VerbId V_ANSWER = 190;
+constexpr VerbId V_REPLY = 191;
+constexpr VerbId V_COMMAND = 192;
+constexpr VerbId V_ECHO = 193;
+constexpr VerbId V_FOLLOW = 194;
+constexpr VerbId V_KISS = 195;
+constexpr VerbId V_MUMBLE = 196;
+constexpr VerbId V_REPENT = 197;
+constexpr VerbId V_SEND = 198;
+constexpr VerbId V_WISH = 199;
+constexpr VerbId V_SPRAY = 200; // Found missing in list check, adding for completeness
+
 // Verb handlers
 namespace Verbs {
     bool vLook();
@@ -218,6 +231,18 @@ namespace Verbs {
     bool vSqueeze();
     bool vWind();
     bool vTieUp();
+    // Batch 3: Interactions
+    bool vAnswer();
+    bool vReply();
+    bool vCommand();
+    bool vEcho();
+    bool vFollow();
+    bool vKiss();
+    bool vMumble();
+    bool vRepent();
+    bool vSend();
+    bool vWish();
+    bool vSpray();
     bool vWalk();
     bool vWalkDir(Direction dir);
     

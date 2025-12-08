@@ -165,6 +165,19 @@ void VerbRegistry::initializeVerbSynonyms() {
     
     // TIE UP is likely handled by "tie" + "up" preposition in syntax.
 
+
+    // Interaction Batch for Phase 10.3
+    registerVerb(V_ANSWER, {"answer"});
+    registerVerb(V_REPLY, {"reply"});
+    registerVerb(V_COMMAND, {"command"});
+    registerVerb(V_ECHO, {"echo"});
+    registerVerb(V_FOLLOW, {"follow", "pursue", "chase", "come with"});
+    registerVerb(V_KISS, {"kiss"});
+    registerVerb(V_MUMBLE, {"mumble", "sigh"});
+    registerVerb(V_REPENT, {"repent"});
+    registerVerb(V_SEND, {"send"});
+    registerVerb(V_WISH, {"wish"});
+    registerVerb(V_SPRAY, {"spray"});
 }
 
 void VerbRegistry::registerVerb(VerbId verbId, std::vector<std::string> synonyms) {
@@ -1021,5 +1034,54 @@ void VerbRegistry::initializeSyntaxPatterns() {
         Elem upPrep(ET::PREPOSITION, {"up"});
         // Need to check if TIE verb is registered. Assuming V_TIE (90) exists.
         registerSyntax(VerbId(90), SyntaxPattern(V_TIE_UP, {Elem(ET::VERB), objElem, upPrep}));
+    }
+
+    // Interaction Batch Syntaxes (Phase 10.3)
+    
+    // ANSWER / REPLY / COMMAND / FOLLOW / KISS / SEND / SPRAY / MUMBLES
+    {
+        Elem objElem(ET::OBJECT);
+        Elem actorElem(ET::OBJECT, ObjectFlag::ACTORBIT); 
+        
+        // ANSWER
+        registerSyntax(V_ANSWER, SyntaxPattern(V_ANSWER, {Elem(ET::VERB)}));
+        registerSyntax(V_ANSWER, SyntaxPattern(V_ANSWER, {Elem(ET::VERB), objElem})); // Answer obj (troll)
+        
+        // REPLY
+        registerSyntax(V_REPLY, SyntaxPattern(V_REPLY, {Elem(ET::VERB)}));
+        registerSyntax(V_REPLY, SyntaxPattern(V_REPLY, {Elem(ET::VERB), objElem}));
+        
+        // COMMAND
+        registerSyntax(V_COMMAND, SyntaxPattern(V_COMMAND, {Elem(ET::VERB), actorElem})); // Command Troll
+        
+        // ECHO
+        registerSyntax(V_ECHO, SyntaxPattern(V_ECHO, {Elem(ET::VERB)}));
+        registerSyntax(V_ECHO, SyntaxPattern(V_ECHO, {Elem(ET::VERB), objElem})); // Echo something? (usually just echo)
+        
+        // FOLLOW
+        registerSyntax(V_FOLLOW, SyntaxPattern(V_FOLLOW, {Elem(ET::VERB)})); // Follow?
+        registerSyntax(V_FOLLOW, SyntaxPattern(V_FOLLOW, {Elem(ET::VERB), objElem}));
+        
+        // KISS
+        registerSyntax(V_KISS, SyntaxPattern(V_KISS, {Elem(ET::VERB), objElem}));
+        
+        // MUMBLE
+        registerSyntax(V_MUMBLE, SyntaxPattern(V_MUMBLE, {Elem(ET::VERB)}));
+        
+        // REPENT
+        registerSyntax(V_REPENT, SyntaxPattern(V_REPENT, {Elem(ET::VERB)}));
+        
+        // SEND FOR
+        Elem forPrep(ET::PREPOSITION, {"for"});
+        registerSyntax(V_SEND, SyntaxPattern(V_SEND, {Elem(ET::VERB), forPrep, objElem}));
+        
+        // SPRAY
+        registerSyntax(V_SPRAY, SyntaxPattern(V_SPRAY, {Elem(ET::VERB), objElem}));
+        Elem onPrep(ET::PREPOSITION, {"on"});
+        Elem target(ET::OBJECT);
+        registerSyntax(V_SPRAY, SyntaxPattern(V_SPRAY, {Elem(ET::VERB), objElem, onPrep, target}));
+        
+        // WISH
+        registerSyntax(V_WISH, SyntaxPattern(V_WISH, {Elem(ET::VERB)}));
     }
 }

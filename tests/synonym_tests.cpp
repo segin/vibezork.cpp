@@ -258,6 +258,19 @@ TEST(RegistrySynonyms) {
     check(V_SQUEEZE, {"squeeze"});
     check(V_WIND, {"wind"});
 
+    // Interaction Batch Verification
+    check(V_ANSWER, {"answer"});
+    check(V_REPLY, {"reply"});
+    check(V_COMMAND, {"command"});
+    check(V_ECHO, {"echo"});
+    check(V_FOLLOW, {"follow", "pursue", "chase", "come with"});
+    check(V_KISS, {"kiss"});
+    check(V_MUMBLE, {"mumble", "sigh"});
+    check(V_REPENT, {"repent"});
+    check(V_SEND, {"send"});
+    check(V_WISH, {"wish"});
+    check(V_SPRAY, {"spray"});
+    
     // Easter Eggs / Misc
     check(V_WAIT, {"wait"}); // zswait
     check(V_SWIM, {"swim"});

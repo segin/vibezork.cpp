@@ -2748,4 +2748,70 @@ bool vTieUp() {
     return RTRUE;
 }
 
+
+// Phase 10.3 Batch 3: Interactions
+
+bool vAnswer() {
+    printLine("There is no one waiting for an answer.");
+    return RTRUE;
+}
+
+bool vReply() {
+    printLine("It is hardly likely that the ");
+    if (Globals::instance().prso) print(Globals::instance().prso->getDesc());
+    printLine(" is interested.");
+    return RTRUE;
+}
+
+bool vCommand() {
+    if (Globals::instance().prso) {
+         print("The ");
+         print(Globals::instance().prso->getDesc());
+         printLine(" pays no attention.");
+    } else {
+         printLine("Command whom?");
+    }
+    return RTRUE;
+}
+
+bool vEcho() {
+    printLine("Echo... echo... echo...");
+    return RTRUE;
+}
+
+bool vFollow() {
+    printLine("You're not following anything.");
+    return RTRUE;
+}
+
+bool vKiss() {
+    printLine("I'd sooner kiss a pig.");
+    return RTRUE;
+}
+
+bool vMumble() {
+    printLine("You'll have to speak up if you expect me to hear you!");
+    return RTRUE;
+}
+
+bool vRepent() {
+    printLine("It could well be too late!");
+    return RTRUE;
+}
+
+bool vSend() {
+    printLine("Why would you send for that?");
+    return RTRUE;
+}
+
+bool vWish() {
+    printLine("With luck, your wish will come true.");
+    return RTRUE;
+}
+
+bool vSpray() {
+    printLine("You can't spray that.");
+    return RTRUE;
+}
+
 } // namespace Verbs
