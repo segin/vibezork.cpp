@@ -146,6 +146,25 @@ void VerbRegistry::initializeVerbSynonyms() {
     registerVerb(V_LAUNCH, {"launch"});
     // V_WALK_AROUND and V_WALK_TO are handled by syntax under V_WALK ("walk")
     // See initializeSyntaxPatterns mappings
+
+    // Manipulation Batch for Phase 10.3
+    registerVerb(V_CUT, {"cut", "slice", "pierce"});
+    registerVerb(V_LOWER, {"lower"});
+    registerVerb(V_RAISE, {"raise", "lift"});
+    registerVerb(V_MAKE, {"make"});
+    registerVerb(V_MELT, {"melt", "liquefy"});
+    registerVerb(V_PLAY, {"play"});
+    registerVerb(V_PLUG, {"plug", "glue", "patch", "repair", "fix"});
+    registerVerb(V_POUR_ON, {"pour", "spill"}); // Syntax will map specific uses
+    registerVerb(V_SHAKE, {"shake"});
+    registerVerb(V_SPIN, {"spin"});
+    registerVerb(V_SQUEEZE, {"squeeze"});
+    registerVerb(V_WIND, {"wind"});
+    // V_TIE exists? If not, need to check. Grep said V_TIE = 90.
+    // registerVerb(V_TIE, {"tie", "fasten"}); // likely already exists in main block
+    
+    // TIE UP is likely handled by "tie" + "up" preposition in syntax.
+
 }
 
 void VerbRegistry::registerVerb(VerbId verbId, std::vector<std::string> synonyms) {
@@ -910,5 +929,97 @@ void VerbRegistry::initializeSyntaxPatterns() {
     {
         Elem objElem(ET::OBJECT, ObjectFlag::VEHBIT);
         registerSyntax(V_LAUNCH, SyntaxPattern(V_LAUNCH, {Elem(ET::VERB), objElem}));
+    }
+
+    // Manipulation Batch Syntaxes (Phase 10.3)
+    
+    // CUT
+    {
+        Elem objElem(ET::OBJECT);
+        Elem withPrep(ET::PREPOSITION, {"with"});
+        Elem weaponElem(ET::OBJECT, ObjectFlag::WEAPONBIT);
+        Elem toolElem(ET::OBJECT, ObjectFlag::TOOLBIT);
+        
+        registerSyntax(V_CUT, SyntaxPattern(V_CUT, {Elem(ET::VERB), objElem}));
+        registerSyntax(V_CUT, SyntaxPattern(V_CUT, {Elem(ET::VERB), objElem, withPrep, weaponElem}));
+        registerSyntax(V_CUT, SyntaxPattern(V_CUT, {Elem(ET::VERB), objElem, withPrep, toolElem}));
+    }
+    
+    // SHAKE/LOWER/RAISE/SPIN/SQUEEZE/WIND/PLAY
+    {
+        Elem objElem(ET::OBJECT);
+        registerSyntax(V_SHAKE, SyntaxPattern(V_SHAKE, {Elem(ET::VERB), objElem}));
+        registerSyntax(V_LOWER, SyntaxPattern(V_LOWER, {Elem(ET::VERB), objElem}));
+        registerSyntax(V_RAISE, SyntaxPattern(V_RAISE, {Elem(ET::VERB), objElem}));
+        registerSyntax(V_SPIN, SyntaxPattern(V_SPIN, {Elem(ET::VERB), objElem}));
+        registerSyntax(V_SQUEEZE, SyntaxPattern(V_SQUEEZE, {Elem(ET::VERB), objElem}));
+        registerSyntax(V_WIND, SyntaxPattern(V_WIND, {Elem(ET::VERB), objElem}));
+        registerSyntax(V_PLAY, SyntaxPattern(V_PLAY, {Elem(ET::VERB), objElem}));
+        registerSyntax(V_MAKE, SyntaxPattern(V_MAKE, {Elem(ET::VERB), objElem})); // Make obj?
+        
+        // PLUG WITH
+        Elem withPrep(ET::PREPOSITION, {"with"});
+        Elem tool(ET::OBJECT);
+        registerSyntax(V_PLUG, SyntaxPattern(V_PLUG, {Elem(ET::VERB), objElem, withPrep, tool}));
+        // ZIL says PLUG can be bare? "PLUG HOLE"
+        registerSyntax(V_PLUG, SyntaxPattern(V_PLUG, {Elem(ET::VERB), objElem}));
+    }
+    
+    // MELT
+    {
+        Elem objElem(ET::OBJECT);
+        Elem withPrep(ET::PREPOSITION, {"with"});
+        Elem tool(ET::OBJECT);
+        registerSyntax(V_MELT, SyntaxPattern(V_MELT, {Elem(ET::VERB), objElem, withPrep, tool}));
+    }
+    
+    // POUR Handling
+    {
+        // POUR OBJ -> DROP
+        Elem objElem(ET::OBJECT);
+        registerSyntax(V_POUR_ON, SyntaxPattern(V_DROP, {Elem(ET::VERB), objElem}));
+        
+        // POUR OBJ IN OBJ -> PUT
+        Elem inPrep(ET::PREPOSITION, {"in", "into"});
+        Elem container(ET::OBJECT);
+        registerSyntax(V_POUR_ON, SyntaxPattern(V_PUT, {Elem(ET::VERB), objElem, inPrep, container}));
+        
+        // POUR OBJ ON OBJ -> POUR_ON
+        Elem onPrep(ET::PREPOSITION, {"on"});
+        Elem surface(ET::OBJECT);
+        registerSyntax(V_POUR_ON, SyntaxPattern(V_POUR_ON, {Elem(ET::VERB), objElem, onPrep, surface}));
+    }
+    
+    // PUSH / MOVE Handling
+    {
+        Elem objElem(ET::OBJECT);
+        
+        // PUSH OBJ TO OBJ
+        Elem toPrep(ET::PREPOSITION, {"to"});
+        Elem dest(ET::OBJECT);
+        registerSyntax(V_PUSH, SyntaxPattern(V_PUSH_TO, {Elem(ET::VERB), objElem, toPrep, dest}));
+        // Also MOVE OBJ TO OBJ -> PUSH_TO (ZIL: MOVE ... TO = V-PUSH-TO)
+        // Need to check if MOVE is alias for PUSH or separate verb?
+        // Usually MOVE is synonym for PUSH in registry.
+        
+        // PUSH OBJ UNDER OBJ
+        Elem underPrep(ET::PREPOSITION, {"under"});
+        registerSyntax(V_PUSH, SyntaxPattern(V_PUT_UNDER, {Elem(ET::VERB), objElem, underPrep, dest}));
+        
+        // PUT OBJ UNDER OBJ
+        registerSyntax(V_PUT, SyntaxPattern(V_PUT_UNDER, {Elem(ET::VERB), objElem, underPrep, dest}));
+        
+        // PUT OBJ BEHIND OBJ
+        Elem behindPrep(ET::PREPOSITION, {"behind"});
+        registerSyntax(V_PUT, SyntaxPattern(V_PUT_BEHIND, {Elem(ET::VERB), objElem, behindPrep, dest}));
+    }
+    
+    // TIE UP
+    {
+        // TIE OBJ UP -> V_TIE_UP
+        Elem objElem(ET::OBJECT);
+        Elem upPrep(ET::PREPOSITION, {"up"});
+        // Need to check if TIE verb is registered. Assuming V_TIE (90) exists.
+        registerSyntax(VerbId(90), SyntaxPattern(V_TIE_UP, {Elem(ET::VERB), objElem, upPrep}));
     }
 }

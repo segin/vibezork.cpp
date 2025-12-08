@@ -2665,4 +2665,87 @@ bool vLaunch() {
     return RTRUE;
 }
 
+
+// Phase 10.3 Batch 2: Manipulation
+
+bool vCut() {
+    printLine("It doesn't seem to work.");
+    return RTRUE;
+}
+
+bool vLower() {
+    printLine("You can't lower that.");
+    return RTRUE;
+}
+
+bool vRaise() {
+    printLine("You can't raise that.");
+    return RTRUE;
+}
+
+bool vMake() {
+    printLine("You can't do that.");
+    return RTRUE;
+}
+
+bool vMelt() {
+    printLine("It's not clear that needs melting.");
+    return RTRUE;
+}
+
+bool vPlay() {
+    printLine("That's silly!");
+    return RTRUE;
+}
+
+bool vPlug() {
+    printLine("This has no effect.");
+    return RTRUE;
+}
+
+bool vPourOn() {
+    printLine("You can't pour that on anything.");
+    return RTRUE;
+}
+
+bool vPushTo() {
+    printLine("You can't push things to that.");
+    return RTRUE;
+}
+
+bool vPutUnder() {
+    printLine("You can't do that.");
+    return RTRUE;
+}
+
+bool vPutBehind() {
+    printLine("You can't do that.");
+    return RTRUE;
+}
+
+bool vShake() {
+    printLine("Shaken.");
+    return RTRUE;
+}
+
+bool vSpin() {
+    printLine("You can't spin that.");
+    return RTRUE;
+}
+
+bool vSqueeze() {
+    printLine("You can't squeeze that.");
+    return RTRUE;
+}
+
+bool vWind() {
+    printLine("You can't wind that up.");
+    return RTRUE;
+}
+
+bool vTieUp() {
+    printLine("You can't tie that up.");
+    return RTRUE;
+}
+
 } // namespace Verbs

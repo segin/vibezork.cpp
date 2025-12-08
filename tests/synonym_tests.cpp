@@ -244,6 +244,20 @@ TEST(RegistrySynonyms) {
     check(V_ALARM, {"wake", "awake", "surprise", "startle"});
     check(V_LAUNCH, {"launch"});
 
+    // Manipulation Batch Verification
+    check(V_CUT, {"cut", "slice", "pierce"});
+    check(V_LOWER, {"lower"});
+    check(V_RAISE, {"raise", "lift"});
+    check(V_MAKE, {"make"});
+    check(V_MELT, {"melt", "liquefy"});
+    check(V_PLAY, {"play"});
+    check(V_PLUG, {"plug", "glue", "patch", "repair", "fix"});
+    check(V_POUR_ON, {"pour", "spill"});
+    check(V_SHAKE, {"shake"});
+    check(V_SPIN, {"spin"});
+    check(V_SQUEEZE, {"squeeze"});
+    check(V_WIND, {"wind"});
+
     // Easter Eggs / Misc
     check(V_WAIT, {"wait"}); // zswait
     check(V_SWIM, {"swim"});

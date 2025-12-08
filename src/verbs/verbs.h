@@ -149,6 +149,24 @@ constexpr VerbId V_WALK_TO = 165;     // Walk to
 constexpr VerbId V_LAUNCH = 166;      // Launch (vehicle)
 constexpr VerbId V_LAND = 167;        // Land (vehicle - if needed, or Disembark aliases)
 
+// Phase 10.3 Batch 2: Manipulation
+constexpr VerbId V_CUT = 170;
+constexpr VerbId V_LOWER = 171;
+constexpr VerbId V_RAISE = 172;
+constexpr VerbId V_MAKE = 173;
+constexpr VerbId V_MELT = 174;
+constexpr VerbId V_PLAY = 175;
+constexpr VerbId V_PLUG = 176;
+constexpr VerbId V_POUR_ON = 177;
+constexpr VerbId V_PUSH_TO = 178;
+constexpr VerbId V_PUT_UNDER = 179;
+constexpr VerbId V_PUT_BEHIND = 180;
+constexpr VerbId V_SHAKE = 181;
+constexpr VerbId V_SPIN = 182;
+constexpr VerbId V_SQUEEZE = 183;
+constexpr VerbId V_WIND = 184;
+constexpr VerbId V_TIE_UP = 185; // Syntax TIE UP
+
 // Verb handlers
 namespace Verbs {
     bool vLook();
@@ -183,6 +201,23 @@ namespace Verbs {
     bool vWalkAround();
     bool vWalkTo();
     bool vLaunch();
+    // Batch 2: Manipulation
+    bool vCut();
+    bool vLower();
+    bool vRaise();
+    bool vMake();
+    bool vMelt();
+    bool vPlay();
+    bool vPlug();
+    bool vPourOn();
+    bool vPushTo();
+    bool vPutUnder();
+    bool vPutBehind();
+    bool vShake();
+    bool vSpin();
+    bool vSqueeze();
+    bool vWind();
+    bool vTieUp();
     bool vWalk();
     bool vWalkDir(Direction dir);
     
