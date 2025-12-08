@@ -354,8 +354,8 @@ std::vector<ZObject*> Parser::findObjects(const std::vector<std::string>& words,
                                 otherWords.push_back(w);
                             }
                         }
-                        // Only match if other words are adjectives or if object has no adjectives
-                        if (matchesAdjectives(obj, otherWords) || obj->getAdjectives().empty()) {
+                        // Only match if other words are adjectives
+                        if (matchesAdjectives(obj, otherWords)) {
                             matched = true;
                             break;
                         }
@@ -827,6 +827,18 @@ ParsedCommand Parser::parse(const std::string& input) {
     // Check for verb
     cmd.verb = findVerb(cmd.words[0]);
     if (cmd.verb == 0) {
+        // Check for unknown words first - prevents OOPS failure when mixing unknown/known words
+        for (const auto& word : cmd.words) {
+            if (word != "the" && word != "a" && word != "an" && 
+                !isPreposition(word) && !isKnownObjectWord(word)) {
+                
+                // Unknown word - save for OOPS
+                setLastUnknownWord(word);
+                printLine("I don't know the word \"" + word + "\".");
+                return cmd;
+            }
+        }
+
         // Check if it might be an object name (user typed just an object without a verb)
         auto matches = findObjects(cmd.words, 0);
         if (!matches.empty()) {
@@ -834,26 +846,8 @@ ParsedCommand Parser::parse(const std::string& input) {
             return cmd;
         }
         
-        // Check if the word is a known object word (even if not visible)
-        // This gives a better error message than "I don't know the word"
-        bool isKnownWord = false;
-        for (const auto& word : cmd.words) {
-            if (word != "the" && word != "a" && word != "an" && 
-                !isPreposition(word) && isKnownObjectWord(word)) {
-                isKnownWord = true;
-                break;
-            }
-        }
-        
-        if (isKnownWord) {
-            // Word is known but no verb was given
-            printLine("I don't understand that sentence.");
-            return cmd;
-        }
-        
-        // Unknown word - save for OOPS
-        setLastUnknownWord(cmd.words[0]);
-        printLine("I don't know the word \"" + cmd.words[0] + "\".");
+        // All words are known but syntax is invalid
+        printLine("I don't understand that sentence.");
         return cmd;
     }
     

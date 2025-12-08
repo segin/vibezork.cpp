@@ -116,6 +116,11 @@ if(BUILD_TESTS)
     add_executable(meta_game_additional_tests tests/meta_game_additional_tests.cpp ${LIB_SOURCES})
     add_test(NAME MetaGameAdditionalTests COMMAND meta_game_additional_tests)
     
+    # Synonym tests
+    add_executable(synonym_tests tests/synonym_tests.cpp ${LIB_SOURCES})
+    add_test(NAME SynonymTests COMMAND synonym_tests)
+
+    
     
     # Integration tests
     add_executable(integration_tests tests/integration_tests.cpp ${LIB_SOURCES})
