@@ -1,5 +1,6 @@
 #include "test_framework.h"
 #include "../src/parser/parser.h"
+#include "../src/parser/verb_registry.h"
 #include "../src/verbs/verbs.h"
 #include "../src/core/globals.h"
 #include "../src/world/objects.h"
@@ -48,6 +49,49 @@ TEST(ComplexSyntaxPutIn) {
     ASSERT_EQ(cmd.verb, V_PUT);
     ASSERT_EQ(cmd.directObj, objPtr);
     ASSERT_EQ(cmd.indirectObj, containerPtr);
+}
+
+TEST(ComplexSyntaxPutOn) {
+    auto& g = Globals::instance();
+    g.reset();
+    
+    // Create surface (table) and object (lamp)
+    auto table = std::make_unique<ZObject>(200, "table");
+    table->addSynonym("table");
+    table->setFlag(ObjectFlag::SURFACEBIT);
+    // Note: In Zorky behavior, surface doesn't explicitly need OPENBIT usually, 
+    // but parser might check if it's a container-like thing.
+    // Zork I tables accept things on them.
+    
+    auto lamp = std::make_unique<ZObject>(201, "lamp");
+    lamp->addSynonym("lamp");
+    lamp->setFlag(ObjectFlag::TAKEBIT);
+    
+    // Lamp in inventory
+    lamp->moveTo(g.winner);
+    // Table in room
+    table->moveTo(g.here);
+    
+    ZObject* tablePtr = table.get();
+    ZObject* lampPtr = lamp.get();
+    
+    g.registerObject(200, std::move(table));
+    g.registerObject(201, std::move(lamp));
+    
+    VerbRegistry registry;
+    Parser parser(&registry);
+    
+    // Test "put lamp on table"
+    auto cmd = parser.parse("put lamp on table");
+    ASSERT_EQ(cmd.verb, V_PUT_ON);
+    ASSERT_EQ(cmd.directObj, lampPtr);
+    ASSERT_EQ(cmd.indirectObj, tablePtr);
+    
+    // Test "put lamp onto table"
+    cmd = parser.parse("put lamp onto table");
+    ASSERT_EQ(cmd.verb, V_PUT_ON);
+    ASSERT_EQ(cmd.directObj, lampPtr);
+    ASSERT_EQ(cmd.indirectObj, tablePtr);
 }
 
 int main() {

@@ -19,3 +19,7 @@ These steering documents are the authoritative source for project conventions an
 ## Additional Notes
 
 For specifications and task definitions, see [`.kiro/specs/`](.kiro/specs/).
+
+## User Directives
+
+- **Never use a simpler approach**: Always choose the correct, hard, comprehensive solution, no matter how arduous. Never compromise architectural integrity for convenience or speed. Simpler approaches that sacrifice correctness or robustness are strictly forbidden.

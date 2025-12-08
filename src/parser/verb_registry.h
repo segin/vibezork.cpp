@@ -97,6 +97,16 @@ public:
      * @return Set of all valid prepositions for this verb
      */
     std::set<std::string> getValidPrepositions(VerbId verbId) const;
+
+    /**
+     * Get the specific VerbId for a syntax (baseVerb + preposition).
+     * Used to resolve ambiguous verbs like PUT vs PUT-ON based on preposition.
+     * 
+     * @param baseVerb The initially identified verb (e.g., V_PUT)
+     * @param preposition The preposition found in the command
+     * @return The specific VerbId if a matching pattern is found, or std::nullopt
+     */
+    std::optional<VerbId> getVerbIdForSyntax(VerbId baseVerb, const std::string& preposition) const;
     
 private:
     // Map from synonym word to verb ID

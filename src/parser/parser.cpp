@@ -945,6 +945,14 @@ ParsedCommand Parser::parse(const std::string& input) {
                 return cmd;
             }
             
+            // Update verb ID based on syntax (e.g., PUT + ON -> V_PUT_ON)
+            if (verbRegistry_) {
+                auto specificVerb = verbRegistry_->getVerbIdForSyntax(cmd.verb, preposition);
+                if (specificVerb.has_value()) {
+                    cmd.verb = specificVerb.value();
+                }
+            }
+            
             // Extract direct object (words between verb and preposition)
             std::vector<std::string> directObjWords(
                 cmd.words.begin() + 1, 

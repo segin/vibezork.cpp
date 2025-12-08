@@ -31,7 +31,7 @@ void VerbRegistry::initializeVerbSynonyms() {
     registerVerb(V_TAKE, {"take", "get", "hold", "carry", "remove", "grab", "catch"});
     registerVerb(V_DROP, {"drop", "leave"});
     registerVerb(V_PUT, {"put", "stuff", "insert", "place", "hide"});
-    registerVerb(V_PUT_ON, {"put"});  // "put on" handled by syntax pattern
+    // registerVerb(V_PUT_ON, {"put"});  // "put on" handled by syntax pattern
     registerVerb(V_GIVE, {"give", "donate", "offer", "feed"});
     
     // Examination verbs
@@ -202,6 +202,25 @@ std::set<std::string> VerbRegistry::getValidPrepositions(VerbId verbId) const {
     return validPreps;
 }
 
+std::optional<VerbId> VerbRegistry::getVerbIdForSyntax(VerbId baseVerb, const std::string& preposition) const {
+    const auto& patterns = getSyntaxPatterns(baseVerb);
+    
+    for (const auto& pattern : patterns) {
+        // Check pattern elements for this preposition
+        for (const auto& element : pattern.getPattern()) {
+            if (element.type == SyntaxPattern::ElementType::PREPOSITION) {
+                for (const auto& prep : element.values) {
+                    if (prep == preposition) {
+                        return pattern.getVerbId();
+                    }
+                }
+            }
+        }
+    }
+    
+    return std::nullopt;
+}
+
 
 
 void VerbRegistry::initializeSyntaxPatterns() {
@@ -257,7 +276,7 @@ void VerbRegistry::initializeSyntaxPatterns() {
         Elem obj1(ET::OBJECT);
         Elem prep(ET::PREPOSITION, {"on", "onto"});
         Elem obj2(ET::OBJECT);
-        registerSyntax(V_PUT_ON, SyntaxPattern(V_PUT_ON, {Elem(ET::VERB), obj1, prep, obj2}));
+        registerSyntax(V_PUT, SyntaxPattern(V_PUT_ON, {Elem(ET::VERB), obj1, prep, obj2}));
     }
     
     // EXAMINE verb patterns
