@@ -270,6 +270,18 @@ TEST(RegistrySynonyms) {
     check(V_SEND, {"send"});
     check(V_WISH, {"wish"});
     check(V_SPRAY, {"spray"});
+
+    // Magic/Misc Batch Verification
+    check(V_BLAST, {"blast", "blow up", "detonate"});
+    check(V_BURN, {"burn", "ignite", "incinerate"});
+    check(V_CHANT, {"chant"});
+    check(V_DISENCHANT, {"disenchant", "condemn"});
+    check(V_ENCHANT, {"enchant"});
+    check(V_INCANT, {"incant"});
+    check(V_WIN, {"win"});
+    check(V_TREASURE, {"treasure"});
+    check(V_STAY, {"stay"});
+    // V_SWIM checked below
     
     // Easter Eggs / Misc
     check(V_WAIT, {"wait"}); // zswait

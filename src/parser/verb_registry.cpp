@@ -178,6 +178,18 @@ void VerbRegistry::initializeVerbSynonyms() {
     registerVerb(V_SEND, {"send"});
     registerVerb(V_WISH, {"wish"});
     registerVerb(V_SPRAY, {"spray"});
+
+    // Magic/Misc Batch (Phase 10.3 Batch 4)
+    registerVerb(V_BLAST, {"blast", "blow up", "detonate"}); // BLOW UP checked in syntax
+    registerVerb(V_BURN, {"burn", "ignite", "incinerate"});
+    registerVerb(V_CHANT, {"chant"});
+    registerVerb(V_DISENCHANT, {"disenchant", "condemn"}); // ZIL: DISENCHANT
+    registerVerb(V_ENCHANT, {"enchant"});
+    registerVerb(V_INCANT, {"incant"});
+    registerVerb(V_WIN, {"win"});
+    registerVerb(V_TREASURE, {"treasure"});
+    registerVerb(V_STAY, {"stay"});
+    registerVerb(V_SWIM, {"swim", "bathe", "wade"});
 }
 
 void VerbRegistry::registerVerb(VerbId verbId, std::vector<std::string> synonyms) {
@@ -1083,5 +1095,39 @@ void VerbRegistry::initializeSyntaxPatterns() {
         
         // WISH
         registerSyntax(V_WISH, SyntaxPattern(V_WISH, {Elem(ET::VERB)}));
+    }
+
+    // Magic/Misc Batch Syntaxes (Phase 10.3 Batch 4)
+    {
+        Elem objElem(ET::OBJECT);
+        Elem withPrep(ET::PREPOSITION, {"with"});
+        
+        // BLAST
+        registerSyntax(V_BLAST, SyntaxPattern(V_BLAST, {Elem(ET::VERB)})); // BLAST
+        // BLOW UP handled by synonyms/syntax if "blow" "up"
+        
+        // BURN
+        registerSyntax(V_BURN, SyntaxPattern(V_BURN, {Elem(ET::VERB), objElem})); // BURN OBJ
+        
+        Elem toolObj(ET::OBJECT, ObjectFlag::TOOLBIT);
+        Elem flameObj(ET::OBJECT, ObjectFlag::FLAMEBIT);
+        registerSyntax(V_BURN, SyntaxPattern(V_BURN, {Elem(ET::VERB), objElem, withPrep, toolObj})); // BURN OBJ WITH TOOL
+        registerSyntax(V_BURN, SyntaxPattern(V_BURN, {Elem(ET::VERB), objElem, withPrep, flameObj})); // BURN OBJ WITH FLAME
+        
+        // CHANT / INCANT / ENCHANT / DISENCHANT / WIN / TREASURE / STAY / SWIM
+        registerSyntax(V_CHANT, SyntaxPattern(V_CHANT, {Elem(ET::VERB)}));
+        registerSyntax(V_INCANT, SyntaxPattern(V_INCANT, {Elem(ET::VERB)}));
+        registerSyntax(V_ENCHANT, SyntaxPattern(V_ENCHANT, {Elem(ET::VERB), objElem})); // ENCHANT OBJ?
+        registerSyntax(V_DISENCHANT, SyntaxPattern(V_DISENCHANT, {Elem(ET::VERB), objElem}));
+        registerSyntax(V_WIN, SyntaxPattern(V_WIN, {Elem(ET::VERB)}));
+        registerSyntax(V_WIN, SyntaxPattern(V_WIN, {Elem(ET::VERB), objElem})); // WIN OBJ?
+        registerSyntax(V_TREASURE, SyntaxPattern(V_TREASURE, {Elem(ET::VERB)})); // TREASURE
+        registerSyntax(V_STAY, SyntaxPattern(V_STAY, {Elem(ET::VERB)}));
+        
+        // SWIM
+        registerSyntax(V_SWIM, SyntaxPattern(V_SWIM, {Elem(ET::VERB)}));
+        // SWIM IN WATER?
+        Elem inPrep(ET::PREPOSITION, {"in"});
+        registerSyntax(V_SWIM, SyntaxPattern(V_SWIM, {Elem(ET::VERB), inPrep, objElem}));
     }
 }

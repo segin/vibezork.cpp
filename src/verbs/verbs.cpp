@@ -2814,4 +2814,54 @@ bool vSpray() {
     return RTRUE;
 }
 
+
+// Phase 10.3 Batch 4: Magic/Misc
+
+bool vBlast() {
+    printLine("Start small, why don't you?");
+    return RTRUE;
+}
+
+bool vBurn() {
+    printLine("You can't burn that.");
+    return RTRUE;
+}
+
+bool vChant() {
+    printLine("Chanting won't help you.");
+    return RTRUE;
+}
+
+bool vDisenchant() {
+    printLine("You can't disenchant that.");
+    return RTRUE;
+}
+
+bool vEnchant() {
+    printLine("You're not a wizard.");
+    return RTRUE;
+}
+
+bool vIncant() {
+    printLine("The incantation fails.");
+    return RTRUE;
+}
+
+bool vWin() {
+    printLine("Nature, red in tooth and claw...");
+    return RTRUE;
+}
+
+bool vTreasure() {
+    printLine("This is a treasure/adventure.");
+    return RTRUE;
+}
+
+bool vStay() {
+    printLine("You will be captured.");
+    return RTRUE;
+}
+
+
+
 } // namespace Verbs

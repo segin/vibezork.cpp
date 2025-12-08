@@ -178,7 +178,19 @@ constexpr VerbId V_MUMBLE = 196;
 constexpr VerbId V_REPENT = 197;
 constexpr VerbId V_SEND = 198;
 constexpr VerbId V_WISH = 199;
-constexpr VerbId V_SPRAY = 200; // Found missing in list check, adding for completeness
+constexpr VerbId V_SPRAY = 200;
+
+// Phase 10.3 Batch 4: Magic/Misc
+constexpr VerbId V_BLAST = 201;
+// V_BURN exists as 117
+constexpr VerbId V_CHANT = 203;
+constexpr VerbId V_DISENCHANT = 204;
+constexpr VerbId V_ENCHANT = 205;
+constexpr VerbId V_INCANT = 206;
+constexpr VerbId V_WIN = 207;
+constexpr VerbId V_TREASURE = 208;
+constexpr VerbId V_STAY = 209;
+// V_SWIM exists as 141
 
 // Verb handlers
 namespace Verbs {
@@ -243,6 +255,19 @@ namespace Verbs {
     bool vSend();
     bool vWish();
     bool vSpray();
+    
+    // Batch 4: Magic/Misc
+    bool vBlast();
+    bool vBurn(); // Likely needed if ID exists but handler doesn't?
+    bool vChant();
+    bool vDisenchant();
+    bool vEnchant();
+    bool vIncant();
+    bool vWin();
+    bool vTreasure();
+    bool vStay();
+    bool vSwim(); // ID exists, handler might not?
+
     bool vWalk();
     bool vWalkDir(Direction dir);
     
