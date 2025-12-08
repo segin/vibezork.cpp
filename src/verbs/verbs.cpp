@@ -196,6 +196,30 @@ bool vTake() {
         printLine("You already have that!");
         return RTRUE;
     }
+
+    // Check if taking FROM a specific object (syntax: TAKE OBJECT FROM OBJECT)
+    if (g.prsi) {
+        // Verify object is actually in the source
+        if (g.prso->getLocation() != g.prsi) {
+            print("The ");
+            print(g.prso->getDesc());
+            print(" isn't in the ");
+            print(g.prsi->getDesc());
+            printLine(".");
+            return RTRUE;
+        }
+        
+        // Verify source is accessible (open container or surface)
+        // If it's a closed opaque container, we shouldn't be able to take from it
+        if (!g.prsi->hasFlag(ObjectFlag::OPENBIT) && 
+            !g.prsi->hasFlag(ObjectFlag::SURFACEBIT) && 
+            !g.prsi->hasFlag(ObjectFlag::TRANSBIT)) {
+             print("The ");
+             print(g.prsi->getDesc());
+             printLine(" isn't open.");
+             return RTRUE;
+        }
+    }
     
     // Call object action handler FIRST for TRYTAKEBIT objects
     // This allows objects like mailbox to give custom "anchored" messages
