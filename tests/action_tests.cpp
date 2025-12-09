@@ -319,6 +319,61 @@ TEST(BasketF_TakeBlocked) {
 }
 
 // =============================================================================
+// BAT-F Tests (1actions.zil lines 308-324)
+// ZIL Logic: TAKE/ATTACK with garlic = can't reach, else bat teleports
+// =============================================================================
+
+extern bool batAction();
+
+TEST(BatF_AttackWithoutGarlicTriggersFlyMe) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    // Ensure garlic is not with player
+    ZObject* garlic = g.getObject(ObjectIds::GARLIC);
+    if (garlic) garlic->moveTo(nullptr);
+    
+    g.prsa = V_ATTACK;
+    
+    OutputCapture cap;
+    bool result = batAction();
+    
+    ASSERT_TRUE(result);
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("Fweep") != std::string::npos);
+    ASSERT_TRUE(output.find("grabs you") != std::string::npos);
+}
+
+TEST(BatF_TakeWithGarlicBlocksAction) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    // Put garlic in player's inventory
+    ZObject* garlic = g.getObject(ObjectIds::GARLIC);
+    if (garlic) garlic->moveTo(g.winner);
+    
+    g.prsa = V_TAKE;
+    
+    OutputCapture cap;
+    bool result = batAction();
+    
+    ASSERT_TRUE(result);
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("ceiling") != std::string::npos);
+}
+
+TEST(BatF_OtherVerbsReturnFalse) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prsa = V_EXAMINE;
+    
+    bool result = batAction();
+    
+    ASSERT_FALSE(result);
+}
+
+// =============================================================================
 // KNIFE-F Tests (1actions.zil lines 926-929)
 // ZIL Logic: On TAKE, clears ATTIC-TABLE NDESCBIT
 // =============================================================================

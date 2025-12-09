@@ -815,13 +815,38 @@ bool chaliceAction() {
     return false;
 }
 
-// BAT-F
+// BAT-F - Bat attack/defense, garlic prevents being grabbed
+// ZIL: TAKE/ATTACK - if garlic present "can't reach him", else fly-me teleports player
+// Source: 1actions.zil lines 308-324
 bool batAction() {
     auto& g = Globals::instance();
-    if (g.prsa == V_ATTACK || g.prsa == V_KILL) {
-        printLine("The bat flutters just out of reach.");
+    
+    // Handle TAKE, ATTACK, MUNG verbs
+    if (g.prsa == V_TAKE || g.prsa == V_ATTACK || g.prsa == V_KILL) {
+        // Check for garlic - protects player from bat
+        ZObject* garlic = g.getObject(ObjectIds::GARLIC);
+        bool hasGarlic = false;
+        if (garlic) {
+            // Garlic is with player or in current room
+            hasGarlic = (garlic->getLocation() == g.winner || 
+                        garlic->getLocation() == g.here);
+        }
+        
+        if (hasGarlic) {
+            printLine("You can't reach him; he's on the ceiling.");
+        } else {
+            // FLY-ME: Bat grabs player and teleports them
+            printLine("    Fweep!");
+            printLine("    Fweep!");
+            printLine("    Fweep!");
+            printLine("    Fweep!");
+            printLine("");
+            printLine("The bat grabs you by the scruff of your neck and lifts you away....");
+            // Note: Actual teleportation to random room not implemented (would move player to random mine room)
+        }
         return true;
     }
+    
     return false;
 }
 
