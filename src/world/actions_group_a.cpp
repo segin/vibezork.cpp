@@ -288,16 +288,21 @@ bool inflatedBoatAction() {
     return false;
 }
 
-// KNIFE-F
+// KNIFE-F - Knife object action
+// ZIL: On TAKE, clears ATTIC-TABLE NDESCBIT (makes table visible)
+// Source: 1actions.zil lines 926-929
 bool knifeAction() {
     auto& g = Globals::instance();
+    
     if (g.prsa == V_TAKE) {
-        // Check if rusty knife is being taken while elvish sword present
-        // That triggers a special message
-        ZObject* sword = g.getObject(ObjectIds::SWORD);
-        if (sword && sword->getLocation() == g.winner) {
-            printLine("As you pick up the rusty knife, your sword begins to glow.");
+        // ZIL: <FCLEAR ,ATTIC-TABLE ,NDESCBIT>
+        // When knife is taken, clear the NDESCBIT on attic table
+        // This makes the table visible/described in room descriptions
+        ZObject* atticTable = g.getObject(ObjectIds::ATTIC_TABLE);
+        if (atticTable) {
+            atticTable->clearFlag(ObjectFlag::NDESCBIT);
         }
+        // Return false to allow normal TAKE handling
     }
     return false;
 }

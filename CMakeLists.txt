@@ -180,4 +180,8 @@ if(BUILD_TESTS)
     # Critical Puzzles Tests (Egg, Canary, Basket)
     add_executable(critical_puzzles_tests tests/critical_puzzles_tests.cpp ${LIB_SOURCES})
     add_test(NAME CriticalPuzzlesTests COMMAND critical_puzzles_tests)
+
+    # Action Tests (ZIL action routines)
+    add_executable(action_tests tests/action_tests.cpp ${LIB_SOURCES})
+    add_test(NAME ActionTests COMMAND action_tests)
 endif()

@@ -47,7 +47,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] HOT-BELL-F - Hot bell (after exorcism)
 - [x] IBOAT-FUNCTION - Inflated boat
 - [x] KITCHEN-FCN - Kitchen room handler
-- [ ] KITCHEN-WINDOW-F - Kitchen window
+- [x] KITCHEN-WINDOW-F - Kitchen window
 - [ ] KNIFE-F - Rusty knife with sword
 - [ ] LARGE-BAG-F - Thief's bag
 - [ ] LEAK-FUNCTION - Boat leak
@@ -71,7 +71,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [ ] ROBBER-FUNCTION - Thief AI
 - [ ] ROPE-FUNCTION - Rope tie/untie
 - [ ] RUG-FCN - Rug/trap door
-- [ ] RUSTY-KNIFE-FCN - Rusty knife curse
+- [x] RUSTY-KNIFE-FCN - Rusty knife curse
 - [ ] SAND-FUNCTION - Sand digging
 - [ ] SANDWICH-BAG-FCN - Lunch bag container
 - [ ] SCEPTRE-FUNCTION - Sceptre/rainbow
