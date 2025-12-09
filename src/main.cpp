@@ -11,6 +11,8 @@
 #include "systems/score.h"
 #include <iostream>
 #include <map>
+#include <cstdlib>
+#include <sstream>
 
 // Verb dispatch table
 std::map<VerbId, std::function<bool()>> verbHandlers = {
@@ -93,11 +95,38 @@ void mainLoop1() {
     auto& g = Globals::instance();
     auto& score = ScoreSystem::instance();
     
-    // Display status bar (Location / Score / Moves)
+    // Display status bar using ANSI escape codes
+    // Save cursor, move to top, print in reverse video, restore
     std::string locationName = g.here ? g.here->getDesc() : "???";
-    std::cout << "\n[" << locationName 
-              << "  Score: " << score.getScore() 
-              << "  Moves: " << score.getMoves() << "]" << std::endl;
+    
+    // Get terminal width (default 80 if unknown)
+    int termWidth = 80;
+    const char* cols = std::getenv("COLUMNS");
+    if (cols) {
+        termWidth = std::atoi(cols);
+        if (termWidth < 40) termWidth = 80;
+    }
+    
+    // Build status line content
+    std::ostringstream status;
+    status << " " << locationName;
+    
+    // Right-align score/moves
+    std::ostringstream rightPart;
+    rightPart << "Score: " << score.getScore() << "  Moves: " << score.getMoves() << " ";
+    
+    // Calculate padding
+    int leftLen = status.str().length();
+    int rightLen = rightPart.str().length();
+    int padding = termWidth - leftLen - rightLen;
+    if (padding < 1) padding = 1;
+    
+    // Print status bar with ANSI reverse video
+    std::cout << "\033[7m";  // Reverse video on
+    std::cout << status.str();
+    for (int i = 0; i < padding; ++i) std::cout << ' ';
+    std::cout << rightPart.str();
+    std::cout << "\033[0m" << std::endl;  // Reset attributes
     
     std::cout << "> ";
     std::string input = readLine();
