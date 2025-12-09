@@ -9,43 +9,43 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 ## Action Routines
 
 ### Object Actions (1actions.zil)
-- [ ] AXE-F - Axe interaction with Troll
-- [ ] BAG-OF-COINS-F - Stupid container for coins
-- [ ] BARROW-DOOR-FCN - Barrow door interactions
-- [ ] BARROW-FCN - Stone Barrow room handler
-- [ ] BASKET-F - Basket/dumbwaiter mechanics
-- [ ] BAT-F - Bat attack/defense
-- [ ] BELL-F - Bell ringing mechanics
-- [ ] BOARD-F - Board manipulation
-- [ ] BOARDED-WINDOW-FCN - Boarded window interactions
-- [ ] BODY-FUNCTION - Dead body interactions
-- [ ] BOLT-F - Dam bolt mechanics
-- [ ] BOTTLE-FUNCTION - Bottle container
-- [ ] BUBBLE-F - Bubble interactions
-- [ ] BUTTON-F - Dam control buttons
-- [ ] CANDLES-FCN - Candle lighting/burning
-- [ ] CELLAR-FCN - Cellar room handler
-- [ ] CHALICE-FCN - Chalice interactions
-- [ ] CHIMNEY-F - Chimney navigation
-- [ ] CLEARING-FCN - Clearing room handler
-- [ ] CRACK-FCN - Crack examination
-- [ ] CYCLOPS-FCN - Cyclops NPC behavior
-- [ ] CYCLOPS-ROOM-FCN - Cyclops room handler
-- [ ] DAM-FUNCTION - Dam mechanics
-- [ ] DAM-ROOM-FCN - Dam room handler
-- [ ] DBOAT-FUNCTION - Deflated boat
-- [ ] DEAD-FUNCTION - Death handling
-- [ ] DEEP-CANYON-F - Deep canyon navigation
-- [ ] DOME-ROOM-FCN - Dome room handler
-- [ ] FOREST-F - Forest room handler
-- [ ] FRONT-DOOR-FCN - Front door interactions
-- [ ] GARLIC-F - Garlic eating/bat repellent
-- [ ] GHOSTS-F - Ghost interactions
-- [ ] GRANITE-WALL-F - Granite wall examination
-- [ ] GRATE-FUNCTION - Grating open/close/lock
-- [ ] GUNK-FUNCTION - Gunk/sludge interactions
-- [ ] HOT-BELL-F - Hot bell (after exorcism)
-- [ ] IBOAT-FUNCTION - Inflated boat
+- [x] AXE-F - Axe interaction with Troll
+- [x] BAG-OF-COINS-F - Stupid container for coins
+- [x] BARROW-DOOR-FCN - Barrow door interactions
+- [x] BARROW-FCN - Stone Barrow room handler
+- [x] BASKET-F - Basket/dumbwaiter mechanics
+- [x] BAT-F - Bat attack/defense
+- [x] BELL-F - Bell ringing mechanics
+- [x] BOARD-F - Board manipulation
+- [x] BOARDED-WINDOW-FCN - Boarded window interactions
+- [x] BODY-FUNCTION - Dead body interactions
+- [x] BOLT-F - Dam bolt mechanics
+- [x] BOTTLE-FUNCTION - Bottle container
+- [x] BUBBLE-F - Bubble interactions
+- [x] BUTTON-F - Dam control buttons
+- [x] CANDLES-FCN - Candle lighting/burning
+- [x] CELLAR-FCN - Cellar room handler
+- [x] CHALICE-FCN - Chalice interactions
+- [x] CHIMNEY-F - Chimney navigation
+- [x] CLEARING-FCN - Clearing room handler
+- [x] CRACK-FCN - Crack examination
+- [x] CYCLOPS-FCN - Cyclops NPC behavior
+- [x] CYCLOPS-ROOM-FCN - Cyclops room handler
+- [x] DAM-FUNCTION - Dam mechanics
+- [x] DAM-ROOM-FCN - Dam room handler
+- [x] DBOAT-FUNCTION - Deflated boat
+- [x] DEAD-FUNCTION - Death handling
+- [x] DEEP-CANYON-F - Deep canyon navigation
+- [x] DOME-ROOM-FCN - Dome room handler
+- [x] FOREST-F - Forest room handler
+- [x] FRONT-DOOR-FCN - Front door interactions
+- [x] GARLIC-F - Garlic eating/bat repellent
+- [x] GHOSTS-F - Ghost interactions
+- [x] GRANITE-WALL-F - Granite wall examination
+- [x] GRATE-FUNCTION - Grating open/close/lock
+- [x] GUNK-FUNCTION - Gunk/sludge interactions
+- [x] HOT-BELL-F - Hot bell (after exorcism)
+- [x] IBOAT-FUNCTION - Inflated boat
 - [ ] KITCHEN-FCN - Kitchen room handler
 - [ ] KITCHEN-WINDOW-F - Kitchen window
 - [ ] KNIFE-F - Rusty knife with sword
