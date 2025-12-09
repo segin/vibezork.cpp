@@ -307,13 +307,43 @@ bool knifeAction() {
     return false;
 }
 
-// LARGE-BAG-F (Thief's bag)
+// LARGE-BAG-F - Thief's bag object action
+// ZIL: Prevents taking/opening bag while thief is alive/unconscious
+// Source: 1actions.zil lines 2094-2112
 bool largeBagAction() {
     auto& g = Globals::instance();
-    if (g.prsa == V_OPEN || g.prsa == V_CLOSE) {
-        printLine("The thief's bag is already open.");
+    
+    // TAKE - blocked based on thief state
+    if (g.prsa == V_TAKE) {
+        ZObject* thief = g.getObject(ObjectIds::THIEF);
+        // Check if thief is unconscious (collapsed on bag) vs dead
+        // If thief has NDESCBIT, he's dead; otherwise he's alive/unconscious
+        if (thief && !thief->hasFlag(ObjectFlag::NDESCBIT)) {
+            printLine("Sadly for you, the robber collapsed on top of the bag. Trying to take it would wake him.");
+        } else {
+            printLine("The bag will be taken over his dead body.");
+        }
         return true;
     }
+    
+    // PUT into bag blocked
+    if (g.prsa == V_PUT && g.prsi && g.prsi->getId() == ObjectIds::BAG) {
+        printLine("It would be a good trick.");
+        return true;
+    }
+    
+    // OPEN/CLOSE blocked
+    if (g.prsa == V_OPEN || g.prsa == V_CLOSE) {
+        printLine("Getting close enough would be a good trick.");
+        return true;
+    }
+    
+    // EXAMINE/LOOK-INSIDE
+    if (g.prsa == V_EXAMINE || g.prsa == V_LOOK_INSIDE) {
+        printLine("The bag is underneath the thief, so one can't say what, if anything, is inside.");
+        return true;
+    }
+    
     return false;
 }
 
@@ -456,9 +486,8 @@ bool rustyKnifeAction() {
                   "overmastering will. Slowly, your hand turns, until the rusty blade "
                   "is an inch from your neck. The knife seems to sing as it savagely "
                   "slits your throat.");
-        
-        // Trigger death
-        DeathSystem::killPlayer(DeathSystem::CauseOfDeath::KNIFE_CURSE);
+        // Trigger death using jigsUp (the knife curse has already printed its message)
+        DeathSystem::jigsUp("", DeathSystem::DeathCause::OTHER);
         return true;
     }
     
