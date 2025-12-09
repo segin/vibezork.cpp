@@ -116,6 +116,18 @@ bool barrowDoorAction() {
     return false;
 }
 
+// BARROW-FCN - Stone barrow entrance, THROUGH goes west
+// ZIL: <COND (<VERB? THROUGH> <DO-WALK ,P?WEST>)>
+// Source: 1actions.zil lines 436-438
+bool barrowAction() {
+    auto& g = Globals::instance();
+    if (g.prsa == V_THROUGH || g.prsa == V_ENTER) {
+        Verbs::vWalkDir(Direction::WEST);
+        return true;
+    }
+    return false;
+}
+
 // CELLAR-FCN (Room action for Cellar)
 void cellarAction(int rarg) {
     // M_LOOK: Handle darkness, trap door, etc.

@@ -229,6 +229,48 @@ TEST(BarrowDoorFcn_OtherVerbsReturnFalse) {
 }
 
 // =============================================================================
+// BARROW-FCN Tests (1actions.zil lines 436-438)
+// ZIL Logic: THROUGH verb triggers walk west
+// =============================================================================
+
+extern bool barrowAction();
+
+TEST(BarrowFcn_ThroughReturnsTrue) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prsa = V_THROUGH;
+    
+    bool result = barrowAction();
+    
+    // THROUGH handled
+    ASSERT_TRUE(result);
+}
+
+TEST(BarrowFcn_EnterReturnsTrue) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prsa = V_ENTER;
+    
+    bool result = barrowAction();
+    
+    // ENTER handled (synonym for THROUGH)
+    ASSERT_TRUE(result);
+}
+
+TEST(BarrowFcn_OtherVerbsReturnFalse) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prsa = V_EXAMINE;
+    
+    bool result = barrowAction();
+    
+    ASSERT_FALSE(result);
+}
+
+// =============================================================================
 // KNIFE-F Tests (1actions.zil lines 926-929)
 // ZIL Logic: On TAKE, clears ATTIC-TABLE NDESCBIT
 // =============================================================================
