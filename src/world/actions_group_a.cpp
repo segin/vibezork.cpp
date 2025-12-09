@@ -3,6 +3,8 @@
 #include "verbs/verbs.h"
 #include "core/io.h"
 #include "world/objects.h"
+#include "world/rooms.h"
+#include "systems/death.h"
 
 // Helper for STUPID-CONTAINER logic (Bag of Coins, Trunk)
 // Returns true if handled
@@ -424,15 +426,37 @@ bool robberAction() {
     return false;
 }
 
-// RUSTY-KNIFE-FCN
+// RUSTY-KNIFE-FCN - Cursed knife that kills player when used to attack
+// ZIL Source: 1actions.zil lines 907-924
 bool rustyKnifeAction() {
     auto& g = Globals::instance();
+    
+    // TAKE with sword present - sword glows
     if (g.prsa == V_TAKE) {
         ZObject* sword = g.getObject(ObjectIds::SWORD);
         if (sword && sword->getLocation() == g.winner) {
-            printLine("As you touch the rusty knife, your sword gives a single pulse of light.");
+            printLine("As you touch the rusty knife, your sword gives a single pulse of blinding blue light.");
         }
+        return false;  // Allow take to proceed
     }
+    
+    // ATTACK with rusty knife or SWING at something - kills player!
+    if ((g.prsa == V_ATTACK && g.prsi && g.prsi->getId() == ObjectIds::RUSTY_KNIFE) ||
+        (g.prsa == V_SWING && g.prso && g.prso->getId() == ObjectIds::RUSTY_KNIFE && g.prsi)) {
+        // Remove knife and kill player
+        ZObject* knife = g.getObject(ObjectIds::RUSTY_KNIFE);
+        if (knife) knife->moveTo(nullptr);
+        
+        printLine("As the knife approaches its victim, your mind is submerged by an "
+                  "overmastering will. Slowly, your hand turns, until the rusty blade "
+                  "is an inch from your neck. The knife seems to sing as it savagely "
+                  "slits your throat.");
+        
+        // Trigger death
+        DeathSystem::killPlayer(DeathSystem::CauseOfDeath::KNIFE_CURSE);
+        return true;
+    }
+    
     return false;
 }
 
