@@ -374,6 +374,38 @@ TEST(BatF_OtherVerbsReturnFalse) {
 }
 
 // =============================================================================
+// BELL-F Tests (1actions.zil lines 343-349)
+// ZIL Logic: RING prints "Ding, dong."
+// =============================================================================
+
+extern bool bellAction();
+
+TEST(BellF_RingPrintsDingDong) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prsa = V_RING;
+    
+    OutputCapture cap;
+    bool result = bellAction();
+    
+    ASSERT_TRUE(result);
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("Ding") != std::string::npos);
+}
+
+TEST(BellF_OtherVerbsReturnFalse) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prsa = V_EXAMINE;
+    
+    bool result = bellAction();
+    
+    ASSERT_FALSE(result);
+}
+
+// =============================================================================
 // KNIFE-F Tests (1actions.zil lines 926-929)
 // ZIL Logic: On TAKE, clears ATTIC-TABLE NDESCBIT
 // =============================================================================
