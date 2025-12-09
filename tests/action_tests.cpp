@@ -130,6 +130,58 @@ TEST(AxeF_TrollNotInRoomAllowsTake) {
 }
 
 // =============================================================================
+// BAG-OF-COINS-F Tests (1actions.zil lines 4137-4152)
+// ZIL Logic: STUPID-CONTAINER for coins - blocks OPEN/CLOSE, handles EXAMINE
+// =============================================================================
+
+extern bool bagOfCoinsAction();
+
+TEST(BagOfCoinsF_OpenReturnsMessage) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prsa = V_OPEN;
+    g.prso = g.getObject(ObjectIds::BAG_OF_COINS);
+    
+    OutputCapture cap;
+    bool result = bagOfCoinsAction();
+    
+    ASSERT_TRUE(result);
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("coins") != std::string::npos);
+    ASSERT_TRUE(output.find("safely inside") != std::string::npos);
+}
+
+TEST(BagOfCoinsF_ExamineShowsContents) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prsa = V_EXAMINE;
+    g.prso = g.getObject(ObjectIds::BAG_OF_COINS);
+    
+    OutputCapture cap;
+    bool result = bagOfCoinsAction();
+    
+    ASSERT_TRUE(result);
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("lots of") != std::string::npos);
+    ASSERT_TRUE(output.find("coins") != std::string::npos);
+}
+
+TEST(BagOfCoinsF_TakeReturnsFalse) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prsa = V_TAKE;
+    g.prso = g.getObject(ObjectIds::BAG_OF_COINS);
+    
+    bool result = bagOfCoinsAction();
+    
+    // TAKE not handled by stupid container, returns false
+    ASSERT_FALSE(result);
+}
+
+// =============================================================================
 // KNIFE-F Tests (1actions.zil lines 926-929)
 // ZIL Logic: On TAKE, clears ATTIC-TABLE NDESCBIT
 // =============================================================================
