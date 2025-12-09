@@ -498,6 +498,38 @@ TEST(BoardedWindowFcn_OtherVerbsReturnFalse) {
 }
 
 // =============================================================================
+// BODY-FUNCTION Tests (1actions.zil lines 2178-2185)
+// ZIL Logic: TAKE = "force keeps you", MUNG/BURN = death
+// =============================================================================
+
+extern bool bodyAction();
+
+TEST(BodyFunction_TakePrintsForceKeepsYou) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prsa = V_TAKE;
+    
+    OutputCapture cap;
+    bool result = bodyAction();
+    
+    ASSERT_TRUE(result);
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("force keeps you") != std::string::npos);
+}
+
+TEST(BodyFunction_OtherVerbsReturnFalse) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prsa = V_EXAMINE;
+    
+    bool result = bodyAction();
+    
+    ASSERT_FALSE(result);
+}
+
+// =============================================================================
 // KNIFE-F Tests (1actions.zil lines 926-929)
 // ZIL Logic: On TAKE, clears ATTIC-TABLE NDESCBIT
 // =============================================================================

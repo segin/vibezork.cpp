@@ -876,15 +876,20 @@ bool boardedWindowAction() {
     return false;
 }
 
-// BODY-FUNCTION (Dead adventurer's body)
+// BODY-FUNCTION - Dead adventurer bodies
+// ZIL: TAKE = "force keeps you", MUNG/BURN = death
+// Source: 1actions.zil lines 2178-2185
 bool bodyAction() {
     auto& g = Globals::instance();
-    if (g.prsa == V_EXAMINE) {
-        printLine("The body is that of a previous adventurer, long dead.");
+    if (g.prsa == V_TAKE) {
+        printLine("A force keeps you from taking the bodies.");
         return true;
     }
-    if (g.prsa == V_TAKE) {
-        printLine("A ghost appears and drives you away!");
+    if (g.prsa == V_ATTACK || g.prsa == V_BURN) {
+        // Death for disrespecting the bodies
+        printLine("The voice of the guardian of the dungeon booms out from the darkness, "
+                  "\"Your disrespect costs you your life!\" and places your head on a sharp pole.");
+        DeathSystem::jigsUp("", DeathSystem::DeathCause::OTHER);
         return true;
     }
     return false;
