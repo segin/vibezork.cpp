@@ -1,5 +1,8 @@
 #include "score.h"
 
+// External flag from actions.cpp for end game access
+extern bool wonFlag;
+
 ScoreSystem& ScoreSystem::instance() {
     static ScoreSystem instance;
     return instance;
@@ -10,6 +13,11 @@ void ScoreSystem::addScore(int points) {
     score_ += points;
     if (score_ > MAX_SCORE) {
         score_ = MAX_SCORE;
+    }
+    
+    // Trigger end game when max score reached (Requirement 70: Winnability)
+    if (score_ >= MAX_SCORE && !wonFlag) {
+        wonFlag = true;
     }
 }
 

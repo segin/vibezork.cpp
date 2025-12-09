@@ -10,6 +10,10 @@
 // Global flag for winning the game
 bool wonFlag = false;
 
+// Dam puzzle state (Requirement 70.2: Dam puzzle)
+// Yellow button opens the gates, brown button closes them
+bool damGatesOpen = false;
+
 // Room action functions
 void westHouseAction(int rarg) {
     if (rarg == M_LOOK) {
@@ -1046,13 +1050,40 @@ bool machineAction() {
     
     // Handle EXAMINE
     if (g.prsa == V_EXAMINE) {
-        printLine("The machine is a large metal contraption with various buttons, switches, and levers. It appears to be some kind of control panel.");
+        if (g.prso->hasFlag(ObjectFlag::OPENBIT)) {
+            printLine("The machine is a large metal contraption with an open lid. Inside, you can see a container designed to hold something.");
+        } else {
+            printLine("The machine is a large metal contraption with a closed lid. There's a switch on one side.");
+        }
         return RTRUE;
     }
     
-    // Handle TURN/PUSH/PULL - interact with machine
-    if (g.prsa == V_TURN || g.prsa == V_PUSH || g.prsa == V_PULL) {
-        printLine("The machine makes a grinding noise but nothing else happens.");
+    // Handle TURN - activate the machine (coal to diamond)
+    if (g.prsa == V_TURN) {
+        // Check if machine is closed
+        if (g.prso->hasFlag(ObjectFlag::OPENBIT)) {
+            printLine("The machine must be closed before you switch it on.");
+            return RTRUE;
+        }
+        
+        // Check if coal is inside the machine
+        ZObject* coal = g.getObject(ObjectIds::COAL);
+        if (coal && coal->getLocation() == g.prso) {
+            // Transform coal to diamond!
+            printLine("The machine whirs and crackles. Smoke pours from the vents.\nAfter a moment, the machine stops.");
+            
+            // Get or create diamond
+            ZObject* diamond = g.getObject(ObjectIds::DIAMOND);
+            if (diamond) {
+                // Move diamond to machine (replacing coal)
+                diamond->moveTo(g.prso);
+                // Remove coal completely
+                coal->moveTo(nullptr);
+            }
+            return RTRUE;
+        }
+        
+        printLine("The machine makes a grinding noise but nothing useful happens.");
         return RTRUE;
     }
     
@@ -1062,7 +1093,13 @@ bool machineAction() {
             printLine("The machine is already open.");
         } else {
             g.prso->setFlag(ObjectFlag::OPENBIT);
-            printLine("You open the machine's access panel.");
+            printLine("You open the machine lid.");
+            
+            // Show contents
+            ZObject* diamond = g.getObject(ObjectIds::DIAMOND);
+            if (diamond && diamond->getLocation() == g.prso) {
+                printLine("Inside is a beautiful diamond!");
+            }
         }
         return RTRUE;
     }
@@ -1073,7 +1110,7 @@ bool machineAction() {
             printLine("The machine is already closed.");
         } else {
             g.prso->clearFlag(ObjectFlag::OPENBIT);
-            printLine("You close the machine's access panel.");
+            printLine("You close the machine lid.");
         }
         return RTRUE;
     }
@@ -1249,9 +1286,19 @@ bool buttonAction() {
     // Handle PUSH - pressing the button
     if (g.prsa == V_PUSH) {
         if (isYellow) {
-            printLine("You press the yellow button. A light flashes.");
+            if (damGatesOpen) {
+                printLine("The yellow button is already depressed. The gates are open.");
+            } else {
+                damGatesOpen = true;
+                printLine("You press the yellow button. A rumbling noise sounds from the dam and water rushes through the opened gates!");
+            }
         } else if (isBrown) {
-            printLine("You press the brown button. You hear a grinding noise.");
+            if (!damGatesOpen) {
+                printLine("The brown button is already depressed. The gates are closed.");
+            } else {
+                damGatesOpen = false;
+                printLine("You press the brown button. The rumbling subsides as the gates close.");
+            }
         } else if (isRed) {
             printLine("You press the red button. A siren sounds briefly.");
         } else if (isBlue) {
