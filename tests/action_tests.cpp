@@ -271,6 +271,54 @@ TEST(BarrowFcn_OtherVerbsReturnFalse) {
 }
 
 // =============================================================================
+// BASKET-F Tests (1actions.zil lines 277-306)
+// ZIL Logic: RAISE/LOWER moves basket, TAKE blocked (securely fastened)
+// =============================================================================
+
+extern bool basketAction();
+
+TEST(BasketF_RaiseHandled) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prso = g.getObject(ObjectIds::RAISED_BASKET);
+    g.prsa = V_RAISE;
+    
+    OutputCapture cap;
+    bool result = basketAction();
+    
+    ASSERT_TRUE(result);
+}
+
+TEST(BasketF_LowerHandled) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prso = g.getObject(ObjectIds::RAISED_BASKET);
+    g.prsa = V_LOWER;
+    
+    OutputCapture cap;
+    bool result = basketAction();
+    
+    ASSERT_TRUE(result);
+}
+
+TEST(BasketF_TakeBlocked) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prso = g.getObject(ObjectIds::RAISED_BASKET);
+    g.prsa = V_TAKE;
+    
+    OutputCapture cap;
+    bool result = basketAction();
+    
+    ASSERT_TRUE(result);
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("securely fastened") != std::string::npos);
+}
+
+// =============================================================================
 // KNIFE-F Tests (1actions.zil lines 926-929)
 // ZIL Logic: On TAKE, clears ATTIC-TABLE NDESCBIT
 // =============================================================================
