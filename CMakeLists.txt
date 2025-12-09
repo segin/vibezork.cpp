@@ -163,4 +163,7 @@ if(BUILD_TESTS)
     # Performance tests (Task 71)
     add_executable(performance_tests tests/performance_tests.cpp ${LIB_SOURCES})
     add_test(NAME PerformanceTests COMMAND performance_tests)
+    # Trophy Case tests
+    add_executable(trophy_case_test tests/trophy_case_test.cpp ${LIB_SOURCES})
+    add_test(NAME TrophyCaseTest COMMAND trophy_case_test)
 endif()

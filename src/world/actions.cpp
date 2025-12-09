@@ -4,6 +4,7 @@
 #include "verbs/verbs.h"
 #include "systems/npc.h"
 #include "systems/candle.h"
+#include "systems/score.h"
 #include <memory>
 
 // Global flag for winning the game
@@ -67,10 +68,36 @@ bool mailboxAction() {
 
 bool trophyCaseAction() {
     auto& g = Globals::instance();
+    
+    // Prevent taking the trophy case
     if (g.prsa == V_TAKE && g.prso && g.prso->getId() == ObjectIds::TROPHY_CASE) {
         printLine("The trophy case is securely fastened to the wall.");
         return RTRUE;
     }
+    
+    // Handle putting treasures into the trophy case (Requirement 85)
+    // ZIL: TROPHY-CASE-F (M-PUT)
+    if (g.prsa == V_PUT && g.prsi && g.prsi->getId() == ObjectIds::TROPHY_CASE) {
+        if (g.prso) {
+            // Check if object has TVALUE (treasure value for storing)
+            int tValue = g.prso->getProperty(P_TVALUE);
+            
+            if (tValue > 0) {
+                auto& scoreSystem = ScoreSystem::instance();
+                
+                // Only award points if not already scored
+                if (!scoreSystem.isTreasureScored(g.prso->getId())) {
+                    scoreSystem.addScore(tValue);
+                    scoreSystem.markTreasureScored(g.prso->getId());
+                    
+                    // ZIL logic: "You get x points for putting the y in the trophy case."
+                    // But standard Zork transcript often just says "Done." and adds score silently?
+                    // Let's rely on standard vPut "Done." message by returning RFALSE.
+                }
+            }
+        }
+    }
+    
     return RFALSE;
 }
 
