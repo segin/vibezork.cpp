@@ -26,6 +26,11 @@ bool ZObject::hasFlag(ObjectFlag flag) const {
 }
 
 void ZObject::moveTo(ZObject* location) {
+    // Prevent moving object to itself
+    if (location == this) {
+        return;
+    }
+    
     // Remove from current location
     if (location_) {
         auto& contents = location_->contents_;
@@ -50,13 +55,17 @@ void ZObject::addAdjective(std::string_view adj) {
 }
 
 bool ZObject::hasSynonym(std::string_view word) const {
-    // O(1) lookup using hash set instead of O(n) linear search
-    return synonymSet_.find(std::string(word)) != synonymSet_.end();
+    // O(1) lookup using hash set, case-insensitive
+    std::string lowerWord(word);
+    std::transform(lowerWord.begin(), lowerWord.end(), lowerWord.begin(), ::tolower);
+    return synonymSet_.find(lowerWord) != synonymSet_.end();
 }
 
 bool ZObject::hasAdjective(std::string_view word) const {
-    // O(1) lookup using hash set instead of O(n) linear search
-    return adjectiveSet_.find(std::string(word)) != adjectiveSet_.end();
+    // O(1) lookup using hash set, case-insensitive
+    std::string lowerWord(word);
+    std::transform(lowerWord.begin(), lowerWord.end(), lowerWord.begin(), ::tolower);
+    return adjectiveSet_.find(lowerWord) != adjectiveSet_.end();
 }
 
 void ZObject::setText(std::string_view text) {
