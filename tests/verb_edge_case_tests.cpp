@@ -22,9 +22,9 @@ TEST(VerbPreCheckTakeNonExistent) {
     g.prsa = V_TAKE;
     g.prso = nullptr;
     
-    // Should handle gracefully
+    // Should handle gracefully - verbs return true when handled (ZIL semantics)
     bool result = Verbs::vTake();
-    ASSERT_FALSE(result);
+    ASSERT_TRUE(result);
     
     g.reset();
 }
@@ -49,8 +49,9 @@ TEST(VerbPreCheckDropNotInInventory) {
     g.prsa = V_DROP;
     g.prso = lampPtr;
     
+    // Even error cases return true (command was handled)
     bool result = Verbs::vDrop();
-    ASSERT_FALSE(result);
+    ASSERT_TRUE(result);
     
     g.reset();
 }
@@ -75,8 +76,9 @@ TEST(VerbPreCheckOpenNonContainer) {
     g.prsa = V_OPEN;
     g.prso = lampPtr;
     
+    // Even error cases return true (command was handled)
     bool result = Verbs::vOpen();
-    ASSERT_FALSE(result);
+    ASSERT_TRUE(result);
     
     g.reset();
 }
@@ -103,8 +105,9 @@ TEST(VerbErrorTakeAnchored) {
     g.prsa = V_TAKE;
     g.prso = housePtr;
     
+    // Even error cases return true (command was handled)
     bool result = Verbs::vTake();
-    ASSERT_FALSE(result);
+    ASSERT_TRUE(result);
     
     g.reset();
 }
@@ -139,8 +142,9 @@ TEST(VerbErrorPutInClosedContainer) {
     g.prso = lampPtr;
     g.prsi = boxPtr;
     
+    // Even error cases return true (command was handled)
     bool result = Verbs::vPut();
-    ASSERT_FALSE(result);
+    ASSERT_TRUE(result);
     
     g.reset();
 }
