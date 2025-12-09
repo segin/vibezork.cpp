@@ -212,9 +212,12 @@ bool whiteHouseAction() {
     return RFALSE;
 }
 
+// BOARD-F - Boards are securely fastened 
+// ZIL: TAKE/EXAMINE prints "The boards are securely fastened."
+// Source: 1actions.zil lines 44-46
 bool boardAction() {
     auto& g = Globals::instance();
-    if (g.prsa == V_TAKE) {
+    if (g.prsa == V_TAKE || g.prsa == V_EXAMINE) {
         printLine("The boards are securely fastened.");
         return RTRUE;
     }

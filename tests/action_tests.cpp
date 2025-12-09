@@ -406,6 +406,52 @@ TEST(BellF_OtherVerbsReturnFalse) {
 }
 
 // =============================================================================
+// BOARD-F Tests (1actions.zil lines 44-46)
+// ZIL Logic: TAKE/EXAMINE prints "The boards are securely fastened."
+// =============================================================================
+
+extern bool boardAction();
+
+TEST(BoardF_TakePrintsSecurelyFastened) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prsa = V_TAKE;
+    
+    OutputCapture cap;
+    bool result = boardAction();
+    
+    ASSERT_TRUE(result);
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("securely fastened") != std::string::npos);
+}
+
+TEST(BoardF_ExaminePrintsSecurelyFastened) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prsa = V_EXAMINE;
+    
+    OutputCapture cap;
+    bool result = boardAction();
+    
+    ASSERT_TRUE(result);
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("securely fastened") != std::string::npos);
+}
+
+TEST(BoardF_OtherVerbsReturnFalse) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prsa = V_OPEN;
+    
+    bool result = boardAction();
+    
+    ASSERT_FALSE(result);
+}
+
+// =============================================================================
 // KNIFE-F Tests (1actions.zil lines 926-929)
 // ZIL Logic: On TAKE, clears ATTIC-TABLE NDESCBIT
 // =============================================================================
