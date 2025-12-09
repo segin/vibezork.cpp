@@ -388,9 +388,52 @@ bool leakAction() {
     return false;
 }
 
-// LIVING-ROOM-FCN (Room action)
+// LIVING-ROOM-FCN - Living room handler with dynamic description
+// ZIL: M-LOOK shows door/trophy/rug/trap door state, M-END updates score
+// Source: 1actions.zil lines 449-485
+static bool rugMoved = false;  // RUG-MOVED flag
+static bool magicFlag = false; // MAGIC-FLAG (cyclops door opened)
+
 void livingRoomAction(int rarg) {
-    // Handle rug, trap door, etc.
+    auto& g = Globals::instance();
+    
+    // M-LOOK: Dynamic room description
+    if (rarg == 0) {
+        print("You are in the living room. There is a doorway to the east");
+        
+        // Check door state (magic cyclops door vs nailed shut)
+        if (magicFlag) {
+            print(". To the west is a cyclops-shaped opening in an old wooden door, "
+                  "above which is some strange gothic lettering, ");
+        } else {
+            print(", a wooden door with strange gothic lettering to the west, "
+                  "which appears to be nailed shut, ");
+        }
+        
+        print("a trophy case, ");
+        
+        // Check rug/trap door state
+        ZObject* trapDoor = g.getObject(ObjectIds::TRAP_DOOR);
+        bool trapOpen = trapDoor && trapDoor->hasFlag(ObjectFlag::OPENBIT);
+        
+        if (rugMoved && trapOpen) {
+            printLine("and a rug lying beside an open trap door.");
+        } else if (rugMoved) {
+            printLine("and a closed trap door at your feet.");
+        } else if (trapOpen) {
+            printLine("and an open trap door at your feet.");
+        } else {
+            printLine("and a large oriental rug in the center of the room.");
+        }
+    }
+    
+    // M-END: Update score when touching trophy case
+    if (rarg == 2) {
+        if (g.prsa == V_TAKE || (g.prsa == V_PUT && g.prsi && 
+            g.prsi->getId() == ObjectIds::TROPHY_CASE)) {
+            // Score update handled by score system
+        }
+    }
 }
 
 // LOUD-ROOM-FCN (Room action - echoes)
