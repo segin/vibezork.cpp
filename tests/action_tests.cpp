@@ -182,6 +182,53 @@ TEST(BagOfCoinsF_TakeReturnsFalse) {
 }
 
 // =============================================================================
+// BARROW-DOOR-FCN Tests (1actions.zil lines 432-434)
+// ZIL Logic: OPEN/CLOSE prints "The door is too heavy."
+// =============================================================================
+
+extern bool barrowDoorAction();
+
+TEST(BarrowDoorFcn_OpenPrintsTooHeavy) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prsa = V_OPEN;
+    
+    OutputCapture cap;
+    bool result = barrowDoorAction();
+    
+    ASSERT_TRUE(result);
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("too heavy") != std::string::npos);
+}
+
+TEST(BarrowDoorFcn_ClosePrintsTooHeavy) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prsa = V_CLOSE;
+    
+    OutputCapture cap;
+    bool result = barrowDoorAction();
+    
+    ASSERT_TRUE(result);
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("too heavy") != std::string::npos);
+}
+
+TEST(BarrowDoorFcn_OtherVerbsReturnFalse) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prsa = V_EXAMINE;
+    
+    bool result = barrowDoorAction();
+    
+    // Other verbs not handled
+    ASSERT_FALSE(result);
+}
+
+// =============================================================================
 // KNIFE-F Tests (1actions.zil lines 926-929)
 // ZIL Logic: On TAKE, clears ATTIC-TABLE NDESCBIT
 // =============================================================================

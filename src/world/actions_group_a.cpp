@@ -104,11 +104,13 @@ bool grueAction() {
     return true;
 }
 
-// BARROW-DOOR-FCN
+// BARROW-DOOR-FCN - Barrow door is too heavy to open/close
+// ZIL: OPEN/CLOSE prints "The door is too heavy."
+// Source: 1actions.zil lines 432-434
 bool barrowDoorAction() {
     auto& g = Globals::instance();
     if (g.prsa == V_OPEN || g.prsa == V_CLOSE) {
-        printLine("The door is firmly closed and cannot be opened.");
+        printLine("The door is too heavy.");
         return true;
     }
     return false;
