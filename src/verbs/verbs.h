@@ -192,6 +192,26 @@ constexpr VerbId V_TREASURE = 208;
 constexpr VerbId V_STAY = 209;
 // V_SWIM exists as 141
 
+// Phase 10.3 Batch 5: Cleanup & Edge Cases
+constexpr VerbId V_BRUSH = 211;
+constexpr VerbId V_BUG = 212;
+constexpr VerbId V_CHOMP = 213;
+constexpr VerbId V_COUNT = 214;
+constexpr VerbId V_CROSS = 215;
+constexpr VerbId V_HATCH = 216;
+constexpr VerbId V_KNOCK = 217;
+constexpr VerbId V_LEAVE = 218; // Handling LEAVE vs LEAVE OBJ (Exit vs Drop)
+constexpr VerbId V_LEAN_ON = 219;
+constexpr VerbId V_PUMP = 220;
+constexpr VerbId V_STRIKE = 221; // Intransitive STRIKE support
+// V_RAPE exists as 157
+// V_CURSE exists as 144
+constexpr VerbId V_READ_PAGE = 224; // Read object (book)
+constexpr VerbId V_PICK = 225;
+constexpr VerbId V_APPLY = 226;
+
+
+
 // Verb handlers
 namespace Verbs {
     bool vLook();
@@ -267,6 +287,23 @@ namespace Verbs {
     bool vTreasure();
     bool vStay();
     bool vSwim(); // ID exists, handler might not?
+
+    // Batch 5: Cleanup
+    bool vBrush();
+    bool vBug();
+    bool vChomp();
+    bool vCount();
+    bool vCross();
+    bool vHatch();
+    bool vKnock();
+    bool vLeave();
+    bool vLeanOn();
+    bool vPump();
+    bool vStrike();
+    bool vReadPage();
+    bool vPick();
+    bool vApply();
+
 
     bool vWalk();
     bool vWalkDir(Direction dir);

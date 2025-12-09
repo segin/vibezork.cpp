@@ -159,7 +159,7 @@ TEST(RegistrySynonyms) {
 
     // Manipulation
     check(V_TAKE, {"take", "get", "hold", "carry", "remove", "grab", "catch"});
-    check(V_DROP, {"drop", "leave"});
+    check(V_DROP, {"drop"});
     check(V_PUT, {"put", "stuff", "insert", "place", "hide"});
     check(V_GIVE, {"give", "donate", "offer", "feed"});
     
@@ -183,7 +183,7 @@ TEST(RegistrySynonyms) {
     check(V_DISEMBARK, {"disembark"});
     
     // Combat
-    check(V_ATTACK, {"attack", "fight", "hurt", "injure", "hit", "strike"});
+    check(V_ATTACK, {"attack", "fight", "hurt", "injure", "hit"});
     check(V_KILL, {"kill", "murder", "slay", "dispatch"});
     check(V_THROW, {"throw", "hurl", "chuck", "toss"});
     check(V_SWING, {"swing", "thrust"});
@@ -283,6 +283,21 @@ TEST(RegistrySynonyms) {
     check(V_STAY, {"stay"});
     // V_SWIM checked below
     
+    // Cleanup Batch Verification
+    check(V_BRUSH, {"brush", "clean"});
+    check(V_BUG, {"bug"});
+    check(V_CHOMP, {"chomp", "lose"}); 
+    check(V_COUNT, {"count"});
+    check(V_CROSS, {"cross", "ford"});
+    check(V_HATCH, {"hatch"});
+    check(V_KNOCK, {"knock", "rap"});
+    check(V_LEAVE, {"leave"});
+    check(V_LEAN_ON, {"lean"});
+    check(V_PUMP, {"pump"});
+    check(V_STRIKE, {"strike"});
+    check(V_PICK, {"pick"});
+    check(V_APPLY, {"apply"});
+
     // Easter Eggs / Misc
     check(V_WAIT, {"wait"}); // zswait
     check(V_SWIM, {"swim"});

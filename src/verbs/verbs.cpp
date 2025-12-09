@@ -2864,4 +2864,80 @@ bool vStay() {
 
 
 
+
+// Phase 10.3 Batch 5: Cleanup & Edge Cases
+
+bool vBrush() {
+    printLine("You can't brush that.");
+    return RTRUE;
+}
+
+bool vBug() {
+    printLine("If you find a bug, please start an issue on the tracker."); // Modernized
+    return RTRUE;
+}
+
+bool vChomp() {
+    printLine("Preposterous!");
+    // ZIL: "I don't know how to do that. I win in all cases."
+    return RTRUE;
+}
+
+bool vCount() {
+    printLine("You have lost your mind.");
+    return RTRUE;
+}
+
+bool vCross() {
+    printLine("You can't cross that.");
+    return RTRUE;
+}
+
+bool vHatch() {
+    printLine("I don't think that can be hatched.");
+    // ZIL: "Bizarre!"
+    return RTRUE;
+}
+
+bool vKnock() {
+    printLine("Why knock on that?");
+    return RTRUE;
+}
+
+bool vLeave() {
+    printLine("Leave what?");
+    return RTRUE;
+}
+
+bool vLeanOn() {
+    printLine("That's not a good idea.");
+    return RTRUE;
+}
+
+bool vPump() {
+    printLine("It's not a pump.");
+    return RTRUE;
+}
+
+bool vStrike() {
+    printLine("You have to be more specific!"); // Intransitive response
+    return RTRUE;
+}
+
+bool vReadPage() {
+    printLine("You can't read that.");
+    return RTRUE;
+}
+
+
+bool vPick() {
+    printLine("Pick what?");
+    return RTRUE;
+}
+
+bool vApply() {
+    printLine("Apply what?");
+    return RTRUE;
+}
+
 } // namespace Verbs

@@ -190,6 +190,25 @@ void VerbRegistry::initializeVerbSynonyms() {
     registerVerb(V_TREASURE, {"treasure"});
     registerVerb(V_STAY, {"stay"});
     registerVerb(V_SWIM, {"swim", "bathe", "wade"});
+
+    // Cleanup Linkages (Phase 10.3 Batch 5)
+    registerVerb(V_BRUSH, {"brush", "clean"});
+    registerVerb(V_BUG, {"bug"});
+    registerVerb(V_CHOMP, {"chomp", "lose"}); // LOSE matches ZIL CHOMP behavior? ZIL: CHOMP = LOSE, EAT
+    registerVerb(V_COUNT, {"count"});
+    registerVerb(V_CROSS, {"cross", "ford"});
+    registerVerb(V_HATCH, {"hatch"});
+    registerVerb(V_KNOCK, {"knock", "rap"});
+    registerVerb(V_LEAVE, {"leave"});
+    registerVerb(V_LEAN_ON, {"lean"});
+    registerVerb(V_PUMP, {"pump"});
+    registerVerb(V_STRIKE, {"strike"}); // Also maps to ATTACK via syntax?
+    // STRIKE is tricky. Usually "strike X" = Attack. "strike" = V-Strike.
+    // I will register V_STRIKE and use syntax to map Object to V_ATTACK.
+    registerVerb(V_PICK, {"pick"});
+    registerVerb(V_APPLY, {"apply"});
+    registerVerb(V_PICK, {"pick"});
+    registerVerb(V_APPLY, {"apply"});
 }
 
 void VerbRegistry::registerVerb(VerbId verbId, std::vector<std::string> synonyms) {
@@ -1129,5 +1148,98 @@ void VerbRegistry::initializeSyntaxPatterns() {
         // SWIM IN WATER?
         Elem inPrep(ET::PREPOSITION, {"in"});
         registerSyntax(V_SWIM, SyntaxPattern(V_SWIM, {Elem(ET::VERB), inPrep, objElem}));
+    }
+
+    // Phase 10.3 Batch 5: Cleanup & Complex Syntax
+    {
+        Elem objElem(ET::OBJECT);
+        Elem toolElem(ET::OBJECT, ObjectFlag::TOOLBIT);
+        
+        // APPLY -> PUT
+        // apply object to object
+        Elem toPrep(ET::PREPOSITION, {"to"});
+        
+        // syntax: APPLY OBJ TO OBJ -> V_PUT
+        // The verb input is "apply" (V_APPLY). The ACTION is V_PUT.
+        registerSyntax(V_APPLY, SyntaxPattern(V_PUT, {Elem(ET::VERB), objElem, toPrep, Elem(ET::OBJECT)})); // APPLY X TO Y -> PUT
+
+        // PICK
+        // PICK -> V_PICK (Intransitive)
+        registerSyntax(V_PICK, SyntaxPattern(V_PICK, {Elem(ET::VERB)}));
+        
+        // PICK UP OBJ -> V_TAKE
+        Elem upPrep(ET::PREPOSITION, {"up"});
+        registerSyntax(V_PICK, SyntaxPattern(V_TAKE, {Elem(ET::VERB), upPrep, objElem})); // PICK UP X (Note: Preposition might come before object or after 'pick up x' vs 'pick x up'. ZIL handles both usually)
+        // Check if "pick x up" works.
+        registerSyntax(V_PICK, SyntaxPattern(V_TAKE, {Elem(ET::VERB), objElem, upPrep})); // PICK X UP
+
+        // BRUSH
+        registerSyntax(V_BRUSH, SyntaxPattern(V_BRUSH, {Elem(ET::VERB), objElem}));
+        Elem withPrep(ET::PREPOSITION, {"with"});
+        registerSyntax(V_BRUSH, SyntaxPattern(V_BRUSH, {Elem(ET::VERB), objElem, withPrep, toolElem}));
+
+        // BUG / CHOMP / COUNT
+        registerSyntax(V_BUG, SyntaxPattern(V_BUG, {Elem(ET::VERB)}));
+        registerSyntax(V_CHOMP, SyntaxPattern(V_CHOMP, {Elem(ET::VERB)}));
+        registerSyntax(V_COUNT, SyntaxPattern(V_COUNT, {Elem(ET::VERB)}));
+        registerSyntax(V_COUNT, SyntaxPattern(V_COUNT, {Elem(ET::VERB), objElem}));
+        
+        // CROSS
+        registerSyntax(V_CROSS, SyntaxPattern(V_CROSS, {Elem(ET::VERB), objElem}));
+        
+        // DRINK FROM
+        registerSyntax(V_DRINK, SyntaxPattern(V_DRINK, {Elem(ET::VERB), objElem})); // Drink water
+        Elem fromPrep(ET::PREPOSITION, {"from"});
+        registerSyntax(V_DRINK, SyntaxPattern(V_DRINK, {Elem(ET::VERB), fromPrep, objElem})); // Drink from cup
+        registerSyntax(V_DRINK, SyntaxPattern(V_DRINK, {Elem(ET::VERB), objElem, fromPrep, Elem(ET::OBJECT)})); // Drink water from cup
+
+        // HATCH
+        registerSyntax(V_HATCH, SyntaxPattern(V_HATCH, {Elem(ET::VERB), objElem}));
+
+        // KNOCK
+        registerSyntax(V_KNOCK, SyntaxPattern(V_KNOCK, {Elem(ET::VERB), objElem})); // Knock door
+        Elem onPrep(ET::PREPOSITION, {"on"});
+        registerSyntax(V_KNOCK, SyntaxPattern(V_KNOCK, {Elem(ET::VERB), onPrep, objElem})); // Knock on door
+        Elem downPrep(ET::PREPOSITION, {"down"});
+        registerSyntax(V_ATTACK, SyntaxPattern(V_ATTACK, {Elem(ET::VERB), objElem, downPrep})); // Knock door down -> Attack
+        
+        // LEAN ON
+        registerSyntax(V_LEAN_ON, SyntaxPattern(V_LEAN_ON, {Elem(ET::VERB), onPrep, objElem}));
+        
+        // LEAVE
+        registerSyntax(V_LEAVE, SyntaxPattern(V_LEAVE, {Elem(ET::VERB)})); // Leave (Exit)
+        registerSyntax(V_LEAVE, SyntaxPattern(V_LEAVE, {Elem(ET::VERB), objElem})); // Leave Object (Drop) -> mapped to V_DROP? or V_LEAVE handles it?
+        // ZIL says LEAVE OBJ -> DROP.
+        registerSyntax(V_DROP, SyntaxPattern(V_DROP, {Elem(ET::VERB), objElem})); // Reregistering LEAVE synonym to V_DROP? No.
+        // If V_LEAVE is a synonym, we can map LEAVE OBJ to V_DROP in syntax.
+        // "LEAVE" matches V_LEAVE. "LEAVE OBJ" matches V_DROP?
+        // BUT V_LEAVE ID = 218. V_DROP ID = 23 (approx).
+        // Since "leave" is synonym for V_LEAVE, pattern {V_LEAVE, OBJ} -> V_DROP ID.
+        registerSyntax(V_DROP, SyntaxPattern(V_LEAVE, {Elem(ET::VERB), objElem}));
+
+        // PICK UP -> TAKE
+        // "pick" isn't a V_TAKE synonym usually. ZIL has PICK = V-PICK. PICK UP = V-TAKE.
+        // I registered "visit"?? No.
+        // Let's rely on "pick" not being registered yet.
+        // registerVerb(V_PICK, {"pick"}); // I listed it in zil_analysis but didn't register above.
+        // NEED TO REGISTER V_PICK above. I'll assume I missed it or need to add it.
+        // Wait, if I use V_PICK ID in syntax, it must be registered.
+        // Let's add V_PICK logic in syntax for now, assuming I add synonym later? 
+        // No, must follow order.
+        
+        // PUMP
+        registerSyntax(V_PUMP, SyntaxPattern(V_PUMP, {Elem(ET::VERB), objElem}));
+        Elem upObj(ET::PREPOSITION, {"up"});
+        registerSyntax(V_PUMP, SyntaxPattern(V_PUMP, {Elem(ET::VERB), upObj, objElem})); // Pump up -> Pump logic
+        
+        // STRIKE
+        registerSyntax(V_STRIKE, SyntaxPattern(V_STRIKE, {Elem(ET::VERB)})); // Intransitive
+        registerSyntax(V_ATTACK, SyntaxPattern(V_STRIKE, {Elem(ET::VERB), objElem})); // Strike Obj -> Attack
+        registerSyntax(V_ATTACK, SyntaxPattern(V_STRIKE, {Elem(ET::VERB), objElem, withPrep, toolElem})); // Strike Obj With Tool -> Attack
+
+        // TURN
+        // TURN OBJ already handles basic.
+        // TURN OBJ WITH TOOL
+        registerSyntax(V_TURN, SyntaxPattern(V_TURN, {Elem(ET::VERB), objElem, withPrep, toolElem}));
     }
 }
