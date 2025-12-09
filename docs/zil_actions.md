@@ -17,7 +17,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] BELL-F - Bell ringing mechanics
 - [x] BOARD-F - Board manipulation
 - [x] BOARDED-WINDOW-FCN - Boarded window interactions
-- [ ] BODY-FUNCTION - Dead body interactions
+- [x] BODY-FUNCTION - Dead body interactions
 - [ ] BOLT-F - Dam bolt mechanics
 - [ ] BOTTLE-FUNCTION - Bottle container
 - [ ] BUBBLE-F - Bubble interactions

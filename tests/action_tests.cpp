@@ -530,6 +530,39 @@ TEST(BodyFunction_OtherVerbsReturnFalse) {
 }
 
 // =============================================================================
+// BOLT-F Tests (1actions.zil lines 1187-1215)
+// ZIL Logic: TURN with wrench toggles gates, EXAMINE describes bolt
+// =============================================================================
+
+extern bool boltAction();
+
+TEST(BoltF_ExaminePrintsDescription) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prso = g.getObject(ObjectIds::BOLT);
+    g.prsa = V_EXAMINE;
+    
+    OutputCapture cap;
+    bool result = boltAction();
+    
+    ASSERT_TRUE(result);
+}
+
+TEST(BoltF_TurnWithoutWrenchPrintsMessage) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prso = g.getObject(ObjectIds::BOLT);
+    g.prsa = V_TURN;
+    
+    OutputCapture cap;
+    bool result = boltAction();
+    
+    ASSERT_TRUE(result);
+}
+
+// =============================================================================
 // KNIFE-F Tests (1actions.zil lines 926-929)
 // ZIL Logic: On TAKE, clears ATTIC-TABLE NDESCBIT
 // =============================================================================
