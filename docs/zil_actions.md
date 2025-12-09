@@ -51,7 +51,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] KNIFE-F - Rusty knife with sword
 - [x] LARGE-BAG-F - Thief's bag
 - [x] LEAK-FUNCTION - Boat leak
-- [ ] LIVING-ROOM-FCN - Living room handler
+- [x] LIVING-ROOM-FCN - Living room handler
 - [ ] LOUD-ROOM-FCN - Loud room echo puzzle
 - [ ] MACHINE-F - Coal machine
 - [ ] MACHINE-ROOM-FCN - Machine room handler

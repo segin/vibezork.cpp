@@ -436,9 +436,67 @@ void livingRoomAction(int rarg) {
     }
 }
 
-// LOUD-ROOM-FCN (Room action - echoes)
+// LOUD-ROOM-FCN - Loud room echo puzzle handler
+// ZIL: ECHO command sets LOUD-FLAG and clears BAR SACREDBIT, making bar takeable
+// Source: 1actions.zil lines 1660-1728
+static bool loudFlag = false;  // LOUD-FLAG - room has been quieted
+extern bool damGatesOpen;      // From actions.cpp - dam gates state
+
 void loudRoomAction(int rarg) {
-    // Any speech gets echoed and causes platinum bar to fall
+    auto& g = Globals::instance();
+    
+    // M-LOOK: Dynamic room description
+    if (rarg == 0) {
+        print("This is a large room with a ceiling which cannot be detected from "
+              "the ground. There is a narrow passage from east to west and a stone "
+              "stairway leading upward.");
+        
+        // Check if room is quiet or loud
+        if (loudFlag || !damGatesOpen) {
+            printLine(" The room is eerie in its quietness.");
+        } else {
+            printLine(" The room is deafeningly loud with an undetermined rushing sound. "
+                      "The sound seems to reverberate from all of the walls, making it "
+                      "difficult even to think.");
+        }
+    }
+    
+    // M-END: Eject player if room is too loud
+    if (rarg == 2 && damGatesOpen && !loudFlag) {
+        printLine("It is unbearably loud here, with an ear-splitting roar seeming to "
+                  "come from all around you. There is a pounding in your head which won't "
+                  "stop. With a tremendous effort, you scramble out of the room.");
+        // Player gets ejected to random adjacent room (simplified: go west)
+        Verbs::vWalkDir(Direction::WEST);
+    }
+}
+
+// Handle ECHO command in loud room (called from verb handler)
+bool handleEchoInLoudRoom() {
+    auto& g = Globals::instance();
+    
+    // Only works in loud room when it's loud
+    if (g.here && g.here->getId() != RoomIds::LOUD_ROOM) {
+        return false;
+    }
+    
+    if (!loudFlag && damGatesOpen) {
+        // Saying ECHO quiets the room and makes platinum bar takeable
+        loudFlag = true;
+        
+        // Clear SACREDBIT on platinum bar (makes it takeable by thief too)
+        ZObject* bar = g.getObject(ObjectIds::BAR);
+        if (bar) {
+            bar->clearFlag(ObjectFlag::SACREDBIT);
+        }
+        
+        printLine("The acoustics of the room change subtly.");
+        return true;
+    }
+    
+    // Room is already quiet - just echo
+    printLine("Echo...");
+    return true;
 }
 
 // MACHINE-ROOM-FCN
