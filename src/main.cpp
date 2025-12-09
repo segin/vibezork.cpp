@@ -8,6 +8,7 @@
 #include "systems/lamp.h"
 #include "systems/candle.h"
 #include "systems/sword.h"
+#include "systems/score.h"
 #include <iostream>
 #include <map>
 
@@ -90,8 +91,15 @@ std::map<VerbId, std::function<bool()>> verbHandlers = {
 
 void mainLoop1() {
     auto& g = Globals::instance();
+    auto& score = ScoreSystem::instance();
     
-    std::cout << "\n> ";
+    // Display status bar (Location / Score / Moves)
+    std::string locationName = g.here ? g.here->getDesc() : "???";
+    std::cout << "\n[" << locationName 
+              << "  Score: " << score.getScore() 
+              << "  Moves: " << score.getMoves() << "]" << std::endl;
+    
+    std::cout << "> ";
     std::string input = readLine();
     
     // Handle empty input gracefully (Requirement 72.1)

@@ -12,6 +12,9 @@
 #include <fstream>
 #include <sstream>
 
+// External state from actions.cpp
+extern bool damGatesOpen;
+
 namespace Verbs {
 
 // Helper function to calculate total weight (size) of an object and all its contents recursively
@@ -649,6 +652,17 @@ bool vWalkDir(Direction dir) {
                 return RTRUE;
             }
             break;
+    }
+    
+    // Check for dam-related water rooms (Requirement 70.2: Dam puzzle)
+    // Block entry to reservoir and stream when dam gates are closed
+    if (!damGatesOpen) {
+        ObjectId targetId = exit->targetRoom;
+        if (targetId == RoomIds::RESERVOIR || 
+            targetId == RoomIds::IN_STREAM) {
+            printLine("The water level is too high to enter. The reservoir is full.");
+            return RTRUE;
+        }
     }
     
     // Move to new room

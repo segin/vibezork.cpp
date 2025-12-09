@@ -514,6 +514,12 @@ void thiefDeath() {
         printLine("The thief's stiletto clatters to the ground.");
     }
     
+    // Special: Killing thief in Treasure Room reveals his hoard
+    if (g.here && g.here->getId() == RoomIds::TREASURE_ROOM) {
+        printLine("With his dying breath, the thief reveals where he has hidden his treasures.");
+        printLine("All the stolen valuables are now yours for the taking!");
+    }
+    
     // Move thief body to current room (or remove from game)
     thief->moveTo(g.here);
 }
