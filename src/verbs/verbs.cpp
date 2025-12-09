@@ -511,8 +511,9 @@ bool vLock() {
         return RTRUE;
     }
     
-    // Default LOCK behavior - authentic ZIL V-LOCK just says this
-    printLine("It doesn't seem to work.");
+    // Default LOCK behavior - lock the object if all prechecks passed
+    g.prso->setFlag(ObjectFlag::LOCKEDBIT);
+    printLine("Locked.");
     
     return RTRUE;
 }
@@ -560,9 +561,9 @@ bool vUnlock() {
         return RTRUE;
     }
     
-    // Default UNLOCK behavior - authentic ZIL V-UNLOCK calls V-LOCK
-    // which just says "It doesn't seem to work."
-    printLine("It doesn't seem to work.");
+    // Default UNLOCK behavior - unlock the object if all prechecks passed
+    g.prso->clearFlag(ObjectFlag::LOCKEDBIT);
+    printLine("Unlocked.");
     
     return RTRUE;
 }
