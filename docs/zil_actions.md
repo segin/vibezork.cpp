@@ -49,7 +49,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] KITCHEN-FCN - Kitchen room handler
 - [x] KITCHEN-WINDOW-F - Kitchen window
 - [x] KNIFE-F - Rusty knife with sword
-- [ ] LARGE-BAG-F - Thief's bag
+- [x] LARGE-BAG-F - Thief's bag
 - [ ] LEAK-FUNCTION - Boat leak
 - [ ] LIVING-ROOM-FCN - Living room handler
 - [ ] LOUD-ROOM-FCN - Loud room echo puzzle

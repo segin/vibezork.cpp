@@ -347,13 +347,44 @@ bool largeBagAction() {
     return false;
 }
 
-// LEAK-FUNCTION
+// LEAK-FUNCTION - Dam leak repair with putty
+// ZIL: PUT putty on leak or PLUG with putty fixes the dam
+// Source: 1actions.zil lines 1362-1377
+static int waterLevel = 1;  // >0 means dam is leaking
+
 bool leakAction() {
     auto& g = Globals::instance();
-    if (g.prsa == V_PLUG) {
-        printLine("You can't plug the leak.");
+    
+    // Only active if WATER-LEVEL > 0 (dam is leaking)
+    if (waterLevel <= 0) {
+        return false;
+    }
+    
+    // PUT putty on leak
+    if ((g.prsa == V_PUT || g.prsa == V_PUT_ON) && 
+        g.prso && g.prso->getId() == ObjectIds::PUTTY) {
+        // FIX-MAINT-LEAK: repair the dam
+        waterLevel = -1;
+        printLine("By some miracle of Zorkian technology, you have managed to stop the leak in the dam.");
         return true;
     }
+    
+    // PLUG with putty
+    if (g.prsa == V_PLUG) {
+        if (g.prsi && g.prsi->getId() == ObjectIds::PUTTY) {
+            // FIX-MAINT-LEAK: repair the dam
+            waterLevel = -1;
+            printLine("By some miracle of Zorkian technology, you have managed to stop the leak in the dam.");
+            return true;
+        } else {
+            print("With ");
+            if (g.prsi) print(g.prsi->getDesc());
+            else print("that");
+            printLine("? You must be joking.");
+            return true;
+        }
+    }
+    
     return false;
 }
 
