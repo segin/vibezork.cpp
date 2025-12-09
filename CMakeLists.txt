@@ -166,4 +166,8 @@ if(BUILD_TESTS)
     # Trophy Case tests
     add_executable(trophy_case_test tests/trophy_case_test.cpp ${LIB_SOURCES})
     add_test(NAME TrophyCaseTest COMMAND trophy_case_test)
+
+    # Diagnose tests
+    add_executable(diagnose_test tests/diagnose_test.cpp ${LIB_SOURCES})
+    add_test(NAME DiagnoseTest COMMAND diagnose_test)
 endif()

@@ -5,8 +5,9 @@
 #include "world/rooms.h"
 #include "world/objects.h"
 #include "world/world.h"
-#include "systems/npc.h"
-#include "systems/combat.h"
+#include "../systems/npc.h"
+#include "../systems/combat.h"
+#include "../systems/death.h"
 #include "systems/lamp.h"
 #include <fstream>
 #include <sstream>
@@ -1952,14 +1953,33 @@ bool vScore() {
 bool vDiagnose() {
     auto& g = Globals::instance();
     
-    // Display player health status
-    // For now, just display a simple message
-    // Full implementation would track injuries and health
+    // Check if in combat and track health
+    if (CombatSystem::isInCombat()) {
+        auto& combatManager = CombatSystem::CombatManager::instance();
+        auto playerCombatant = combatManager.getPlayerCombatant();
+        
+        if (playerCombatant && playerCombatant->object == g.winner) {
+            int health = playerCombatant->health;
+            int maxHealth = playerCombatant->maxHealth;
+            
+            if (health == maxHealth) {
+                printLine("You are in perfect health.");
+            } else if (health > maxHealth * 3 / 4) {
+                printLine("You have a few grazes.");
+            } else if (health > maxHealth / 2) {
+                printLine("You have some serious wounds.");
+            } else if (health > 0) {
+                printLine("You are staggering.");
+            } else {
+                printLine("You are dead.");
+            }
+            return RTRUE;
+        }
+    }
     
+    // Default / Out of combat
+    // Since health is ephemeral in current CombatSystem, assume perfect health when not fighting
     printLine("You are in perfect health.");
-    
-    // If we had a health system, we would check for injuries here
-    // and display them
     
     return RTRUE;
 }
