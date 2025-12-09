@@ -115,16 +115,73 @@ bool coffinAction() {
 bool basketAction() {
     auto& g = Globals::instance();
     
-    // Basket is part of the balloon/shaft system
-    // It can be raised and lowered, but cannot be taken
-    if (g.prsa == V_TAKE && g.prso && 
-        (g.prso->getId() == ObjectIds::BASKET || 
-         g.prso->getId() == ObjectIds::RAISED_BASKET)) {
-        printLine("The basket is securely fastened to the iron chain.");
+    // Check if handling basket objects
+    if (!g.prso) return RFALSE;
+    bool isBasket = (g.prso->getId() == ObjectIds::BASKET || 
+                     g.prso->getId() == ObjectIds::RAISED_BASKET ||
+                     g.prso->getId() == ObjectIds::LOWERED_BASKET);
+    if (!isBasket && g.prsi) {
+        isBasket = (g.prsi->getId() == ObjectIds::BASKET || 
+                    g.prsi->getId() == ObjectIds::RAISED_BASKET ||
+                    g.prsi->getId() == ObjectIds::LOWERED_BASKET);
+    }
+    
+    if (!isBasket) return RFALSE;
+    
+    // Static state for basket position (true = top, false = bottom)
+    static bool cageTop = true; 
+    
+    // RAISE
+    if (g.prsa == V_RAISE) {
+        if (cageTop) {
+            printLine("The basket is already at the top."); // Simple dummy response for now
+        } else {
+            // Raise it
+            ZObject* raisedBasket = g.getObject(ObjectIds::RAISED_BASKET);
+            ZObject* loweredBasket = g.getObject(ObjectIds::LOWERED_BASKET);
+            ZObject* shaftRoom = g.getObject(RoomIds::SHAFT_ROOM);
+            ZObject* lowerShaft = g.getObject(RoomIds::LOWER_SHAFT);
+            
+            if (raisedBasket && shaftRoom) raisedBasket->moveTo(shaftRoom);
+            if (loweredBasket && lowerShaft) loweredBasket->moveTo(lowerShaft);
+            
+            cageTop = true;
+            printLine("The basket is raised to the top of the shaft.");
+        }
         return RTRUE;
     }
     
-    // Basket cannot be interacted with in other ways in this simplified version
+    // LOWER
+    if (g.prsa == V_LOWER) {
+        if (!cageTop) {
+            printLine("The basket is already at the bottom.");
+        } else {
+            // Lower it
+            ZObject* raisedBasket = g.getObject(ObjectIds::RAISED_BASKET);
+            ZObject* loweredBasket = g.getObject(ObjectIds::LOWERED_BASKET);
+            ZObject* shaftRoom = g.getObject(RoomIds::SHAFT_ROOM);
+            ZObject* lowerShaft = g.getObject(RoomIds::LOWER_SHAFT);
+            
+            if (raisedBasket && lowerShaft) raisedBasket->moveTo(lowerShaft);
+            if (loweredBasket && shaftRoom) loweredBasket->moveTo(shaftRoom);
+            
+            cageTop = false;
+            printLine("The basket is lowered to the bottom of the shaft.");
+            
+            // Note: Lighting check omitted for now as light system handles it strictly by location
+            if (g.here && !g.here->hasFlag(ObjectFlag::ONBIT)) {
+                printLine("It is now pitch black.");
+            }
+        }
+        return RTRUE;
+    }
+    
+    // TAKE
+    if (g.prsa == V_TAKE) {
+        printLine("The cage is securely fastened to the iron chain.");
+        return RTRUE;
+    }
+    
     return RFALSE;
 }
 
@@ -767,12 +824,12 @@ bool canaryAction() {
     }
     
     // Handle WIND verb (winding the canary)
-    // Note: V_WIND would need to be added to verbs.h, using V_TURN as substitute
-    if (g.prsa == V_TURN) {
+    if (g.prsa == V_WIND) {
         if (isCanary) {
             // Check if in forest area - produces bauble
             ZRoom* room = dynamic_cast<ZRoom*>(g.here);
             bool inForest = false;
+            
             if (room) {
                 ObjectId roomId = room->getId();
                 inForest = (roomId == RoomIds::FOREST_1 || 
@@ -782,11 +839,16 @@ bool canaryAction() {
                            roomId == RoomIds::UP_A_TREE);
             }
             
-            // Check if bauble has already been produced
-            ZObject* bauble = g.getObject(ObjectIds::BAUBLE);
-            bool baubleProduced = bauble && bauble->getLocation() != nullptr;
+            // Check if bauble has already been produced/moved
+            // In Zork, once the canary sings, it sets a global flag (SING-SONG)
+            // We can approximate by checking if bauble is not in Initial (Nowhere) state
+            // But if player lost it, we might re-spawn? ZIL uses flag.
+            // Let's check if bauble has a location. If it's NOWHERE (default), it can spawn.
             
-            if (inForest && !baubleProduced) {
+            ZObject* bauble = g.getObject(ObjectIds::BAUBLE);
+            bool baubleSpawned = bauble && bauble->getLocation() != nullptr;
+            
+            if (inForest && !baubleSpawned) {
                 printLine("The canary chirps, slightly off-key, an aria from a forgotten opera. From out of the greenery flies a lovely songbird. It perches on a limb just over your head and opens its beak to sing. As it does so a beautiful brass bauble drops from its mouth, bounces off the top of your head, and lands glimmering in the grass. As the canary winds down, the songbird flies away.");
                 
                 // Move bauble to current room (or forest path if in tree)

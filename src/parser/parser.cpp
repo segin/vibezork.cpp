@@ -10,7 +10,9 @@
 #include <sstream>
 #include <stdexcept>
 
-Parser::Parser() : verbRegistry_(nullptr) {
+Parser::Parser() {
+    static VerbRegistry defaultRegistry;
+    verbRegistry_ = &defaultRegistry;
     initializeVerbsAndDirections();
 }
 
@@ -66,6 +68,10 @@ void Parser::initializeVerbsAndDirections() {
     verbSynonyms_["turn"] = V_TURN;
     verbSynonyms_["rotate"] = V_TURN;
     verbSynonyms_["twist"] = V_TURN;
+    verbSynonyms_["wind"] = V_WIND;
+    verbSynonyms_["raise"] = V_RAISE;
+    verbSynonyms_["lift"] = V_RAISE;
+    verbSynonyms_["lower"] = V_LOWER;
     
     // Movement verbs
     verbSynonyms_["enter"] = V_ENTER;
@@ -138,6 +144,18 @@ void Parser::initializeVerbsAndDirections() {
     verbSynonyms_["damn"] = V_CURSE;
     verbSynonyms_["shit"] = V_CURSE;
     verbSynonyms_["fuck"] = V_CURSE;
+    
+    // Phase 12 Batch 2: Missing Verbs
+    verbSynonyms_["oil"] = V_OIL;
+    verbSynonyms_["grease"] = V_OIL;
+    verbSynonyms_["lubricate"] = V_OIL;
+    verbSynonyms_["stab"] = V_STAB;
+    verbSynonyms_["pierce"] = V_STAB;
+    verbSynonyms_["thrust"] = V_STAB;
+    verbSynonyms_["record"] = V_RECORD;
+    verbSynonyms_["unrecord"] = V_UNRECORD;
+    verbSynonyms_["verify"] = V_VERIFY;
+    verbSynonyms_["random"] = V_RANDOM;
     
     // Directions
     directions_["north"] = Direction::NORTH;

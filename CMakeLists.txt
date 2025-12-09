@@ -32,6 +32,12 @@ if(BUILD_TESTS)
     add_executable(room_navigation_tests tests/room_navigation_tests.cpp ${LIB_SOURCES})
     add_test(NAME RoomNavigationTests COMMAND room_navigation_tests)
     
+    # Add specific source files to LIB_SOURCES if they are not already included by GLOB_RECURSE
+    list(APPEND LIB_SOURCES
+        src/world/actions_group_a.cpp
+        src/world/consumables.cpp
+    )
+    
     # World initialization tests
     add_executable(world_initialization_tests tests/world_initialization_tests.cpp ${LIB_SOURCES})
     add_test(NAME WorldInitializationTests COMMAND world_initialization_tests)
@@ -170,4 +176,8 @@ if(BUILD_TESTS)
     # Diagnose tests
     add_executable(diagnose_test tests/diagnose_test.cpp ${LIB_SOURCES})
     add_test(NAME DiagnoseTest COMMAND diagnose_test)
+
+    # Critical Puzzles Tests (Egg, Canary, Basket)
+    add_executable(critical_puzzles_tests tests/critical_puzzles_tests.cpp ${LIB_SOURCES})
+    add_test(NAME CriticalPuzzlesTests COMMAND critical_puzzles_tests)
 endif()

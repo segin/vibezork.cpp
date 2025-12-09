@@ -63,6 +63,7 @@ constexpr ObjectId TUBE = 213;        // Tube containing putty
 constexpr ObjectId MAILBOX = 300;
 constexpr ObjectId TROPHY_CASE = 301;
 constexpr ObjectId BASKET = 302;      // Lowered basket
+constexpr ObjectId LOWERED_BASKET = 302; // Alias for code clarity
 constexpr ObjectId RAISED_BASKET = 303;
 constexpr ObjectId SACK = 304;        // Brown sack/sandwich bag
 constexpr ObjectId BAG = 305;         // Large bag (thief's)
@@ -179,6 +180,14 @@ constexpr ObjectId BURNED_OUT_LANTERN = 721;
 constexpr ObjectId LUNCH = 740;       // Hot pepper sandwich
 constexpr ObjectId GARLIC = 741;
 constexpr ObjectId WATER = 742;       // Water in bottle
+constexpr ObjectId BAG_OF_COINS = 743;
+constexpr ObjectId BLESSINGS = 744;     // Abstract concept?
+constexpr ObjectId INFLATABLE_BOAT = 745;
+constexpr ObjectId INFLATED_BOAT = 746;
+constexpr ObjectId PUNCTURED_BOAT = 747;
+constexpr ObjectId LARGE_BAG = 748;
+constexpr ObjectId SANDWICH_BAG = 749;
+constexpr ObjectId LUNGS = 750;
 
 // ============================================================================
 // READABLE OBJECTS (760-779)

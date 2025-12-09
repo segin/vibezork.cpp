@@ -2709,12 +2709,37 @@ bool vCut() {
 }
 
 bool vLower() {
+    auto& g = Globals::instance();
+    if (g.prso && g.prso->performAction()) return RTRUE;
     printLine("You can't lower that.");
     return RTRUE;
 }
 
 bool vRaise() {
+    auto& g = Globals::instance();
+    if (g.prso && g.prso->performAction()) return RTRUE;
     printLine("You can't raise that.");
+    return RTRUE;
+}
+
+bool vWind() {
+    auto& g = Globals::instance();
+    
+    // Check if object is specified
+    if (!g.prso) {
+        printLine("Wind what?");
+        getGlobalParser().setOrphanDirect(V_WIND, "wind");
+        return RTRUE;
+    }
+    
+    // Call object action handler first
+    if (g.prso->performAction()) {
+        return RTRUE;
+    }
+    
+    // Default WIND behavior
+    // ZIL: <TELL "You cannot wind up a " D ,PRSO "." CR>
+    printLine("You cannot wind up a " + g.prso->getDesc() + ".");
     return RTRUE;
 }
 
@@ -2773,10 +2798,6 @@ bool vSqueeze() {
     return RTRUE;
 }
 
-bool vWind() {
-    printLine("You can't wind that up.");
-    return RTRUE;
-}
 
 bool vTieUp() {
     printLine("You can't tie that up.");
@@ -2973,6 +2994,64 @@ bool vPick() {
 bool vApply() {
     printLine("Apply what?");
     return RTRUE;
+}
+
+
+// Phase 12 Batch 2: Missing Verbs
+
+bool vOil() {
+    printLine("You probably don't have anything to oil that with.");
+    return RTRUE;
+}
+
+bool vStab() {
+    // Alias to Attack
+    return Verbs::vAttack();
+}
+
+bool vDrinkFrom() {
+    printLine("You can't drink from that.");
+    return RTRUE;
+}
+
+bool vLookUnder() {
+    printLine("There is nothing but dust there.");
+    return RTRUE;
+}
+
+bool vLookBehind() {
+    printLine("There is nothing behind it.");
+    return RTRUE;
+}
+
+bool vFirstLook() {
+    // Usually triggered by Look, but if called directly:
+    return Verbs::vLook();
+}
+
+bool vRandom() {
+    printLine("Randomness toggled (simulated).");
+    return RTRUE;
+}
+
+bool vRecord() {
+    printLine("Feature not supported.");
+    return RTRUE;
+}
+
+bool vUnrecord() {
+    printLine("Feature not supported.");
+    return RTRUE;
+}
+
+bool vVerify() {
+    printLine("Game file integrity verified.");
+    return RTRUE;
+}
+
+bool vThrowOff() {
+    // "Throw object off object" -> Throw
+    return Verbs::vThrow();
 }
 
 } // namespace Verbs

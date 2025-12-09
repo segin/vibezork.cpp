@@ -1,0 +1,507 @@
+# Comprehensive Implementation Checklist
+Generated from ZIL vs C++ Gap Analysis.
+
+## Objects
+- [x] ADVENTURER
+- [x] ADVERTISEMENT
+- [x] ALTAR
+- [x] ATTIC-TABLE
+- [x] AXE
+- [x] BAG-OF-COINS
+- [x] BAR
+- [x] BARROW
+- [x] BARROW-DOOR
+- [x] BAT
+- [x] BAUBLE
+- [x] BELL
+- [x] BLESSINGS
+- [x] BLUE-BUTTON
+- [x] BOARD
+- [x] BOARDED-WINDOW
+- [x] BOAT-LABEL
+- [x] BODIES
+- [x] BOLT
+- [x] BONES
+- [x] BOOK
+- [x] BOTTLE
+- [x] BRACELET
+- [x] BROKEN-CANARY
+- [x] BROKEN-EGG
+- [x] BROKEN-LAMP
+- [x] BROWN-BUTTON
+- [x] BUBBLE
+- [x] BUOY
+- [x] BURNED-OUT-LANTERN
+- [x] CANARY
+- [x] CANDLES
+- [x] CHALICE
+- [x] CHIMNEY
+- [x] CLIMBABLE-CLIFF
+- [x] COAL
+- [x] COFFIN
+- [x] CONTROL-PANEL
+- [x] CRACK
+- [x] CYCLOPS
+- [x] DAM
+- [x] DIAMOND
+- [x] EGG
+- [x] EMERALD
+- [x] ENGRAVINGS
+- [x] FOREST
+- [x] FRONT-DOOR
+- [x] GARLIC
+- [x] GHOSTS
+- [ ] GLOBAL-OBJECTS
+- [x] GLOBAL-WATER
+- [x] GRANITE-WALL
+- [x] GRATE
+- [x] GROUND
+- [x] GRUE
+- [x] GUIDE
+- [x] GUNK
+- [x] HANDS
+- [x] HOT-BELL
+- [x] INFLATABLE-BOAT
+- [x] INFLATED-BOAT
+- [ ] INTNUM
+- [x] IT
+- [x] JADE
+- [x] KEYS
+- [x] KITCHEN-TABLE
+- [x] KITCHEN-WINDOW
+- [x] KNIFE
+- [x] LADDER
+- [x] LAMP
+- [x] LARGE-BAG
+- [x] LEAK
+- [x] LEAVES
+- [ ] LOCAL-GLOBALS
+- [x] LOWERED-BASKET
+- [x] LUNCH
+- [x] LUNGS
+- [x] MACHINE
+- [x] MACHINE-SWITCH
+- [x] MAILBOX
+- [x] MAP
+- [x] MATCH
+- [x] ME
+- [x] MIRROR-1
+- [x] MIRROR-2
+- [x] MOUNTAIN-RANGE
+- [x] NEST
+- [ ] NOT-HERE-OBJECT
+- [x] OWNERS-MANUAL
+- [x] PAINTING
+- [ ] PATHOBJ
+- [x] PEDESTAL
+- [x] POT-OF-GOLD
+- [x] PRAYER
+- [ ] PSEUDO-OBJECT
+- [x] PUMP
+- [x] PUNCTURED-BOAT
+- [x] PUTTY
+- [x] RAILING
+- [x] RAINBOW
+- [x] RAISED-BASKET
+- [x] RED-BUTTON
+- [x] RIVER
+- [x] ROOMS
+- [x] ROPE
+- [x] RUG
+- [x] RUSTY-KNIFE
+- [x] SAILOR
+- [x] SAND
+- [x] SANDWICH-BAG
+- [x] SCARAB
+- [x] SCEPTRE
+- [x] SCREWDRIVER
+- [x] SHOVEL
+- [x] SKULL
+- [x] SLIDE
+- [x] SONGBIRD
+- [x] STAIRS
+- [x] STILETTO
+- [x] SWORD
+- [x] TEETH
+- [x] THIEF
+- [x] TIMBERS
+- [x] TOOL-CHEST
+- [x] TORCH
+- [x] TRAP-DOOR
+- [x] TREE
+- [x] TRIDENT
+- [x] TROLL
+- [x] TROPHY-CASE
+- [x] TRUNK
+- [x] TUBE
+- [x] WALL
+- [x] WATER
+- [x] WHITE-CLIFF
+- [x] WHITE-HOUSE
+- [x] WOODEN-DOOR
+- [x] WRENCH
+- [x] YELLOW-BUTTON
+- [x] ZORKMID
+
+## Rooms
+- [x] ARAGAIN-FALLS
+- [x] ATLANTIS-ROOM
+- [x] ATTIC
+- [x] BAT-ROOM
+- [x] CANYON-BOTTOM
+- [x] CANYON-VIEW
+- [x] CELLAR
+- [x] CHASM-ROOM
+- [x] CLEARING
+- [x] CLIFF-MIDDLE
+- [x] COLD-PASSAGE
+- [x] CYCLOPS-ROOM
+- [x] DAM-BASE
+- [x] DAM-LOBBY
+- [x] DAM-ROOM
+- [x] DAMP-CAVE
+- [x] DEAD-END-1
+- [x] DEAD-END-2
+- [x] DEAD-END-3
+- [x] DEAD-END-4
+- [x] DEAD-END-5
+- [x] DEEP-CANYON
+- [x] DOME-ROOM
+- [x] EAST-OF-CHASM
+- [x] EAST-OF-HOUSE
+- [x] EGYPT-ROOM
+- [x] END-OF-RAINBOW
+- [x] ENGRAVINGS-CAVE
+- [x] ENTRANCE-TO-HADES
+- [x] EW-PASSAGE
+- [x] FOREST-1
+- [x] FOREST-2
+- [x] FOREST-3
+- [x] GALLERY
+- [x] GAS-ROOM
+- [x] GRATING-CLEARING
+- [x] GRATING-ROOM
+- [x] IN-STREAM
+- [x] KITCHEN
+- [x] LADDER-BOTTOM
+- [x] LADDER-TOP
+- [x] LAND-OF-LIVING-DEAD
+- [x] LIVING-ROOM
+- [x] LOUD-ROOM
+- [x] LOWER-SHAFT
+- [x] MACHINE-ROOM
+- [x] MAINTENANCE-ROOM
+- [x] MAZE-1
+- [x] MAZE-10
+- [x] MAZE-11
+- [x] MAZE-12
+- [x] MAZE-13
+- [x] MAZE-14
+- [x] MAZE-15
+- [x] MAZE-2
+- [x] MAZE-3
+- [x] MAZE-4
+- [x] MAZE-5
+- [x] MAZE-6
+- [x] MAZE-7
+- [x] MAZE-8
+- [x] MAZE-9
+- [x] MINE-1
+- [x] MINE-2
+- [x] MINE-3
+- [x] MINE-4
+- [x] MINE-ENTRANCE
+- [x] MIRROR-ROOM-1
+- [x] MIRROR-ROOM-2
+- [x] MOUNTAINS
+- [x] NARROW-PASSAGE
+- [x] NORTH-OF-HOUSE
+- [x] NORTH-TEMPLE
+- [x] NS-PASSAGE
+- [x] ON-RAINBOW
+- [x] PATH
+- [x] RESERVOIR
+- [x] RESERVOIR-NORTH
+- [x] RESERVOIR-SOUTH
+- [x] RIVER-1
+- [x] RIVER-2
+- [x] RIVER-3
+- [x] RIVER-4
+- [x] RIVER-5
+- [x] ROUND-ROOM
+- [x] SANDY-BEACH
+- [x] SANDY-CAVE
+- [x] SHAFT-ROOM
+- [x] SHORE
+- [x] SLIDE-ROOM
+- [x] SMALL-CAVE
+- [x] SMELLY-ROOM
+- [x] SOUTH-OF-HOUSE
+- [x] SOUTH-TEMPLE
+- [x] SQUEEKY-ROOM
+- [x] STONE-BARROW
+- [x] STRANGE-PASSAGE
+- [x] STREAM-VIEW
+- [x] STUDIO
+- [x] TIMBER-ROOM
+- [x] TINY-CAVE
+- [x] TORCH-ROOM
+- [x] TREASURE-ROOM
+- [x] TROLL-ROOM
+- [x] TWISTING-PASSAGE
+- [x] UP-A-TREE
+- [x] WEST-OF-HOUSE
+- [x] WHITE-CLIFFS-NORTH
+- [x] WHITE-CLIFFS-SOUTH
+- [x] WINDING-PASSAGE
+
+## Verbs (V-*)
+- [ ] V-ADVENT
+- [x] V-ALARM
+- [x] V-ANSWER
+- [x] V-ATTACK
+- [x] V-BACK
+- [x] V-BLAST
+- [x] V-BOARD
+- [x] V-BREATHE
+- [x] V-BRIEF
+- [x] V-BRUSH
+- [x] V-BUG
+- [x] V-BURN
+- [x] V-CHOMP
+- [x] V-CLIMB-DOWN
+- [x] V-CLIMB-FOO
+- [x] V-CLIMB-ON
+- [x] V-CLIMB-UP
+- [x] V-CLOSE
+- [x] V-COMMAND
+- [ ] V-COMMAND-FILE
+- [x] V-COUNT
+- [x] V-CROSS
+- [x] V-CURSES
+- [x] V-CUT
+- [x] V-DEFLATE
+- [x] V-DIAGNOSE
+- [x] V-DIG
+- [x] V-DISEMBARK
+- [x] V-DISENCHANT
+- [x] V-DRINK
+- [x] V-DRINK-FROM
+- [x] V-DROP
+- [x] V-EAT
+- [x] V-ECHO
+- [x] V-ENCHANT
+- [x] V-ENTER
+- [x] V-EXAMINE
+- [x] V-EXIT
+- [x] V-EXORCISE
+- [x] V-FILL
+- [x] V-FIND
+- [ ] V-FIRST-LOOK
+- [x] V-FOLLOW
+- [x] V-FROBOZZ
+- [x] V-GIVE
+- [x] V-HATCH
+- [x] V-HELLO
+- [x] V-INCANT
+- [x] V-INFLATE
+- [x] V-INVENTORY
+- [x] V-KICK
+- [x] V-KISS
+- [x] V-KNOCK
+- [x] V-LAMP-OFF
+- [x] V-LAMP-ON
+- [x] V-LAUNCH
+- [x] V-LEAN-ON
+- [x] V-LEAP
+- [x] V-LEAVE
+- [x] V-LISTEN
+- [x] V-LOCK
+- [x] V-LOOK
+- [ ] V-LOOK-BEHIND
+- [x] V-LOOK-INSIDE
+- [x] V-LOOK-ON
+- [x] V-LOOK-UNDER
+- [x] V-LOOK-BEHIND
+- [x] V-FIRST-LOOK
+- [x] V-LOWER
+- [x] V-MAKE
+- [x] V-MELT
+- [x] V-MOVE
+- [x] V-MUMBLE
+- [x] V-MUNG
+- [x] V-ODYSSEUS
+- [x] V-OIL
+- [x] V-OPEN
+- [ ] V-OVERBOARD
+- [x] V-PICK
+- [x] V-PLAY
+- [x] V-PLUG
+- [x] V-POUR-ON
+- [x] V-PRAY
+- [x] V-PUMP
+- [x] V-PUSH
+- [x] V-PUSH-TO
+- [x] V-PUT
+- [x] V-PUT-BEHIND
+- [x] V-PUT-ON
+- [x] V-PUT-UNDER
+- [x] V-QUIT
+- [x] V-RAISE
+- [x] V-RANDOM
+- [x] V-RAPE
+- [x] V-READ
+- [x] V-READ-PAGE
+- [x] V-RECORD
+- [x] V-REPENT
+- [x] V-REPLY
+- [x] V-RESTART
+- [x] V-RESTORE
+- [x] V-RING
+- [x] V-RUB
+- [x] V-SAVE
+- [x] V-SAY
+- [x] V-SCORE
+- [x] V-SCRIPT
+- [x] V-SEARCH
+- [x] V-SEND
+- [ ] V-SGIVE
+- [x] V-SHAKE
+- [ ] V-SKIP
+- [x] V-SMELL
+- [x] V-SPIN
+- [x] V-SPRAY
+- [x] V-SQUEEZE
+- [ ] V-SSPRAY
+- [x] V-STAB
+- [x] V-STAND
+- [x] V-STAY
+- [x] V-STRIKE
+- [x] V-SUPER-BRIEF
+- [x] V-SWIM
+- [x] V-SWING
+- [x] V-TAKE
+- [x] V-TELL
+- [x] V-THROUGH
+- [x] V-THROW
+- [x] V-THROW-OFF
+- [x] V-TIE
+- [x] V-TIE-UP
+- [x] V-TREASURE
+- [x] V-TURN
+- [x] V-UNLOCK
+- [x] V-UNRECORD
+- [x] V-UNSCRIPT
+- [x] V-UNTIE
+- [x] V-VERBOSE
+- [x] V-VERIFY
+- [x] V-VERSION
+- [x] V-WAIT
+- [x] V-WALK
+- [x] V-WALK-AROUND
+- [x] V-WALK-TO
+- [x] V-WAVE
+- [x] V-WEAR
+- [x] V-WIN
+- [x] V-WIND
+- [x] V-WISH
+- [x] V-YELL
+- [x] V-ZORK
+
+## Actions (*-FCN)
+- [ ] AXE-F
+- [ ] BAG-OF-COINS-F
+- [ ] BARROW-DOOR-FCN
+- [x] BARROW-FCN
+- [x] BASKET-F
+- [ ] BAT-F
+- [ ] BELL-F
+- [x] BOARD-F
+- [ ] BOARDED-WINDOW-FCN
+- [ ] BODY-FUNCTION
+- [x] BOLT-F
+- [x] BOTTLE-FUNCTION
+- [x] BUBBLE-F
+- [x] BUTTON-F
+- [x] CANDLES-FCN
+- [ ] CANYON-VIEW-F
+- [ ] CELLAR-FCN
+- [ ] CHALICE-FCN
+- [ ] CHIMNEY-F
+- [ ] CLEARING-FCN
+- [ ] CRACK-FCN
+- [ ] CRETIN-FCN
+- [x] CYCLOPS-FCN
+- [ ] CYCLOPS-ROOM-FCN
+- [x] DAM-FUNCTION
+- [ ] DAM-ROOM-FCN
+- [ ] DBOAT-FUNCTION
+- [x] DEAD-FUNCTION
+- [ ] DEEP-CANYON-F
+- [ ] DOME-ROOM-FCN
+- [x] FOREST-F
+- [ ] FRONT-DOOR-FCN
+- [ ] GARLIC-F
+- [ ] GHOSTS-F
+- [ ] GRANITE-WALL-F
+- [ ] GRATE-FUNCTION
+- [x] GROUND-FUNCTION
+- [ ] GRUE-FUNCTION
+- [x] GUNK-FUNCTION
+- [ ] HOT-BELL-F
+- [ ] IBOAT-FUNCTION
+- [x] KITCHEN-FCN
+- [x] KITCHEN-WINDOW-F
+- [ ] KNIFE-F
+- [ ] LARGE-BAG-F
+- [ ] LEAK-FUNCTION
+- [ ] LIVING-ROOM-FCN
+- [ ] LOUD-ROOM-FCN
+- [x] MACHINE-F
+- [ ] MACHINE-ROOM-FCN
+- [x] MAILBOX-F
+- [x] MATCH-FUNCTION
+- [ ] MAZE-11-FCN
+- [ ] MOUNTAIN-RANGE-F
+- [ ] MSWITCH-FUNCTION
+- [ ] NOT-HERE-OBJECT-F
+- [ ] NULL-F
+- [x] PAINTING-FCN
+- [ ] PUTTY-FCN
+- [ ] RAINBOW-FCN
+- [ ] RBOAT-FUNCTION
+- [ ] RESERVOIR-FCN
+- [ ] RESERVOIR-NORTH-FCN
+- [ ] RESERVOIR-SOUTH-FCN
+- [x] RIVER-FUNCTION
+- [ ] ROBBER-FUNCTION
+- [x] ROPE-FUNCTION
+- [x] RUG-FCN
+- [ ] RUSTY-KNIFE-FCN
+- [ ] SAILOR-FCN
+- [ ] SAND-FUNCTION
+- [ ] SANDWICH-BAG-FCN
+- [ ] SCEPTRE-FUNCTION
+- [ ] SLIDE-FUNCTION
+- [ ] SONGBIRD-F
+- [ ] SOUTH-TEMPLE-FCN
+- [ ] STAIRS-F
+- [ ] STILETTO-FUNCTION
+- [x] STONE-BARROW-FCN
+- [x] SWORD-FCN
+- [ ] TEETH-F
+- [ ] TOOL-CHEST-FCN
+- [ ] TORCH-ROOM-FCN
+- [ ] TRAP-DOOR-FCN
+- [ ] TREASURE-ROOM-FCN
+- [x] TROLL-FCN
+- [ ] TROLL-ROOM-F
+- [x] TROPHY-CASE-FCN
+- [ ] TRUNK-F
+- [ ] TUBE-FUNCTION
+- [ ] UP-CHIMNEY-FUNCTION
+- [ ] WATER-F
+- [ ] WEAPON-FUNCTION
+- [ ] WHITE-CLIFFS-FUNCTION
+- [x] WHITE-HOUSE-F
+- [ ] ZORKMID-FUNCTION

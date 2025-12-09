@@ -1190,8 +1190,8 @@ void VerbRegistry::initializeSyntaxPatterns() {
         // DRINK FROM
         registerSyntax(V_DRINK, SyntaxPattern(V_DRINK, {Elem(ET::VERB), objElem})); // Drink water
         Elem fromPrep(ET::PREPOSITION, {"from"});
-        registerSyntax(V_DRINK, SyntaxPattern(V_DRINK, {Elem(ET::VERB), fromPrep, objElem})); // Drink from cup
-        registerSyntax(V_DRINK, SyntaxPattern(V_DRINK, {Elem(ET::VERB), objElem, fromPrep, Elem(ET::OBJECT)})); // Drink water from cup
+        registerSyntax(V_DRINK, SyntaxPattern(V_DRINK_FROM, {Elem(ET::VERB), fromPrep, objElem})); // Drink from cup -> V_DRINK_FROM
+        registerSyntax(V_DRINK, SyntaxPattern(V_DRINK_FROM, {Elem(ET::VERB), objElem, fromPrep, Elem(ET::OBJECT)})); // Drink water from cup -> V_DRINK_FROM
 
         // HATCH
         registerSyntax(V_HATCH, SyntaxPattern(V_HATCH, {Elem(ET::VERB), objElem}));
@@ -1241,5 +1241,38 @@ void VerbRegistry::initializeSyntaxPatterns() {
         // TURN OBJ already handles basic.
         // TURN OBJ WITH TOOL
         registerSyntax(V_TURN, SyntaxPattern(V_TURN, {Elem(ET::VERB), objElem, withPrep, toolElem}));
+    }
+
+    // Phase 12 Batch 2: New Syntax
+    {
+        Elem objElem(ET::OBJECT);
+        Elem toolElem(ET::OBJECT, ObjectFlag::TOOLBIT); // Should ideally check specific tools? ZIL checks flags.
+        Elem weaponElem(ET::OBJECT, ObjectFlag::WEAPONBIT); 
+        
+        // OIL (V_OIL)
+        registerSyntax(V_OIL, SyntaxPattern(V_OIL, {Elem(ET::VERB), objElem})); // OIL X
+        Elem withPrep(ET::PREPOSITION, {"with"});
+        registerSyntax(V_OIL, SyntaxPattern(V_OIL, {Elem(ET::VERB), objElem, withPrep, objElem})); // OIL X WITH Y
+        
+        // STAB (V_STAB)
+        registerSyntax(V_STAB, SyntaxPattern(V_STAB, {Elem(ET::VERB), objElem})); // STAB X
+        registerSyntax(V_STAB, SyntaxPattern(V_STAB, {Elem(ET::VERB), objElem, withPrep, weaponElem})); // STAB X WITH Y
+        
+        // LOOK UNDER / BEHIND
+        Elem underPrep(ET::PREPOSITION, {"under", "underneath", "beneath", "below"});
+        registerSyntax(V_LOOK, SyntaxPattern(V_LOOK_UNDER, {Elem(ET::VERB), underPrep, objElem})); // LOOK UNDER X
+        
+        Elem behindPrep(ET::PREPOSITION, {"behind"});
+        registerSyntax(V_LOOK, SyntaxPattern(V_LOOK_BEHIND, {Elem(ET::VERB), behindPrep, objElem})); // LOOK BEHIND X
+        
+        // THROW OFF
+        Elem offPrep(ET::PREPOSITION, {"off"});
+        registerSyntax(V_THROW, SyntaxPattern(V_THROW_OFF, {Elem(ET::VERB), objElem, offPrep, objElem})); // THROW X OFF Y
+        
+        // RECORD / UNRECORD / VERIFY / RANDOM (Intransitive)
+        registerSyntax(V_RECORD, SyntaxPattern(V_RECORD, {Elem(ET::VERB)}));
+        registerSyntax(V_UNRECORD, SyntaxPattern(V_UNRECORD, {Elem(ET::VERB)}));
+        registerSyntax(V_VERIFY, SyntaxPattern(V_VERIFY, {Elem(ET::VERB)}));
+        registerSyntax(V_RANDOM, SyntaxPattern(V_RANDOM, {Elem(ET::VERB), objElem})); // RANDOM X
     }
 }

@@ -198,6 +198,19 @@ constexpr VerbId V_BUG = 212;
 constexpr VerbId V_CHOMP = 213;
 constexpr VerbId V_COUNT = 214;
 constexpr VerbId V_CROSS = 215;
+
+// Phase 12 Batch 2: Missing Verbs
+constexpr VerbId V_OIL = 220;
+constexpr VerbId V_STAB = 221;
+constexpr VerbId V_DRINK_FROM = 222;
+constexpr VerbId V_LOOK_UNDER = 223;
+constexpr VerbId V_LOOK_BEHIND = 224;
+constexpr VerbId V_FIRST_LOOK = 225;
+constexpr VerbId V_RANDOM = 226;
+constexpr VerbId V_RECORD = 227;
+constexpr VerbId V_UNRECORD = 228;
+constexpr VerbId V_VERIFY = 229;
+constexpr VerbId V_THROW_OFF = 230;
 constexpr VerbId V_HATCH = 216;
 constexpr VerbId V_KNOCK = 217;
 constexpr VerbId V_LEAVE = 218; // Handling LEAVE vs LEAVE OBJ (Exit vs Drop)
@@ -251,6 +264,7 @@ namespace Verbs {
     bool vLower();
     bool vRaise();
     bool vMake();
+    bool vWind();
     bool vMelt();
     bool vPlay();
     bool vPlug();
@@ -384,6 +398,19 @@ namespace Verbs {
     bool vWait();
     bool vSwim();
     bool vBack();
+
+    // Phase 12 Batch 2: Missing Verbs
+    bool vOil();
+    bool vStab();
+    bool vDrinkFrom();
+    bool vLookUnder();
+    bool vLookBehind();
+    bool vFirstLook();
+    bool vRandom();
+    bool vRecord();
+    bool vUnrecord();
+    bool vVerify();
+    bool vThrowOff();
     bool vJump();
     bool vCurse();
     

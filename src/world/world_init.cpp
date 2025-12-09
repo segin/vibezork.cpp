@@ -52,6 +52,10 @@ bool boltAction();
 bool bubbleAction();
 bool buttonAction();
 bool gunkAction();
+// Batch 3 Actions
+bool bagOfCoinsAction();
+bool trunkAction();
+bool axeAction();
 
 void initializeWorld() {
     auto& g = Globals::instance();
@@ -2319,10 +2323,27 @@ void initializeWorld() {
     bag->setFlag(ObjectFlag::OPENBIT);     // Initially open
     bag->setProperty(P_CAPACITY, 100);     // Large capacity (thief's bag)
     bag->setProperty(P_SIZE, 20);
-    bag->setAction(bagAction);
-    // Initially with thief - will be placed when thief is created
-    
     g.registerObject(ObjectIds::BAG, std::move(bag));
+
+    // Create BAG_OF_COINS
+    auto bagOfCoins = std::make_unique<ZObject>(ObjectIds::BAG_OF_COINS, "bag of coins");
+    bagOfCoins->addSynonym("bag");
+    bagOfCoins->addSynonym("coins");
+    bagOfCoins->addAdjective("old");
+    bagOfCoins->addAdjective("leather");
+    bagOfCoins->setFlag(ObjectFlag::TAKEBIT);
+    bagOfCoins->setFlag(ObjectFlag::CONTBIT); // It contains coins, but maybe just treated as opaque object? ZIL says STUPID-CONTAINER.
+    bagOfCoins->setProperty(P_SIZE, 15);
+    bagOfCoins->setProperty(P_VALUE, 10); // Treasure value
+    bagOfCoins->setAction(bagOfCoinsAction);
+    
+    // Initial location? Usually in Maze or with Thief?
+    // ZIL: "bag of coins" IN "maze" (Room MAZE-11?) or Thief has it?
+    // Zork1 Logic: Thief has it initially or drops it. 
+    // For now, place in a maze room or leave null to be placed by Thief logic.
+    // Let's place it in MAZE_5 (placeholder) or define initial location.
+    
+    g.registerObject(ObjectIds::BAG_OF_COINS, std::move(bagOfCoins));
     
     // Create RAISED_BASKET (Basket at top of shaft) - special container
     auto raisedBasket = std::make_unique<ZObject>(ObjectIds::RAISED_BASKET, "basket");
@@ -2985,8 +3006,8 @@ void initializeWorld() {
     pump->moveTo(g.getObject(RoomIds::RESERVOIR_NORTH));
     g.registerObject(ObjectIds::PUMP, std::move(pump));
     
-    // Create BOAT_INFLATABLE (Deflated rubber boat)
-    auto boatInflatable = std::make_unique<ZObject>(ObjectIds::BOAT_INFLATABLE, "pile of plastic");
+    // Create INFLATABLE_BOAT (Deflated rubber boat)
+    auto boatInflatable = std::make_unique<ZObject>(ObjectIds::INFLATABLE_BOAT, "pile of plastic");
     boatInflatable->addSynonym("boat");
     boatInflatable->addSynonym("raft");
     boatInflatable->addSynonym("pile");
@@ -2995,15 +3016,14 @@ void initializeWorld() {
     boatInflatable->addAdjective("deflated");
     boatInflatable->addAdjective("small");
     boatInflatable->setFlag(ObjectFlag::TAKEBIT);
-    boatInflatable->setFlag(ObjectFlag::BURNBIT);  // Can be burned
+    boatInflatable->setFlag(ObjectFlag::BURNBIT);
     boatInflatable->setProperty(P_SIZE, 10);
-    boatInflatable->setAction(boatAction);
-    boatInflatable->setLongDesc("There is a folded pile of plastic here which has a small valve attached.");
-    boatInflatable->moveTo(g.getObject(RoomIds::RESERVOIR_SOUTH));
-    g.registerObject(ObjectIds::BOAT_INFLATABLE, std::move(boatInflatable));
-    
-    // Create BOAT_INFLATED (Inflated rubber boat)
-    auto boatInflated = std::make_unique<ZObject>(ObjectIds::BOAT_INFLATED, "rubber boat");
+    // boatInflatable->setAction(boatAction); // To Be Implemented in Batch 3
+    boatInflatable->moveTo(g.getObject(RoomIds::DAM_BASE));
+    g.registerObject(ObjectIds::INFLATABLE_BOAT, std::move(boatInflatable));
+
+    // Create INFLATED_BOAT (Magic Boat)
+    auto boatInflated = std::make_unique<ZObject>(ObjectIds::INFLATED_BOAT, "magic boat");
     boatInflated->addSynonym("boat");
     boatInflated->addSynonym("raft");
     boatInflated->addAdjective("rubber");
@@ -3333,6 +3353,7 @@ void initializeWorld() {
     // Axe is not takeable while troll is alive (troll is holding it)
     // TAKEBIT will be set when troll dies
     axe->setFlag(ObjectFlag::WEAPONBIT);
+    axe->setFlag(ObjectFlag::TOOLBIT); // Required for OPEN X WITH Y syntax
     axe->setProperty(P_SIZE, 15);
     axe->setProperty(P_STRENGTH, 7);  // Strong weapon
     // Axe starts with troll (will be dropped when troll dies)
