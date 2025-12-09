@@ -860,11 +860,17 @@ bool bellAction() {
     return false;
 }
 
-// BOARDED-WINDOW-FCN
+// BOARDED-WINDOW-FCN - Boarded window blocking
+// ZIL: OPEN = "windows are boarded", MUNG = "can't break windows open"
+// Source: 1actions.zil lines 370-374
 bool boardedWindowAction() {
     auto& g = Globals::instance();
-    if (g.prsa == V_OPEN || g.prsa == V_ATTACK) { // V_BREAK not defined, using V_ATTACK
-        printLine("The window is boarded up and cannot be opened.");
+    if (g.prsa == V_OPEN) {
+        printLine("The windows are boarded and can't be opened.");
+        return true;
+    }
+    if (g.prsa == V_ATTACK || g.prsa == V_KILL) { // MUNG = break
+        printLine("You can't break the windows open.");
         return true;
     }
     return false;

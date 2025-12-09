@@ -15,7 +15,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] BASKET-F - Basket/dumbwaiter mechanics
 - [x] BAT-F - Bat attack/defense
 - [x] BELL-F - Bell ringing mechanics
-- [ ] BOARD-F - Board manipulation
+- [x] BOARD-F - Board manipulation
 - [ ] BOARDED-WINDOW-FCN - Boarded window interactions
 - [ ] BODY-FUNCTION - Dead body interactions
 - [ ] BOLT-F - Dam bolt mechanics

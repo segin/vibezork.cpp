@@ -452,6 +452,52 @@ TEST(BoardF_OtherVerbsReturnFalse) {
 }
 
 // =============================================================================
+// BOARDED-WINDOW-FCN Tests (1actions.zil lines 370-374)
+// ZIL Logic: OPEN = boarded, MUNG/break = can't break
+// =============================================================================
+
+extern bool boardedWindowAction();
+
+TEST(BoardedWindowFcn_OpenPrintsBoarded) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prsa = V_OPEN;
+    
+    OutputCapture cap;
+    bool result = boardedWindowAction();
+    
+    ASSERT_TRUE(result);
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("boarded") != std::string::npos);
+}
+
+TEST(BoardedWindowFcn_AttackPrintsCantBreak) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prsa = V_ATTACK;
+    
+    OutputCapture cap;
+    bool result = boardedWindowAction();
+    
+    ASSERT_TRUE(result);
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("break") != std::string::npos);
+}
+
+TEST(BoardedWindowFcn_OtherVerbsReturnFalse) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prsa = V_EXAMINE;
+    
+    bool result = boardedWindowAction();
+    
+    ASSERT_FALSE(result);
+}
+
+// =============================================================================
 // KNIFE-F Tests (1actions.zil lines 926-929)
 // ZIL Logic: On TAKE, clears ATTIC-TABLE NDESCBIT
 // =============================================================================
