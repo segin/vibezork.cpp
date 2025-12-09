@@ -29,11 +29,104 @@ private:
 };
 
 // Forward declarations for action functions
+extern bool axeAction();
 extern bool knifeAction();
 
 // Initialize world for testing
 static void setupTestWorld() {
     initializeWorld();
+}
+
+// =============================================================================
+// AXE-F Tests (1actions.zil lines 622-638)
+// ZIL Logic: If troll alive in room, prevents taking axe via WEAPON-FUNCTION
+// =============================================================================
+
+TEST(AxeF_TrollInRoomBlocksTake) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    // Move player and troll to same room
+    ZObject* troll = g.getObject(ObjectIds::TROLL);
+    ZObject* axe = g.getObject(ObjectIds::AXE);
+    ZObject* trollRoom = g.getObject(RoomIds::TROLL_ROOM);
+    
+    if (!troll || !axe || !trollRoom) {
+        return; // Skip if objects not defined
+    }
+    
+    // Setup: troll and player in troll room, axe on ground
+    g.here = trollRoom;
+    troll->moveTo(trollRoom);
+    axe->moveTo(trollRoom);
+    troll->clearFlag(ObjectFlag::NDESCBIT); // Troll is alive
+    
+    // Try to take axe
+    g.prsa = V_TAKE;
+    g.prso = axe;
+    
+    OutputCapture cap;
+    bool result = axeAction();
+    
+    // Should block take and print message
+    ASSERT_TRUE(result);
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("swings") != std::string::npos || 
+                output.find("white-hot") != std::string::npos);
+}
+
+TEST(AxeF_DeadTrollAllowsTake) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* troll = g.getObject(ObjectIds::TROLL);
+    ZObject* axe = g.getObject(ObjectIds::AXE);
+    ZObject* trollRoom = g.getObject(RoomIds::TROLL_ROOM);
+    
+    if (!troll || !axe || !trollRoom) {
+        return;
+    }
+    
+    // Setup: dead troll (NDESCBIT set)
+    g.here = trollRoom;
+    troll->moveTo(trollRoom);
+    axe->moveTo(trollRoom);
+    troll->setFlag(ObjectFlag::NDESCBIT); // Troll is dead
+    
+    g.prsa = V_TAKE;
+    g.prso = axe;
+    
+    bool result = axeAction();
+    
+    // Should return false, allowing normal take
+    ASSERT_FALSE(result);
+}
+
+TEST(AxeF_TrollNotInRoomAllowsTake) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* troll = g.getObject(ObjectIds::TROLL);
+    ZObject* axe = g.getObject(ObjectIds::AXE);
+    ZObject* livingRoom = g.getObject(RoomIds::LIVING_ROOM);
+    ZObject* trollRoom = g.getObject(RoomIds::TROLL_ROOM);
+    
+    if (!troll || !axe || !livingRoom || !trollRoom) {
+        return;
+    }
+    
+    // Player in living room, troll in troll room
+    g.here = livingRoom;
+    troll->moveTo(trollRoom);
+    axe->moveTo(livingRoom);
+    
+    g.prsa = V_TAKE;
+    g.prso = axe;
+    
+    bool result = axeAction();
+    
+    // Troll not here, should allow take
+    ASSERT_FALSE(result);
 }
 
 // =============================================================================
