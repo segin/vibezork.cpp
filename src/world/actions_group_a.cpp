@@ -654,3 +654,39 @@ bool bodyAction() {
     }
     return false;
 }
+
+// KITCHEN-FCN - Kitchen room handler
+// ZIL: Handles M-LOOK (description with window state) and M-BEG (climb stairs)
+// Source: 1actions.zil lines 385-401
+void kitchenAction(int rarg) {
+    auto& g = Globals::instance();
+    
+    // M-LOOK: Print room description with window state
+    if (rarg == 0) {  // M-LOOK equivalent
+        print("You are in the kitchen of the white house. A table seems to "
+              "have been used recently for the preparation of food. A passage "
+              "leads to the west and a dark staircase can be seen leading "
+              "upward. A dark chimney leads down and to the east is a small "
+              "window which is ");
+        
+        // Check kitchen window OPENBIT
+        ZObject* window = g.getObject(ObjectIds::KITCHEN_WINDOW);
+        if (window && window->hasFlag(ObjectFlag::OPENBIT)) {
+            printLine("open.");
+        } else {
+            printLine("slightly ajar.");
+        }
+    }
+    
+    // M-BEG: Handle CLIMB-UP STAIRS
+    if (rarg == 1) {  // M-BEG equivalent
+        ZObject* stairs = g.getObject(ObjectIds::STAIRS);
+        if (g.prsa == V_CLIMB_UP && g.prso == stairs) {
+            // Execute walk up (handled by caller triggering direction movement)
+            Verbs::vWalkDir(Direction::UP);
+        }
+        if (g.prsa == V_CLIMB_DOWN && g.prso == stairs) {
+            printLine("There are no stairs leading down.");
+        }
+    }
+}
