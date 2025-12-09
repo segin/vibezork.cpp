@@ -1,101 +1,114 @@
-# ZIL Actions Chart
-Scanned from `zil` files. Focused on Object Action Routines (*-F, *-FCN, *-FUNCTION).
+# ZIL Actions Implementation Checklist
+Scanned from `zil` files. Track implementation progress for Object Action Routines.
 
-| Action Routine | File | Description |
-|----------------|------|-------------|
-| AXE-F | 1actions.zil | | |
-| BAG-OF-COINS-F | 1actions.zil | | |
-| BARROW-DOOR-FCN | 1actions.zil | | |
-| BARROW-FCN | 1actions.zil | | |
-| BASKET-F | 1actions.zil | | |
-| BAT-F | 1actions.zil | | |
-| BELL-F | 1actions.zil | | |
-| BOARD-F | 1actions.zil | | |
-| BOARDED-WINDOW-FCN | 1actions.zil | | |
-| BODY-FUNCTION | 1actions.zil | | |
-| BOLT-F | 1actions.zil | | |
-| BOTTLE-FUNCTION | 1actions.zil | | |
-| BUBBLE-F | 1actions.zil | | |
-| BUTTON-F | 1actions.zil | | |
-| CANDLES-FCN | 1actions.zil | | |
-| CANYON-VIEW-F | 1dungeon.zil | | |
-| CELLAR-FCN | 1actions.zil | | |
-| CHALICE-FCN | 1actions.zil | | |
-| CHIMNEY-F | 1actions.zil | | |
-| CLEARING-FCN | 1actions.zil | | |
-| CRACK-FCN | 1actions.zil | | |
-| CRETIN-FCN | gglobals.zil | | |
-| CYCLOPS-FCN | 1actions.zil | | |
-| CYCLOPS-ROOM-FCN | 1actions.zil | | |
-| DAM-FUNCTION | 1actions.zil | | |
-| DAM-ROOM-FCN | 1actions.zil | | |
-| DBOAT-FUNCTION | 1actions.zil | | |
-| DEAD-FUNCTION | 1actions.zil | | |
-| DEEP-CANYON-F | 1actions.zil | | |
-| DOME-ROOM-FCN | 1actions.zil | | |
-| FOREST-F | 1actions.zil | | |
-| FRONT-DOOR-FCN | 1actions.zil | | |
-| GARLIC-F | 1actions.zil | | |
-| GHOSTS-F | 1actions.zil | | |
-| GRANITE-WALL-F | 1actions.zil | | |
-| GRATE-FUNCTION | 1actions.zil | | |
-| GROUND-FUNCTION | gglobals.zil | | |
-| GRUE-FUNCTION | gglobals.zil | | |
-| GUNK-FUNCTION | 1actions.zil | | |
-| HOT-BELL-F | 1actions.zil | | |
-| IBOAT-FUNCTION | 1actions.zil | | |
-| KITCHEN-FCN | 1actions.zil | | |
-| KITCHEN-WINDOW-F | 1actions.zil | | |
-| KNIFE-F | 1actions.zil | | |
-| LARGE-BAG-F | 1actions.zil | | |
-| LEAK-FUNCTION | 1actions.zil | | |
-| LIVING-ROOM-FCN | 1actions.zil | | |
-| LOUD-ROOM-FCN | 1actions.zil | | |
-| MACHINE-F | 1actions.zil | | |
-| MACHINE-ROOM-FCN | 1actions.zil | | |
-| MAILBOX-F | 1actions.zil | | |
-| MATCH-FUNCTION | 1actions.zil | | |
-| MAZE-11-FCN | 1actions.zil | | |
-| MOUNTAIN-RANGE-F | 1actions.zil | | |
-| MSWITCH-FUNCTION | 1actions.zil | | |
-| NOT-HERE-OBJECT-F | gglobals.zil | | |
-| NULL-F | gglobals.zil | | |
-| PAINTING-FCN | 1actions.zil | | |
-| PUTTY-FCN | 1actions.zil | | |
-| RAINBOW-FCN | 1actions.zil | | |
-| RBOAT-FUNCTION | 1actions.zil | | |
-| RESERVOIR-FCN | 1actions.zil | | |
-| RESERVOIR-NORTH-FCN | 1actions.zil | | |
-| RESERVOIR-SOUTH-FCN | 1actions.zil | | |
-| RIVER-FUNCTION | 1actions.zil | | |
-| ROBBER-FUNCTION | 1actions.zil | | |
-| ROPE-FUNCTION | 1actions.zil | | |
-| RUG-FCN | 1actions.zil | | |
-| RUSTY-KNIFE-FCN | 1actions.zil | | |
-| SAILOR-FCN | gglobals.zil | | |
-| SAND-FUNCTION | 1actions.zil | | |
-| SANDWICH-BAG-FCN | 1actions.zil | | |
-| SCEPTRE-FUNCTION | 1actions.zil | | |
-| SLIDE-FUNCTION | 1actions.zil | | |
-| SONGBIRD-F | 1actions.zil | | |
-| SOUTH-TEMPLE-FCN | 1actions.zil | | |
-| STAIRS-F | gglobals.zil | | |
-| STILETTO-FUNCTION | 1actions.zil | | |
-| STONE-BARROW-FCN | 1actions.zil | | |
-| SWORD-FCN | 1actions.zil | | |
-| TEETH-F | 1actions.zil | | |
-| TOOL-CHEST-FCN | 1actions.zil | | |
-| TORCH-ROOM-FCN | 1actions.zil | | |
-| TRAP-DOOR-FCN | 1actions.zil | | |
-| TREASURE-ROOM-FCN | 1actions.zil | | |
-| TROLL-FCN | 1actions.zil | | |
-| TROLL-ROOM-F | 1actions.zil | | |
-| TROPHY-CASE-FCN | 1actions.zil | | |
-| TRUNK-F | 1actions.zil | | |
-| TUBE-FUNCTION | 1actions.zil | | |
-| UP-CHIMNEY-FUNCTION | 1actions.zil | | |
-| WATER-F | 1actions.zil | | |
-| WEAPON-FUNCTION | 1actions.zil | | |
-| WHITE-CLIFFS-FUNCTION | 1actions.zil | | |
-| WHITE-HOUSE-F | 1actions.zil | | |
-| ZORKMID-FUNCTION | gglobals.zil | | |
+## Implementation Status Legend
+- [ ] Not implemented
+- [x] Implemented
+- [~] Partial/stub implementation
+
+## Action Routines
+
+### Object Actions (1actions.zil)
+- [ ] AXE-F - Axe interaction with Troll
+- [ ] BAG-OF-COINS-F - Stupid container for coins
+- [ ] BARROW-DOOR-FCN - Barrow door interactions
+- [ ] BARROW-FCN - Stone Barrow room handler
+- [ ] BASKET-F - Basket/dumbwaiter mechanics
+- [ ] BAT-F - Bat attack/defense
+- [ ] BELL-F - Bell ringing mechanics
+- [ ] BOARD-F - Board manipulation
+- [ ] BOARDED-WINDOW-FCN - Boarded window interactions
+- [ ] BODY-FUNCTION - Dead body interactions
+- [ ] BOLT-F - Dam bolt mechanics
+- [ ] BOTTLE-FUNCTION - Bottle container
+- [ ] BUBBLE-F - Bubble interactions
+- [ ] BUTTON-F - Dam control buttons
+- [ ] CANDLES-FCN - Candle lighting/burning
+- [ ] CELLAR-FCN - Cellar room handler
+- [ ] CHALICE-FCN - Chalice interactions
+- [ ] CHIMNEY-F - Chimney navigation
+- [ ] CLEARING-FCN - Clearing room handler
+- [ ] CRACK-FCN - Crack examination
+- [ ] CYCLOPS-FCN - Cyclops NPC behavior
+- [ ] CYCLOPS-ROOM-FCN - Cyclops room handler
+- [ ] DAM-FUNCTION - Dam mechanics
+- [ ] DAM-ROOM-FCN - Dam room handler
+- [ ] DBOAT-FUNCTION - Deflated boat
+- [ ] DEAD-FUNCTION - Death handling
+- [ ] DEEP-CANYON-F - Deep canyon navigation
+- [ ] DOME-ROOM-FCN - Dome room handler
+- [ ] FOREST-F - Forest room handler
+- [ ] FRONT-DOOR-FCN - Front door interactions
+- [ ] GARLIC-F - Garlic eating/bat repellent
+- [ ] GHOSTS-F - Ghost interactions
+- [ ] GRANITE-WALL-F - Granite wall examination
+- [ ] GRATE-FUNCTION - Grating open/close/lock
+- [ ] GUNK-FUNCTION - Gunk/sludge interactions
+- [ ] HOT-BELL-F - Hot bell (after exorcism)
+- [ ] IBOAT-FUNCTION - Inflated boat
+- [ ] KITCHEN-FCN - Kitchen room handler
+- [ ] KITCHEN-WINDOW-F - Kitchen window
+- [ ] KNIFE-F - Rusty knife with sword
+- [ ] LARGE-BAG-F - Thief's bag
+- [ ] LEAK-FUNCTION - Boat leak
+- [ ] LIVING-ROOM-FCN - Living room handler
+- [ ] LOUD-ROOM-FCN - Loud room echo puzzle
+- [ ] MACHINE-F - Coal machine
+- [ ] MACHINE-ROOM-FCN - Machine room handler
+- [ ] MAILBOX-F - Mailbox container
+- [ ] MATCH-FUNCTION - Match lighting
+- [ ] MAZE-11-FCN - Maze room 11 (grating)
+- [ ] MOUNTAIN-RANGE-F - Mountain range scenery
+- [ ] MSWITCH-FUNCTION - Machine switch
+- [ ] PAINTING-FCN - Painting interactions
+- [ ] PUTTY-FCN - Putty interactions
+- [ ] RAINBOW-FCN - Rainbow/pot of gold
+- [ ] RBOAT-FUNCTION - Punctured boat
+- [ ] RESERVOIR-FCN - Reservoir water handler
+- [ ] RESERVOIR-NORTH-FCN - North reservoir
+- [ ] RESERVOIR-SOUTH-FCN - South reservoir
+- [ ] RIVER-FUNCTION - River flow/boat mechanics
+- [ ] ROBBER-FUNCTION - Thief AI
+- [ ] ROPE-FUNCTION - Rope tie/untie
+- [ ] RUG-FCN - Rug/trap door
+- [ ] RUSTY-KNIFE-FCN - Rusty knife curse
+- [ ] SAND-FUNCTION - Sand digging
+- [ ] SANDWICH-BAG-FCN - Lunch bag container
+- [ ] SCEPTRE-FUNCTION - Sceptre/rainbow
+- [ ] SLIDE-FUNCTION - Coal slide
+- [ ] SONGBIRD-F - Songbird bauble drop
+- [ ] SOUTH-TEMPLE-FCN - Temple room handler
+- [ ] STILETTO-FUNCTION - Thief's stiletto
+- [ ] STONE-BARROW-FCN - Stone barrow entry
+- [ ] SWORD-FCN - Sword glow mechanics
+- [ ] TEETH-F - Teeth scenery
+- [ ] TOOL-CHEST-FCN - Tool chest container
+- [ ] TORCH-ROOM-FCN - Torch room handler
+- [ ] TRAP-DOOR-FCN - Trap door open/close
+- [ ] TREASURE-ROOM-FCN - Thief's lair
+- [ ] TROLL-FCN - Troll combat/behavior
+- [ ] TROLL-ROOM-F - Troll room handler
+- [ ] TROPHY-CASE-FCN - Trophy case scoring
+- [ ] TRUNK-F - Trunk stupid container
+- [ ] TUBE-FUNCTION - Tube navigation
+- [ ] UP-CHIMNEY-FUNCTION - Chimney climbing
+- [ ] WATER-F - Water interactions
+- [ ] WEAPON-FUNCTION - Weapon blocked by NPC
+- [ ] WHITE-CLIFFS-FUNCTION - White cliffs scenery
+- [ ] WHITE-HOUSE-F - White house exterior
+
+### Global Actions (gglobals.zil)
+- [ ] CANYON-VIEW-F - Canyon view scenery
+- [ ] CRETIN-FCN - Self/me interactions
+- [ ] GROUND-FUNCTION - Ground/floor
+- [ ] GRUE-FUNCTION - Grue darkness attack
+- [ ] NOT-HERE-OBJECT-F - Object not visible
+- [ ] NULL-F - No-op action
+- [ ] SAILOR-FCN - "Hello Sailor" easter egg
+- [ ] STAIRS-F - Stairs navigation
+- [ ] ZORKMID-FUNCTION - Zorkmid coin
+
+## Progress
+- Total: 96 actions
+- Implemented: 0
+- Remaining: 96

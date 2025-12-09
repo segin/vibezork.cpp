@@ -41,23 +41,59 @@ bool trunkAction() {
     return stupidContainerAction("jewels");
 }
 
-// AXE-F
+// WEAPON-FUNCTION helper (shared by AXE-F and STILETTO-FUNCTION)
+// ZIL: Prevents taking weapon if NPC wielder is present
+// W = weapon object, V = villain/NPC wielding it
+static bool weaponFunction(ZObject* weapon, ZObject* villain) {
+    auto& g = Globals::instance();
+    
+    // If villain is not in current room, allow normal handling
+    if (!villain || villain->getLocation() != g.here) {
+        return false;
+    }
+    
+    // Only applies to TAKE verb
+    if (g.prsa != V_TAKE) {
+        return false;
+    }
+    
+    // Check if weapon is in villain's possession
+    if (weapon->getLocation() == villain) {
+        // Villain swings weapon out of reach
+        print("The ");
+        print(villain->getDesc());
+        printLine(" swings it out of your reach.");
+        return true;
+    } else {
+        // Weapon is white-hot (magical curse)
+        print("The ");
+        print(weapon->getDesc());
+        printLine(" seems white-hot. You can't hold on to it.");
+        return true;
+    }
+}
+
+// AXE-F - Axe interaction with Troll
+// ZIL: <COND (,TROLL-FLAG <>) (T <WEAPON-FUNCTION ,AXE ,TROLL>)>
 bool axeAction() {
     auto& g = Globals::instance();
-    // Logic: If Troll is present (and alive? TROLL-FLAG?), prevent taking.
-    // ZIL: <COND (,TROLL-FLAG <>) (T <WEAPON-FUNCTION ,AXE ,TROLL>)>
-    // TROLL-FLAG usually starts FALSE (Troll is alive/threat).
-    // If TROLL-FLAG is TRUE, return FALSE (allow normal take).
     
-    // Simplified: If troll is in room when trying to take axe, it swings away
+    // Check TROLL-FLAG - if true, troll is dead, allow normal handling
+    // TROLL-FLAG is stored as a property on the troll or as global state
     ZObject* troll = g.getObject(ObjectIds::TROLL);
-    if (troll && troll->getLocation() == g.here) {
-        if (g.prsa == V_TAKE) {
-            printLine("The troll swings it out of your reach.");
-            return true;
-        }
+    
+    // If troll is dead (not in game), allow normal behavior
+    if (!troll || troll->getLocation() == nullptr) {
+        return false;
     }
-    return false;
+    
+    // If troll has NDESCBIT set, it's dead/unconscious
+    if (troll->hasFlag(ObjectFlag::NDESCBIT)) {
+        return false;
+    }
+    
+    // Call weapon function
+    return weaponFunction(g.prso, troll);
 }
 
 // GRUE-FUNCTION - Called when player is in darkness
