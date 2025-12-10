@@ -2813,6 +2813,46 @@ TEST(GrateFcn_LockUnlock) {
         ASSERT_TRUE(cap.getOutput().find("unlocked") != std::string::npos);
     }
 }
+
+// =============================================================================
+// GUNK-FUNCTION Tests (1actions.zil line 2553)
+// ZIL Logic: Unconditional Crumble
+// =============================================================================
+
+// Forward decl
+extern bool gunkAction();
+
+TEST(GunkFcn_Interact) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    // Create Gunk
+    auto gunk = std::make_unique<ZObject>(12345); // Dummy ID
+    gunk->setName("slag");
+    gunk->moveTo(g.here); // Verify removal
+    g.prso = gunk.get();
+    
+    // Test Any Verb (TAKE)
+    g.prsa = V_TAKE;
+    { 
+        OutputCapture cap; 
+        ASSERT_TRUE(gunkAction()); 
+        ASSERT_TRUE(cap.getOutput().find("crumbles into dust") != std::string::npos);
+    }
+    ASSERT_EQ(gunk->getLocation(), nullptr);
+    
+    // Test Another Verb (EXAMINE) - Should also trigger?
+    // ZIL implies yes (no conditions).
+    // Re-add gunk
+    gunk->moveTo(g.here);
+    g.prsa = V_EXAMINE;
+    { 
+        OutputCapture cap; 
+        ASSERT_TRUE(gunkAction()); 
+        ASSERT_TRUE(cap.getOutput().find("crumbles into dust") != std::string::npos);
+    }
+    ASSERT_EQ(gunk->getLocation(), nullptr);
+}
 // Correction for above test block:
 // ASSERT_TRUE(out.find(...) != npos);
 // - YELLOW: GATE-FLAG = T (Power On)

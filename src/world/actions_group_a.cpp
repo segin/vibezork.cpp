@@ -894,18 +894,18 @@ bool grateAction() {
     
     return false;
 }
-bool grateAction() {
+
+// GUNK-FUNCTION
+// ZIL: Unconditional interaction causes crumbling.
+// Source: 1actions.zil lines 2553-2556
+bool gunkAction() {
     auto& g = Globals::instance();
-    if (g.prsa == V_OPEN) {
-        // Check for key or unlock first
-        if (g.prso && g.prso->hasFlag(ObjectFlag::OPENBIT)) {
-            printLine("The grate is already open.");
-        } else {
-            printLine("The grate is locked.");
-        }
-        return true;
-    }
-    return false;
+    // ZIL: <REMOVE-CAREFULLY ,GUNK> <TELL ...>
+    // No verb check implies any interaction triggers this.
+    // Logic: If action called, it crumbles.
+    printLine("The slag was rather insubstantial, and crumbles into dust at your touch.");
+    if (g.prso) g.prso->moveTo(nullptr); // Consumed/Removed
+    return true;
 }
 
 // HOT-BELL-F
