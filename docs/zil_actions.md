@@ -43,8 +43,8 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] GRANITE-WALL-F - Granite wall examination
 - [x] GRATE-FUNCTION - Grating open/close/lock
 - [x] GUNK-FUNCTION - Gunk/sludge interactions
-- [/] HOT-BELL-F - Hot bell (after exorcism)
-- [ ] IBOAT-FUNCTION - Inflated boat
+- [x] HOT-BELL-F - Hot bell (after exorcism)
+- [/] IBOAT-FUNCTION - Inflated boat
 - [ ] KITCHEN-FCN - Kitchen room handler
 - [ ] KITCHEN-WINDOW-F - Kitchen window
 - [ ] KNIFE-F - Rusty knife with sword
@@ -109,5 +109,5 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 96 actions
-- Implemented: 35
-- Remaining: 61
+- Implemented: 36
+- Remaining: 60
