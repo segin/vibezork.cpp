@@ -43,6 +43,7 @@ public:
     
     // Puzzle state flags
     bool rugMoved = false;             // Has the rug been moved to reveal trap door?
+    bool lldFlag = false;              // Land of Living Dead flag (ceremony complete?)
     
     // Display modes
     bool verboseMode = true;           // Full descriptions

@@ -43,6 +43,8 @@ void Globals::reset() {
     quoteFlag = false;
     lampBattery = 330;
     lampWarned = false;
+    rugMoved = false;
+    lldFlag = false;
     
     // Reset display modes to defaults (Requirement 65.5)
     verboseMode = true;

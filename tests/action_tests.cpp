@@ -538,6 +538,9 @@ TEST(BellF_RingPrintsDingDong) {
     setupTestWorld();
     auto& g = Globals::instance();
     
+    // Ensure we are NOT in LLD room
+    // Default setupTestWorld starts in Living Room
+    
     g.prsa = V_RING;
     
     OutputCapture cap;
@@ -545,7 +548,57 @@ TEST(BellF_RingPrintsDingDong) {
     
     ASSERT_TRUE(result);
     std::string output = cap.getOutput();
-    ASSERT_TRUE(output.find("Ding") != std::string::npos);
+    ASSERT_TRUE(output.find("Ding, dong") != std::string::npos);
+}
+
+TEST(BellF_RingInLLDWithoutFlagReturnsFalse) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    // Create LLD Room if needed
+    ZObject* lldRoom = g.getObject(ObjectIds::LAND_OF_LIVING_DEAD);
+    if (!lldRoom) {
+         auto newRoom = std::make_unique<ZObject>(ObjectIds::LAND_OF_LIVING_DEAD, "Land of Living Dead");
+         g.registerObject(ObjectIds::LAND_OF_LIVING_DEAD, std::move(newRoom));
+         lldRoom = g.getObject(ObjectIds::LAND_OF_LIVING_DEAD);
+    }
+    
+    // Move player to LLD
+    g.here = lldRoom;
+    g.lldFlag = false; // Flag false
+    
+    g.prsa = V_RING;
+    
+    bool result = bellAction();
+    
+    // Should return FALSE (blocked) to let room handle it
+    ASSERT_FALSE(result);
+}
+
+TEST(BellF_RingInLLDWithFlagPrintsDingDong) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    // Create LLD Room if needed
+    ZObject* lldRoom = g.getObject(ObjectIds::LAND_OF_LIVING_DEAD);
+    if (!lldRoom) {
+         auto newRoom = std::make_unique<ZObject>(ObjectIds::LAND_OF_LIVING_DEAD, "Land of Living Dead");
+         g.registerObject(ObjectIds::LAND_OF_LIVING_DEAD, std::move(newRoom));
+         lldRoom = g.getObject(ObjectIds::LAND_OF_LIVING_DEAD);
+    }
+    
+    // Move player to LLD
+    g.here = lldRoom;
+    g.lldFlag = true; // Flag TRUE
+    
+    g.prsa = V_RING;
+    
+    OutputCapture cap;
+    bool result = bellAction();
+    
+    ASSERT_TRUE(result);
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("Ding, dong") != std::string::npos);
 }
 
 TEST(BellF_OtherVerbsReturnFalse) {

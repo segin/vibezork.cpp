@@ -963,6 +963,11 @@ bool batAction() {
 bool bellAction() {
     auto& g = Globals::instance();
     if (g.prsa == V_RING) {
+        // ZIL: <COND (<AND <EQUAL? ,HERE ,LLD-ROOM> <NOT ,LLD-FLAG>> <RFALSE>) ...>
+        if (g.here && g.here->getId() == ObjectIds::LAND_OF_LIVING_DEAD && !g.lldFlag) {
+            return false;
+        }
+        
         printLine("Ding, dong.");
         return true;
     }
