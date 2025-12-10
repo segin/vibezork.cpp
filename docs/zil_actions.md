@@ -19,7 +19,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] BOARDED-WINDOW-FCN - Boarded window interactions
 - [x] BODY-FUNCTION - Dead body interactions
 - [x] BOLT-F - Dam bolt mechanics
-- [x] BOTTLE-FUNCTION - Bottle container
+- [/] BOTTLE-FUNCTION - Bottle container
 - [x] BUBBLE-F - Bubble interactions
 - [x] BUTTON-F - Dam control buttons
 - [x] CANDLES-FCN - Candle lighting/burning

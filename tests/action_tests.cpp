@@ -1205,6 +1205,109 @@ TEST(BoltFcn_TurnWithWrenchAndPowerTogglesGates) {
     }
 }
 
+// =============================================================================
+// BOTTLE-FUNCTION Tests (1actions.zil line 1491)
+// ZIL Logic: THROW/MUNG destroys bottle (and likely spills), SHAKE spills if open.
+// =============================================================================
+
+TEST(BottleFcn_ThrowDestroysBottleAndSpillsWater) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    // Ensure bottle and water exist and are linked
+    ZObject* bottle = g.getObject(ObjectIds::BOTTLE);
+    ZObject* water = g.getObject(ObjectIds::WATER);
+    
+    ASSERT_TRUE(bottle != nullptr);
+    ASSERT_TRUE(water != nullptr);
+    
+    // Put water in bottle
+    water->moveTo(bottle);
+    bottle->moveTo(g.player);
+    g.prso = bottle;
+    
+    g.prsa = V_THROW;
+    
+    OutputCapture cap;
+    bool result = bottleAction();
+    
+    ASSERT_TRUE(result);
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("shatters") != std::string::npos);
+    ASSERT_TRUE(output.find("water spills") != std::string::npos); // Should spill
+    
+    // Verify removal
+    ASSERT_TRUE(bottle->getLocation() == nullptr);
+    ASSERT_TRUE(water->getLocation() == nullptr);
+}
+
+TEST(BottleFcn_AttackDestroysBottle) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* bottle = g.getObject(ObjectIds::BOTTLE);
+    bottle->moveTo(g.player);
+    g.prso = bottle;
+    
+    g.prsa = V_ATTACK; // or MUNG
+    
+    OutputCapture cap;
+    bool result = bottleAction();
+    
+    ASSERT_TRUE(result);
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("destroys the bottle") != std::string::npos);
+    ASSERT_TRUE(bottle->getLocation() == nullptr);
+}
+
+TEST(BottleFcn_ShakeOpenSpillsWater) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* bottle = g.getObject(ObjectIds::BOTTLE);
+    ZObject* water = g.getObject(ObjectIds::WATER);
+    
+    water->moveTo(bottle);
+    bottle->moveTo(g.player);
+    bottle->setFlag(ObjectFlag::OPENBIT); // Open
+    g.prso = bottle;
+    
+    g.prsa = V_SHAKE;
+    
+    OutputCapture cap;
+    bool result = bottleAction();
+    
+    ASSERT_TRUE(result);
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("water spills") != std::string::npos);
+    ASSERT_TRUE(water->getLocation() == nullptr); // Water gone
+    ASSERT_TRUE(bottle->getLocation() != nullptr); // Bottle stays
+}
+
+TEST(BottleFcn_ShakeClosedDoesNotSpill) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* bottle = g.getObject(ObjectIds::BOTTLE);
+    ZObject* water = g.getObject(ObjectIds::WATER);
+    
+    water->moveTo(bottle);
+    bottle->moveTo(g.player);
+    bottle->unsetFlag(ObjectFlag::OPENBIT); // Closed
+    g.prso = bottle;
+    
+    g.prsa = V_SHAKE;
+    
+    OutputCapture cap;
+    bool result = bottleAction();
+    
+    // Should NOT be handled (returns false, no spill message)
+    ASSERT_FALSE(result);
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("water spills") == std::string::npos);
+    ASSERT_TRUE(water->getLocation() == bottle); // Water still inside
+}
+
 TEST(KnifeF_NonTakeVerbDoesNotAffectTable) {
     setupTestWorld();
     auto& g = Globals::instance();

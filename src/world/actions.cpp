@@ -197,10 +197,49 @@ bool bagAction() {
     return RFALSE;
 }
 
+// BOTTLE-FUNCTION - Bottle interactions
+// ZIL: THROW/MUNG destroys bottle. SHAKE spills water if open.
+// Source: 1actions.zil lines 1491-1507
 bool bottleAction() {
     auto& g = Globals::instance();
-    // Bottle is a portable container with no special behavior
-    return RFALSE;
+    bool spilled = false;
+    bool destroyed = false;
+
+    // THROW - Bottle hits wall and shatters
+    if (g.prsa == V_THROW) {
+        printLine("The bottle hits the far wall and shatters.");
+        destroyed = true;
+    }
+    // MUNG (Attack/Break) - Destroys bottle
+    else if (g.prsa == V_ATTACK || g.prsa == V_KILL || g.prsa == V_MUNG) {
+        printLine("A brilliant maneuver destroys the bottle.");
+        destroyed = true;
+    }
+    // SHAKE - Spills water if open
+    else if (g.prsa == V_SHAKE) {
+        if (g.prso->hasFlag(ObjectFlag::OPENBIT) && g.prso->contains(ObjectIds::WATER)) {
+            spilled = true;
+        }
+    }
+
+    if (destroyed) {
+        // Check for water before removing bottle contents via destruction
+        if (g.prso->contains(ObjectIds::WATER)) {
+            spilled = true;
+        }
+        g.prso->moveTo(nullptr); // Remove bottle
+    }
+
+    if (spilled) {
+        printLine("The water spills to the floor and evaporates.");
+        ZObject* water = g.getObject(ObjectIds::WATER);
+        if (water) water->moveTo(nullptr); // Remove water
+        return true;
+    }
+
+    if (destroyed) return true;
+
+    return false;
 }
 
 bool whiteHouseAction() {
