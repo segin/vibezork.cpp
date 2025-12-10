@@ -1362,6 +1362,9 @@ bool boltAction() {
 
 // Bubble action - green bubble puzzle
 // Requirements: 42
+// BUBBLE-F - Bubble interactions
+// ZIL: Only handles TAKE (Integral part).
+// Source: 1actions.zil lines 1219-1221
 bool bubbleAction() {
     auto& g = Globals::instance();
     
@@ -1369,23 +1372,9 @@ bool bubbleAction() {
         return RFALSE;
     }
     
-    // Handle EXAMINE
-    if (g.prsa == V_EXAMINE) {
-        printLine("It's a large green bubble, shimmering and translucent.");
-        return RTRUE;
-    }
-    
     // Handle TAKE - ZIL: INTEGRAL-PART prints this message
-    // Source: 1actions.zil lines 1219-1224
     if (g.prsa == V_TAKE) {
         printLine("It is an integral part of the control panel.");
-        return RTRUE;
-    }
-    
-    // Handle ATTACK/BREAK - popping the bubble
-    if (g.prsa == V_ATTACK) {
-        printLine("The bubble pops with a soft sound and disappears.");
-        g.prso->moveTo(nullptr);  // Remove bubble from game
         return RTRUE;
     }
     

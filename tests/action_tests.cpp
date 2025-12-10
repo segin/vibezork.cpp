@@ -1308,6 +1308,47 @@ TEST(BottleFcn_ShakeClosedDoesNotSpill) {
     ASSERT_TRUE(water->getLocation() == bottle); // Water still inside
 }
 
+// =============================================================================
+// BUBBLE-F Tests (1actions.zil line 1219)
+// ZIL Logic: Only handles TAKE (Integral part).
+// =============================================================================
+
+TEST(BubbleFcn_TakePrintsIntegralPart) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* bubble = g.getObject(ObjectIds::BUBBLE);
+    
+    g.prsa = V_TAKE;
+    g.prso = bubble;
+    
+    OutputCapture cap;
+    bool result = bubbleAction();
+    
+    ASSERT_TRUE(result);
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("integral part") != std::string::npos);
+}
+
+TEST(BubbleFcn_AttackDoesNotDestroy) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* bubble = g.getObject(ObjectIds::BUBBLE);
+    
+    g.prsa = V_ATTACK;
+    g.prso = bubble;
+    
+    OutputCapture cap;
+    bool result = bubbleAction();
+    
+    // Should NOT be handled by action (fall through to parser default "Violence isn't the answer")
+    ASSERT_FALSE(result);
+    
+    // Verify bubble still exists
+    ASSERT_TRUE(bubble->getLocation() != nullptr);
+}
+
 TEST(KnifeF_NonTakeVerbDoesNotAffectTable) {
     setupTestWorld();
     auto& g = Globals::instance();
