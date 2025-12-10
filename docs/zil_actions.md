@@ -44,7 +44,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] GRATE-FUNCTION - Grating open/close/lock
 - [x] GUNK-FUNCTION - Gunk/sludge interactions
 - [x] HOT-BELL-F - Hot bell (after exorcism)
-- [/] IBOAT-FUNCTION - Inflated boat
+- [x] IBOAT-FUNCTION - Inflated boat
 - [x] KITCHEN-FCN - Kitchen room handler
 - [x] KITCHEN-WINDOW-F - Kitchen window
 - [x] KNIFE-F - Rusty knife with sword
