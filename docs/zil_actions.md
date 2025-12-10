@@ -53,8 +53,8 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] LIVING-ROOM-FCN - Living room handler
 - [x] LOUD-ROOM-FCN - Loud room echo puzzle
 - [x] MACHINE-F - Coal machine
-- [/] MACHINE-ROOM-FCN - Machine room handler
-- [ ] MAILBOX-F - Mailbox container
+- [x] MACHINE-ROOM-FCN - Machine room handler
+- [/] MAILBOX-F - Mailbox container
 - [ ] MATCH-FUNCTION - Match lighting
 - [ ] MAZE-11-FCN - Maze room 11 (grating)
 - [ ] MOUNTAIN-RANGE-F - Mountain range scenery
@@ -109,5 +109,5 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 96 actions
-- Implemented: 45
-- Remaining: 51
+- Implemented: 46
+- Remaining: 50
