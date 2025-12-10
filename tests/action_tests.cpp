@@ -337,26 +337,56 @@ TEST(BasketF_RaiseHandled) {
     setupTestWorld();
     auto& g = Globals::instance();
     
-    g.prso = g.getObject(ObjectIds::RAISED_BASKET);
-    g.prsa = V_RAISE;
+    ZObject* raisedBasket = g.getObject(ObjectIds::RAISED_BASKET);
+    ZObject* loweredBasket = g.getObject(ObjectIds::LOWERED_BASKET);
+    ZObject* shaftRoom = g.getObject(RoomIds::SHAFT_ROOM);
+    ZObject* lowerShaft = g.getObject(RoomIds::LOWER_SHAFT);
     
+    // Ensure initial state for test (assuming cageTop=false or unknown)
+    // To properly test, we might need to reset static state, but we can't.
+    // So we try RAISE. If it says "already at top", we try LOWER then RAISE.
+    
+    g.prso = raisedBasket;
+    g.prsa = V_LOWER; // Ensure it's at bottom first
+    basketAction(); 
+    
+    // Now Raise
+    g.prsa = V_RAISE;
     OutputCapture cap;
     bool result = basketAction();
     
     ASSERT_TRUE(result);
+    // Verify move: Raised Basket should be in Shaft Room (Top)
+    ASSERT_EQ(raisedBasket->getLocation(), shaftRoom);
+    // Lowered Basket should be in Lower Shaft (Bottom)
+    ASSERT_EQ(loweredBasket->getLocation(), lowerShaft);
 }
 
 TEST(BasketF_LowerHandled) {
     setupTestWorld();
     auto& g = Globals::instance();
     
-    g.prso = g.getObject(ObjectIds::RAISED_BASKET);
-    g.prsa = V_LOWER;
+    ZObject* raisedBasket = g.getObject(ObjectIds::RAISED_BASKET);
+    ZObject* loweredBasket = g.getObject(ObjectIds::LOWERED_BASKET);
+    ZObject* shaftRoom = g.getObject(RoomIds::SHAFT_ROOM);
+    ZObject* lowerShaft = g.getObject(RoomIds::LOWER_SHAFT);
+
+    // Ensure it's at top first
+    g.prso = raisedBasket;
+    g.prsa = V_RAISE;
+    basketAction();
     
+    // Now Lower
+    g.prsa = V_LOWER;
     OutputCapture cap;
     bool result = basketAction();
     
     ASSERT_TRUE(result);
+    // Verify move: Raised Basket should be in Lower Shaft (Bottom) - wait, ZIL says:
+    // <MOVE ,RAISED-BASKET ,LOWER-SHAFT>
+    // <MOVE ,LOWERED-BASKET ,SHAFT-ROOM>
+    ASSERT_EQ(raisedBasket->getLocation(), lowerShaft);
+    ASSERT_EQ(loweredBasket->getLocation(), shaftRoom);
 }
 
 TEST(BasketF_TakeBlocked) {

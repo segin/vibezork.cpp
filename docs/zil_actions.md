@@ -12,7 +12,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] BAG-OF-COINS-F - Stupid container for coins
 - [x] BARROW-DOOR-FCN - Barrow door interactions
 - [x] BARROW-FCN - Stone Barrow room handler
-- [x] BASKET-F - Basket/dumbwaiter mechanics
+- [/] BASKET-F - Basket/dumbwaiter mechanics
 - [x] BAT-F - Bat attack/defense
 - [x] BELL-F - Bell ringing mechanics
 - [x] BOARD-F - Board manipulation
