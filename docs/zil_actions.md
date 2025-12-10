@@ -76,8 +76,8 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] SCEPTRE-FUNCTION - Sceptre/rainbow
 - [x] SLIDE-FUNCTION - Coal slide
 - [x] SONGBIRD-F - Songbird bauble drop
-- [/] SOUTH-TEMPLE-FCN - Temple room handler
-- [ ] STILETTO-FUNCTION - Thief's stiletto
+- [x] SOUTH-TEMPLE-FCN - Temple room handler
+- [/] STILETTO-FUNCTION - Thief's stiletto
 - [ ] STONE-BARROW-FCN - Stone barrow entry
 - [ ] SWORD-FCN - Sword glow mechanics
 - [ ] TEETH-F - Teeth scenery
@@ -109,5 +109,5 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 96 actions
-- Implemented: 68
-- Remaining: 28
+- Implemented: 69
+- Remaining: 27
