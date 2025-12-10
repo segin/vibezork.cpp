@@ -70,10 +70,36 @@ TEST(AxeF_TrollInRoomBlocksTake) {
     bool result = axeAction();
     
     // Should block take and print message
+    // Should block take and print message
     ASSERT_TRUE(result);
     std::string output = cap.getOutput();
-    ASSERT_TRUE(output.find("swings") != std::string::npos || 
-                output.find("white-hot") != std::string::npos);
+    ASSERT_TRUE(output.find("white-hot") != std::string::npos);
+}
+
+TEST(AxeF_TrollPossessionBlocksTake) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* troll = g.getObject(ObjectIds::TROLL);
+    ZObject* axe = g.getObject(ObjectIds::AXE);
+    ZObject* trollRoom = g.getObject(RoomIds::TROLL_ROOM);
+    
+    if (!troll || !axe || !trollRoom) return;
+    
+    g.here = trollRoom;
+    troll->moveTo(trollRoom);
+    axe->moveTo(troll); // Axe is IN Troll (inventory)
+    troll->clearFlag(ObjectFlag::NDESCBIT);
+    
+    g.prsa = V_TAKE;
+    g.prso = axe;
+    
+    OutputCapture cap;
+    bool result = axeAction();
+    
+    ASSERT_TRUE(result);
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("swings") != std::string::npos);
 }
 
 TEST(AxeF_DeadTrollAllowsTake) {

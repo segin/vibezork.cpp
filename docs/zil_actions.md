@@ -8,7 +8,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 ## Action Routines
 
 ### Object Actions (1actions.zil)
-- [x] AXE-F - Axe interaction with Troll
+- [/] AXE-F - Axe handling (Troll interaction)
 - [x] BAG-OF-COINS-F - Stupid container for coins
 - [x] BARROW-DOOR-FCN - Barrow door interactions
 - [x] BARROW-FCN - Stone Barrow room handler
