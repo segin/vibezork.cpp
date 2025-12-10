@@ -46,6 +46,7 @@ public:
     bool lldFlag = false;              // Land of Living Dead flag (ceremony complete?)
     bool gateFlag = false;             // Dam control panel activated (Green Bubble light)
     bool gatesOpen = false;            // Are dam sluice gates open?
+    int waterLevel = 0;                // Water level in Maintenance Room (0=Dry, >0=Rising)
     
     // Display modes
     bool verboseMode = true;           // Full descriptions

@@ -1395,39 +1395,46 @@ bool buttonAction() {
         return RFALSE;
     }
     
-    // Handle EXAMINE
-    if (g.prsa == V_EXAMINE) {
-        if (isYellow) {
-            printLine("A yellow button on the control panel.");
-        } else if (isBrown) {
-            printLine("A brown button on the control panel.");
-        } else if (isRed) {
-            printLine("A red button on the control panel.");
-        } else if (isBlue) {
-            printLine("A blue button on the control panel.");
+    
+    // Handle PUSH
+    if (g.prsa == V_PUSH) {
+        if (isBlue) {
+            if (g.waterLevel == 0) {
+                 printLine("There is a rumbling sound and a stream of water appears to burst from the east wall of the room (apparently, a leak has occurred in a pipe).");
+                 g.waterLevel = 1;
+                 // TODO: FCLEAR ,LEAK ,INVISIBLE
+                 // TODO: QUEUE I-MAINT-ROOM -1
+                 return true;
+            } else {
+                 printLine("The blue button appears to be jammed.");
+                 return true;
+            }
+        } 
+        else if (isRed) {
+            print("The lights within the room ");
+            if (g.here->hasFlag(ObjectFlag::ONBIT)) {
+                g.here->unsetFlag(ObjectFlag::ONBIT);
+                printLine("shut off.");
+            } else {
+                g.here->setFlag(ObjectFlag::ONBIT);
+                printLine("come on.");
+            }
+            return true;
+        } 
+        else if (isBrown) {
+            g.gateFlag = false;
+            printLine("Click.");
+            return true; // ZIL also clears DAM-ROOM TOUCHBIT, but that's for description flow mostly
+        } 
+        else if (isYellow) {
+            g.gateFlag = true;
+            printLine("Click.");
+            return true;
         }
-        return RTRUE;
     }
     
-    // Handle PUSH - pressing the button
-    if (g.prsa == V_PUSH) {
-        if (isYellow) {
-            if (damGatesOpen) {
-                printLine("The yellow button is already depressed. The gates are open.");
-            } else {
-                damGatesOpen = true;
-                printLine("You press the yellow button. A rumbling noise sounds from the dam and water rushes through the opened gates!");
-            }
-        } else if (isBrown) {
-            if (!damGatesOpen) {
-                printLine("The brown button is already depressed. The gates are closed.");
-            } else {
-                damGatesOpen = false;
-                printLine("You press the brown button. The rumbling subsides as the gates close.");
-            }
-        } else if (isRed) {
-            printLine("You press the red button. A siren sounds briefly.");
-        } else if (isBlue) {
+    return false;
+}
             printLine("You press the blue button. Nothing obvious happens.");
         }
         return RTRUE;

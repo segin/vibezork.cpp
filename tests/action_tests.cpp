@@ -1349,6 +1349,129 @@ TEST(BubbleFcn_AttackDoesNotDestroy) {
     ASSERT_TRUE(bubble->getLocation() != nullptr);
 }
 
+// =============================================================================
+// BUTTON-F Tests (1actions.zil line 1298)
+// ZIL Logic:
+// - YELLOW: GATE-FLAG = T (Power On)
+// - BROWN: GATE-FLAG = F (Power Off)
+// - RED: Toggle Lights (ONBIT)
+// - BLUE: if waterLevel=0 set LEAK logic & waterLevel=1, else jammed
+// =============================================================================
+
+TEST(ButtonFcn_YellowTurnsPowerOn) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* yBtn = g.getObject(ObjectIds::YELLOW_BUTTON);
+    if (!yBtn) { // Create if missing
+        auto b = std::make_unique<ZObject>(ObjectIds::YELLOW_BUTTON, "yellow button");
+        g.registerObject(ObjectIds::YELLOW_BUTTON, std::move(b));
+        yBtn = g.getObject(ObjectIds::YELLOW_BUTTON);
+    }
+    g.prso = yBtn;
+    g.prsa = V_PUSH;
+    
+    g.gateFlag = false;
+    
+    OutputCapture cap;
+    bool result = buttonAction();
+    
+    ASSERT_TRUE(result);
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("Click") != std::string::npos);
+    ASSERT_TRUE(g.gateFlag);
+}
+
+TEST(ButtonFcn_BrownTurnsPowerOff) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* bBtn = g.getObject(ObjectIds::BROWN_BUTTON);
+    if (!bBtn) {
+        auto b = std::make_unique<ZObject>(ObjectIds::BROWN_BUTTON, "brown button");
+        g.registerObject(ObjectIds::BROWN_BUTTON, std::move(b));
+        bBtn = g.getObject(ObjectIds::BROWN_BUTTON);
+    }
+    g.prso = bBtn;
+    g.prsa = V_PUSH;
+    
+    g.gateFlag = true;
+    
+    OutputCapture cap;
+    bool result = buttonAction();
+    
+    ASSERT_TRUE(result);
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("Click") != std::string::npos);
+    ASSERT_FALSE(g.gateFlag);
+}
+
+TEST(ButtonFcn_RedTogglesLights) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* rBtn = g.getObject(ObjectIds::RED_BUTTON);
+    if (!rBtn) {
+        auto b = std::make_unique<ZObject>(ObjectIds::RED_BUTTON, "red button");
+        g.registerObject(ObjectIds::RED_BUTTON, std::move(b));
+        rBtn = g.getObject(ObjectIds::RED_BUTTON);
+    }
+    g.prso = rBtn;
+    g.prsa = V_PUSH;
+    
+    // Test Turn Off
+    g.here->setFlag(ObjectFlag::ONBIT);
+    {
+        OutputCapture cap;
+        bool result = buttonAction();
+        ASSERT_TRUE(result);
+        ASSERT_TRUE(cap.getOutput().find("shut off") != std::string::npos);
+        ASSERT_FALSE(g.here->hasFlag(ObjectFlag::ONBIT));
+    }
+    
+    // Test Turn On
+    {
+        OutputCapture cap;
+        bool result = buttonAction();
+        ASSERT_TRUE(result);
+        ASSERT_TRUE(cap.getOutput().find("come on") != std::string::npos);
+        ASSERT_TRUE(g.here->hasFlag(ObjectFlag::ONBIT));
+    }
+}
+
+TEST(ButtonFcn_BlueTriggersLeakOrJams) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* bBtn = g.getObject(ObjectIds::BLUE_BUTTON);
+    if (!bBtn) {
+        auto b = std::make_unique<ZObject>(ObjectIds::BLUE_BUTTON, "blue button");
+        g.registerObject(ObjectIds::BLUE_BUTTON, std::move(b));
+        bBtn = g.getObject(ObjectIds::BLUE_BUTTON);
+    }
+    g.prso = bBtn;
+    g.prsa = V_PUSH;
+    
+    // Case 1: Water Level 0 -> Leak
+    g.waterLevel = 0;
+    {
+        OutputCapture cap;
+        bool result = buttonAction();
+        ASSERT_TRUE(result);
+        ASSERT_TRUE(cap.getOutput().find("burst from the east wall") != std::string::npos);
+        ASSERT_EQ(g.waterLevel, 1);
+    }
+    
+    // Case 2: Water Level > 0 -> Jammed
+    {
+        OutputCapture cap;
+        bool result = buttonAction();
+        ASSERT_TRUE(result);
+        ASSERT_TRUE(cap.getOutput().find("jammed") != std::string::npos);
+        ASSERT_EQ(g.waterLevel, 1); // Remains unchanged
+    }
+}
+
 TEST(KnifeF_NonTakeVerbDoesNotAffectTable) {
     setupTestWorld();
     auto& g = Globals::instance();

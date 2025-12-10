@@ -47,6 +47,7 @@ void Globals::reset() {
     lldFlag = false;
     gateFlag = false;
     gatesOpen = false;
+    waterLevel = 0;
     
     // Reset display modes to defaults (Requirement 65.5)
     verboseMode = true;
