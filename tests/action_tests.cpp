@@ -583,6 +583,74 @@ TEST(BottleFunction_ReturnsFalseNoSpecialBehavior) {
 }
 
 // =============================================================================
+// BUBBLE-F Tests (1actions.zil lines 1292-1321)
+// ZIL Logic: EXAMINE/TAKE/ATTACK bubble
+// =============================================================================
+
+extern bool bubbleAction();
+
+TEST(BubbleF_ExaminePrintsDescription) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prso = g.getObject(ObjectIds::BUBBLE);
+    g.prsa = V_EXAMINE;
+    
+    OutputCapture cap;
+    bool result = bubbleAction();
+    
+    ASSERT_TRUE(result);
+}
+
+TEST(BubbleF_TakeBlockedTooFragile) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prso = g.getObject(ObjectIds::BUBBLE);
+    g.prsa = V_TAKE;
+    
+    OutputCapture cap;
+    bool result = bubbleAction();
+    
+    ASSERT_TRUE(result);
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("fragile") != std::string::npos);
+}
+
+// =============================================================================
+// BUTTON-F Tests (1actions.zil dam control buttons)
+// ZIL Logic: PUSH buttons to control dam gates
+// =============================================================================
+
+extern bool buttonAction();
+
+TEST(ButtonF_ExaminePrintsDescription) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prso = g.getObject(ObjectIds::YELLOW_BUTTON);
+    g.prsa = V_EXAMINE;
+    
+    OutputCapture cap;
+    bool result = buttonAction();
+    
+    ASSERT_TRUE(result);
+}
+
+TEST(ButtonF_PushYellowOpensGates) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prso = g.getObject(ObjectIds::YELLOW_BUTTON);
+    g.prsa = V_PUSH;
+    
+    OutputCapture cap;
+    bool result = buttonAction();
+    
+    ASSERT_TRUE(result);
+}
+
+// =============================================================================
 // KNIFE-F Tests (1actions.zil lines 926-929)
 // ZIL Logic: On TAKE, clears ATTIC-TABLE NDESCBIT
 // =============================================================================
