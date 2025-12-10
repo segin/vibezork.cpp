@@ -563,6 +563,26 @@ TEST(BoltF_TurnWithoutWrenchPrintsMessage) {
 }
 
 // =============================================================================
+// BOTTLE-FUNCTION Tests (1actions.zil lines 1491-1507)
+// ZIL Logic: THROW/MUNG destroys bottle, SHAKE spills water
+// Current impl: Returns false (no special behavior)
+// =============================================================================
+
+extern bool bottleAction();
+
+TEST(BottleFunction_ReturnsFalseNoSpecialBehavior) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prsa = V_EXAMINE;
+    
+    bool result = bottleAction();
+    
+    // Current implementation has no special behavior
+    ASSERT_FALSE(result);
+}
+
+// =============================================================================
 // KNIFE-F Tests (1actions.zil lines 926-929)
 // ZIL Logic: On TAKE, clears ATTIC-TABLE NDESCBIT
 // =============================================================================
