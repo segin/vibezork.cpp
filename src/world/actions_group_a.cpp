@@ -437,8 +437,31 @@ void cyclopsRoomAction(int rarg) {
 }
 
 // DAM-ROOM-FCN (Room action for Dam)
+// DAM-ROOM-FCN (Room action for Dam)
+// ZIL: Handles M-LOOK logic based on water level and gates status.
+// Source: 1actions.zil lines 1156-1185
 void damRoomAction(int rarg) {
-    // Stub
+    auto& g = Globals::instance();
+    
+    if (rarg == M_LOOK) {
+        printLine("You are standing on the top of the Flood Control Dam #3, which was quite a tourist attraction in times far distant. There are paths to the north, south, and west, and a scramble down.");
+        
+        if (g.lowTide && g.gatesOpen) {
+            printLine("The water level behind the dam is low: The sluice gates have been opened. Water rushes through the dam and downstream.");
+        } else if (g.gatesOpen) {
+            printLine("The sluice gates are open, and water rushes through the dam. The water level behind the dam is still high.");
+        } else if (g.lowTide) {
+            printLine("The sluice gates are closed. The water level in the reservoir is quite low, but the level is rising quickly.");
+        } else {
+            printLine("The sluice gates on the dam are closed. Behind the dam, there can be seen a wide reservoir. Water is pouring over the top of the now abandoned dam.");
+        }
+        
+        print("There is a control panel here, on which a large metal bolt is mounted. Directly above the bolt is a small green plastic bubble");
+        if (g.gateFlag) {
+            print(" which is glowing serenely");
+        }
+        printLine(".");
+    }
 }
 
 // DBOAT-FUNCTION (Deflated boat)

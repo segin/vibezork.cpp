@@ -47,6 +47,7 @@ void Globals::reset() {
     lldFlag = false;
     gateFlag = false;       // Dam Green Bubble status
     gatesOpen = false;      // Dam Sluice Gates
+    lowTide = false;        // Dam Reservoir Low Tide
     waterLevel = 0;         // Maintenance Room water
     grateRevealed = false;  // Clearing Grating
     

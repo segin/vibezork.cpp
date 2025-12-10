@@ -2144,6 +2144,70 @@ TEST(DamFcn_ExamineFallsThrough) {
     // Should return false
     ASSERT_FALSE(damAction());
 }
+
+// =============================================================================
+// DAM-ROOM-FCN Tests (1actions.zil line 1156)
+// ZIL Logic: Describes Dam Top + Water Levels + Control Panel
+// =============================================================================
+
+// Forward decl
+extern void damRoomAction(int rarg);
+
+TEST(DamRoomFcn_Look) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    // Case 1: Default (Closed, High Water, Not Glowing)
+    g.gatesOpen = false;
+    g.lowTide = false;
+    g.gateFlag = false;
+    
+    {
+        OutputCapture cap;
+        damRoomAction(M_LOOK);
+        std::string out = cap.getOutput();
+        ASSERT_TRUE(out.find("tourist attraction") != std::string::npos); // Base
+        ASSERT_TRUE(out.find("pouring over the top") != std::string::npos); // Closed+High
+        ASSERT_TRUE(out.find("green plastic bubble.") != std::string::npos); // Not glowing (ends with dot)
+        ASSERT_TRUE(out.find("glowing serenely") == std::string::npos);
+    }
+    
+    // Case 2: Low Tide + Open Gates
+    g.gatesOpen = true;
+    g.lowTide = true;
+    {
+        OutputCapture cap;
+        damRoomAction(M_LOOK);
+        ASSERT_TRUE(cap.getOutput().find("level behind the dam is low") != std::string::npos);
+    }
+    
+    // Case 3: Open Gates + High Water
+    g.gatesOpen = true;
+    g.lowTide = false;
+    {
+        OutputCapture cap;
+        damRoomAction(M_LOOK);
+        ASSERT_TRUE(cap.getOutput().find("rushes through the dam") != std::string::npos);
+        ASSERT_TRUE(cap.getOutput().find("still high") != std::string::npos);
+    }
+    
+    // Case 4: Closed Gates + Low Tide
+    g.gatesOpen = false;
+    g.lowTide = true;
+    {
+        OutputCapture cap;
+        damRoomAction(M_LOOK);
+        ASSERT_TRUE(cap.getOutput().find("rising quickly") != std::string::npos);
+    }
+    
+    // Case 5: Control Panel Glowing
+    g.gateFlag = true;
+    {
+        OutputCapture cap;
+        damRoomAction(M_LOOK);
+        ASSERT_TRUE(cap.getOutput().find("glowing serenely") != std::string::npos);
+    }
+}
 // - YELLOW: GATE-FLAG = T (Power On)
 // - BROWN: GATE-FLAG = F (Power Off)
 // - RED: Toggle Lights (ONBIT)
