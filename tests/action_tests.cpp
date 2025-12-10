@@ -1465,6 +1465,59 @@ TEST(CandlesFcn_LampOffExtinguishes) {
 }
 
 // =============================================================================
+// CELLAR-FCN Tests (1actions.zil line 531)
+// ZIL Logic: M-LOOK prints desc. M-ENTER slams trap door logic.
+// =============================================================================
+
+// Forward declare logic function if not exported
+extern void cellarAction(int rarg);
+
+TEST(CellarFcn_LookPrintsDescription) {
+    setupTestWorld();
+    
+    OutputCapture cap;
+    cellarAction(M_LOOK);
+    
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("dark and damp cellar") != std::string::npos);
+}
+
+TEST(CellarFcn_EnterSlamsTrapDoor) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* trapdoor = g.getObject(ObjectIds::TRAP_DOOR);
+    if (!trapdoor) {
+        auto t = std::make_unique<ZObject>(ObjectIds::TRAP_DOOR, "trap door");
+        g.registerObject(ObjectIds::TRAP_DOOR, std::move(t));
+        trapdoor = g.getObject(ObjectIds::TRAP_DOOR);
+    }
+    
+    // Conditions for slam: OPEN and NOT TOUCHED
+    trapdoor->setFlag(ObjectFlag::OPENBIT);
+    trapdoor->unsetFlag(ObjectFlag::TOUCHBIT);
+    
+    OutputCapture cap;
+    cellarAction(M_ENTER);
+
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("trap door crashes shut") != std::string::npos);
+    
+    // Check state change
+    ASSERT_FALSE(trapdoor->hasFlag(ObjectFlag::OPENBIT)); // Slammed shut
+    ASSERT_TRUE(trapdoor->hasFlag(ObjectFlag::TOUCHBIT)); // Now touched
+    
+    // Verify it doesn't happen again (Touched)
+    trapdoor->setFlag(ObjectFlag::OPENBIT); // Re-open
+    // (Already Touched)
+    
+    OutputCapture cap2;
+    cellarAction(M_ENTER);
+    ASSERT_TRUE(cap2.getOutput().empty()); // No message
+    ASSERT_TRUE(trapdoor->hasFlag(ObjectFlag::OPENBIT)); // Stays open
+}
+
+// =============================================================================
 // BUTTON-F Tests (1actions.zil line 1298)
 // ZIL Logic:
 // - YELLOW: GATE-FLAG = T (Power On)

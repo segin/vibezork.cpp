@@ -137,9 +137,23 @@ bool barrowAction() {
 }
 
 // CELLAR-FCN (Room action for Cellar)
+// CELLAR-FCN - Cellar room handler
+// ZIL: M-LOOK prints desc. M-ENTER slams TRAP-DOOR if open/untouched.
+// Source: 1actions.zil lines 531-543
 void cellarAction(int rarg) {
-    // M_LOOK: Handle darkness, trap door, etc.
-    // For now, stub
+    auto& g = Globals::instance();
+
+    if (rarg == M_LOOK) {
+        printLine("You are in a dark and damp cellar with a narrow passageway leading north, and a crawlway to the south. On the west is the bottom of a steep metal ramp which is unclimbable.");
+    }
+    else if (rarg == M_ENTER) {
+        ZObject* trapdoor = g.getObject(ObjectIds::TRAP_DOOR);
+        if (trapdoor && trapdoor->hasFlag(ObjectFlag::OPENBIT) && !trapdoor->hasFlag(ObjectFlag::TOUCHBIT)) {
+            trapdoor->unsetFlag(ObjectFlag::OPENBIT);
+            trapdoor->setFlag(ObjectFlag::TOUCHBIT);
+            printLine("The trap door crashes shut, and you hear someone barring it.");
+        }
+    }
 }
 
 // CHIMNEY-F
