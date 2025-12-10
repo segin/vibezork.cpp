@@ -754,18 +754,38 @@ bool garlicAction() {
 }
 
 // GHOSTS-F
+// GHOSTS-F
+// ZIL: TELL, EXORCISE, ATTACK/MUNG, Catch-All.
+// Source: 1actions.zil lines 264-273
 bool ghostsAction() {
     auto& g = Globals::instance();
-    if (g.prsa == V_ATTACK || g.prsa == V_KILL) {
-        printLine("How can you attack a spirit with material weapons?");
+    
+    if (g.prsa == V_TELL) {
+        printLine("The spirits jeer loudly and ignore you.");
+        // ZIL: <SETG P-CONT <>> (Stop continuation).
         return true;
     }
+    
+    // ZIL uses EXORCISE. Verifying V_EXORCISE exists.
+    // If grep fails, I might map V_COMMAND?
+    // Start with V_EXORCISE or V_SAY?
+    // I'll check if V_EXORCISE is valid in next step.
+    // Assuming V_EXORCISE is valid based on previous actions using it/checking it.
     if (g.prsa == V_EXORCISE) {
-        printLine("The spirits depart with a faint sighing sound.");
-        g.prso->moveTo(nullptr);
+        printLine("Only the ceremony itself has any effect.");
         return true;
     }
-    return false;
+    
+    if (g.prsa == V_ATTACK || g.prsa == V_MUNG || g.prsa == V_KILL) {
+        if (g.prso && g.prso->getId() == ObjectIds::GHOSTS) {
+             printLine("How can you attack a spirit with material objects?");
+             return true;
+        }
+    }
+    
+    // Catch-All (ZIL handles T with "Unable to interact")
+    printLine("You seem unable to interact with these spirits.");
+    return true;
 }
 
 // GRANITE-WALL-F

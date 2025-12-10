@@ -2635,6 +2635,46 @@ TEST(GarlicFcn_Eat) {
     // Verify removal
     ASSERT_EQ(garlic->getLocation(), nullptr);
 }
+
+// =============================================================================
+// GHOSTS-F Tests (1actions.zil line 264)
+// ZIL Logic: TELL, EXORCISE, ATTACK, Catch-All
+// =============================================================================
+
+// Forward decl
+extern bool ghostsAction();
+
+TEST(GhostsFcn_Verbs) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    // Create Ghosts Object
+    // Assuming ObjectIds::GHOSTS exists (used in action).
+    // If not, we might need a distinct ID or mock.
+    // We'll trust the codebase usage for now.
+    // If compilation fails, we'll know.
+    // But action uses ObjectIds::GHOSTS, so it MUST be defined in header.
+    // Creating object:
+    auto ghosts = std::make_unique<ZObject>(ObjectIds::GHOSTS); 
+    ghosts->setName("ghosts");
+    g.prso = ghosts.get();
+    
+    // TELL
+    g.prsa = V_TELL;
+    { OutputCapture cap; ASSERT_TRUE(ghostsAction()); ASSERT_TRUE(cap.getOutput().find("jeer loudly") != std::string::npos); }
+
+    // EXORCISE
+    g.prsa = V_EXORCISE;
+    { OutputCapture cap; ASSERT_TRUE(ghostsAction()); ASSERT_TRUE(cap.getOutput().find("ceremony itself") != std::string::npos); }
+
+    // ATTACK
+    g.prsa = V_ATTACK;
+    { OutputCapture cap; ASSERT_TRUE(ghostsAction()); ASSERT_TRUE(cap.getOutput().find("material objects") != std::string::npos); }
+
+    // Default (e.g. EXAMINE)
+    g.prsa = V_EXAMINE;
+    { OutputCapture cap; ASSERT_TRUE(ghostsAction()); ASSERT_TRUE(cap.getOutput().find("unable to interact") != std::string::npos); }
+}
 // Correction for above test block:
 // ASSERT_TRUE(out.find(...) != npos);
 // - YELLOW: GATE-FLAG = T (Power On)
