@@ -56,8 +56,8 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] MACHINE-ROOM-FCN - Machine room handler
 - [x] MAILBOX-F - Mailbox container
 - [x] MATCH-FUNCTION - Match lighting
-- [/] MAZE-11-FCN - Maze room 11 (grating)
-- [ ] MOUNTAIN-RANGE-F - Mountain range scenery
+- [x] MAZE-11-FCN - Maze room 11 (grating)
+- [/] MOUNTAIN-RANGE-F - Mountain range scenery
 - [ ] MSWITCH-FUNCTION - Machine switch
 - [ ] PAINTING-FCN - Painting interactions
 - [ ] PUTTY-FCN - Putty interactions
@@ -109,5 +109,5 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 96 actions
-- Implemented: 48
-- Remaining: 48
+- Implemented: 49
+- Remaining: 47
