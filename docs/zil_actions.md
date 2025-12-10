@@ -75,8 +75,8 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] SANDWICH-BAG-FCN - Lunch bag container
 - [x] SCEPTRE-FUNCTION - Sceptre/rainbow
 - [x] SLIDE-FUNCTION - Coal slide
-- [/] SONGBIRD-F - Songbird bauble drop
-- [ ] SOUTH-TEMPLE-FCN - Temple room handler
+- [x] SONGBIRD-F - Songbird bauble drop
+- [/] SOUTH-TEMPLE-FCN - Temple room handler
 - [ ] STILETTO-FUNCTION - Thief's stiletto
 - [ ] STONE-BARROW-FCN - Stone barrow entry
 - [ ] SWORD-FCN - Sword glow mechanics
@@ -109,5 +109,5 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 96 actions
-- Implemented: 67
-- Remaining: 29
+- Implemented: 68
+- Remaining: 28
