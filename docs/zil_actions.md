@@ -3,23 +3,23 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Implementation Status Legend
 - [ ] Not implemented
-- [x] Implemented
+- [ ] Implemented
 
 ## Action Routines
 
 ### Object Actions (1actions.zil)
-- [x] AXE-F - Axe interaction with Troll
-- [x] BAG-OF-COINS-F - Stupid container for coins
-- [x] BARROW-DOOR-FCN - Barrow door interactions
-- [x] BARROW-FCN - Stone Barrow room handler
-- [x] BASKET-F - Basket/dumbwaiter mechanics
-- [x] BAT-F - Bat attack/defense
-- [x] BELL-F - Bell ringing mechanics
-- [x] BOARD-F - Board manipulation
-- [x] BOARDED-WINDOW-FCN - Boarded window interactions
-- [x] BODY-FUNCTION - Dead body interactions
-- [x] BOLT-F - Dam bolt mechanics
-- [x] BOTTLE-FUNCTION - Bottle container
+- [ ] AXE-F - Axe interaction with Troll
+- [ ] BAG-OF-COINS-F - Stupid container for coins
+- [ ] BARROW-DOOR-FCN - Barrow door interactions
+- [ ] BARROW-FCN - Stone Barrow room handler
+- [ ] BASKET-F - Basket/dumbwaiter mechanics
+- [ ] BAT-F - Bat attack/defense
+- [ ] BELL-F - Bell ringing mechanics
+- [ ] BOARD-F - Board manipulation
+- [ ] BOARDED-WINDOW-FCN - Boarded window interactions
+- [ ] BODY-FUNCTION - Dead body interactions
+- [ ] BOLT-F - Dam bolt mechanics
+- [ ] BOTTLE-FUNCTION - Bottle container
 - [ ] BUBBLE-F - Bubble interactions
 - [ ] BUTTON-F - Dam control buttons
 - [ ] CANDLES-FCN - Candle lighting/burning
@@ -109,5 +109,5 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 96 actions
-- Implemented: 12
-- Remaining: 84
+- Implemented: 0
+- Remaining: 96

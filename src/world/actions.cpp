@@ -1304,9 +1304,10 @@ bool bubbleAction() {
         return RTRUE;
     }
     
-    // Handle TAKE
+    // Handle TAKE - ZIL: INTEGRAL-PART prints this message
+    // Source: 1actions.zil lines 1219-1224
     if (g.prsa == V_TAKE) {
-        printLine("The bubble is too fragile to take.");
+        printLine("It is an integral part of the control panel.");
         return RTRUE;
     }
     
