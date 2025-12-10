@@ -79,8 +79,8 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] SOUTH-TEMPLE-FCN - Temple room handler
 - [x] STILETTO-FUNCTION - Thief's stiletto
 - [x] STONE-BARROW-FCN - Stone barrow entry
-- [/] SWORD-FCN - Sword glow mechanics
-- [ ] TEETH-F - Teeth scenery
+- [x] SWORD-FCN - Sword glow mechanics
+- [/] TEETH-F - Teeth scenery
 - [ ] TOOL-CHEST-FCN - Tool chest container
 - [ ] TORCH-ROOM-FCN - Torch room handler
 - [ ] TRAP-DOOR-FCN - Trap door open/close
@@ -109,5 +109,5 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 96 actions
-- Implemented: 71
-- Remaining: 25
+- Implemented: 72
+- Remaining: 24
