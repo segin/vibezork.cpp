@@ -49,15 +49,15 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] KITCHEN-WINDOW-F - Kitchen window
 - [x] KNIFE-F - Rusty knife with sword
 - [x] LARGE-BAG-F - Thief's bag
-- [x] LEAK-FUNCTION - Boat leak
+- [/] LEAK-FUNCTION - Boat leak
 - [x] LIVING-ROOM-FCN - Living room handler
 - [x] LOUD-ROOM-FCN - Loud room echo puzzle
 - [x] MACHINE-F - Coal machine
 - [x] MACHINE-ROOM-FCN - Machine room handler
 - [x] MAILBOX-F - Mailbox container
-- [x] MATCH-FUNCTION - Match lighting
-- [x] MAZE-11-FCN - Maze room 11 (grating)
-- [x] MOUNTAIN-RANGE-F - Mountain range scenery
+- [ ] MATCH-FUNCTION - Match lighting
+- [ ] MAZE-11-FCN - Maze room 11 (grating)
+- [ ] MOUNTAIN-RANGE-F - Mountain range scenery
 - [x] MSWITCH-FUNCTION - Machine switch
 - [x] PAINTING-FCN - Painting interactions
 - [x] PUTTY-FCN - Putty interactions

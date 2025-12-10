@@ -1132,23 +1132,42 @@ bool largeBagAction() {
 
     return false;
 }
-        printLine("Getting close enough would be a good trick.");
-        return true;
-    }
+// LEAK-FUNCTION
+// ZIL: Repairs leak with Putty.
+// Source: 1actions.zil lines 1362-1377
+bool leakFunction() {
+    auto& g = Globals::instance();
     
-    // EXAMINE/LOOK-INSIDE
-    if (g.prsa == V_EXAMINE || g.prsa == V_LOOK_INSIDE) {
-        printLine("The bag is underneath the thief, so one can't say what, if anything, is inside.");
-        return true;
+    // Logic only applies if Water Level > 0 (Leaking)
+    if (g.waterLevel > 0) {
+        // PUT PUTTY (ON LEAK)
+        if ((g.prsa == V_PUT || g.prsa == V_PUT_ON) && g.prso && g.prso->getId() == ObjectIds::PUTTY) {
+             // Success
+             g.waterLevel = -1;
+             printLine("By some miracle of Zorkian technology, you have managed to stop the leak in the dam.");
+             return true;
+        }
+        
+        // PLUG LEAK (WITH PUTTY)
+        if (g.prsa == V_PLUG) {
+            if (g.prsi && g.prsi->getId() == ObjectIds::PUTTY) {
+                // Success
+                g.waterLevel = -1;
+                printLine("By some miracle of Zorkian technology, you have managed to stop the leak in the dam.");
+                return true;
+            }
+            // PLUG with Hand/Other
+            if (g.prsi) {
+                printLine("With a " + g.prsi->getName() + "? Do you know how big this dam is? You could only stop a tiny leak with that.");
+            } else {
+                printLine("Plug it with what?");
+            }
+            return true;
+        }
     }
     
     return false;
 }
-
-// LEAK-FUNCTION - Dam leak repair with putty
-// ZIL: PUT putty on leak or PLUG with putty fixes the dam
-// Source: 1actions.zil lines 1362-1377
-static int waterLevel = 1;  // >0 means dam is leaking
 
 bool leakAction() {
     auto& g = Globals::instance();

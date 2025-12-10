@@ -3146,6 +3146,82 @@ TEST(LargeBagFcn_ThiefBlocks) {
     g.prsi = nullptr; // Reset
     ASSERT_FALSE(largeBagAction()); // Default handling should proceed
 }
+
+// =============================================================================
+// LEAK-FUNCTION Tests (1actions.zil line 1362)
+// ZIL Logic: Plug leak with putty fixes dam (sets waterLevel = -1)
+// =============================================================================
+
+// Forward decl
+extern bool leakFunction();
+
+TEST(LeakFcn_Plug) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    // Initialize Water Level (Leaking)
+    g.waterLevel = 1;
+    
+    // Objects
+    auto putty = std::make_unique<ZObject>(ObjectIds::PUTTY);
+    putty->setName("putty");
+    g.registerObject(ObjectIds::PUTTY, std::move(putty));
+    
+    auto leak = std::make_unique<ZObject>(ObjectIds::LEAK);
+    leak->setName("leak");
+    g.registerObject(ObjectIds::LEAK, std::move(leak));
+    
+    auto hands = std::make_unique<ZObject>(ObjectIds::HANDS);
+    hands->setName("hands");
+    g.registerObject(ObjectIds::HANDS, std::move(hands));
+
+    g.prso = g.getObject(ObjectIds::LEAK);
+    
+    // 1. PLUG LEAK WITH PUTTY (Success)
+    g.prsa = V_PLUG;
+    g.prsi = g.getObject(ObjectIds::PUTTY);
+    { 
+        OutputCapture cap; 
+        ASSERT_TRUE(leakFunction()); 
+        ASSERT_TRUE(cap.getOutput().find("managed to stop the leak") != std::string::npos);
+        ASSERT_EQ(g.waterLevel, -1);
+    }
+
+    // Reset Level
+    g.waterLevel = 1;
+
+    // 2. PUT PUTTY (Success) - Implicitly on leak context? Logic just checks PRSO=Putty
+    g.prsa = V_PUT;
+    g.prso = g.getObject(ObjectIds::PUTTY);
+    g.prsi = g.getObject(ObjectIds::LEAK);
+    { 
+        OutputCapture cap; 
+        ASSERT_TRUE(leakFunction()); 
+        ASSERT_TRUE(cap.getOutput().find("managed to stop the leak") != std::string::npos);
+        ASSERT_EQ(g.waterLevel, -1);
+    }
+
+    // Reset Level
+    g.waterLevel = 1;
+
+    // 3. PLUG LEAK WITH HANDS (Fail)
+    g.prsa = V_PLUG;
+    g.prso = g.getObject(ObjectIds::LEAK);
+    g.prsi = g.getObject(ObjectIds::HANDS);
+    { 
+        OutputCapture cap; 
+        ASSERT_TRUE(leakFunction()); 
+        ASSERT_TRUE(cap.getOutput().find("only stop a tiny leak") != std::string::npos);
+        // Level unchanged
+        ASSERT_EQ(g.waterLevel, 1);
+    }
+    
+    // 4. Fixed State (Ignored)
+    g.waterLevel = -1;
+    { 
+        ASSERT_FALSE(leakFunction());
+    }
+}
 // Correction for above test block:
 // ASSERT_TRUE(out.find(...) != npos);
 // - YELLOW: GATE-FLAG = T (Power On)
