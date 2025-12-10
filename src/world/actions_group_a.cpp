@@ -789,13 +789,49 @@ bool ghostsAction() {
 }
 
 // GRANITE-WALL-F
+// GRANITE-WALL-F
+// ZIL: Room-specific interactions (North Temple, Treasure Room, Slide Room).
+// Source: 1actions.zil lines 64-80
 bool graniteWallAction() {
     auto& g = Globals::instance();
-    if (g.prsa == V_ATTACK || g.prsa == V_PUSH || g.prsa == V_MOVE) {
-        printLine("It's solid granite.");
+    auto room = g.here->getId();
+    
+    // Case 1: North Temple (West Wall)
+    if (room == RoomIds::NORTH_TEMPLE) {
+        if (g.prsa == V_FIND || g.prsa == V_EXAMINE) {
+            printLine("The west wall is solid granite here.");
+            return true;
+        }
+        if (g.prsa == V_TAKE || g.prsa == V_RAISE || g.prsa == V_LOWER || g.prsa == V_MOVE) {
+            printLine("It's solid granite.");
+            return true;
+        }
+    }
+    // Case 2: Treasure Room (East Wall)
+    else if (room == RoomIds::TREASURE_ROOM) {
+         if (g.prsa == V_FIND || g.prsa == V_EXAMINE) {
+            printLine("The east wall is solid granite here.");
+            return true;
+        }
+        if (g.prsa == V_TAKE || g.prsa == V_RAISE || g.prsa == V_LOWER || g.prsa == V_MOVE) {
+            printLine("It's solid granite.");
+            return true;
+        }
+    }
+    // Case 3: Slide Room (Fake Wall?)
+    else if (room == RoomIds::SLIDE_ROOM) {
+        if (g.prsa == V_FIND || g.prsa == V_EXAMINE || g.prsa == V_READ) {
+            printLine("It only SAYS \"Granite Wall\".");
+            return true;
+        }
+        // Catch-all specific to Slide Room
+        printLine("The wall isn't granite.");
         return true;
     }
-    return false;
+    
+    // Default (Wrong Room)
+    printLine("There is no granite wall here.");
+    return true;
 }
 
 // GRATE-FUNCTION

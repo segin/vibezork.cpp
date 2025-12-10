@@ -2675,6 +2675,64 @@ TEST(GhostsFcn_Verbs) {
     g.prsa = V_EXAMINE;
     { OutputCapture cap; ASSERT_TRUE(ghostsAction()); ASSERT_TRUE(cap.getOutput().find("unable to interact") != std::string::npos); }
 }
+
+// =============================================================================
+// GRANITE-WALL-F Tests (1actions.zil line 64)
+// ZIL Logic: Room-specific context (North Temple, Treasure Room, Slide Room)
+// =============================================================================
+
+// Forward decl
+extern bool graniteWallAction();
+
+TEST(GraniteWallFcn_Contexts) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    // Case 1: North Temple
+    // Create/Register Room
+    auto northTemple = std::make_unique<ZRoom>(RoomIds::NORTH_TEMPLE, "North Temple", "Desc");
+    g.registerObject(RoomIds::NORTH_TEMPLE, std::move(northTemple));
+    g.here = g.getObject(RoomIds::NORTH_TEMPLE);
+    
+    // Test FIND
+    g.prsa = V_FIND;
+    { OutputCapture cap; ASSERT_TRUE(graniteWallAction()); ASSERT_TRUE(cap.getOutput().find("west wall is solid") != std::string::npos); }
+    
+    // Test TAKE
+    g.prsa = V_TAKE;
+     { OutputCapture cap; ASSERT_TRUE(graniteWallAction()); ASSERT_TRUE(cap.getOutput().find("It's solid granite") != std::string::npos); }
+
+    // Case 2: Treasure Room
+    auto treasureRoom = std::make_unique<ZRoom>(RoomIds::TREASURE_ROOM, "Treasure Room", "Desc");
+    g.registerObject(RoomIds::TREASURE_ROOM, std::move(treasureRoom));
+    g.here = g.getObject(RoomIds::TREASURE_ROOM);
+    
+    // Test FIND
+    g.prsa = V_FIND;
+     { OutputCapture cap; ASSERT_TRUE(graniteWallAction()); ASSERT_TRUE(cap.getOutput().find("east wall is solid") != std::string::npos); }
+
+    // Case 3: Slide Room
+    auto slideRoom = std::make_unique<ZRoom>(RoomIds::SLIDE_ROOM, "Slide Room", "Desc");
+    g.registerObject(RoomIds::SLIDE_ROOM, std::move(slideRoom));
+    g.here = g.getObject(RoomIds::SLIDE_ROOM);
+    
+    // Test READ
+    g.prsa = V_READ;
+     { OutputCapture cap; ASSERT_TRUE(graniteWallAction()); ASSERT_TRUE(cap.getOutput().find("SAYS \"Granite Wall\"") != std::string::npos); }
+     
+    // Test Default (e.g. TAKE)
+    g.prsa = V_TAKE;
+     { OutputCapture cap; ASSERT_TRUE(graniteWallAction()); ASSERT_TRUE(cap.getOutput().find("wall isn't granite") != std::string::npos); }
+
+    // Case 4: Random Room (No Wall)
+     auto randomRoom = std::make_unique<ZRoom>(12345, "Random Room", "Desc");
+    g.registerObject(12345, std::move(randomRoom));
+    g.here = g.getObject(12345);
+    
+    // Test FIND
+    g.prsa = V_FIND;
+     { OutputCapture cap; ASSERT_TRUE(graniteWallAction()); ASSERT_TRUE(cap.getOutput().find("no granite wall here") != std::string::npos); }
+}
 // Correction for above test block:
 // ASSERT_TRUE(out.find(...) != npos);
 // - YELLOW: GATE-FLAG = T (Power On)
