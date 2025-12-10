@@ -1819,9 +1819,45 @@ TEST(ClearingFcn_LookPrintsDescriptionAndGrateStatus) {
     {
         OutputCapture cap;
         clearingAction(M_LOOK);
-        std::string out = cap.getOutput();
         ASSERT_TRUE(out.find("open grating") != std::string::npos);
     }
+}
+
+// =============================================================================
+// CRACK-FCN Tests (1actions.zil line 381)
+// ZIL Logic: THROUGH fails. LOOK INSIDE fails (custom C++ logic retained).
+// =============================================================================
+
+TEST(CrackFcn_ThroughFails) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* crack = g.getObject(ObjectIds::CRACK);
+    if (!crack) {
+         auto c = std::make_unique<ZObject>(ObjectIds::CRACK, "crack");
+         g.registerObject(ObjectIds::CRACK, std::move(c));
+    }
+    
+    g.prsa = V_THROUGH;
+    
+    OutputCapture cap;
+    bool result = crackAction();
+    
+    ASSERT_TRUE(result);
+    ASSERT_TRUE(cap.getOutput().find("can't fit through") != std::string::npos);
+}
+
+TEST(CrackFcn_LookInsideFails) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prsa = V_LOOK_INSIDE;
+    
+    OutputCapture cap;
+    bool result = crackAction();
+    
+    ASSERT_TRUE(result);
+    ASSERT_TRUE(cap.getOutput().find("too small") != std::string::npos);
 }
 // - YELLOW: GATE-FLAG = T (Power On)
 // - BROWN: GATE-FLAG = F (Power Off)

@@ -265,13 +265,30 @@ void clearingAction(int rarg) {
 }
 
 // CRACK-FCN
+// CRACK-FCN
+// ZIL: THROUGH -> "You can't fit".
+// Source: 1actions.zil lines 381-383
 bool crackAction() {
     auto& g = Globals::instance();
-    if (g.prsa == V_LOOK_INSIDE || g.prsa == V_EXAMINE) {
-        printLine("The crack is too small for you to see anything.");
-        return true;
+    
+    if (g.prsa == V_THROUGH) { // Assuming V_THROUGH exists
+        printLine("You can't fit through the crack.");
+        return RTRUE;
     }
-    return false;
+    
+    // Original C++ had LOOK_INSIDE/EXAMINE logic. ZIL does not.
+    // We should let it fall through or keep if useful?
+    // ZIL fidelity suggests removing custom EXAMINE unless it matches LDESC.
+    // LDESC: "There's a narrow crack in the rock."
+    // Original C++: "The crack is too small for you to see anything."
+    // Detailed analysis: LOOK INSIDE != EXAMINE.
+    // I will KEEP LOOK_INSIDE as "Too small" but REMOVE EXAMINE interception.
+    if (g.prsa == V_LOOK_INSIDE) {
+         printLine("The crack is too small for you to see anything.");
+         return RTRUE; 
+    }
+    
+    return RFALSE;
 }
 
 // CRETIN-FCN (handles "me", "self", "cretin")
