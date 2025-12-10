@@ -99,8 +99,8 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 ### Global Actions (gglobals.zil)
 - [x] CANYON-VIEW-F - Canyon view scenery
 - [x] CRETIN-FCN - Self/me interactions
-- [/] GROUND-FUNCTION - Ground/floor
-- [ ] GRUE-FUNCTION - Grue darkness attack
+- [x] GROUND-FUNCTION - Ground/floor
+- [/] GRUE-FUNCTION - Grue darkness attack
 - [ ] NOT-HERE-OBJECT-F - Object not visible
 - [ ] NULL-F - No-op action
 - [ ] SAILOR-FCN - "Hello Sailor" easter egg
@@ -109,5 +109,5 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 96 actions
-- Implemented: 89
-- Remaining: 7
+- Implemented: 90
+- Remaining: 6
