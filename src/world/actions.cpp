@@ -1323,6 +1323,9 @@ bool mirrorAction() {
 // Dam action - controls water flow
 // Based on DAM-OBJECT from 1actions.zil
 // Requirements: 42
+// DAM-FUNCTION
+// ZIL: OPEN/CLOSE -> "Sounds reasonable...". PLUG -> Dutch boy / Tiny leak logic.
+// Source: 1actions.zil lines 1400-1410
 bool damAction() {
     auto& g = Globals::instance();
     
@@ -1330,17 +1333,28 @@ bool damAction() {
         return RFALSE;
     }
     
-    // Handle EXAMINE
-    if (g.prsa == V_EXAMINE) {
-        printLine("The dam is a massive concrete structure. There is a control panel with various switches and buttons.");
+    if (g.prsa == V_OPEN || g.prsa == V_CLOSE) {
+        printLine("Sounds reasonable, but this isn't how.");
         return RTRUE;
     }
     
-    // Handle OPEN - opening the dam gates
-    if (g.prsa == V_OPEN) {
-        printLine("The dam gates are controlled by the panel in the maintenance room.");
+    // Check V_PLUG existence first?
+    // Assuming V_PLUG exists based on ZIL. If not, compilation fails.
+    // I'll assume usage is correct.
+    if (g.prsa == V_PLUG) {
+        if (g.prsi && g.prsi->getId() == ObjectIds::HANDS) {
+             printLine("Are you the little Dutch boy, then? Sorry, this is a big dam.");
+        } else if (g.prsi) {
+             printLine("With a " + g.prsi->getShortDescription() + "? Do you know how big this dam is? You could only stop a tiny leak with that.");
+        } else {
+             // PLUG without object? Parser usually enforces PLUG OBJECT WITH OBJECT?
+             // If not, generic failure.
+             printLine("You must specify what to plug it with.");
+        }
         return RTRUE;
     }
+    
+    // EXAMINE falls through to standard description.
     
     return RFALSE;
 }

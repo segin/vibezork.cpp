@@ -2028,6 +2028,7 @@ TEST(CyclopsRoomFcn_Look) {
     // Just calling the logic function
     
     // Check output contains "staircase leading up"
+    // Check output contains "staircase leading up"
     {
         OutputCapture cap;
         cyclopsRoomAction(M_LOOK);
@@ -2062,6 +2063,86 @@ TEST(CyclopsRoomFcn_BlockUp) {
         // If he blocks: "refuses to let you pass"
         ASSERT_TRUE(out.find("refuses to let you pass") != std::string::npos);
     }
+}
+
+// =============================================================================
+// DAM-FUNCTION Tests (1actions.zil line 1400)
+// ZIL Logic: Open/Close denied. Plug with Hands/Tool specific messages.
+// =============================================================================
+
+// Forward decl
+extern bool damAction();
+
+TEST(DamFcn_OpenClose) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* dam = g.getObject(ObjectIds::DAM);
+    if (!dam) { 
+        auto d = std::make_unique<ZObject>(ObjectIds::DAM, "dam"); 
+        g.registerObject(ObjectIds::DAM, std::move(d)); 
+        dam = g.getObject(ObjectIds::DAM);
+    }
+    g.prso = dam;
+    
+    g.prsa = V_OPEN;
+    { OutputCapture cap; ASSERT_TRUE(damAction()); ASSERT_TRUE(cap.getOutput().find("Sounds reasonable") != std::string::npos); }
+    
+    g.prsa = V_CLOSE;
+    { OutputCapture cap; ASSERT_TRUE(damAction()); ASSERT_TRUE(cap.getOutput().find("Sounds reasonable") != std::string::npos); }
+}
+
+TEST(DamFcn_PlugHands) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* dam = g.getObject(ObjectIds::DAM);
+    if (!dam) { auto d = std::make_unique<ZObject>(ObjectIds::DAM, "dam"); g.registerObject(ObjectIds::DAM, std::move(d)); dam = g.getObject(ObjectIds::DAM); }
+    g.prso = dam;
+    
+    ZObject* hands = g.getObject(ObjectIds::HANDS);
+    if (!hands) { 
+        auto h = std::make_unique<ZObject>(ObjectIds::HANDS, "hands"); 
+        g.registerObject(ObjectIds::HANDS, std::move(h)); 
+        hands = g.getObject(ObjectIds::HANDS);
+    }
+    g.prsi = hands;
+    
+    g.prsa = V_PLUG;
+    { OutputCapture cap; ASSERT_TRUE(damAction()); ASSERT_TRUE(cap.getOutput().find("Dutch boy") != std::string::npos); }
+}
+
+TEST(DamFcn_PlugTool) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* dam = g.getObject(ObjectIds::DAM);
+    if (!dam) { auto d = std::make_unique<ZObject>(ObjectIds::DAM, "dam"); g.registerObject(ObjectIds::DAM, std::move(d)); dam = g.getObject(ObjectIds::DAM); }
+    g.prso = dam;
+    
+    ZObject* shovel = g.getObject(ObjectIds::SHOVEL);
+    if (!shovel) { 
+        auto s = std::make_unique<ZObject>(ObjectIds::SHOVEL, "shovel"); 
+        g.registerObject(ObjectIds::SHOVEL, std::move(s)); 
+        shovel = g.getObject(ObjectIds::SHOVEL);
+    }
+    g.prsi = shovel;
+    
+    g.prsa = V_PLUG;
+    { OutputCapture cap; ASSERT_TRUE(damAction()); ASSERT_TRUE(cap.getOutput().find("tiny leak") != std::string::npos); }
+}
+
+TEST(DamFcn_ExamineFallsThrough) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* dam = g.getObject(ObjectIds::DAM);
+    if (!dam) { auto d = std::make_unique<ZObject>(ObjectIds::DAM, "dam"); g.registerObject(ObjectIds::DAM, std::move(d)); dam = g.getObject(ObjectIds::DAM); }
+    g.prso = dam;
+    
+    g.prsa = V_EXAMINE;
+    // Should return false
+    ASSERT_FALSE(damAction());
 }
 // - YELLOW: GATE-FLAG = T (Power On)
 // - BROWN: GATE-FLAG = F (Power Off)

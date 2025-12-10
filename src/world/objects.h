@@ -137,6 +137,7 @@ constexpr ObjectId CLIMBABLE_CLIFF = 538;
 constexpr ObjectId WHITE_CLIFF = 539;
 constexpr ObjectId CONTROL_PANEL = 540;
 constexpr ObjectId GROUND = 541;      // Global ground object (for PUT X ON GROUND)
+constexpr ObjectId HANDS = 542;       // Pair of hands (for PLUG DAM WITH HANDS)
 
 // ============================================================================
 // SPECIAL PUZZLE OBJECTS (600-649)

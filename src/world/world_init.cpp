@@ -2501,6 +2501,17 @@ void initializeWorld() {
     ground->setFlag(ObjectFlag::INVISIBLE);
     ground->setAction(groundAction);
     g.registerObject(ObjectIds::GROUND, std::move(ground));
+
+    // Create Hands global object (ZIL: HANDS in GLOBAL-OBJECTS)
+    auto hands = std::make_unique<ZObject>(ObjectIds::HANDS, "pair of hands");
+    hands->setDescription("pair of hands");
+    hands->addSynonym("pair");
+    hands->addSynonym("hands");
+    hands->addSynonym("hand");
+    hands->addAdjective("bare");
+    hands->setFlag(ObjectFlag::NDESCBIT);
+    hands->setFlag(ObjectFlag::TOOLBIT);
+    g.registerObject(ObjectIds::HANDS, std::move(hands));
     
     // Create Adventurer object (Task 24.1: Initialize player state)
     auto adventurer = std::make_unique<ZObject>(OBJ_ADVENTURER, "adventurer");
