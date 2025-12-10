@@ -711,12 +711,31 @@ void domeRoomAction(int rarg) {
 }
 
 // FRONT-DOOR-FCN
+// ZIL: OPEN, BURN, MUNG, LOOK-BEHIND.
+// Source: 1actions.zil lines 2163-2172
 bool frontDoorAction() {
     auto& g = Globals::instance();
-    if (g.prsa == V_OPEN || g.prsa == V_CLOSE) {
-        printLine("The door is boarded and nailed shut.");
+    
+    if (g.prsa == V_OPEN) {
+        printLine("The door cannot be opened.");
         return true;
     }
+    
+    if (g.prsa == V_BURN) {
+        printLine("You cannot burn this door.");
+        return true;
+    }
+    
+    if (g.prsa == V_MUNG) {
+        printLine("You can't seem to damage the door.");
+        return true;
+    }
+    
+    if (g.prsa == V_LOOK_BEHIND) {
+        printLine("It won't open.");
+        return true;
+    }
+    
     return false;
 }
 

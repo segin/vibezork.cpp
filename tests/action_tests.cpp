@@ -2573,6 +2573,35 @@ TEST(ForestFcn_WalkAround) {
         ASSERT_TRUE(cap.getOutput().find("aren't even in the forest") != std::string::npos);
     }
 }
+
+// =============================================================================
+// FRONT-DOOR-FCN Tests (1actions.zil line 2163)
+// ZIL Logic: OPEN, BURN, MUNG, LOOK-BEHIND messages
+// =============================================================================
+
+// Forward decl
+extern bool frontDoorAction();
+
+TEST(FrontDoorFcn_Verbs) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    // OPEN
+    g.prsa = V_OPEN;
+    { OutputCapture cap; ASSERT_TRUE(frontDoorAction()); ASSERT_TRUE(cap.getOutput().find("cannot be opened") != std::string::npos); }
+
+    // BURN
+    g.prsa = V_BURN;
+    { OutputCapture cap; ASSERT_TRUE(frontDoorAction()); ASSERT_TRUE(cap.getOutput().find("cannot burn this door") != std::string::npos); }
+
+    // MUNG
+    g.prsa = V_MUNG;
+    { OutputCapture cap; ASSERT_TRUE(frontDoorAction()); ASSERT_TRUE(cap.getOutput().find("can't seem to damage") != std::string::npos); }
+
+    // LOOK-BEHIND
+    g.prsa = V_LOOK_BEHIND;
+    { OutputCapture cap; ASSERT_TRUE(frontDoorAction()); ASSERT_TRUE(cap.getOutput().find("won't open") != std::string::npos); }
+}
 // Correction for above test block:
 // ASSERT_TRUE(out.find(...) != npos);
 // - YELLOW: GATE-FLAG = T (Power On)
