@@ -2499,6 +2499,80 @@ TEST(DomeRoomFcn_EnterLeap) {
         // We verify the message.
     }
 }
+
+// =============================================================================
+// FOREST-F Tests (1actions.zil line 136)
+// ZIL Logic: FIND, LISTEN, DISEMBARK, WALK-AROUND
+// =============================================================================
+
+// Forward decl
+extern bool forestAction();
+
+TEST(ForestFcn_Verbs) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    // FIND
+    g.prsa = V_FIND;
+    { OutputCapture cap; ASSERT_TRUE(forestAction()); ASSERT_TRUE(cap.getOutput().find("cannot see the forest") != std::string::npos); }
+
+    // LISTEN
+    g.prsa = V_LISTEN;
+    { OutputCapture cap; ASSERT_TRUE(forestAction()); ASSERT_TRUE(cap.getOutput().find("seem to be murmuring") != std::string::npos); }
+
+    // DISEMBARK
+    g.prsa = V_DISEMBARK;
+    { OutputCapture cap; ASSERT_TRUE(forestAction()); ASSERT_TRUE(cap.getOutput().find("specify a direction") != std::string::npos); }
+}
+
+TEST(ForestFcn_WalkAround) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    g.prsa = V_WALK_AROUND;
+    
+    // Case 1: Not in forest (House)
+    // Need setup rooms if not created by setupTestWorld?
+    // setupTestWorld creates standard rooms.
+    // WEST_OF_HOUSE likely exists.
+    auto* westHouse = g.getObject(RoomIds::WEST_OF_HOUSE);
+    if (westHouse) {
+        g.here = westHouse;
+        g.winner->moveTo(westHouse);
+        OutputCapture cap;
+        ASSERT_TRUE(forestAction());
+        ASSERT_TRUE(cap.getOutput().find("aren't even in the forest") != std::string::npos);
+    }
+    
+    // Case 2: In Forest 1 -> Next is Forest 2
+    auto* forest1 = g.getObject(RoomIds::FOREST_1);
+    if (forest1) {
+        g.here = forest1;
+        g.winner->moveTo(forest1);
+        OutputCapture cap;
+        ASSERT_TRUE(forestAction());
+        ASSERT_EQ(g.here->getId(), RoomIds::FOREST_2);
+    }
+
+    // Case 3: In Clearing -> Next is Forest 1
+    auto* clearing = g.getObject(RoomIds::CLEARING);
+    if (clearing) {
+        g.here = clearing;
+        g.winner->moveTo(clearing);
+        OutputCapture cap;
+        ASSERT_TRUE(forestAction());
+        ASSERT_EQ(g.here->getId(), RoomIds::FOREST_1);
+    }
+    
+    // Case 4: Random Room (e.g. LIVING_ROOM) -> Not in forest list
+    auto* livingRoom = g.getObject(RoomIds::LIVING_ROOM);
+    if (livingRoom) {
+        g.here = livingRoom;
+        g.winner->moveTo(livingRoom);
+        OutputCapture cap;
+        ASSERT_TRUE(forestAction());
+        ASSERT_TRUE(cap.getOutput().find("aren't even in the forest") != std::string::npos);
+    }
+}
 // Correction for above test block:
 // ASSERT_TRUE(out.find(...) != npos);
 // - YELLOW: GATE-FLAG = T (Power On)
