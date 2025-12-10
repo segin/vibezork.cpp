@@ -774,15 +774,22 @@ bool teethAction() {
 // TOOL-CHEST-FCN
 bool toolChestAction() {
     auto& g = Globals::instance();
-    if (g.prsa == V_OPEN) {
-        if (!g.prso->hasFlag(ObjectFlag::OPENBIT)) {
-            g.prso->setFlag(ObjectFlag::OPENBIT);
-            printLine("Opening the tool chest reveals a wrench and a screwdriver.");
-        } else {
-            printLine("It's already open.");
-        }
+    
+    // ZIL: EXAMINE -> "The chests are all empty."
+    // ZIL: TAKE/OPEN/PUT -> Remove object, print "The chests are so rusty..."
+    // Source: 1actions.zil lines 1332-1340
+    
+    if (g.prsa == V_EXAMINE) {
+        printLine("The chests are all empty.");
         return true;
     }
+    
+    if (g.prsa == V_TAKE || g.prsa == V_OPEN || g.prsa == V_PUT) {
+        printLine("The chests are so rusty and corroded that they crumble when you touch them.");
+        g.prso->moveTo(nullptr); // REMOVE-CAREFULLY
+        return true;
+    }
+    
     return false;
 }
 

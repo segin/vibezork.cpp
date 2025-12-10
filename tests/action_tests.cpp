@@ -945,6 +945,37 @@ TEST(TeethF_ExaminePrintsDescription) {
 
 
 
+// TOOL-CHEST-FCN Test
+extern bool toolChestAction();
+
+TEST(ToolChestFcn_ExaminePrintsEmpty) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    // Create tool chest for testing (ID 298 from ZIL)
+    // Note: ZIL ID is 298, assuming ObjectIds::TOOL_CHEST maps correctly
+    // If undefined in tests, we might need to mock or ensure it exists
+    ZObject* chest = g.getObject(ObjectIds::TOOL_CHEST);
+    
+    // If chest doesn't exist in minimal test world, create it
+    if (!chest) {
+        auto newChest = std::make_unique<ZObject>(ObjectIds::TOOL_CHEST, "tool chests");
+        g.registerObject(ObjectIds::TOOL_CHEST, std::move(newChest));
+        chest = g.getObject(ObjectIds::TOOL_CHEST);
+    }
+
+    
+    g.prsa = V_EXAMINE;
+    g.prso = chest;
+    
+    OutputCapture capture;
+    bool result = toolChestAction();
+    std::string output = capture.getOutput();
+    
+    ASSERT_TRUE(result);
+    ASSERT_TRUE(output.find("The chests are all empty.") != std::string::npos);
+}
+
 // Main test runner
 int main(int argc, char* argv[]) {
     std::cout << "Running Action Tests" << std::endl;
