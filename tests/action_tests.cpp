@@ -2208,6 +2208,90 @@ TEST(DamRoomFcn_Look) {
         ASSERT_TRUE(cap.getOutput().find("glowing serenely") != std::string::npos);
     }
 }
+
+// =============================================================================
+// BOAT FUNCTIONS (DBOAT/IBOAT)
+// ZIL: Punctured Boat (Fixable) vs Inflatable Boat (Inflatable)
+// =============================================================================
+
+// Forward decl
+extern bool inflatableBoatAction();
+extern bool puncturedBoatAction();
+
+TEST(InflatableBoatFcn) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* boat = g.getObject(ObjectIds::BOAT_INFLATABLE);
+    if (!boat) {
+        auto b = std::make_unique<ZObject>(ObjectIds::BOAT_INFLATABLE, "inflatable boat");
+        g.registerObject(ObjectIds::BOAT_INFLATABLE, std::move(b));
+        boat = g.getObject(ObjectIds::BOAT_INFLATABLE);
+    }
+    g.prso = boat;
+    
+    // Test 1: Held (Fail)
+    boat->setLocation(g.winner); // In player inventory
+    g.prsa = V_INFLATE;
+    { OutputCapture cap; ASSERT_TRUE(inflatableBoatAction()); ASSERT_TRUE(cap.getOutput().find("must be on the ground") != std::string::npos); }
+    
+    // Test 2: On Ground (Lungs Fail)
+    boat->setLocation(g.here);
+    ZObject* lungs = g.getObject(ObjectIds::LUNGS);
+    if (!lungs) {
+         auto l = std::make_unique<ZObject>(ObjectIds::LUNGS, "lungs");
+         g.registerObject(ObjectIds::LUNGS, std::move(l));
+         lungs = g.getObject(ObjectIds::LUNGS);
+    }
+    g.prsi = lungs;
+    { OutputCapture cap; ASSERT_TRUE(inflatableBoatAction()); ASSERT_TRUE(cap.getOutput().find("lung power") != std::string::npos); }
+    
+    // Test 3: On Ground (Pump Success)
+    ZObject* pump = g.getObject(ObjectIds::PUMP);
+    if (!pump) {
+         auto p = std::make_unique<ZObject>(ObjectIds::PUMP, "pump");
+         g.registerObject(ObjectIds::PUMP, std::move(p));
+         pump = g.getObject(ObjectIds::PUMP);
+    }
+    g.prsi = pump;
+    { OutputCapture cap; ASSERT_TRUE(inflatableBoatAction()); ASSERT_TRUE(cap.getOutput().find("appears seaworthy") != std::string::npos); }
+}
+
+TEST(PuncturedBoatFcn) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* boat = g.getObject(ObjectIds::BOAT_PUNCTURED);
+    if (!boat) {
+        auto b = std::make_unique<ZObject>(ObjectIds::BOAT_PUNCTURED, "punctured boat");
+        g.registerObject(ObjectIds::BOAT_PUNCTURED, std::move(b));
+        boat = g.getObject(ObjectIds::BOAT_PUNCTURED);
+    }
+    // Also need Inflatable Boat for transformation
+    if (!g.getObject(ObjectIds::BOAT_INFLATABLE)) {
+        auto ib = std::make_unique<ZObject>(ObjectIds::BOAT_INFLATABLE, "inflatable boat");
+        g.registerObject(ObjectIds::BOAT_INFLATABLE, std::move(ib));
+    }
+    
+    g.prso = boat;
+    boat->setLocation(g.here);
+    
+    // Test 1: Inflate fails
+    g.prsa = V_INFLATE;
+    { OutputCapture cap; ASSERT_TRUE(puncturedBoatAction()); ASSERT_TRUE(cap.getOutput().find("moron punctured it") != std::string::npos); }
+    
+    // Test 2: Plug with Putty Success
+    g.prsa = V_PLUG;
+    ZObject* putty = g.getObject(ObjectIds::PUTTY);
+    if (!putty) {
+         auto p = std::make_unique<ZObject>(ObjectIds::PUTTY, "putty");
+         g.registerObject(ObjectIds::PUTTY, std::move(p));
+         putty = g.getObject(ObjectIds::PUTTY);
+    }
+    g.prsi = putty;
+    
+    { OutputCapture cap; ASSERT_TRUE(puncturedBoatAction()); ASSERT_TRUE(cap.getOutput().find("boat is repaired") != std::string::npos); }
+}
 // - YELLOW: GATE-FLAG = T (Power On)
 // - BROWN: GATE-FLAG = F (Power Off)
 // - RED: Toggle Lights (ONBIT)

@@ -48,6 +48,9 @@ bool pumpAction();
 bool machineAction();
 bool mirrorAction();
 bool damAction();
+bool damRoomAction(int rarg);
+bool inflatableBoatAction(); // IBOAT-FUNCTION
+bool puncturedBoatAction(); // DBOAT-FUNCTION
 bool boltAction();
 bool bubbleAction();
 bool buttonAction();
@@ -3058,9 +3061,25 @@ void initializeWorld() {
     boatPunctured->addAdjective("damaged");
     boatPunctured->setFlag(ObjectFlag::TRYTAKEBIT);  // Can't be taken
     boatPunctured->setProperty(P_SIZE, 30);
-    boatPunctured->setAction(boatAction);
+    boatPunctured->setAction(puncturedBoatAction);
     // Starts not in game - created if boat is punctured
     g.registerObject(ObjectIds::BOAT_PUNCTURED, std::move(boatPunctured));
+
+    // Create BOAT_INFLATABLE (Pile of plastic / Deflated boat)
+    // ZIL: INFLATABLE-BOAT in DAM-BASE
+    auto boatInflatable = std::make_unique<ZObject>(ObjectIds::BOAT_INFLATABLE, "pile of plastic");
+    boatInflatable->addSynonym("boat");
+    boatInflatable->addSynonym("pile");
+    boatInflatable->addSynonym("plastic");
+    boatInflatable->addSynonym("valve");
+    boatInflatable->addAdjective("plastic");
+    boatInflatable->addAdjective("inflatable"); // "inflat" in ZIL
+    boatInflatable->setDescription("pile of plastic");
+    boatInflatable->setFlag(ObjectFlag::TAKEBIT);
+    boatInflatable->setFlag(ObjectFlag::BURNBIT);
+    boatInflatable->setAction(inflatableBoatAction);
+    boatInflatable->moveTo(g.getObject(RoomIds::DAM_BASE)); 
+    g.registerObject(ObjectIds::BOAT_INFLATABLE, std::move(boatInflatable));
     
     // Create BOTTLE (Glass bottle - container and tool)
     auto bottle = std::make_unique<ZObject>(ObjectIds::BOTTLE, "glass bottle");

@@ -465,20 +465,90 @@ void damRoomAction(int rarg) {
 }
 
 // DBOAT-FUNCTION (Deflated boat)
-bool deflatedBoatAction() {
+// IBOAT-FUNCTION (Inflatable Boat / Pile of Plastic)
+// ZIL: Handles INFLATE with PUMP (Success) or LUNGS (Fail). Must be on ground.
+// Source: 1actions.zil lines 2820-2840
+bool inflatableBoatAction() {
     auto& g = Globals::instance();
-    if (g.prsa == V_INFLATE) {
-        // Check for pump
-        ZObject* pump = g.getObject(ObjectIds::PUMP);
-        if (pump && pump->getLocation() == g.winner) {
-            printLine("The boat inflates and is now ready to board.");
-            // Transform to inflated boat
-            return true;
-        } else {
-            printLine("You don't have anything to inflate it with.");
-            return true;
+    ZObject* boat = g.getObject(ObjectIds::BOAT_INFLATABLE);
+    
+    if (g.prsa == V_INFLATE || g.prsa == V_FILL) {
+        // Validation: Boat must be on ground (not held)
+        if (boat && boat->getLocation() != g.here) { // Assuming global 'here' is current room
+             // Check if held? If held by player, loc == winner.
+             // ZIL: <NOT <IN? ,INFLATABLE-BOAT ,HERE>> -> "Must be on ground".
+             // If player holds it, it is IN PLAYER, not IN HERE.
+             printLine("The boat must be on the ground to be inflated.");
+             return true;
+        }
+
+        if (g.prsi && g.prsi->getId() == ObjectIds::PUMP) {
+             printLine("The boat inflates and appears seaworthy.");
+             // TODO: Boat Label Logic (lines 2828-2830)
+             
+             // Transform: Remove Inflatable, Add Inflated
+             // Need access to Inflated Boat (600)
+             if (boat) {
+                 ObjectId loc = boat->getLocation(); // Should be HERE
+                 g.removeObject(ObjectIds::BOAT_INFLATABLE);
+                 
+                 ZObject* inflated = g.getObject(ObjectIds::BOAT_INFLATED);
+                 if (inflated) {
+                     inflated->setLocation(loc);
+                 } else {
+                     // Create if missing? world_init should create it.
+                     // Assuming it exists but is invisible/nowhere.
+                 }
+             }
+             return true;
+        } else if (g.prsi && g.prsi->getId() == ObjectIds::LUNGS) {
+             printLine("You don't have enough lung power to inflate it.");
+             return true;
+        } else if (g.prsi) {
+             printLine("With a " + g.prsi->getShortDescription() + "? Surely you jest!");
+             return true;
         }
     }
+    return false;
+}
+
+// DBOAT-FUNCTION (Punctured Boat)
+// ZIL: INFLATE -> Fail. PLUG/PUT with PUTTY -> Repaired (becomes Inflatable).
+// Source: 1actions.zil lines 2652-2667
+bool puncturedBoatAction() {
+    auto& g = Globals::instance();
+    
+    if (g.prsa == V_INFLATE || g.prsa == V_FILL) {
+        printLine("No chance. Some moron punctured it.");
+        return true;
+    }
+    
+    // Check for PLUG/PUT with PUTTY
+    bool isFix = false;
+    if (g.prsa == V_PLUG && g.prsi && g.prsi->getId() == ObjectIds::PUTTY) isFix = true;
+    if ((g.prsa == V_PUT || g.prsa == V_PUT_ON) && g.prso && g.prso->getId() == ObjectIds::PUTTY) isFix = true; // PUT PUTTY (ON BOAT)
+    
+    if (isFix) {
+        // FIX-BOAT Logic
+        printLine("Well done. The boat is repaired.");
+        
+        ZObject* punctured = g.getObject(ObjectIds::BOAT_PUNCTURED);
+        if (punctured) {
+             ObjectId loc = punctured->getLocation();
+             g.removeObject(ObjectIds::BOAT_PUNCTURED);
+             
+             // Move Inflatable Boat to here
+             ZObject* inflatable = g.getObject(ObjectIds::BOAT_INFLATABLE);
+             if (inflatable) {
+                 inflatable->setLocation(loc);
+             }
+        }
+        return true;
+    } else if (g.prsa == V_PLUG && g.prsi) {
+        printLine("With a " + g.prsi->getShortDescription() + "?");
+        return true;
+    }
+
     return false;
 }
 

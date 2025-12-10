@@ -32,7 +32,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] CYCLOPS-ROOM-FCN - Cyclops room handler
 - [x] DAM-FUNCTION - Dam mechanics
 - [x] DAM-ROOM-FCN - Dam room handler
-- [x] DBOAT-FUNCTION - Deflated boat
+- [/] DBOAT-FUNCTION - Deflated boat
 - [x] DEAD-FUNCTION - Death handling
 - [x] DEEP-CANYON-F - Deep canyon navigation
 - [x] DOME-ROOM-FCN - Dome room handler
