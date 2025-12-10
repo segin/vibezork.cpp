@@ -36,7 +36,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] DEAD-FUNCTION - Death handling
 - [x] DEEP-CANYON-F - Deep canyon navigation
 - [x] DOME-ROOM-FCN - Dome room handler
-- [/] FOREST-F - Forest room handler
+- [x] FOREST-F - Forest room handler
 - [x] FRONT-DOOR-FCN - Front door interactions
 - [x] GARLIC-F - Garlic eating/bat repellent
 - [x] GHOSTS-F - Ghost interactions
