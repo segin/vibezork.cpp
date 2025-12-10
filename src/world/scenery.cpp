@@ -9,6 +9,7 @@ bool boardAction();
 bool forestAction();
 bool kitchenWindowAction();
 bool groundAction();
+bool bodyAction();
 
 void initializeScenery() {
     using namespace ObjectIds;

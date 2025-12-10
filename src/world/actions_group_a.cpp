@@ -1044,3 +1044,19 @@ void kitchenAction(int rarg) {
         }
     }
 }
+
+// BODY-FUNCTION - Dead body interactions
+// ZIL: TAKE = "A force keeps you...", MUNG/BURN = Death
+// source: 1dungeon.zil line 694, 1actions.zil line 2178
+bool bodyAction() {
+    auto& g = Globals::instance();
+    if (g.prsa == V_TAKE) {
+        printLine("A force keeps you from taking the bodies.");
+        return true;
+    }
+    if (g.prsa == V_ATTACK || g.prsa == V_KILL || g.prsa == V_MUNG || g.prsa == V_BURN) {
+        DeathSystem::jigsUp("The voice of the guardian of the dungeon booms out from the darkness, \"Your disrespect costs you your life!\" and places your head on a sharp pole.");
+        return true;
+    }
+    return false;
+}

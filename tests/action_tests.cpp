@@ -1060,6 +1060,59 @@ TEST(KnifeF_TakeKnifeClearsAtticTableNdescbit) {
     ASSERT_FALSE(atticTable->hasFlag(ObjectFlag::NDESCBIT));
 }
 
+// =============================================================================
+// BODY-FUNCTION Tests (1dungeon.zil line 694, 1actions.zil line 2178)
+// ZIL Logic: TAKE sends msg, MUNG/BURN kills
+// =============================================================================
+
+extern bool bodyAction();
+
+TEST(BodyFcn_TakePrintsMessage) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prsa = V_TAKE;
+    
+    OutputCapture cap;
+    bool result = bodyAction();
+    
+    ASSERT_TRUE(result);
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("force keeps you") != std::string::npos);
+}
+
+TEST(BodyFcn_AttackKillMungBurnTriggersDeath) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    // Test ATTACK
+    g.prsa = V_ATTACK;
+    
+    // Pipe "no\n" to handle death prompt
+    {
+        InputRedirect input("no\n");
+        OutputCapture cap;
+        bool result = bodyAction(); 
+        ASSERT_TRUE(result);
+        std::string output = cap.getOutput();
+        ASSERT_TRUE(output.find("disrespect costs you your life") != std::string::npos);
+    }
+    
+    g.reset();
+    setupTestWorld();
+    
+    // Test BURN
+    g.prsa = V_BURN;
+    {
+        InputRedirect input("no\n");
+        OutputCapture cap;
+        bool result = bodyAction();
+        ASSERT_TRUE(result);
+        std::string output = cap.getOutput();
+        ASSERT_TRUE(output.find("disrespect costs you your life") != std::string::npos);
+    }
+}
+
 TEST(KnifeF_NonTakeVerbDoesNotAffectTable) {
     setupTestWorld();
     auto& g = Globals::instance();
