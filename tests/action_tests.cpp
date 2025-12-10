@@ -426,17 +426,30 @@ TEST(BatF_AttackWithoutGarlicTriggersFlyMe) {
     
     ASSERT_TRUE(result);
     std::string output = cap.getOutput();
-    ASSERT_TRUE(output.find("Fweep") != std::string::npos);
-    ASSERT_TRUE(output.find("grabs you") != std::string::npos);
+    ASSERT_TRUE(output.find("Fweep!") != std::string::npos);
+    ASSERT_TRUE(output.find("lifts you away") != std::string::npos);
+    
+    // Check if player moved (teleportation)
+    // Assuming start room wasn't one of the drop targets, or check room changed
+    // In random test, player might land in same room if unlucky (if testing randomness)
+    // But basic check is: did logic run? Yes.
+    // For verifying teleport:
+    // ASSERT_NE(g.player->getLocation(), someInitialRoom);
 }
 
-TEST(BatF_TakeWithGarlicBlocksAction) {
+TEST(BatF_GarlicProtects) {
     setupTestWorld();
     auto& g = Globals::instance();
     
-    // Put garlic in player's inventory
     ZObject* garlic = g.getObject(ObjectIds::GARLIC);
-    if (garlic) garlic->moveTo(g.winner);
+    if (!garlic) {
+         auto newGarlic = std::make_unique<ZObject>(ObjectIds::GARLIC, "garlic");
+         g.registerObject(ObjectIds::GARLIC, std::move(newGarlic));
+         garlic = g.getObject(ObjectIds::GARLIC);
+    }
+    
+    // Give garlic to player
+    garlic->moveTo(g.player);
     
     g.prsa = V_TAKE;
     
@@ -445,7 +458,62 @@ TEST(BatF_TakeWithGarlicBlocksAction) {
     
     ASSERT_TRUE(result);
     std::string output = cap.getOutput();
-    ASSERT_TRUE(output.find("ceiling") != std::string::npos);
+    ASSERT_TRUE(output.find("can't reach him") != std::string::npos);
+    ASSERT_FALSE(output.find("Fweep!") != std::string::npos);
+}
+
+TEST(BatF_TellPrintsFweep) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prsa = V_TELL;
+    
+    OutputCapture cap;
+    bool result = batAction();
+    
+    ASSERT_TRUE(result);
+    std::string output = cap.getOutput();
+    // Should print 6 fweeps
+    // We can just count or check occurrence.
+    ASSERT_TRUE(output.find("Fweep!") != std::string::npos);
+    // Simple verification
+}
+
+TEST(BatF_FlyMeTeleports) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    // Ensure no garlic
+    if (auto* gar = g.getObject(ObjectIds::GARLIC)) gar->moveTo(nullptr);
+    
+    // Start somewhere NOT in the drop list if possible, or just check that location is one of the drops
+    ZObject* safeRoom = g.getObject(RoomIds::LIVING_ROOM); // Safe start
+    g.player->moveTo(safeRoom);
+    
+    g.prsa = V_ATTACK;
+    
+    // Need random seed? std::rand() used in implementation.
+    // We can loop a few times if needed, or just check one jump.
+    
+    batAction();
+    
+    ZObject* finalLoc = g.player->getLocation();
+    ASSERT_NE(finalLoc, safeRoom); // Should have moved
+    
+    // List of valid drops (sync with implementation)
+    std::vector<ObjectId> validDrops = {
+        RoomIds::MINE_1, RoomIds::MINE_2, RoomIds::MINE_3, RoomIds::MINE_4,
+        RoomIds::LADDER_TOP, RoomIds::LADDER_BOTTOM, RoomIds::SQUEEKY_ROOM, RoomIds::COAL_MINE_1
+    };
+    
+    bool found = false;
+    for (auto id : validDrops) {
+        if (finalLoc->getId() == id) {
+            found = true;
+            break;
+        }
+    }
+    ASSERT_TRUE(found) << "Player teleported to invalid room: " << finalLoc->getDescription();
 }
 
 TEST(BatF_OtherVerbsReturnFalse) {
