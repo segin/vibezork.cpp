@@ -909,16 +909,67 @@ bool gunkAction() {
 }
 
 // HOT-BELL-F
+// HOT-BELL-F
+// ZIL: Take, Ring, Rub/Ring-With (Burn/Heat), Pour-On (Cool).
+// Source: 1actions.zil lines 351-368
 bool hotBellAction() {
     auto& g = Globals::instance();
+    
+    // TAKE
     if (g.prsa == V_TAKE) {
-        printLine("The bell is too hot to take!");
+        printLine("The bell is very hot and cannot be taken.");
         return true;
     }
+    
+    // RING (Simple) - "Too hot to reach" implies manual ringing without tools?
+    // ZIL: (<VERB? RING> ... too hot to reach) comes AFTER the RING+PRSI check.
+    // So we check RING+PRSI first.
+    
+    // RUB or RING+PRSI
+    if (g.prsa == V_RUB || (g.prsa == V_RING && g.prsi)) {
+        ZObject* tool = g.prsi;
+        if (tool) {
+            if (tool->hasFlag(ObjectFlag::BURNBIT)) {
+                printLine("The " + tool->getName() + " burns and is consumed.");
+                tool->moveTo(nullptr); // Consumed
+                return true;
+            }
+            if (tool->getId() == ObjectIds::HANDS) {
+                printLine("The bell is too hot to touch.");
+                return true;
+            }
+        }
+        printLine("The heat from the bell is too intense.");
+        return true;
+    }
+    
+    // POUR-ON (Cooling)
+    if (g.prsa == V_POUR) {
+         // Logic assumes PRSO is Water, PRSI is Bell (context).
+         // ZIL: Removes PRSO (Water).
+         if (g.prso) g.prso->moveTo(nullptr);
+         
+         printLine("The water cools the bell and is evaporated.");
+         
+         // Transformation: Swap HOT_BELL for BELL
+         ZObject* hotBell = g.getObject(ObjectIds::HOT_BELL); // Assuming this object
+         ZObject* regularBell = g.getObject(ObjectIds::BELL);
+         
+         if (hotBell && regularBell) {
+             // Swap location
+             ZObject* loc = hotBell->getLocation();
+             hotBell->moveTo(nullptr);
+             regularBell->moveTo(loc);
+         }
+         return true;
+    }
+    
+    // RING (Fallthrough for simple Ring)
     if (g.prsa == V_RING) {
-        printLine("The bell is too hot to ring.");
+        printLine("The bell is too hot to reach.");
         return true;
     }
+    
     return false;
 }
 

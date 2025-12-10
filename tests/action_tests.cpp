@@ -2853,6 +2853,83 @@ TEST(GunkFcn_Interact) {
     }
     ASSERT_EQ(gunk->getLocation(), nullptr);
 }
+
+// =============================================================================
+// HOT-BELL-F Tests (1actions.zil line 351)
+// ZIL Logic: Take, Ring, Burn, Cool (Swap)
+// =============================================================================
+
+// Forward decl
+extern bool hotBellAction();
+
+TEST(HotBellFcn_Interactions) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    // Create Objects
+    auto hotBell = std::make_unique<ZObject>(ObjectIds::HOT_BELL);
+    hotBell->setName("hot bell");
+    g.registerObject(ObjectIds::HOT_BELL, std::move(hotBell));
+    
+    auto bell = std::make_unique<ZObject>(ObjectIds::BELL);
+    bell->setName("bell");
+    g.registerObject(ObjectIds::BELL, std::move(bell));
+    
+    auto hands = std::make_unique<ZObject>(ObjectIds::HANDS);
+    hands->setName("hands");
+    g.registerObject(ObjectIds::HANDS, std::move(hands));
+    
+    auto water = std::make_unique<ZObject>(ObjectIds::WATER); // Hypothetical
+    water->setName("water");
+    
+    auto stick = std::make_unique<ZObject>(12345);
+    stick->setName("stick");
+    stick->setFlag(ObjectFlag::BURNBIT);
+    
+    // Setup Context
+    ZObject* hb = g.getObject(ObjectIds::HOT_BELL); // Pointer
+    hb->moveTo(g.here);
+    g.prso = hb; // Acting on Bell (usually Direct Object unless PRSI logic)
+    // Wait, POUR WATER ON BELL -> PRSO=Water, PRSI=Bell
+    // RING BELL WITH STICK -> PRSO=Bell, PRSI=Stick
+    
+    // 1. TAKE
+    g.prsa = V_TAKE;
+    g.prso = hb;
+    { OutputCapture cap; ASSERT_TRUE(hotBellAction()); ASSERT_TRUE(cap.getOutput().find("annot be taken") != std::string::npos); }
+    
+    // 2. RING (Simple)
+    g.prsa = V_RING;
+    g.prsi = nullptr;
+    { OutputCapture cap; ASSERT_TRUE(hotBellAction()); ASSERT_TRUE(cap.getOutput().find("too hot to reach") != std::string::npos); }
+    
+    // 3. RING with HANDS (Touch)
+    g.prsa = V_RING;
+    g.prsi = g.getObject(ObjectIds::HANDS);
+    { OutputCapture cap; ASSERT_TRUE(hotBellAction()); ASSERT_TRUE(cap.getOutput().find("too hot to touch") != std::string::npos); }
+
+    // 4. RING with BURNABLE
+    g.prsa = V_RING;
+    g.prsi = stick.get();
+    stick->moveTo(g.here);
+    { OutputCapture cap; ASSERT_TRUE(hotBellAction()); ASSERT_TRUE(cap.getOutput().find("burns and is consumed") != std::string::npos); }
+    ASSERT_EQ(stick->getLocation(), nullptr);
+    
+    // 5. POUR WATER (Cooling + Swap)
+    g.prsa = V_POUR; // or POUR_ON
+    g.prso = water.get(); // Pouring Water
+    g.prsi = hb; // On Bell (Logic assumes Context uses PRSI if PRSO is water?)
+    // Note: hotBellAction implementation checks global registry logic for swap
+    // It assumes action called because of connection to Bell.
+    { 
+        OutputCapture cap; 
+        ASSERT_TRUE(hotBellAction()); 
+        ASSERT_TRUE(cap.getOutput().find("cools the bell") != std::string::npos);
+    }
+    // Verify Swap
+    ASSERT_EQ(hb->getLocation(), nullptr); // Hot Bell removed
+    ASSERT_EQ(g.getObject(ObjectIds::BELL)->getLocation(), g.here); // Regular Bell added
+}
 // Correction for above test block:
 // ASSERT_TRUE(out.find(...) != npos);
 // - YELLOW: GATE-FLAG = T (Power On)
