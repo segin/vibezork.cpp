@@ -88,8 +88,8 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] TROLL-FCN - Troll combat/behavior
 - [x] TROLL-ROOM-F - Troll room handler
 - [x] TROPHY-CASE-FCN - Trophy case scoring
-- [/] TRUNK-F - Trunk stupid container
-- [ ] TUBE-FUNCTION - Tube navigation
+- [x] TRUNK-F - Trunk stupid container
+- [/] TUBE-FUNCTION - Tube navigation
 - [ ] UP-CHIMNEY-FUNCTION - Chimney climbing
 - [ ] WATER-F - Water interactions
 - [ ] WEAPON-FUNCTION - Weapon blocked by NPC
@@ -109,5 +109,5 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 96 actions
-- Implemented: 80
-- Remaining: 16
+- Implemented: 81
+- Remaining: 15
