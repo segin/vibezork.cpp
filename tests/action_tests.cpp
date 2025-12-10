@@ -976,6 +976,38 @@ TEST(ToolChestFcn_ExaminePrintsEmpty) {
     ASSERT_TRUE(output.find("The chests are all empty.") != std::string::npos);
 }
 
+TEST(ToolChestFcn_TakeCrumbs) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    // Create tool chest
+    auto newChest = std::make_unique<ZObject>(ObjectIds::TOOL_CHEST, "tool chests");
+    // Manually set location for test purposes (world_init handles this normally)
+    newChest->moveTo(g.here); 
+    g.registerObject(ObjectIds::TOOL_CHEST, std::move(newChest));
+    ZObject* chest = g.getObject(ObjectIds::TOOL_CHEST);
+    
+    // Verify chest exists initially
+    ASSERT_TRUE(chest != nullptr);
+    ASSERT_TRUE(chest->getLocation() != nullptr); // Should be in a room (or valid parent) if added properly
+    
+    // Setup TAKE action
+    g.prsa = V_TAKE;
+    g.prso = chest;
+    
+    OutputCapture capture;
+    bool result = toolChestAction();
+    std::string output = capture.getOutput();
+    
+    ASSERT_TRUE(result);
+    ASSERT_TRUE(output.find("crumble when you touch them") != std::string::npos);
+    
+    // Verify chest is removed (moved to nullptr)
+    // Note: implementation does g.prso->moveTo(nullptr)
+    ASSERT_TRUE(chest->getLocation() == nullptr);
+}
+
+
 // Main test runner
 int main(int argc, char* argv[]) {
     std::cout << "Running Action Tests" << std::endl;
