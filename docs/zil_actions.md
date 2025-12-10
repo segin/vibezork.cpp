@@ -46,8 +46,8 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] HOT-BELL-F - Hot bell (after exorcism)
 - [x] IBOAT-FUNCTION - Inflated boat
 - [x] KITCHEN-FCN - Kitchen room handler
-- [/] KITCHEN-WINDOW-F - Kitchen window
-- [ ] KNIFE-F - Rusty knife with sword
+- [x] KITCHEN-WINDOW-F - Kitchen window
+- [/] KNIFE-F - Rusty knife with sword
 - [ ] LARGE-BAG-F - Thief's bag
 - [ ] LEAK-FUNCTION - Boat leak
 - [ ] LIVING-ROOM-FCN - Living room handler
@@ -109,5 +109,5 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 96 actions
-- Implemented: 38
-- Remaining: 58
+- Implemented: 39
+- Remaining: 57
