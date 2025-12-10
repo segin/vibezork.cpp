@@ -924,13 +924,12 @@ TEST(TeethF_BrushWithoutToolPrintsMessage) {
 }
 
 
-/*
 TEST(TeethF_ExaminePrintsDescription) {
 
     setupTestWorld();
     auto& g = Globals::instance();
     
-    ZObject* teeth = g.getObject(TEETH);
+    ZObject* teeth = g.getObject(ObjectIds::TEETH);
     ASSERT_TRUE(teeth != nullptr);
     
     g.prsa = V_EXAMINE;
@@ -943,7 +942,7 @@ TEST(TeethF_ExaminePrintsDescription) {
     ASSERT_TRUE(result);
     ASSERT_TRUE(output.find("razor sharp") != std::string::npos);
 }
-*/
+
 
 
 // Main test runner
