@@ -45,7 +45,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] GUNK-FUNCTION - Gunk/sludge interactions
 - [x] HOT-BELL-F - Hot bell (after exorcism)
 - [x] IBOAT-FUNCTION - Inflated boat
-- [/] KITCHEN-FCN - Kitchen room handler
+- [x] KITCHEN-FCN - Kitchen room handler
 - [x] KITCHEN-WINDOW-F - Kitchen window
 - [x] KNIFE-F - Rusty knife with sword
 - [x] LARGE-BAG-F - Thief's bag
