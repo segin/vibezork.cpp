@@ -867,13 +867,37 @@ bool canyonViewAction() {
 }
 
 // CHALICE-FCN
+// CHALICE-FCN - Chalice interaction
+// ZIL: PUT rejection ("not a good chalice"). TAKE check (Thief stab).
+// Source: 1actions.zil lines 2123-2136
 bool chaliceAction() {
     auto& g = Globals::instance();
-    if (g.prsa == V_TAKE) {
-        // If thief is present, he might grab it first
-        return false;
+
+    // Handle PUT stuff IN CHALICE (PRSI == CHALICE)
+    if (g.prsa == V_PUT && g.prsi && g.prsi->getId() == ObjectIds::CHALICE) {
+        printLine("You can't. It's not a very good chalice, is it?");
+        return RTRUE;
     }
-    return false;
+
+    // Handle TAKE (Thief check)
+    if (g.prsa == V_TAKE) {
+        ZObject* chalice = g.getObject(ObjectIds::CHALICE);
+        ZObject* thief = g.getObject(ObjectIds::THIEF);
+        
+        // ZIL: If in Treasure Room, Thief Present, Fighting, Visible...
+        // We simplify slightly: If Thief is fighting here and guarding it.
+        // Assuming location check matches ZIL.
+        if (chalice && chalice->getLocation() && chalice->getLocation()->getId() == RoomIds::TREASURE_ROOM) {
+             if (thief && thief->getLocation() && thief->getLocation()->getId() == RoomIds::TREASURE_ROOM) {
+                 if (thief->hasFlag(ObjectFlag::FIGHTBIT) && !thief->hasFlag(ObjectFlag::INVISIBLE)) {
+                     printLine("You'd be stabbed in the back first.");
+                     return RTRUE;
+                 }
+             }
+        }
+    }
+
+    return RFALSE;
 }
 
 // BAT-F - Bat attack/defense, garlic prevents being grabbed

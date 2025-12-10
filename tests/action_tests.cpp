@@ -1514,7 +1514,115 @@ TEST(CellarFcn_EnterSlamsTrapDoor) {
     OutputCapture cap2;
     cellarAction(M_ENTER);
     ASSERT_TRUE(cap2.getOutput().empty()); // No message
+    OutputCapture cap2;
+    cellarAction(M_ENTER);
+    ASSERT_TRUE(cap2.getOutput().empty()); // No message
     ASSERT_TRUE(trapdoor->hasFlag(ObjectFlag::OPENBIT)); // Stays open
+}
+
+// =============================================================================
+// CHALICE-FCN Tests (1actions.zil line 2123)
+// ZIL Logic: PUT fails. TAKE fails if Thief fighting/visible in Treasure Room.
+// =============================================================================
+
+TEST(ChaliceFcn_PutInFails) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* chalice = g.getObject(ObjectIds::CHALICE);
+    if (!chalice) {
+         auto c = std::make_unique<ZObject>(ObjectIds::CHALICE, "chalice");
+         g.registerObject(ObjectIds::CHALICE, std::move(c));
+         chalice = g.getObject(ObjectIds::CHALICE);
+    }
+    
+    g.prsa = V_PUT;
+    g.prsi = chalice;
+    
+    OutputCapture cap;
+    bool result = chaliceAction();
+    
+    ASSERT_TRUE(result);
+    ASSERT_TRUE(cap.getOutput().find("not a very good chalice") != std::string::npos);
+}
+
+TEST(ChaliceFcn_TakeWithGuardingThiefFails) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    // Setup Treasure Room
+    ZObject* tRoom = g.getObject(RoomIds::TREASURE_ROOM);
+    if (!tRoom) {
+         auto r = std::make_unique<ZObject>(RoomIds::TREASURE_ROOM, "Treasure Room");
+         g.registerObject(RoomIds::TREASURE_ROOM, std::move(r));
+         tRoom = g.getObject(RoomIds::TREASURE_ROOM);
+    }
+    
+    ZObject* chalice = g.getObject(ObjectIds::CHALICE);
+    if (!chalice) {
+         auto c = std::make_unique<ZObject>(ObjectIds::CHALICE, "chalice");
+         g.registerObject(ObjectIds::CHALICE, std::move(c));
+         chalice = g.getObject(ObjectIds::CHALICE);
+    }
+    chalice->moveTo(tRoom);
+
+    ZObject* thief = g.getObject(ObjectIds::THIEF);
+    if (!thief) {
+         auto t = std::make_unique<ZObject>(ObjectIds::THIEF, "thief");
+         g.registerObject(ObjectIds::THIEF, std::move(t));
+         thief = g.getObject(ObjectIds::THIEF);
+    }
+    thief->moveTo(tRoom);
+    thief->setFlag(ObjectFlag::FIGHTBIT);
+    thief->unsetFlag(ObjectFlag::INVISIBLE);
+    
+    g.prsa = V_TAKE;
+    g.prso = chalice; 
+    // Logic inside checks chalice/thief location directly, not g.prso necessarily, but usually PRSO is inferred.
+    // Actually our impl in chaliceAction uses g.getObject(ObjectIds::CHALICE), ignoring PRSO for lookup but using PRSA check.
+    
+    OutputCapture cap;
+    bool result = chaliceAction();
+    
+    ASSERT_TRUE(result);
+    ASSERT_TRUE(cap.getOutput().find("stabbed in the back") != std::string::npos);
+}
+
+TEST(ChaliceFcn_TakeWithoutThiefSucceeds) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    // Setup Treasure Room logic again but Thief is invisible
+    ZObject* tRoom = g.getObject(RoomIds::TREASURE_ROOM);
+    if (!tRoom) {
+         auto r = std::make_unique<ZObject>(RoomIds::TREASURE_ROOM, "Treasure Room");
+         g.registerObject(RoomIds::TREASURE_ROOM, std::move(r));
+    }
+    
+    ZObject* chalice = g.getObject(ObjectIds::CHALICE);
+    if (!chalice) {
+         auto c = std::make_unique<ZObject>(ObjectIds::CHALICE, "chalice");
+         g.registerObject(ObjectIds::CHALICE, std::move(c));
+         chalice = g.getObject(ObjectIds::CHALICE);
+    }
+    chalice->moveTo(g.getObject(RoomIds::TREASURE_ROOM));
+
+    ZObject* thief = g.getObject(ObjectIds::THIEF);
+    if (!thief) {
+         auto t = std::make_unique<ZObject>(ObjectIds::THIEF, "thief");
+         g.registerObject(ObjectIds::THIEF, std::move(t));
+         thief = g.getObject(ObjectIds::THIEF);
+    }
+    thief->moveTo(g.getObject(RoomIds::TREASURE_ROOM));
+    thief->setFlag(ObjectFlag::FIGHTBIT); 
+    thief->setFlag(ObjectFlag::INVISIBLE); // Invisible -> Safe
+    
+    g.prsa = V_TAKE;
+    
+    OutputCapture cap;
+    bool result = chaliceAction();
+    
+    ASSERT_FALSE(result); // Falls through to normal take
 }
 
 // =============================================================================
