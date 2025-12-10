@@ -47,6 +47,7 @@ public:
     bool gateFlag = false;             // Dam control panel activated (Green Bubble light)
     bool gatesOpen = false;            // Are dam sluice gates open?
     int waterLevel = 0;                // Water level in Maintenance Room (0=Dry, >0=Rising)
+    bool grateRevealed = false;        // Has the grating been revealed in the Clearing?
     
     // Display modes
     bool verboseMode = true;           // Full descriptions

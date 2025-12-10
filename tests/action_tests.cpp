@@ -1728,8 +1728,99 @@ TEST(ChimneyFcn_ClimbLogic) {
          OutputCapture cap;
          bool result = chimneyAction();
          ASSERT_TRUE(result);
+         ASSERT_TRUE(cap.getOutput().find("can't get up there") != std::string::npos);
+         ASSERT_EQ(g.player->getLocation()->getId(), RoomIds::LIVING_ROOM);
+    }
+    
+    // Climb Up from Living Room (Success - Only Lamp)
+    sword->moveTo(nullptr); // Remove sword
+    ZObject* lantern = g.getObject(ObjectIds::LANTERN);
+    if (!lantern) { auto l = std::make_unique<ZObject>(ObjectIds::LANTERN, "brass lantern"); g.registerObject(ObjectIds::LANTERN, std::move(l)); lantern = g.getObject(ObjectIds::LANTERN); }
+    lantern->moveTo(g.player);
+    
+    {
+         OutputCapture cap;
+         bool result = chimneyAction();
+         ASSERT_TRUE(result);
          ASSERT_TRUE(cap.getOutput().find("squeeze up") != std::string::npos);
          ASSERT_EQ(g.player->getLocation()->getId(), RoomIds::KITCHEN);
+    }
+}
+
+// =============================================================================
+// CLEARING-FCN Tests (1actions.zil line 815)
+// ZIL Logic: M-ENTER hides unrevealed grate. M-LOOK prints desc + grate status.
+// =============================================================================
+
+// Forward declare logic function if not exported
+extern void clearingAction(int rarg);
+
+TEST(ClearingFcn_EnterHidesUnrevealedGrate) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* grate = g.getObject(ObjectIds::GRATE);
+    if (!grate) {
+         auto gr = std::make_unique<ZObject>(ObjectIds::GRATE, "grating");
+         g.registerObject(ObjectIds::GRATE, std::move(gr));
+         grate = g.getObject(ObjectIds::GRATE);
+    }
+    
+    // Case 1: Not revealed -> Hidden
+    g.grateRevealed = false;
+    grate->unsetFlag(ObjectFlag::INVISIBLE);
+    
+    clearingAction(M_ENTER); // Room Action Enter
+    
+    ASSERT_TRUE(grate->hasFlag(ObjectFlag::INVISIBLE));
+    
+    // Case 2: Revealed -> Visible (or rather, not hidden by action)
+    // Note: ZIL only hides if not revealed. It doesn't auto-reveal. 
+    // Wait, if it's already invisible, it stays invisible.
+    // If we want to test that it DOESN'T hide, we start visible.
+    g.grateRevealed = true;
+    grate->unsetFlag(ObjectFlag::INVISIBLE);
+    
+    clearingAction(M_ENTER);
+    ASSERT_FALSE(grate->hasFlag(ObjectFlag::INVISIBLE)); // Stays visible
+}
+
+TEST(ClearingFcn_LookPrintsDescriptionAndGrateStatus) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* grate = g.getObject(ObjectIds::GRATE);
+    if (!grate) {
+         auto gr = std::make_unique<ZObject>(ObjectIds::GRATE, "grating");
+         g.registerObject(ObjectIds::GRATE, std::move(gr));
+         grate = g.getObject(ObjectIds::GRATE);
+    }
+    
+    // Base Look
+    {
+        OutputCapture cap;
+        clearingAction(M_LOOK);
+        ASSERT_TRUE(cap.getOutput().find("clearing, with a forest") != std::string::npos);
+    }
+    
+    // Grate Revealed (Fastened)
+    g.grateRevealed = true;
+    grate->unsetFlag(ObjectFlag::OPENBIT);
+    {
+        OutputCapture cap;
+        clearingAction(M_LOOK);
+        std::string out = cap.getOutput();
+        ASSERT_TRUE(out.find("fastened") != std::string::npos);
+        ASSERT_TRUE(out.find("open") == std::string::npos);
+    }
+
+    // Grate Open
+    grate->setFlag(ObjectFlag::OPENBIT);
+    {
+        OutputCapture cap;
+        clearingAction(M_LOOK);
+        std::string out = cap.getOutput();
+        ASSERT_TRUE(out.find("open grating") != std::string::npos);
     }
 }
 // - YELLOW: GATE-FLAG = T (Power On)

@@ -238,8 +238,30 @@ bool chimneyAction() {
 }
 
 // CLEARING-FCN (Room action for Clearing)
+// CLEARING-FCN - Clearing room handler
+// ZIL: M-ENTER hides grate if not revealed. M-LOOK prints desc + grate status.
+// Source: 1actions.zil lines 815-831
 void clearingAction(int rarg) {
-    // Stub - handle grating visibility, leaves pile, etc.
+    auto& g = Globals::instance();
+    ZObject* grate = g.getObject(ObjectIds::GRATE);
+
+    if (rarg == M_ENTER) {
+        if (!g.grateRevealed && grate) {
+            grate->setFlag(ObjectFlag::INVISIBLE); 
+        }
+        // Note: Logic for revealing it usually happens via LEAF-PILE or unlocking from outside?
+    }
+    else if (rarg == M_LOOK) {
+        printLine("You are in a clearing, with a forest surrounding you on all sides. A path leads south.");
+        
+        if (grate) {
+            if (grate->hasFlag(ObjectFlag::OPENBIT)) {
+                printLine("There is an open grating, descending into darkness.");
+            } else if (g.grateRevealed) {
+                printLine("There is a grating securely fastened into the ground.");
+            }
+        }
+    }
 }
 
 // CRACK-FCN

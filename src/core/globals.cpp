@@ -45,9 +45,10 @@ void Globals::reset() {
     lampWarned = false;
     rugMoved = false;
     lldFlag = false;
-    gateFlag = false;
-    gatesOpen = false;
-    waterLevel = 0;
+    gateFlag = false;       // Dam Green Bubble status
+    gatesOpen = false;      // Dam Sluice Gates
+    waterLevel = 0;         // Maintenance Room water
+    grateRevealed = false;  // Clearing Grating
     
     // Reset display modes to defaults (Requirement 65.5)
     verboseMode = true;
