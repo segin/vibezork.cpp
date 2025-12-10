@@ -80,7 +80,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] STILETTO-FUNCTION - Thief's stiletto
 - [x] STONE-BARROW-FCN - Stone barrow entry
 - [x] SWORD-FCN - Sword glow mechanics
-- [x] TEETH-F - Teeth scenery
+- [x] TEETH-F - Teeth scenery (Implemented: Brush/Putty death logic)
 - [x] TOOL-CHEST-FCN - Tool chest container
 - [x] TORCH-ROOM-FCN - Torch room handler
 - [x] TRAP-DOOR-FCN - Trap door open/close
