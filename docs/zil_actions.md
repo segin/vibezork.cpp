@@ -86,8 +86,8 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] TRAP-DOOR-FCN - Trap door open/close
 - [x] TREASURE-ROOM-FCN - Thief's lair
 - [x] TROLL-FCN - Troll combat/behavior
-- [/] TROLL-ROOM-F - Troll room handler
-- [ ] TROPHY-CASE-FCN - Trophy case scoring
+- [x] TROLL-ROOM-F - Troll room handler
+- [/] TROPHY-CASE-FCN - Trophy case scoring
 - [ ] TRUNK-F - Trunk stupid container
 - [ ] TUBE-FUNCTION - Tube navigation
 - [ ] UP-CHIMNEY-FUNCTION - Chimney climbing
@@ -109,5 +109,5 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 96 actions
-- Implemented: 78
-- Remaining: 18
+- Implemented: 79
+- Remaining: 17
