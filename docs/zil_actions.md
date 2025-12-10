@@ -94,10 +94,10 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] WATER-F - Water interactions
 - [x] WEAPON-FUNCTION - Weapon blocked by NPC
 - [x] WHITE-CLIFFS-FUNCTION - White cliffs scenery
-- [/] WHITE-HOUSE-F - White house exterior
+- [x] WHITE-HOUSE-F - White house exterior
 
 ### Global Actions (gglobals.zil)
-- [ ] CANYON-VIEW-F - Canyon view scenery
+- [/] CANYON-VIEW-F - Canyon view scenery
 - [ ] CRETIN-FCN - Self/me interactions
 - [ ] GROUND-FUNCTION - Ground/floor
 - [ ] GRUE-FUNCTION - Grue darkness attack
@@ -109,5 +109,5 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 96 actions
-- Implemented: 86
-- Remaining: 10
+- Implemented: 87
+- Remaining: 9
