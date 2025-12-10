@@ -651,6 +651,40 @@ TEST(ButtonF_PushYellowOpensGates) {
 }
 
 // =============================================================================
+// CANDLES-FCN Tests (1actions.zil candle lighting)
+// ZIL Logic: LAMP_ON/LAMP_OFF lights or extinguishes candles
+// =============================================================================
+
+extern bool candlesAction();
+
+TEST(CandlesFcn_LampOnHandled) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prso = g.getObject(ObjectIds::CANDLES);
+    g.prsa = V_LAMP_ON;
+    
+    OutputCapture cap;
+    bool result = candlesAction();
+    
+    ASSERT_TRUE(result);
+}
+
+TEST(CandlesFcn_LampOffHandled) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prso = g.getObject(ObjectIds::CANDLES);
+    if (g.prso) g.prso->setFlag(ObjectFlag::ONBIT);  // Make them lit first
+    g.prsa = V_LAMP_OFF;
+    
+    OutputCapture cap;
+    bool result = candlesAction();
+    
+    ASSERT_TRUE(result);
+}
+
+// =============================================================================
 // KNIFE-F Tests (1actions.zil lines 926-929)
 // ZIL Logic: On TAKE, clears ATTIC-TABLE NDESCBIT
 // =============================================================================
