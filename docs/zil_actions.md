@@ -40,8 +40,8 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] FRONT-DOOR-FCN - Front door interactions
 - [x] GARLIC-F - Garlic eating/bat repellent
 - [x] GHOSTS-F - Ghost interactions
-- [/] GRANITE-WALL-F - Granite wall examination
-- [ ] GRATE-FUNCTION - Grating open/close/lock
+- [x] GRANITE-WALL-F - Granite wall examination
+- [/] GRATE-FUNCTION - Grating open/close/lock
 - [ ] GUNK-FUNCTION - Gunk/sludge interactions
 - [ ] HOT-BELL-F - Hot bell (after exorcism)
 - [ ] IBOAT-FUNCTION - Inflated boat
@@ -109,5 +109,5 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 96 actions
-- Implemented: 32
-- Remaining: 64
+- Implemented: 33
+- Remaining: 63
