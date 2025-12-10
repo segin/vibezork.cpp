@@ -102,12 +102,12 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] GROUND-FUNCTION - Ground/floor
 - [x] GRUE-FUNCTION - Grue darkness attack
 - [x] NOT-HERE-OBJECT-F - Object not visible
-- [/] NULL-F - No-op action
-- [ ] SAILOR-FCN - "Hello Sailor" easter egg
+- [x] NULL-F - No-op action
+- [/] SAILOR-FCN - "Hello Sailor" easter egg
 - [ ] STAIRS-F - Stairs navigation
 - [ ] ZORKMID-FUNCTION - Zorkmid coin
 
 ## Progress
 - Total: 96 actions
-- Implemented: 92
-- Remaining: 4
+- Implemented: 93
+- Remaining: 3
