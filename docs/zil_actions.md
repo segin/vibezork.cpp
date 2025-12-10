@@ -28,7 +28,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] CHIMNEY-F - Chimney navigation
 - [x] CLEARING-FCN - Clearing room handler
 - [x] CRACK-FCN - Crack examination
-- [/] CYCLOPS-FCN - Cyclops NPC behavior
+- [x] CYCLOPS-FCN - Cyclops NPC behavior
 - [x] CYCLOPS-ROOM-FCN - Cyclops room handler
 - [x] DAM-FUNCTION - Dam mechanics
 - [x] DAM-ROOM-FCN - Dam room handler
