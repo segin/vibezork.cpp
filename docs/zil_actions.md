@@ -81,7 +81,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] STONE-BARROW-FCN - Stone barrow entry
 - [x] SWORD-FCN - Sword glow mechanics
 - [x] TEETH-F - Teeth scenery (Implemented: Brush/Putty death logic)
-- [/] TOOL-CHEST-FCN - Tool chest container
+- [x] TOOL-CHEST-FCN - Tool chest container (Implemented: Scenery that crumbles, does NOT contain tools)
 - [x] TORCH-ROOM-FCN - Torch room handler
 - [x] TRAP-DOOR-FCN - Trap door open/close
 - [x] TREASURE-ROOM-FCN - Thief's lair
