@@ -73,8 +73,8 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] RUSTY-KNIFE-FCN - Rusty knife curse
 - [x] SAND-FUNCTION - Sand digging
 - [x] SANDWICH-BAG-FCN - Lunch bag container
-- [/] SCEPTRE-FUNCTION - Sceptre/rainbow
-- [ ] SLIDE-FUNCTION - Coal slide
+- [x] SCEPTRE-FUNCTION - Sceptre/rainbow
+- [/] SLIDE-FUNCTION - Coal slide
 - [ ] SONGBIRD-F - Songbird bauble drop
 - [ ] SOUTH-TEMPLE-FCN - Temple room handler
 - [ ] STILETTO-FUNCTION - Thief's stiletto
@@ -109,5 +109,5 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 96 actions
-- Implemented: 65
-- Remaining: 31
+- Implemented: 66
+- Remaining: 30
