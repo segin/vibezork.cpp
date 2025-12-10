@@ -775,6 +775,40 @@ TEST(CrackFcn_OtherVerbsReturnFalse) {
 }
 
 // =============================================================================
+// DAM-FUNCTION Tests (actions.cpp dam handling)
+// =============================================================================
+
+extern bool damAction();
+
+TEST(DamFunction_ExamineDescribes) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prso = g.getObject(ObjectIds::DAM);
+    g.prsa = V_EXAMINE;
+    
+    OutputCapture cap;
+    bool result = damAction();
+    
+    ASSERT_TRUE(result);
+}
+
+TEST(DamFunction_OpenBlockedByPanel) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prso = g.getObject(ObjectIds::DAM);
+    g.prsa = V_OPEN;
+    
+    OutputCapture cap;
+    bool result = damAction();
+    
+    ASSERT_TRUE(result);
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("panel") != std::string::npos);
+}
+
+// =============================================================================
 // KNIFE-F Tests (1actions.zil lines 926-929)
 // ZIL Logic: On TAKE, clears ATTIC-TABLE NDESCBIT
 // =============================================================================
