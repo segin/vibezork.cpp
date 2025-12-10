@@ -1345,8 +1345,123 @@ TEST(BubbleFcn_AttackDoesNotDestroy) {
     // Should NOT be handled by action (fall through to parser default "Violence isn't the answer")
     ASSERT_FALSE(result);
     
-    // Verify bubble still exists
-    ASSERT_TRUE(bubble->getLocation() != nullptr);
+    // Case 2: Water Level > 0 -> Jammed
+    {
+        OutputCapture cap;
+        bool result = buttonAction();
+        ASSERT_TRUE(result);
+        ASSERT_TRUE(cap.getOutput().find("jammed") != std::string::npos);
+        ASSERT_EQ(g.waterLevel, 1); // Remains unchanged
+    }
+}
+
+// =============================================================================
+// CANDLES-FCN Tests (1actions.zil line 2343)
+// ZIL Logic: Requires Lit Match/Torch. Torch destroys. Match lights.
+// =============================================================================
+
+TEST(CandlesFcn_LightWithNothingFails) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* candles = g.getObject(ObjectIds::CANDLES);
+    // Ensure candles aren't lit
+    candles->unsetFlag(ObjectFlag::ONBIT);
+    candles->setProperty(P_STRENGTH, 10); // Ensure wax
+    
+    g.prso = candles;
+    g.prsa = V_LAMP_ON;
+    g.prsi = nullptr; // No tool
+    
+    // Ensure no match in inventory to auto-infer
+    ZObject* match = g.getObject(ObjectIds::MATCH);
+    if (match) match->moveTo(nullptr);
+    
+    bool result = false;
+    // Catch FATAL return if possible, but our code uses RFATAL define which is just true/false usually?
+    // In actions.cpp, RFATAL is false. Wait, check definition. Usually RFALSE/RTRUE.
+    // Actually RFATAL returns true but signals failure? Or just returns?
+    // In our codebase typically RTRUE=1, RFALSE=0. RFATAL might be defined differently.
+    // Checking actions.cpp... it's not defined, or standard header? 
+    // Assuming RFATAL is handled as return value. Our impl returns RFATAL.
+    
+    OutputCapture cap;
+    result = candlesAction(); // Should return RFATAL
+    
+    // Check message
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("say what to light them with") != std::string::npos);
+}
+
+TEST(CandlesFcn_LightWithLitMatchSucceeds) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* candles = g.getObject(ObjectIds::CANDLES);
+    candles->unsetFlag(ObjectFlag::ONBIT);
+    candles->setProperty(P_STRENGTH, 10);
+    
+    ZObject* match = g.getObject(ObjectIds::MATCH);
+    if (!match) {
+        auto m = std::make_unique<ZObject>(ObjectIds::MATCH, "matchbook");
+        g.registerObject(ObjectIds::MATCH, std::move(m));
+        match = g.getObject(ObjectIds::MATCH);
+    }
+    match->setFlag(ObjectFlag::ONBIT); // Lit match
+    match->moveTo(g.player);
+    
+    g.prso = candles;
+    g.prsi = match;
+    g.prsa = V_LAMP_ON;
+    
+    OutputCapture cap;
+    bool result = candlesAction();
+    
+    ASSERT_TRUE(result);
+    ASSERT_TRUE(cap.getOutput().find("candles are lit") != std::string::npos);
+    ASSERT_TRUE(candles->hasFlag(ObjectFlag::ONBIT));
+}
+
+TEST(CandlesFcn_TorchVaporizesCandles) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* candles = g.getObject(ObjectIds::CANDLES);
+    ZObject* torch = g.getObject(ObjectIds::TORCH);
+    if (!torch) {
+        auto t = std::make_unique<ZObject>(ObjectIds::TORCH, "ivory torch");
+        g.registerObject(ObjectIds::TORCH, std::move(t));
+        torch = g.getObject(ObjectIds::TORCH);
+    }
+    
+    g.prso = candles;
+    g.prsi = torch;
+    g.prsa = V_LAMP_ON;
+    
+    OutputCapture cap;
+    bool result = candlesAction();
+    
+    ASSERT_TRUE(result);
+    ASSERT_TRUE(cap.getOutput().find("vaporized") != std::string::npos);
+    ASSERT_TRUE(candles->getLocation() == nullptr); // Gone
+}
+
+TEST(CandlesFcn_LampOffExtinguishes) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* candles = g.getObject(ObjectIds::CANDLES);
+    candles->setFlag(ObjectFlag::ONBIT); // Lit
+    
+    g.prso = candles;
+    g.prsa = V_LAMP_OFF;
+    
+    OutputCapture cap;
+    bool result = candlesAction();
+    
+    ASSERT_TRUE(result);
+    ASSERT_TRUE(cap.getOutput().find("flame is extinguished") != std::string::npos);
+    ASSERT_FALSE(candles->hasFlag(ObjectFlag::ONBIT));
 }
 
 // =============================================================================

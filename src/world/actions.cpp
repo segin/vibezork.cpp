@@ -597,47 +597,95 @@ bool torchAction() {
 }
 
 // Candles action - temporary light source that burns down
+// CANDLES-FCN - Candle lighting/burning
+// ZIL: Requires lit MATCH. TORCH destroys. Timer usage.
+// Source: 1actions.zil lines 2343-2400+
 bool candlesAction() {
     auto& g = Globals::instance();
     
-    if (g.prsa == V_LAMP_ON && g.prso && g.prso->getId() == ObjectIds::CANDLES) {
-        // Check if candles are already lit
+    if (!g.prso || g.prso->getId() != ObjectIds::CANDLES) return RFALSE;
+
+    // LAMP-ON / BURN
+    if (g.prsa == V_LAMP_ON || g.prsa == V_BURN) {
+        if (g.prso->getProperty(P_STRENGTH) <= 0) { // ZIL: RMUNGBIT check
+             printLine("Alas, there's not much left of the candles. Certainly not enough to burn.");
+             return RTRUE;
+        }
+
+        ZObject* tool = g.prsi;
+        
+        // Auto-infer match if holder has it and it's lit
+        if (!tool) {
+            ZObject* match = g.getObject(ObjectIds::MATCH);
+            if (match && (match->getLocation() == g.player || match->getLocation() == g.here) && match->hasFlag(ObjectFlag::ONBIT)) {
+                printLine("(with the matchbook)");
+                tool = match;
+            }
+        }
+
+        if (!tool) {
+             printLine("You should say what to light them with.");
+             return RFATAL;
+        }
+
+        if (tool->getId() == ObjectIds::TORCH) { // Vaporize
+             if (g.prso->hasFlag(ObjectFlag::ONBIT)) {
+                 printLine("You realize, just in time, that the candles are already lighted.");
+             } else {
+                 printLine("The heat from the torch is so intense that the candles are vaporized.");
+                 g.prso->moveTo(nullptr);
+             }
+             return RTRUE;
+        }
+        else if (tool->getId() == ObjectIds::MATCH && tool->hasFlag(ObjectFlag::ONBIT)) {
+             if (g.prso->hasFlag(ObjectFlag::ONBIT)) {
+                 printLine("The candles are already lit.");
+             } else {
+                 g.prso->setFlag(ObjectFlag::ONBIT);
+                 printLine("The candles are lit.");
+                 CandleSystem::enableCandleTimer();
+             }
+             return RTRUE;
+        }
+        else {
+             printLine("You have to light them with something that's burning, you know.");
+             return RTRUE;
+        }
+    }
+
+    // LAMP-OFF
+    if (g.prsa == V_LAMP_OFF) {
+        CandleSystem::disableCandleTimer();
         if (g.prso->hasFlag(ObjectFlag::ONBIT)) {
-            printLine("The candles are already lit.");
-            return RTRUE;
+             printLine("The flame is extinguished.");
+             g.prso->unsetFlag(ObjectFlag::ONBIT);
+             // TODO: Check darkness "It's really dark in here..."
+             return RTRUE;
+        } else {
+             printLine("The candles are not lighted.");
+             return RTRUE;
         }
-        
-        // Check if candles have wax (property P_STRENGTH tracks remaining wax)
-        int wax = g.prso->getProperty(P_STRENGTH);
-        if (wax <= 0) {
-            printLine("The candles are burned down to nothing.");
-            return RTRUE;
+    }
+
+    // EXAMINE (ZIL line 2399) - Prints state
+    if (g.prsa == V_EXAMINE) {
+        print("The candles are ");
+        if (g.prso->hasFlag(ObjectFlag::ONBIT)) {
+            printLine("burning.");
+        } else {
+            printLine("out.");
         }
-        
-        // Light the candles
-        g.prso->setFlag(ObjectFlag::ONBIT);
-        printLine("The candles are now lit.");
-        
-        // Enable the candle timer (Requirement 48: Enable when candles are lit)
-        CandleSystem::enableCandleTimer();
-        
         return RTRUE;
     }
-    
-    if (g.prsa == V_LAMP_OFF && g.prso && g.prso->getId() == ObjectIds::CANDLES) {
-        // Check if candles are already out
-        if (!g.prso->hasFlag(ObjectFlag::ONBIT)) {
-            printLine("The candles are not lit.");
-            return RTRUE;
-        }
-        
-        // Extinguish the candles
-        g.prso->clearFlag(ObjectFlag::ONBIT);
-        printLine("The candles are now out.");
-        
-        // Disable the candle timer (Requirement 48: Disable when candles are extinguished)
-        CandleSystem::disableCandleTimer();
-        
+
+    // COUNT
+    if (g.prsa == V_COUNT) {
+         printLine("Let's see, how many objects in a pair? Don't tell me, I'll get it.");
+         return RTRUE;
+    }
+
+    return RFALSE;
+}
         return RTRUE;
     }
     
