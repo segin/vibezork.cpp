@@ -685,6 +685,52 @@ TEST(CandlesFcn_LampOffHandled) {
 }
 
 // =============================================================================
+// CELLAR-FCN Tests (1actions.zil room handler)
+// ZIL Logic: Room handler for cellar - currently stub
+// =============================================================================
+
+extern void cellarAction(int rarg);
+
+TEST(CellarFcn_StubDoesNotCrash) {
+    setupTestWorld();
+    // Room handler with int arg - just verify no crash
+    cellarAction(0);
+    ASSERT_TRUE(true);
+}
+
+// =============================================================================
+// CHIMNEY-F Tests (1actions.zil)
+// ZIL Logic: CLIMB_UP/CLIMB_DOWN - chimney is too narrow
+// =============================================================================
+
+extern bool chimneyAction();
+
+TEST(ChimneyF_ClimbUpBlocked) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prsa = V_CLIMB_UP;
+    
+    OutputCapture cap;
+    bool result = chimneyAction();
+    
+    ASSERT_TRUE(result);
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("narrow") != std::string::npos);
+}
+
+TEST(ChimneyF_OtherVerbsReturnFalse) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prsa = V_EXAMINE;
+    
+    bool result = chimneyAction();
+    
+    ASSERT_FALSE(result);
+}
+
+// =============================================================================
 // KNIFE-F Tests (1actions.zil lines 926-929)
 // ZIL Logic: On TAKE, clears ATTIC-TABLE NDESCBIT
 // =============================================================================
