@@ -34,7 +34,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] DAM-ROOM-FCN - Dam room handler
 - [x] DBOAT-FUNCTION - Deflated boat
 - [x] DEAD-FUNCTION - Death handling
-- [x] DEEP-CANYON-F - Deep canyon navigation
+- [/] DEEP-CANYON-F - Deep canyon navigation
 - [x] DOME-ROOM-FCN - Dome room handler
 - [x] FOREST-F - Forest room handler
 - [x] FRONT-DOOR-FCN - Front door interactions

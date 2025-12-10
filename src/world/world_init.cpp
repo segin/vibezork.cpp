@@ -49,6 +49,7 @@ bool machineAction();
 bool mirrorAction();
 bool damAction();
 bool damRoomAction(int rarg);
+void deepCanyonRoomAction(int rarg); // DEEP-CANYON-F
 bool inflatableBoatAction(); // IBOAT-FUNCTION
 bool puncturedBoatAction(); // DBOAT-FUNCTION
 bool boltAction();
@@ -701,11 +702,7 @@ void initializeWorld() {
     );
     // Dark room - no ONBIT flag
     deepCanyon->setFlag(ObjectFlag::RLANDBIT);
-    deepCanyon->setRoomAction([](int rarg) {
-        if (rarg == M_LOOK) {
-            printLine("You are on the south edge of a deep canyon. Passages lead off to the east, northwest and southwest. You can hear the sound of flowing water from below.");
-        }
-    });
+    deepCanyon->setRoomAction(deepCanyonRoomAction);
     
     // Set up exits for Deep Canyon
     deepCanyon->setExit(Direction::NW, RoomExit(RoomIds::RESERVOIR_SOUTH));

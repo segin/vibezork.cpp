@@ -2359,13 +2359,71 @@ TEST(DeadFcn_WalkRestrictions) {
     g.prso = P_NORTH;
     ASSERT_FALSE(deadFunction());
     
-    // Timber Room West Blocked
-    g.here = RoomIds::TIMBER_ROOM;
-    g.prso = P_WEST;
-    {
-        OutputCapture cap;
-        ASSERT_TRUE(deadFunction());
         ASSERT_TRUE(cap.getOutput().find("Cannot enter in your condition") != std::string::npos); 
+    }
+}
+
+// =============================================================================
+// DEEP-CANYON-F Tests (1actions.zil line 1730)
+// ZIL Logic: M-LOOK Water Sound Logic
+// =============================================================================
+
+// Forward decl
+extern void deepCanyonRoomAction(int rarg);
+
+TEST(DeepCanyonFcn_Look) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    // Case 1: Gates Open + Low Tide (Loud Roaring)
+    g.gatesOpen = true;
+    g.lowTide = false; // Wait, ZIL Line 1735: <AND ,GATES-OPEN <NOT ,LOW-TIDE>> -> "Loud Roaring"
+    // So Open + High Tide = Loud Roaring
+    
+    {
+        g.gatesOpen = true;
+        g.lowTide = false;
+        OutputCapture cap;
+        deepCanyonRoomAction(M_LOOK);
+        ASSERT_TRUE(cap.getOutput().find("loud roaring sound") != std::string::npos);
+    }
+    
+    // Case 2: Gates Closed + Low Tide (Silent)
+    // ZIL Line 1739: <AND <NOT ,GATES-OPEN> ,LOW-TIDE> -> RTRUE (Silent)
+    {
+        g.gatesOpen = false;
+        g.lowTide = true;
+        OutputCapture cap;
+        deepCanyonRoomAction(M_LOOK);
+        std::string out = cap.getOutput();
+        ASSERT_TRUE(out.find("loud roaring sound") == std::string::npos);
+        ASSERT_TRUE(out.find("flowing water") == std::string::npos);
+    }
+    
+    // Case 3: Else (Flowing Water)
+    // - Gates Open + Low Tide?
+    // - Gates Closed + High Tide?
+    // ZIL 1742 (T): "flowing water"
+    {
+        // Gates Closed + High Tide
+        g.gatesOpen = false;
+        g.lowTide = false;
+        OutputCapture cap;
+        deepCanyonRoomAction(M_LOOK);
+        ASSERT_TRUE(cap.getOutput().find("flowing water") != std::string::npos);
+    }
+    {
+        // Gates Open + Low Tide
+        // ZIL says: 
+        // 1735: Open & Not Low -> Loud
+        // 1739: Not Open & Low -> Silent
+        // Else -> Flowing.
+        // So Open & Low -> Flowing.
+        g.gatesOpen = true;
+        g.lowTide = true;
+        OutputCapture cap;
+        deepCanyonRoomAction(M_LOOK);
+        ASSERT_TRUE(cap.getOutput().find("flowing water") != std::string::npos);
     }
 }
 // Correction for above test block:

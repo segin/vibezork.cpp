@@ -660,13 +660,23 @@ bool deadFunction() {
 
     return false;
 }
-bool deepCanyonAction() {
+// DEEP-CANYON-F (Room Action)
+// ZIL: M-LOOK with water sound logic.
+// Source: 1actions.zil lines 1730-1745
+void deepCanyonRoomAction(int rarg) {
     auto& g = Globals::instance();
-    if (g.prsa == V_CLIMB_DOWN) {
-        printLine("It's a long way down. Are you sure you want to do that?");
-        return true;
+    
+    if (rarg == M_LOOK) {
+        printLine("You are on the south edge of a deep canyon. Passages lead off to the east, northwest and southwest. A stairway leads down.");
+        
+        if (g.gatesOpen && !g.lowTide) {
+            printLine(" You can hear a loud roaring sound, like that of rushing water, from below.");
+        } else if (!g.gatesOpen && g.lowTide) {
+            // Nothing (CRLF only in ZIL)
+        } else {
+            printLine(" You can hear the sound of flowing water from below.");
+        }
     }
-    return false;
 }
 
 // DOME-ROOM-FCN (Room action)
