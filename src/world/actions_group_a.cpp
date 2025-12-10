@@ -973,7 +973,54 @@ bool hotBellAction() {
     return false;
 }
 
-// IBOAT-FUNCTION (Inflated boat)
+// IBOAT-FUNCTION
+// ZIL: Inflation logic (Pump vs Lungs).
+// Source: 1actions.zil lines 2820-2840
+bool iboatFunction() {
+    auto& g = Globals::instance();
+    
+    // INFLATE / FILL
+    if (g.prsa == V_INFLATE || g.prsa == V_FILL) { // FILL maps to INFLATE context often
+        // Check Location (Must be on ground)
+        if (g.prso && g.prso->getLocation() != g.here) {
+             printLine("The boat must be on the ground to be inflated.");
+             return true;
+        }
+        
+        // Check Tool (PRSI)
+        if (g.prsi && g.prsi->getId() == ObjectIds::PUMP) {
+             printLine("The boat inflates and appears seaworthy.");
+             // Label hint (ZIL checks touchbit, we'll just print it for fidelity/clue)
+             printLine("A tan label is lying inside the boat.");
+             
+             // Swap: Inflatable -> Inflated
+             ZObject* inflatable = g.getObject(ObjectIds::BOAT_INFLATABLE);
+             ZObject* inflated = g.getObject(ObjectIds::BOAT_INFLATED);
+             
+             if (inflatable && inflated) {
+                 inflatable->moveTo(nullptr);
+                 inflated->moveTo(g.here);
+                 g.setIt(inflated);
+             }
+             return true;
+        }
+        
+        if (g.prsi && g.prsi->getId() == ObjectIds::LUNGS) {
+             printLine("You don't have enough lung power to inflate it.");
+             return true;
+        }
+        
+        // Default Tool
+        if (g.prsi) {
+             printLine("With a " + g.prsi->getName() + "? Surely you jest!");
+        } else {
+             printLine("Inflate it with what?");
+        }
+        return true;
+    }
+    
+    return false;
+}
 bool inflatedBoatAction() {
     auto& g = Globals::instance();
     if (g.prsa == V_DEFLATE) {

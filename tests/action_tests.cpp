@@ -2930,6 +2930,87 @@ TEST(HotBellFcn_Interactions) {
     ASSERT_EQ(hb->getLocation(), nullptr); // Hot Bell removed
     ASSERT_EQ(g.getObject(ObjectIds::BELL)->getLocation(), g.here); // Regular Bell added
 }
+
+// =============================================================================
+// IBOAT-FUNCTION Tests (1actions.zil line 2820)
+// ZIL Logic: Inflation (Pump vs Lungs)
+// =============================================================================
+
+// Forward decl
+extern bool iboatFunction();
+
+TEST(IBoatFcn_Inflate) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    // Create Objects
+    auto boatInflatable = std::make_unique<ZObject>(ObjectIds::BOAT_INFLATABLE);
+    boatInflatable->setName("pile of plastic");
+    g.registerObject(ObjectIds::BOAT_INFLATABLE, std::move(boatInflatable));
+    
+    auto boatInflated = std::make_unique<ZObject>(ObjectIds::BOAT_INFLATED);
+    boatInflated->setName("magic boat");
+    g.registerObject(ObjectIds::BOAT_INFLATED, std::move(boatInflated)); // Initially elsewhere
+    
+    auto pump = std::make_unique<ZObject>(ObjectIds::PUMP);
+    pump->setName("pump");
+    g.registerObject(ObjectIds::PUMP, std::move(pump));
+    
+    // Lungs (Pseudo object?)
+    auto lungs = std::make_unique<ZObject>(ObjectIds::LUNGS);
+    lungs->setName("lungs");
+    g.registerObject(ObjectIds::LUNGS, std::move(lungs));
+    
+    auto stick = std::make_unique<ZObject>(12345);
+    stick->setName("stick");
+    
+    // Setup Location
+    ZObject* pile = g.getObject(ObjectIds::BOAT_INFLATABLE);
+    pile->moveTo(g.here);
+    g.prso = pile;
+    
+    // 1. INFLATE with PUMP (Success)
+    g.prsa = V_INFLATE;
+    g.prsi = g.getObject(ObjectIds::PUMP);
+    { 
+        OutputCapture cap; 
+        ASSERT_TRUE(iboatFunction()); 
+        ASSERT_TRUE(cap.getOutput().find("appears seaworthy") != std::string::npos);
+        ASSERT_TRUE(cap.getOutput().find("tan label") != std::string::npos);
+    }
+    // Verify Swap
+    ASSERT_EQ(pile->getLocation(), nullptr);
+    ASSERT_EQ(g.getObject(ObjectIds::BOAT_INFLATED)->getLocation(), g.here);
+    
+    // Reset for other tests
+    g.getObject(ObjectIds::BOAT_INFLATED)->moveTo(nullptr);
+    pile->moveTo(g.here); // Back on ground
+    
+    // 2. INFLATE with LUNGS
+    g.prsi = g.getObject(ObjectIds::LUNGS);
+    { 
+        OutputCapture cap; 
+        ASSERT_TRUE(iboatFunction()); 
+        ASSERT_TRUE(cap.getOutput().find("lung power") != std::string::npos);
+    }
+    
+    // 3. INFLATE with STICK (Default)
+    g.prsi = stick.get();
+    { 
+        OutputCapture cap; 
+        ASSERT_TRUE(iboatFunction()); 
+        ASSERT_TRUE(cap.getOutput().find("Surely you jest") != std::string::npos);
+    }
+    
+    // 4. INFLATE NOT ON GROUND (Holding it?)
+    pile->moveTo(g.winner); // Held
+    g.prsi = g.getObject(ObjectIds::PUMP);
+    { 
+        OutputCapture cap; 
+        ASSERT_TRUE(iboatFunction()); 
+        ASSERT_TRUE(cap.getOutput().find("must be on the ground") != std::string::npos);
+    }
+}
 // Correction for above test block:
 // ASSERT_TRUE(out.find(...) != npos);
 // - YELLOW: GATE-FLAG = T (Power On)
