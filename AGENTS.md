@@ -23,3 +23,10 @@ For specifications and task definitions, see [`.kiro/specs/`](.kiro/specs/).
 ## User Directives
 
 - **Never use a simpler approach**: Always choose the correct, hard, comprehensive solution, no matter how arduous. Never compromise architectural integrity for convenience or speed. Simpler approaches that sacrifice correctness or robustness are strictly forbidden.
+
+- **NEVER batch mark checklist items**: When implementing items from a checklist (e.g., ZIL actions, tests, features), you MUST implement, test, and commit EACH ITEM INDIVIDUALLY before marking it as complete. Batch marking multiple items at once is STRICTLY FORBIDDEN. This includes:
+  - Never mark an item as complete without implementing it first
+  - Never mark multiple items in a single commit
+  - Never skip testing to "catch up" on checklist marking
+  - Each individual item requires: implement → test → verify tests pass → commit → push → mark checkbox
+  - This rule applies even if it seems tedious or time-consuming
