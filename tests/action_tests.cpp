@@ -2426,6 +2426,79 @@ TEST(DeepCanyonFcn_Look) {
         ASSERT_TRUE(cap.getOutput().find("flowing water") != std::string::npos);
     }
 }
+
+// =============================================================================
+// DOME-ROOM-FCN Tests (1actions.zil line 1030)
+// ZIL Logic: Rope Desc, Spirit Pull, Leap Death
+// =============================================================================
+
+// Forward decl
+extern void domeRoomAction(int rarg);
+
+TEST(DomeRoomFcn_Look) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    // Case 1: Flag False (No Rope)
+    g.domeFlag = false;
+    {
+        OutputCapture cap;
+        domeRoomAction(M_LOOK);
+        std::string out = cap.getOutput();
+        ASSERT_TRUE(out.find("precipitous drop") != std::string::npos);
+        ASSERT_TRUE(out.find("Hanging down") == std::string::npos);
+    }
+    
+    // Case 2: Flag True (Rope)
+    g.domeFlag = true;
+    {
+        OutputCapture cap;
+        domeRoomAction(M_LOOK);
+        ASSERT_TRUE(cap.getOutput().find("Hanging down") != std::string::npos);
+    }
+}
+
+TEST(DomeRoomFcn_EnterSpirit) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    DeathSystem::setTestMode(true);
+    DeathSystem::setDead(true); // Simulate Spirit
+    
+    // Create Torch Room (destination)
+    if (!g.getObject(RoomIds::TORCH_ROOM)) {
+         auto tr = std::make_unique<ZRoom>(RoomIds::TORCH_ROOM, "Torch Room", "Desc");
+         g.registerObject(RoomIds::TORCH_ROOM, std::move(tr));
+    }
+    
+    // Current room (Dome)
+    // Call Action with M_ENTER
+    {
+        OutputCapture cap;
+        domeRoomAction(M_ENTER);
+        ASSERT_TRUE(cap.getOutput().find("strong pull") != std::string::npos);
+        ASSERT_EQ(g.here->getId(), RoomIds::TORCH_ROOM);
+    }
+    
+    DeathSystem::setDead(false); // Reset
+}
+
+TEST(DomeRoomFcn_EnterLeap) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    DeathSystem::setTestMode(true);
+    
+    g.prsa = V_LEAP;
+    
+    // Call Action with M_ENTER
+    // Should trigger JigsUp
+    {
+        OutputCapture cap;
+        domeRoomAction(M_ENTER);
+        ASSERT_TRUE(cap.getOutput().find("done you in") != std::string::npos);
+        // JigsUp (in test mode) resurrects or resets.
+        // We verify the message.
+    }
+}
 // Correction for above test block:
 // ASSERT_TRUE(out.find(...) != npos);
 // - YELLOW: GATE-FLAG = T (Power On)

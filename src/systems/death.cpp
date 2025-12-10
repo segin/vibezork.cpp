@@ -32,6 +32,14 @@ void setTestMode(bool enabled) {
     testMode_ = enabled;
 }
 
+void setTestMode(bool enabled) {
+    testMode_ = enabled;
+}
+
+void setDead(bool dead) {
+    dead_ = dead;
+}
+
 // Get death count (Requirement 58.5)
 int getDeathCount() {
     return deathCount_;

@@ -680,8 +680,34 @@ void deepCanyonRoomAction(int rarg) {
 }
 
 // DOME-ROOM-FCN (Room action)
+// DOME-ROOM-FCN (Room action)
+// ZIL: M-LOOK with rope (DOME-FLAG). M-ENTER with Spirit/Leap logic.
+// Source: 1actions.zil lines 1030-1050
 void domeRoomAction(int rarg) {
-    // Handle rope, jumping down, etc.
+    auto& g = Globals::instance();
+    
+    if (rarg == M_LOOK) {
+        printLine("You are at the periphery of a large dome, which forms the ceiling of another room below. Protecting you from a precipitous drop is a wooden railing which circles the dome.");
+        if (g.domeFlag) {
+            printLine("Hanging down from the railing is a rope which ends about ten feet from the floor below.");
+        }
+    }
+    else if (rarg == M_ENTER) {
+        if (DeathSystem::isDead()) {
+             printLine("As you enter the dome you feel a strong pull as if from a wind drawing you over the railing and down.");
+             ZObject* torchRoom = g.getObject(RoomIds::TORCH_ROOM);
+             if (torchRoom && g.winner) {
+                 g.winner->moveTo(torchRoom);
+                 g.here = torchRoom;
+             }
+             // RTRUE implies handled/stop?
+             return; 
+        }
+        
+        if (g.prsa == V_LEAP) {
+             DeathSystem::jigsUp("I'm afraid that the leap you attempted has done you in.");
+        }
+    }
 }
 
 // FRONT-DOOR-FCN

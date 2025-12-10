@@ -25,6 +25,9 @@ void initialize();
 // Set test mode (disables interactive prompts for testing)
 void setTestMode(bool enabled);
 
+// Core death status
+void setDead(bool dead); // Added for testing/ZIL fidelity
+
 // Main death function (Requirement 58.1)
 // Called when player dies
 // Displays death message, offers resurrection or restart
