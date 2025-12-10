@@ -38,7 +38,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] DOME-ROOM-FCN - Dome room handler
 - [x] FOREST-F - Forest room handler
 - [x] FRONT-DOOR-FCN - Front door interactions
-- [/] GARLIC-F - Garlic eating/bat repellent
+- [x] GARLIC-F - Garlic eating/bat repellent
 - [x] GHOSTS-F - Ghost interactions
 - [x] GRANITE-WALL-F - Granite wall examination
 - [x] GRATE-FUNCTION - Grating open/close/lock
