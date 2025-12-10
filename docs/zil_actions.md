@@ -92,8 +92,8 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] TUBE-FUNCTION - Tube navigation
 - [x] UP-CHIMNEY-FUNCTION - Chimney climbing
 - [x] WATER-F - Water interactions
-- [/] WEAPON-FUNCTION - Weapon blocked by NPC
-- [ ] WHITE-CLIFFS-FUNCTION - White cliffs scenery
+- [x] WEAPON-FUNCTION - Weapon blocked by NPC
+- [/] WHITE-CLIFFS-FUNCTION - White cliffs scenery
 - [ ] WHITE-HOUSE-F - White house exterior
 
 ### Global Actions (gglobals.zil)
@@ -109,5 +109,5 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 96 actions
-- Implemented: 84
-- Remaining: 12
+- Implemented: 85
+- Remaining: 11
