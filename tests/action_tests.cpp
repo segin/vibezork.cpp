@@ -3078,6 +3078,74 @@ TEST(KitchenFcn_LookStairs) {
         ASSERT_TRUE(cap.getOutput().find("no stairs leading down") != std::string::npos);
     }
 }
+
+// =============================================================================
+// LARGE-BAG-F Tests (1actions.zil line 2094)
+// ZIL Logic: Block interactions if Thief is present
+// =============================================================================
+
+// Forward decl
+extern bool largeBagAction();
+
+TEST(LargeBagFcn_ThiefBlocks) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    // Setup Objects
+    auto bag = std::make_unique<ZObject>(ObjectIds::BAG); // Assuming ID
+    bag->setName("large bag");
+    g.registerObject(ObjectIds::BAG, std::move(bag));
+    
+    auto thief = std::make_unique<ZObject>(ObjectIds::THIEF);
+    thief->setName("thief");
+    g.registerObject(ObjectIds::THIEF, std::move(thief));
+    
+    // Thief Here -> Blocked
+    ZObject* thiefObj = g.getObject(ObjectIds::THIEF);
+    thiefObj->moveTo(g.here);
+    
+    g.prso = g.getObject(ObjectIds::BAG);
+    
+    // 1. TAKE
+    g.prsa = V_TAKE;
+    { 
+        OutputCapture cap; 
+        ASSERT_TRUE(largeBagAction()); 
+        ASSERT_TRUE(cap.getOutput().find("dead body") != std::string::npos);
+    }
+    
+    // 2. OPEN
+    g.prsa = V_OPEN;
+    { 
+        OutputCapture cap; 
+        ASSERT_TRUE(largeBagAction()); 
+        ASSERT_TRUE(cap.getOutput().find("good trick") != std::string::npos);
+    }
+    
+    // 3. EXAMINE
+    g.prsa = V_EXAMINE;
+    { 
+        OutputCapture cap; 
+        ASSERT_TRUE(largeBagAction()); 
+        ASSERT_TRUE(cap.getOutput().find("underneath the thief") != std::string::npos);
+    }
+    
+    // 4. PUT (Bag as PRSI)
+    g.prsa = V_PUT;
+    g.prso = nullptr; // Ignored
+    g.prsi = g.getObject(ObjectIds::BAG);
+    { 
+        OutputCapture cap; 
+        ASSERT_TRUE(largeBagAction()); 
+        ASSERT_TRUE(cap.getOutput().find("good trick") != std::string::npos);
+    }
+    
+    // Thief Away -> Allowed
+    thiefObj->moveTo(nullptr);
+    g.prsa = V_TAKE;
+    g.prsi = nullptr; // Reset
+    ASSERT_FALSE(largeBagAction()); // Default handling should proceed
+}
 // Correction for above test block:
 // ASSERT_TRUE(out.find(...) != npos);
 // - YELLOW: GATE-FLAG = T (Power On)
