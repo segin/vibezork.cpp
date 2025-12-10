@@ -25,8 +25,8 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] CANDLES-FCN - Candle lighting/burning
 - [x] CELLAR-FCN - Cellar room handler
 - [x] CHALICE-FCN - Chalice interactions
-- [/] CHIMNEY-F - Chimney navigation
-- [ ] CLEARING-FCN - Clearing room handler
+- [x] CHIMNEY-F - Chimney navigation
+- [/] CLEARING-FCN - Clearing room handler
 - [ ] CRACK-FCN - Crack examination
 - [ ] CYCLOPS-FCN - Cyclops NPC behavior
 - [ ] CYCLOPS-ROOM-FCN - Cyclops room handler
@@ -109,5 +109,5 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 96 actions
-- Implemented: 17
-- Remaining: 79
+- Implemented: 18
+- Remaining: 78
