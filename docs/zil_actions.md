@@ -30,7 +30,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] CRACK-FCN - Crack examination
 - [x] CYCLOPS-FCN - Cyclops NPC behavior
 - [x] CYCLOPS-ROOM-FCN - Cyclops room handler
-- [/] DAM-FUNCTION - Dam mechanics
+- [x] DAM-FUNCTION - Dam mechanics
 - [x] DAM-ROOM-FCN - Dam room handler
 - [x] DBOAT-FUNCTION - Deflated boat
 - [x] DEAD-FUNCTION - Death handling
