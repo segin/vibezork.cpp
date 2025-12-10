@@ -11,8 +11,8 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] AXE-F - Axe interaction with Troll
 - [x] BAG-OF-COINS-F - Stupid container for coins
 - [x] BARROW-DOOR-FCN - Barrow door interactions
-- [/] BARROW-FCN - Stone Barrow room handler
-- [ ] BASKET-F - Basket/dumbwaiter mechanics
+- [x] BARROW-FCN - Stone Barrow room handler
+- [/] BASKET-F - Basket/dumbwaiter mechanics
 - [ ] BAT-F - Bat attack/defense
 - [ ] BELL-F - Bell ringing mechanics
 - [ ] BOARD-F - Board manipulation
@@ -109,5 +109,5 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 96 actions
-- Implemented: 3
-- Remaining: 93
+- Implemented: 4
+- Remaining: 92
