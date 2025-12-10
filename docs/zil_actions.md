@@ -40,7 +40,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] FRONT-DOOR-FCN - Front door interactions
 - [x] GARLIC-F - Garlic eating/bat repellent
 - [x] GHOSTS-F - Ghost interactions
-- [/] GRANITE-WALL-F - Granite wall examination
+- [x] GRANITE-WALL-F - Granite wall examination
 - [x] GRATE-FUNCTION - Grating open/close/lock
 - [x] GUNK-FUNCTION - Gunk/sludge interactions
 - [x] HOT-BELL-F - Hot bell (after exorcism)
