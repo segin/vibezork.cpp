@@ -70,8 +70,8 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] ROBBER-FUNCTION - Thief AI
 - [x] ROPE-FUNCTION - Rope tie/untie
 - [x] RUG-FCN - Rug/trap door
-- [/] RUSTY-KNIFE-FCN - Rusty knife curse
-- [ ] SAND-FUNCTION - Sand digging
+- [x] RUSTY-KNIFE-FCN - Rusty knife curse
+- [/] SAND-FUNCTION - Sand digging
 - [ ] SANDWICH-BAG-FCN - Lunch bag container
 - [ ] SCEPTRE-FUNCTION - Sceptre/rainbow
 - [ ] SLIDE-FUNCTION - Coal slide
@@ -109,5 +109,5 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 96 actions
-- Implemented: 62
-- Remaining: 34
+- Implemented: 63
+- Remaining: 33
