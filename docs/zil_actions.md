@@ -97,8 +97,8 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] WHITE-HOUSE-F - White house exterior
 
 ### Global Actions (gglobals.zil)
-- [/] CANYON-VIEW-F - Canyon view scenery
-- [ ] CRETIN-FCN - Self/me interactions
+- [x] CANYON-VIEW-F - Canyon view scenery
+- [/] CRETIN-FCN - Self/me interactions
 - [ ] GROUND-FUNCTION - Ground/floor
 - [ ] GRUE-FUNCTION - Grue darkness attack
 - [ ] NOT-HERE-OBJECT-F - Object not visible
@@ -109,5 +109,5 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 96 actions
-- Implemented: 87
-- Remaining: 9
+- Implemented: 88
+- Remaining: 8
