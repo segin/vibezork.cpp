@@ -320,27 +320,10 @@ bool forestAction() {
         }
         
         if (found) {
-            // GO-NEXT moves player and looks
             auto* target = g.getObject(nextRoom);
             if (target && g.winner) {
                  g.winner->moveTo(target);
                  g.here = target;
-                 // ZIL GO-NEXT usually prints look?
-                 // Standard move handles look.
-                 // We rely on engine. 
-                 // But manual moveTo in action handler usually requires explicit Look if not handled by loop.
-                 // Engine loop: Parser -> Action -> (Returns True) -> Loop continues.
-                 // If moved, loop doesn't auto-look unless configured.
-                 // ZIL usually calls <LOOK> in movement.
-                 // I'll call printRoomDescription or similar if available, or rely on engine.
-                 // Vibezork loop usually prints decsription on new room?
-                 // I'll check `processCommand` or similar.
-                 // For now, simple moveTo. Fidelity test: check if desc printed.
-                 // Ideally: g.perform(V_LOOK, g.player, nullptr);
-                 // Or force look.
-                 // I'll call Look Action? 
-                 // I'll leave it as moveTo for now.
-                 // Note: ZIL `GO-NEXT` performs `TELL`? No, it's movement.
                  return true;
             }
         }

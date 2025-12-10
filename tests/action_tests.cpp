@@ -2733,6 +2733,86 @@ TEST(GraniteWallFcn_Contexts) {
     g.prsa = V_FIND;
      { OutputCapture cap; ASSERT_TRUE(graniteWallAction()); ASSERT_TRUE(cap.getOutput().find("no granite wall here") != std::string::npos); }
 }
+
+// =============================================================================
+// GRATE-FUNCTION Tests (1actions.zil line 850)
+// ZIL Logic: Lock/Unlock (Room Specific)
+// =============================================================================
+
+// Forward decl
+extern bool grateAction();
+
+TEST(GrateFcn_LockUnlock) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    // Setup Rooms
+    auto gratingRoom = std::make_unique<ZRoom>(RoomIds::GRATING_ROOM, "Grating Room", "Desc");
+    g.registerObject(RoomIds::GRATING_ROOM, std::move(gratingRoom));
+    
+    auto clearing = std::make_unique<ZRoom>(RoomIds::CLEARING, "Clearing", "Desc");
+    g.registerObject(RoomIds::CLEARING, std::move(clearing));
+    
+    // Setup Objects
+    auto grate = std::make_unique<ZObject>(ObjectIds::GRATE);
+    grate->setName("grate");
+    g.prso = grate.get();
+    
+    auto keys = std::make_unique<ZObject>(ObjectIds::KEYS);
+    keys->setName("keys");
+    
+    // Case 1: Lock in Grating Room
+    g.here = g.getObject(RoomIds::GRATING_ROOM);
+    g.prsa = V_LOCK;
+    { 
+        OutputCapture cap; 
+        ASSERT_TRUE(grateAction()); 
+        ASSERT_FALSE(g.grunlock); // Locked
+        ASSERT_TRUE(cap.getOutput().find("locked") != std::string::npos);
+    }
+    
+    // Case 2: Lock in Clearing
+    g.here = g.getObject(RoomIds::CLEARING);
+    g.prsa = V_LOCK;
+    { 
+        OutputCapture cap; 
+        ASSERT_TRUE(grateAction()); 
+        ASSERT_TRUE(cap.getOutput().find("can't lock it from this side") != std::string::npos);
+    }
+    
+    // Case 3: Unlock in Grating Room with Keys
+    g.here = g.getObject(RoomIds::GRATING_ROOM);
+    g.prsa = V_UNLOCK;
+    g.prsi = keys.get();
+    {
+        OutputCapture cap;
+        ASSERT_TRUE(grateAction());
+        ASSERT_TRUE(g.grunlock); // Unlocked
+        ASSERT_TRUE(cap.getOutput().find("unlocked") != std::string::npos);
+    }
+    
+    // Case 4: Unlock in Clearing with Keys
+    g.here = g.getObject(RoomIds::CLEARING);
+    g.prsa = V_UNLOCK;
+    g.prsi = keys.get();
+    {
+        OutputCapture cap;
+        ASSERT_TRUE(grateAction());
+        ASSERT_TRUE(cap.getOutput().find("can't reach the lock") != std::string::npos);
+    }
+    
+    // Case 5: Open with Keys -> Unlock Logic
+    g.here = g.getObject(RoomIds::GRATING_ROOM);
+    g.grunlock = false; // Relock
+    g.prsa = V_OPEN;
+    g.prsi = keys.get();
+    {
+        OutputCapture cap;
+        ASSERT_TRUE(grateAction()); // Should delegate to UNLOCK
+        ASSERT_TRUE(g.grunlock); 
+        ASSERT_TRUE(cap.getOutput().find("unlocked") != std::string::npos);
+    }
+}
 // Correction for above test block:
 // ASSERT_TRUE(out.find(...) != npos);
 // - YELLOW: GATE-FLAG = T (Power On)

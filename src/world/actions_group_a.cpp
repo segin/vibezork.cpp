@@ -835,6 +835,65 @@ bool graniteWallAction() {
 }
 
 // GRATE-FUNCTION
+// ZIL: Lock/Unlock interactions with Grate and Keys.
+// Source: 1actions.zil lines 850-870
+bool grateAction() {
+    auto& g = Globals::instance();
+    auto room = g.here->getId();
+    
+    // Helper: Is PRSI Keys?
+    bool withKeys = (g.prsi && g.prsi->getId() == ObjectIds::KEYS);
+    
+    // OPEN with KEYS -> Delegate to UNLOCK
+    if (g.prsa == V_OPEN && withKeys) {
+        // Fall through to UNLOCK logic?
+        // Or explicitly set PRSA to UNLOCK?
+        // ZIL says <PERFORM ,V?UNLOCK ...>
+        // We can just execute UNLOCK block below.
+        g.prsa = V_UNLOCK; 
+    }
+    
+    if (g.prsa == V_LOCK) {
+        if (room == RoomIds::GRATING_ROOM) {
+            g.grunlock = false;
+            printLine("The grate is locked.");
+            // ZIL also calls <FSET ,GRATE ,LOCKEDBIT> if tracking object bits
+            // We use global grunlock.
+            // Also need to set object open/locked status?
+            // Engine checks LOCKEDBIT often.
+            // If we use grunlock, we might need to sync.
+            // For now, fidelity of output is key.
+            return true;
+        }
+        if (room == RoomIds::CLEARING) { // ZIL: GRATING-CLEARING
+            printLine("You can't lock it from this side.");
+            return true;
+        }
+    }
+    
+    if (g.prsa == V_UNLOCK) {
+        if (g.prso && g.prso->getId() == ObjectIds::GRATE) {
+             if (room == RoomIds::GRATING_ROOM && withKeys) {
+                 g.grunlock = true; // Unlocked
+                 printLine("The grate is unlocked.");
+                 return true;
+             }
+             if (room == RoomIds::CLEARING && withKeys) {
+                 printLine("You can't reach the lock from here.");
+                 return true;
+             }
+             // Default Unlock failure
+             if (g.prsi) {
+                 printLine("Can you unlock a grating with a " + g.prsi->getName() + "?");
+             } else {
+                 printLine("Unlock it with what?");
+             }
+             return true;
+        }
+    }
+    
+    return false;
+}
 bool grateAction() {
     auto& g = Globals::instance();
     if (g.prsa == V_OPEN) {

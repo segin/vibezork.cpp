@@ -48,6 +48,7 @@ public:
     bool gatesOpen = false;            // Are dam sluice gates open?
     bool lowTide = false;              // Is water level in reservoir low? (ZIL: LOW-TIDE)
     bool domeFlag = false;             // Is rope tied to railing in Dome Room? (ZIL: DOME-FLAG)
+    bool grunlock = false;             // Is grate unlocked? (ZIL: GRUNLOCK)
     int waterLevel = 0;                // Water level in Maintenance Room (0=Dry, >0=Rising)
     bool grateRevealed = false;        // Has the grating been revealed in the Clearing?
     

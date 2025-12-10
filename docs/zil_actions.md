@@ -41,7 +41,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] GARLIC-F - Garlic eating/bat repellent
 - [x] GHOSTS-F - Ghost interactions
 - [x] GRANITE-WALL-F - Granite wall examination
-- [x] GRATE-FUNCTION - Grating open/close/lock
+- [/] GRATE-FUNCTION - Grating open/close/lock
 - [x] GUNK-FUNCTION - Gunk/sludge interactions
 - [x] HOT-BELL-F - Hot bell (after exorcism)
 - [x] IBOAT-FUNCTION - Inflated boat

@@ -49,6 +49,7 @@ void Globals::reset() {
     gatesOpen = false;      // Dam Sluice Gates
     lowTide = false;        // Dam Reservoir Low Tide
     domeFlag = false;       // Dome Room Rope
+    grunlock = false;       // Grate Unlocked
     waterLevel = 0;         // Maintenance Room water
     grateRevealed = false;  // Clearing Grating
     
