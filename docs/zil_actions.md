@@ -98,7 +98,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ### Global Actions (gglobals.zil)
 - [x] CANYON-VIEW-F - Canyon view scenery
-- [x] CRETIN-FCN - Self/me interactions
+- [/] CRETIN-FCN - Internal "cretin" function
 - [x] GROUND-FUNCTION - Ground/floor
 - [x] GRUE-FUNCTION - Grue darkness attack
 - [x] NOT-HERE-OBJECT-F - Object not visible

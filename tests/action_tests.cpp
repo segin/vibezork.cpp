@@ -1859,6 +1859,78 @@ TEST(CrackFcn_LookInsideFails) {
     ASSERT_TRUE(result);
     ASSERT_TRUE(cap.getOutput().find("too small") != std::string::npos);
 }
+
+// =============================================================================
+// CRETIN-FCN Tests (gglobals.zil line 221)
+// ZIL Logic: Me/Self interactions (Eat, Attack, Examine, etc.)
+// =============================================================================
+
+// Forward decl
+extern bool cretinAction();
+
+TEST(CretinFcn_Examine) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    g.prsa = V_EXAMINE;
+    OutputCapture cap;
+    bool result = cretinAction();
+    ASSERT_TRUE(result);
+    ASSERT_TRUE(cap.getOutput().find("prehensile") != std::string::npos);
+}
+
+TEST(CretinFcn_VariousVerbs) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    // TELL
+    g.prsa = V_TELL;
+    { OutputCapture cap; cretinAction(); ASSERT_TRUE(cap.getOutput().find("mental collapse") != std::string::npos); }
+    
+    // EAT
+    g.prsa = V_EAT;
+    { OutputCapture cap; cretinAction(); ASSERT_TRUE(cap.getOutput().find("Auto-cannibalism") != std::string::npos); }
+    
+    // TAKE
+    g.prsa = V_TAKE;
+    { OutputCapture cap; cretinAction(); ASSERT_TRUE(cap.getOutput().find("How romantic") != std::string::npos); }
+    
+    // THROW ME
+    g.prsa = V_THROW;
+    g.prso = g.player; // Assuming player is ME
+    { OutputCapture cap; cretinAction(); ASSERT_TRUE(cap.getOutput().find("just walk") != std::string::npos); }
+}
+
+TEST(CretinFcn_Attack) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prsa = V_ATTACK;
+    g.prso = g.player;
+    
+    // Case 1: No Weapon
+    g.prsi = nullptr; 
+    { 
+        OutputCapture cap; 
+        cretinAction(); 
+        ASSERT_TRUE(cap.getOutput().find("Suicide is not") != std::string::npos); 
+    }
+    
+    // Case 2: With Weapon
+    ZObject* sword = g.getObject(ObjectIds::SWORD);
+    if (!sword) {
+         auto s = std::make_unique<ZObject>(ObjectIds::SWORD, "sword");
+         g.registerObject(ObjectIds::SWORD, std::move(s));
+         sword = g.getObject(ObjectIds::SWORD);
+    }
+    sword->setFlag(ObjectFlag::WEAPONBIT);
+    g.prsi = sword;
+    
+    { 
+        OutputCapture cap; 
+        cretinAction(); 
+        ASSERT_TRUE(cap.getOutput().find("Poof, you're dead") != std::string::npos); 
+    }
+}
 // - YELLOW: GATE-FLAG = T (Power On)
 // - BROWN: GATE-FLAG = F (Power Off)
 // - RED: Toggle Lights (ONBIT)
