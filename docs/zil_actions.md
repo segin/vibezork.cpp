@@ -13,8 +13,8 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] BARROW-DOOR-FCN - Barrow door interactions
 - [x] BARROW-FCN - Stone Barrow room handler
 - [x] BASKET-F - Basket/dumbwaiter mechanics
-- [/] BAT-F - Bat attack/defense
-- [ ] BELL-F - Bell ringing mechanics
+- [x] BAT-F - Bat attack/defense
+- [/] BELL-F - Bell ringing mechanics
 - [ ] BOARD-F - Board manipulation
 - [ ] BOARDED-WINDOW-FCN - Boarded window interactions
 - [ ] BODY-FUNCTION - Dead body interactions
@@ -109,5 +109,5 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 96 actions
-- Implemented: 5
-- Remaining: 91
+- Implemented: 6
+- Remaining: 90
