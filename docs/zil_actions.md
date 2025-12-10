@@ -23,8 +23,8 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] BUBBLE-F - Bubble interactions
 - [x] BUTTON-F - Dam control buttons
 - [x] CANDLES-FCN - Candle lighting/burning
-- [/] CELLAR-FCN - Cellar room handler
-- [ ] CHALICE-FCN - Chalice interactions
+- [x] CELLAR-FCN - Cellar room handler
+- [/] CHALICE-FCN - Chalice interactions
 - [ ] CHIMNEY-F - Chimney navigation
 - [ ] CLEARING-FCN - Clearing room handler
 - [ ] CRACK-FCN - Crack examination
@@ -109,5 +109,5 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 96 actions
-- Implemented: 15
-- Remaining: 81
+- Implemented: 16
+- Remaining: 80
