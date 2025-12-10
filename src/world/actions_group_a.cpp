@@ -157,13 +157,84 @@ void cellarAction(int rarg) {
 }
 
 // CHIMNEY-F
+// CHIMNEY-F
+// ZIL: EXAMINE prints direction. CLIMB handled by room/direction logic (UP-CHIMNEY-FUNCTION).
+// We implement logic here for CLIMB CHIMNEY verb usage.
+// Source: 1actions.zil lines 545-565
 bool chimneyAction() {
     auto& g = Globals::instance();
-    if (g.prsa == V_CLIMB_UP || g.prsa == V_CLIMB_DOWN) {
-        printLine("The chimney is too narrow.");
-        return true;
+    bool inKitchen = (g.here && g.here->getId() == RoomIds::KITCHEN);
+
+    // EXAMINE
+    if (g.prsa == V_EXAMINE) {
+        if (inKitchen) {
+             printLine("The chimney leads down ward, and looks climbable.");
+        } else {
+             printLine("The chimney leads up ward, and looks climbable.");
+        }
+        return RTRUE;
     }
-    return false;
+
+    // CLIMB UP/DOWN
+    if (g.prsa == V_CLIMB_UP || g.prsa == V_CLIMB_DOWN) {
+        if (inKitchen) {
+             if (g.prsa == V_CLIMB_DOWN) {
+                 // Check if Living Room exists
+                 ZObject* livingRoom = g.getObject(RoomIds::LIVING_ROOM);
+                 if (livingRoom) {
+                     printLine("You slide down the chimney...");
+                     g.player->moveTo(livingRoom);
+                     // Force look?
+                     // Return true handles it.
+                     return RTRUE;
+                 }
+             }
+         } else {
+             // Assuming Living Room (or "Not Kitchen")
+             if (g.prsa == V_CLIMB_UP) {
+                 // Santa Check: Can only carry Lamp (and maybe nothing else)
+                 // Simplify inventory count check
+                 int itemCount = 0;
+                 bool hasLamp = false;
+                 bool hasOther = false;
+                 
+                 // Check player contents
+                 // ZObject doesn't expose iterator directly? Use simple traversal if available or assume list.
+                 // We don't have easy child iteration method exposed in g typically?
+                 // Wait, ZObject has `child`, `sibling`.
+                 ZObject* item = g.player->child;
+                 while(item) {
+                     itemCount++;
+                     if (item->getId() == ObjectIds::LANTERN) hasLamp = true;
+                     else hasOther = true;
+                     item = item->sibling;
+                 }
+
+                 if (itemCount == 0 || (itemCount == 1 && hasLamp)) {
+                      ZObject* kitchen = g.getObject(RoomIds::KITCHEN);
+                      if (kitchen) {
+                          // Trap Door Logic from ZIL 560
+                          ZObject* trapDoor = g.getObject(ObjectIds::TRAP_DOOR);
+                          if (trapDoor && !trapDoor->hasFlag(ObjectFlag::OPENBIT)) {
+                              trapDoor->unsetFlag(ObjectFlag::TOUCHBIT);
+                          }
+                          
+                          printLine("The chimney is tight, but you manage to squeeze up it.");
+                          g.player->moveTo(kitchen);
+                          return RTRUE;
+                      }
+                 } else {
+                      printLine("You can't get up there with what you're carrying.");
+                      return RTRUE;
+                 }
+             }
+         }
+         
+         printLine("The chimney is too narrow.");
+         return RTRUE;
+    }
+
+    return RFALSE;
 }
 
 // CLEARING-FCN (Room action for Clearing)

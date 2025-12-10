@@ -1625,9 +1625,113 @@ TEST(ChaliceFcn_TakeWithoutThiefSucceeds) {
     ASSERT_FALSE(result); // Falls through to normal take
 }
 
+    ASSERT_FALSE(result); // Falls through to normal take
+}
+
 // =============================================================================
-// BUTTON-F Tests (1actions.zil line 1298)
-// ZIL Logic:
+// CHIMNEY-F Tests (1actions.zil line 545)
+// ZIL Logic: EXAMINE (direction). CLIMB UP (Santa - Lamp Only). CLIMB DOWN (Move).
+// =============================================================================
+
+TEST(ChimneyFcn_Examine) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* kitchen = g.getObject(RoomIds::KITCHEN);
+    if (!kitchen) {
+        auto r = std::make_unique<ZObject>(RoomIds::KITCHEN, "Kitchen");
+        g.registerObject(RoomIds::KITCHEN, std::move(r));
+        kitchen = g.getObject(RoomIds::KITCHEN);
+    }
+    
+    ZObject* chimney = g.getObject(ObjectIds::CHIMNEY);
+    if (!chimney) {
+        auto c = std::make_unique<ZObject>(ObjectIds::CHIMNEY, "chimney");
+        g.registerObject(ObjectIds::CHIMNEY, std::move(c));
+        chimney = g.getObject(ObjectIds::CHIMNEY);
+    }
+    
+    g.prsa = V_EXAMINE;
+    g.prso = chimney;
+    
+    // Kitchen (Down)
+    g.here = kitchen;
+    {
+        OutputCapture cap;
+        bool result = chimneyAction();
+        ASSERT_TRUE(result);
+        ASSERT_TRUE(cap.getOutput().find("leads down ward") != std::string::npos);
+    }
+    
+    // Living Room (Up)
+    ZObject* livingRoom = g.getObject(RoomIds::LIVING_ROOM);
+    if (!livingRoom) { // Need valid ptr for else branch test or just != kitchen
+        auto r = std::make_unique<ZObject>(RoomIds::LIVING_ROOM, "Living Room");
+        g.registerObject(RoomIds::LIVING_ROOM, std::move(r));
+        livingRoom = g.getObject(RoomIds::LIVING_ROOM);
+    }
+    g.here = livingRoom;
+    {
+         OutputCapture cap;
+         bool result = chimneyAction();
+         ASSERT_TRUE(result);
+         ASSERT_TRUE(cap.getOutput().find("leads up ward") != std::string::npos);
+    }
+}
+
+TEST(ChimneyFcn_ClimbLogic) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* kitchen = g.getObject(RoomIds::KITCHEN);
+    ZObject* livingRoom = g.getObject(RoomIds::LIVING_ROOM);
+    if (!kitchen) { g.registerObject(RoomIds::KITCHEN, std::make_unique<ZObject>(RoomIds::KITCHEN, "Kitchen")); kitchen = g.getObject(RoomIds::KITCHEN); }
+    if (!livingRoom) { g.registerObject(RoomIds::LIVING_ROOM, std::make_unique<ZObject>(RoomIds::LIVING_ROOM, "Living Room")); livingRoom = g.getObject(RoomIds::LIVING_ROOM); }
+    
+    // Climb Down from Kitchen
+    g.here = kitchen;
+    g.player->moveTo(kitchen);
+    g.prsa = V_CLIMB_DOWN;
+    {
+         OutputCapture cap;
+         bool result = chimneyAction();
+         ASSERT_TRUE(result);
+         ASSERT_TRUE(cap.getOutput().find("slide down") != std::string::npos);
+         ASSERT_EQ(g.player->getLocation()->getId(), RoomIds::LIVING_ROOM);
+    }
+    
+    // Climb Up from Living Room (Fail - Heavy)
+    g.here = livingRoom;
+    g.player->moveTo(livingRoom);
+    g.prsa = V_CLIMB_UP;
+    
+    // Add heavy item
+    ZObject* sword = g.getObject(ObjectIds::SWORD); // Assume exists or make dummy
+    if (!sword) { auto s = std::make_unique<ZObject>(ObjectIds::SWORD, "sword"); g.registerObject(ObjectIds::SWORD, std::move(s)); sword = g.getObject(ObjectIds::SWORD); }
+    sword->moveTo(g.player);
+    
+    {
+         OutputCapture cap;
+         bool result = chimneyAction();
+         ASSERT_TRUE(result);
+         ASSERT_TRUE(cap.getOutput().find("can't get up there") != std::string::npos);
+         ASSERT_EQ(g.player->getLocation()->getId(), RoomIds::LIVING_ROOM);
+    }
+    
+    // Climb Up from Living Room (Success - Only Lamp)
+    sword->moveTo(nullptr); // Remove sword
+    ZObject* lantern = g.getObject(ObjectIds::LANTERN);
+    if (!lantern) { auto l = std::make_unique<ZObject>(ObjectIds::LANTERN, "brass lantern"); g.registerObject(ObjectIds::LANTERN, std::move(l)); lantern = g.getObject(ObjectIds::LANTERN); }
+    lantern->moveTo(g.player);
+    
+    {
+         OutputCapture cap;
+         bool result = chimneyAction();
+         ASSERT_TRUE(result);
+         ASSERT_TRUE(cap.getOutput().find("squeeze up") != std::string::npos);
+         ASSERT_EQ(g.player->getLocation()->getId(), RoomIds::KITCHEN);
+    }
+}
 // - YELLOW: GATE-FLAG = T (Power On)
 // - BROWN: GATE-FLAG = F (Power Off)
 // - RED: Toggle Lights (ONBIT)
