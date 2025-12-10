@@ -52,8 +52,8 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] LEAK-FUNCTION - Boat leak
 - [x] LIVING-ROOM-FCN - Living room handler
 - [x] LOUD-ROOM-FCN - Loud room echo puzzle
-- [/] MACHINE-F - Coal machine
-- [ ] MACHINE-ROOM-FCN - Machine room handler
+- [x] MACHINE-F - Coal machine
+- [/] MACHINE-ROOM-FCN - Machine room handler
 - [ ] MAILBOX-F - Mailbox container
 - [ ] MATCH-FUNCTION - Match lighting
 - [ ] MAZE-11-FCN - Maze room 11 (grating)
@@ -109,5 +109,5 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 96 actions
-- Implemented: 44
-- Remaining: 52
+- Implemented: 45
+- Remaining: 51
