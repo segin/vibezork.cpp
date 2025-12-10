@@ -1031,6 +1031,40 @@ bool inflatedBoatAction() {
     return false;
 }
 
+// KITCHEN-FCN
+// ZIL: M-LOOK (Window state), M-BEG (Stairs Logic)
+// Source: 1actions.zil lines 385-401
+bool kitchenAction() {
+    auto& g = Globals::instance();
+    
+    // M-LOOK (Room Description)
+    if (g.prsa == V_LOOK) {
+        printLine("You are in the kitchen of the white house. A table seems to have been used recently for the preparation of food. A passage leads to the west and a dark staircase can be seen leading upward. A dark chimney leads down and to the east is a small window which is ");
+        
+        ZObject* win = g.getObject(ObjectIds::KITCHEN_WINDOW);
+        if (win && win->hasFlag(ObjectFlag::OPENBIT)) {
+            printLine("open.");
+        } else {
+            printLine("slightly ajar.");
+        }
+        return true;
+    }
+    
+    // M-BEG (Stairs) - Handling CLIMB on STAIRS
+    if (g.prso && g.prso->getId() == ObjectIds::STAIRS) {
+        if (g.prsa == V_CLIMB_UP) {
+            g.performWalk(Direction::UP);
+            return true;
+        }
+        if (g.prsa == V_CLIMB_DOWN) {
+            printLine("There are no stairs leading down.");
+            return true;
+        }
+    }
+    
+    return false;
+}
+
 // KNIFE-F - Knife object action
 // ZIL: On TAKE, clears ATTIC-TABLE NDESCBIT (makes table visible)
 // Source: 1actions.zil lines 926-929

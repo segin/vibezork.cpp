@@ -3011,6 +3011,73 @@ TEST(IBoatFcn_Inflate) {
         ASSERT_TRUE(cap.getOutput().find("must be on the ground") != std::string::npos);
     }
 }
+
+// =============================================================================
+// KITCHEN-FCN Tests (1actions.zil line 385)
+// ZIL Logic: Look (Window), Climb Stairs
+// =============================================================================
+
+// Forward decl
+extern bool kitchenAction();
+
+TEST(KitchenFcn_LookStairs) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    // Setup Kitchen
+    auto kitchen = std::make_unique<ZRoom>(RoomIds::KITCHEN, "Kitchen", "Desc");
+    g.registerObject(RoomIds::KITCHEN, std::move(kitchen));
+    g.here = g.getObject(RoomIds::KITCHEN);
+    
+    // Setup Window
+    auto window = std::make_unique<ZObject>(ObjectIds::KITCHEN_WINDOW);
+    window->setName("window");
+    g.registerObject(ObjectIds::KITCHEN_WINDOW, std::move(window));
+    
+    // Setup Stairs
+    auto stairs = std::make_unique<ZObject>(ObjectIds::STAIRS);
+    stairs->setName("stairs");
+    g.registerObject(ObjectIds::STAIRS, std::move(stairs));
+    
+    // 1. SEEK (Look) - Default (Ajar)
+    g.prsa = V_LOOK;
+    { 
+        OutputCapture cap; 
+        ASSERT_TRUE(kitchenAction()); 
+        ASSERT_TRUE(cap.getOutput().find("slightly ajar") != std::string::npos);
+        ASSERT_TRUE(cap.getOutput().find("white house") != std::string::npos);
+    }
+    
+    // 2. SEEK (Look) - Open
+    g.getObject(ObjectIds::KITCHEN_WINDOW)->setFlag(ObjectFlag::OPENBIT);
+    { 
+        OutputCapture cap; 
+        ASSERT_TRUE(kitchenAction()); 
+        ASSERT_TRUE(cap.getOutput().find("is open") != std::string::npos || 
+                    cap.getOutput().find("window which is open") != std::string::npos);
+        // Note: Logic prints "open." appends to "window which is "
+        // "window which is \nopen." (Check formatting)
+    }
+    
+    // 3. CLIMB UP STAIRS
+    g.prsa = V_CLIMB_UP;
+    g.prso = g.getObject(ObjectIds::STAIRS);
+    // Note: performWalk relies on map. We didn't set UP exit.
+    // Logic just calls it. We check return true.
+    { 
+        OutputCapture cap; 
+        ASSERT_TRUE(kitchenAction()); 
+        // Logic delegates to performWalk.
+    }
+    
+    // 4. CLIMB DOWN STAIRS
+    g.prsa = V_CLIMB_DOWN;
+    { 
+        OutputCapture cap; 
+        ASSERT_TRUE(kitchenAction()); 
+        ASSERT_TRUE(cap.getOutput().find("no stairs leading down") != std::string::npos);
+    }
+}
 // Correction for above test block:
 // ASSERT_TRUE(out.find(...) != npos);
 // - YELLOW: GATE-FLAG = T (Power On)

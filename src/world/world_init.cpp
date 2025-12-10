@@ -409,6 +409,7 @@ void initializeWorld() {
     kitchen->setExit(Direction::UP, RoomExit(RoomIds::ATTIC));
     kitchen->setExit(Direction::DOWN, RoomExit("Only Santa Claus climbs down chimneys."));
     
+    kitchen->setAction(kitchenAction);
     g.registerObject(RoomIds::KITCHEN, std::move(kitchen));
     
     // Create Attic
