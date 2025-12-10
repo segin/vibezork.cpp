@@ -18,8 +18,8 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] BOARD-F - Board manipulation
 - [x] BOARDED-WINDOW-FCN - Boarded window interactions
 - [x] BODY-FUNCTION - Dead body interactions
-- [/] BOLT-F - Dam bolt mechanics
-- [ ] BOTTLE-FUNCTION - Bottle container
+- [x] BOLT-F - Dam bolt mechanics
+- [/] BOTTLE-FUNCTION - Bottle container
 - [ ] BUBBLE-F - Bubble interactions
 - [ ] BUTTON-F - Dam control buttons
 - [ ] CANDLES-FCN - Candle lighting/burning
@@ -109,5 +109,5 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 96 actions
-- Implemented: 10
-- Remaining: 86
+- Implemented: 11
+- Remaining: 85
