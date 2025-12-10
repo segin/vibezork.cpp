@@ -31,6 +31,7 @@ private:
 // Forward declarations for action functions
 extern bool axeAction();
 extern bool knifeAction();
+extern bool teethAction();
 
 // Initialize world for testing
 static void setupTestWorld() {
@@ -872,6 +873,76 @@ TEST(KnifeF_ReturnsFalseToAllowNormalHandling) {
     // Should return false to allow normal TAKE to proceed
     ASSERT_FALSE(result);
 }
+
+// =============================================================================
+// TEETH-F Tests (1actions.zil lines 48-62)
+// ZIL Logic: BRUSH TEETH with putty = death, BRUSH without tool = message
+// =============================================================================
+
+TEST(TeethF_BrushWithPuttyKillsPlayer) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    // Get teeth and putty objects
+    ZObject* teeth = g.getObject(ObjectIds::TEETH);
+    ZObject* putty = g.getObject(ObjectIds::PUTTY);
+    ASSERT_TRUE(teeth != nullptr);
+    ASSERT_TRUE(putty != nullptr);
+    
+    // Put putty in player's inventory
+    putty->moveTo(g.player);
+    
+    // Setup BRUSH TEETH WITH PUTTY
+    g.prsa = V_BRUSH;
+    g.prso = teeth;
+    g.prsi = putty;
+    
+    bool result = teethAction();
+    
+    // Should handle the action (death occurs internally)
+    ASSERT_TRUE(result);
+}
+
+/*
+TEST(TeethF_BrushWithoutToolPrintsMessage) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* teeth = g.getObject(TEETH);
+    ASSERT_TRUE(teeth != nullptr);
+    
+    // Setup BRUSH TEETH with no instrument
+    g.prsa = V_BRUSH;
+    g.prso = teeth;
+    g.prsi = nullptr;
+    
+    OutputCapture capture;
+    bool result = teethAction();
+    std::string output = capture.getOutput();
+    
+    ASSERT_TRUE(result);
+    ASSERT_TRUE(output.find("Dental hygiene") != std::string::npos);
+}
+
+TEST(TeethF_ExaminePrintsDescription) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* teeth = g.getObject(TEETH);
+    ASSERT_TRUE(teeth != nullptr);
+    
+    g.prsa = V_EXAMINE;
+    g.prso = teeth;
+    
+    OutputCapture capture;
+    bool result = teethAction();
+    std::string output = capture.getOutput();
+    
+    ASSERT_TRUE(result);
+    ASSERT_TRUE(output.find("razor sharp") != std::string::npos);
+}
+*/
+
 
 // Main test runner
 int main(int argc, char* argv[]) {

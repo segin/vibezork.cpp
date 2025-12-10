@@ -725,19 +725,51 @@ bool stilettoAction() {
     return false;
 }
 
-// TEETH-F
+// TEETH-F - Teeth object action handler
+// ZIL Source: 1actions.zil lines 48-62
+// Handles BRUSH verb with putty death, and EXAMINE/TAKE
 bool teethAction() {
     auto& g = Globals::instance();
+    
+    // Handle BRUSH TEETH - ZIL checks prso is TEETH
+    if (g.prsa == V_BRUSH && g.prso && g.prso->getId() == ObjectIds::TEETH) {
+        // Check if brushing WITH PUTTY = death
+        // ZIL: <AND <EQUAL? ,PRSI ,PUTTY> <IN? ,PRSI ,WINNER>>
+        if (g.prsi && g.prsi->getId() == ObjectIds::PUTTY && 
+            g.prsi->getLocation() == g.player) {
+            DeathSystem::jigsUp(
+                "Well, you seem to have been brushing your teeth with some sort of "
+                "glue. As a result, your mouth gets glued together (with your nose) "
+                "and you die of respiratory failure.",
+                DeathSystem::DeathCause::OTHER);
+            return true;
+        }
+        // BRUSH TEETH with nothing specified
+        if (!g.prsi) {
+            printLine("Dental hygiene is highly recommended, but I'm not sure what you want to brush them with.");
+            return true;
+        }
+        // BRUSH TEETH with something else
+        printLine("A nice idea, but with a " + g.prsi->getDesc() + "?");
+        return true;
+    }
+    
+    // Handle EXAMINE
     if (g.prsa == V_EXAMINE) {
         printLine("The teeth are razor sharp.");
         return true;
     }
+    
+    // Handle TAKE - scenery can't be taken
     if (g.prsa == V_TAKE) {
         printLine("The teeth are embedded in something. You can't take them.");
         return true;
     }
+    
     return false;
 }
+
+
 
 // TOOL-CHEST-FCN
 bool toolChestAction() {

@@ -3428,4 +3428,14 @@ void initializeWorld() {
     
     // Initialize additional objects from missing_objects.cpp
     // (No longer needed - all objects now in refactored initialization)
+    
+    // Initialize scenery objects
+    void initializeScenery(); // Forward declaration
+    initializeScenery();
+    
+    // Initialize tool objects
+    void initializeTools(); // Forward declaration
+    initializeTools();
 }
+
+
