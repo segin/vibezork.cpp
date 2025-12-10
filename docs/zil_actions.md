@@ -42,7 +42,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] GHOSTS-F - Ghost interactions
 - [x] GRANITE-WALL-F - Granite wall examination
 - [x] GRATE-FUNCTION - Grating open/close/lock
-- [/] GUNK-FUNCTION - Gunk/sludge interactions
+- [x] GUNK-FUNCTION - Gunk/sludge interactions
 - [x] HOT-BELL-F - Hot bell (after exorcism)
 - [x] IBOAT-FUNCTION - Inflated boat
 - [x] KITCHEN-FCN - Kitchen room handler
