@@ -64,8 +64,8 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] RAINBOW-FCN - Rainbow/pot of gold
 - [x] RBOAT-FUNCTION - Punctured boat
 - [x] RESERVOIR-FCN - Reservoir water handler
-- [/] RESERVOIR-NORTH-FCN - North reservoir
-- [ ] RESERVOIR-SOUTH-FCN - South reservoir
+- [x] RESERVOIR-NORTH-FCN - North reservoir
+- [/] RESERVOIR-SOUTH-FCN - South reservoir
 - [ ] RIVER-FUNCTION - River flow/boat mechanics
 - [ ] ROBBER-FUNCTION - Thief AI
 - [ ] ROPE-FUNCTION - Rope tie/untie
@@ -109,5 +109,5 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 96 actions
-- Implemented: 56
-- Remaining: 40
+- Implemented: 57
+- Remaining: 39
