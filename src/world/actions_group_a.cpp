@@ -740,11 +740,14 @@ bool frontDoorAction() {
 }
 
 // GARLIC-F
+// GARLIC-F
+// ZIL: EAT.
+// Source: 1actions.zil lines 4160-4165
 bool garlicAction() {
     auto& g = Globals::instance();
     if (g.prsa == V_EAT) {
-        printLine("What disgusting taste you have!");
-        g.prso->moveTo(nullptr); // Consumed
+        printLine("What the heck! You won't make friends this way, but nobody around here is too friendly anyhow. Gulp!");
+        if (g.prso) g.prso->moveTo(nullptr); // Consumed
         return true;
     }
     return false;

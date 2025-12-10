@@ -2602,6 +2602,39 @@ TEST(FrontDoorFcn_Verbs) {
     g.prsa = V_LOOK_BEHIND;
     { OutputCapture cap; ASSERT_TRUE(frontDoorAction()); ASSERT_TRUE(cap.getOutput().find("won't open") != std::string::npos); }
 }
+
+// =============================================================================
+// GARLIC-F Tests (1actions.zil line 4160)
+// ZIL Logic: EAT message and removal
+// =============================================================================
+
+// Forward decl
+extern bool garlicAction();
+
+TEST(GarlicFcn_Eat) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    // Create dummy garlic
+    auto garlic = std::make_unique<ZObject>(12345); // Dummy ID
+    garlic->setName("garlic");
+    // Place in room
+    garlic->moveTo(g.here);
+    
+    // Setup Action
+    g.prsa = V_EAT;
+    g.prso = garlic.get();
+    
+    // Test
+    { 
+        OutputCapture cap; 
+        ASSERT_TRUE(garlicAction()); 
+        ASSERT_TRUE(cap.getOutput().find("make friends this way") != std::string::npos); // "You won't make friends this way..."
+    }
+    
+    // Verify removal
+    ASSERT_EQ(garlic->getLocation(), nullptr);
+}
 // Correction for above test block:
 // ASSERT_TRUE(out.find(...) != npos);
 // - YELLOW: GATE-FLAG = T (Power On)
