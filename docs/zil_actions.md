@@ -37,8 +37,8 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] DEEP-CANYON-F - Deep canyon navigation
 - [x] DOME-ROOM-FCN - Dome room handler
 - [x] FOREST-F - Forest room handler
-- [/] FRONT-DOOR-FCN - Front door interactions
-- [ ] GARLIC-F - Garlic eating/bat repellent
+- [x] FRONT-DOOR-FCN - Front door interactions
+- [/] GARLIC-F - Garlic eating/bat repellent
 - [ ] GHOSTS-F - Ghost interactions
 - [ ] GRANITE-WALL-F - Granite wall examination
 - [ ] GRATE-FUNCTION - Grating open/close/lock
@@ -109,5 +109,5 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 96 actions
-- Implemented: 29
-- Remaining: 67
+- Implemented: 30
+- Remaining: 66
