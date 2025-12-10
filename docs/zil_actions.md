@@ -104,8 +104,8 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] NOT-HERE-OBJECT-F - Object not visible
 - [x] NULL-F - No-op action
 - [x] SAILOR-FCN - "Hello Sailor" easter egg
-- [/] STAIRS-F - Stairs navigation
-- [ ] ZORKMID-FUNCTION - Zorkmid coin
+- [x] STAIRS-F - Stairs navigation
+- [/] ZORKMID-FUNCTION - Zorkmid coin
 
 ## Progress
 - Total: 96 actions
