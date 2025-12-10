@@ -983,7 +983,7 @@ bool boardedWindowAction() {
         printLine("The windows are boarded and can't be opened.");
         return true;
     }
-    if (g.prsa == V_ATTACK || g.prsa == V_KILL) { // MUNG = break
+    if (g.prsa == V_ATTACK || g.prsa == V_KILL || g.prsa == V_MUNG) { // MUNG = break
         printLine("You can't break the windows open.");
         return true;
     }

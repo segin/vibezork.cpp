@@ -693,6 +693,20 @@ TEST(BoardedWindowFcn_AttackPrintsCantBreak) {
     ASSERT_TRUE(output.find("break") != std::string::npos);
 }
 
+TEST(BoardedWindowFcn_MungPrintsCantBreak) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prsa = V_MUNG;
+    
+    OutputCapture cap;
+    bool result = boardedWindowAction();
+    
+    ASSERT_TRUE(result);
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("break") != std::string::npos);
+}
+
 TEST(BoardedWindowFcn_OtherVerbsReturnFalse) {
     setupTestWorld();
     auto& g = Globals::instance();
