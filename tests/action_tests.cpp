@@ -731,6 +731,50 @@ TEST(ChimneyF_OtherVerbsReturnFalse) {
 }
 
 // =============================================================================
+// CLEARING-FCN Tests (room handler stub)
+// =============================================================================
+
+extern void clearingAction(int rarg);
+
+TEST(ClearingFcn_StubDoesNotCrash) {
+    setupTestWorld();
+    clearingAction(0);
+    ASSERT_TRUE(true);
+}
+
+// =============================================================================
+// CRACK-FCN Tests (1actions.zil line 381-383)
+// ZIL Logic: THROUGH - can't fit through the crack
+// =============================================================================
+
+extern bool crackAction();
+
+TEST(CrackFcn_ExaminePrintsTooSmall) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prsa = V_EXAMINE;
+    
+    OutputCapture cap;
+    bool result = crackAction();
+    
+    ASSERT_TRUE(result);
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("too small") != std::string::npos);
+}
+
+TEST(CrackFcn_OtherVerbsReturnFalse) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prsa = V_TAKE;
+    
+    bool result = crackAction();
+    
+    ASSERT_FALSE(result);
+}
+
+// =============================================================================
 // KNIFE-F Tests (1actions.zil lines 926-929)
 // ZIL Logic: On TAKE, clears ATTIC-TABLE NDESCBIT
 // =============================================================================
