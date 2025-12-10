@@ -22,7 +22,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] BOTTLE-FUNCTION - Bottle container
 - [x] BUBBLE-F - Bubble interactions
 - [x] BUTTON-F - Dam control buttons
-- [/] CANDLES-FCN - Candle lighting/burning
+- [x] CANDLES-FCN - Candle lighting/burning
 - [x] CELLAR-FCN - Cellar room handler
 - [x] CHALICE-FCN - Chalice interactions
 - [x] CHIMNEY-F - Chimney navigation
