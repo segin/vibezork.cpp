@@ -20,8 +20,8 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] BODY-FUNCTION - Dead body interactions
 - [x] BOLT-F - Dam bolt mechanics
 - [x] BOTTLE-FUNCTION - Bottle container
-- [/] BUBBLE-F - Bubble interactions
-- [ ] BUTTON-F - Dam control buttons
+- [x] BUBBLE-F - Bubble interactions
+- [/] BUTTON-F - Dam control buttons
 - [ ] CANDLES-FCN - Candle lighting/burning
 - [ ] CELLAR-FCN - Cellar room handler
 - [ ] CHALICE-FCN - Chalice interactions
@@ -109,5 +109,5 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 96 actions
-- Implemented: 12
-- Remaining: 84
+- Implemented: 13
+- Remaining: 83

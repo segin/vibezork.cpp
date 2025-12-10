@@ -602,7 +602,7 @@ TEST(BubbleF_ExaminePrintsDescription) {
     ASSERT_TRUE(result);
 }
 
-TEST(BubbleF_TakeBlockedTooFragile) {
+TEST(BubbleF_TakeBlockedIntegralPart) {
     setupTestWorld();
     auto& g = Globals::instance();
     
@@ -614,7 +614,8 @@ TEST(BubbleF_TakeBlockedTooFragile) {
     
     ASSERT_TRUE(result);
     std::string output = cap.getOutput();
-    ASSERT_TRUE(output.find("fragile") != std::string::npos);
+    // ZIL: INTEGRAL-PART prints "It is an integral part of the control panel."
+    ASSERT_TRUE(output.find("integral part") != std::string::npos);
 }
 
 // =============================================================================
