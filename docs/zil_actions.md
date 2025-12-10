@@ -28,8 +28,8 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] CHIMNEY-F - Chimney navigation
 - [x] CLEARING-FCN - Clearing room handler
 - [x] CRACK-FCN - Crack examination
-- [/] CYCLOPS-FCN - Cyclops NPC behavior
-- [ ] CYCLOPS-ROOM-FCN - Cyclops room handler
+- [x] CYCLOPS-FCN - Cyclops NPC behavior
+- [/] CYCLOPS-ROOM-FCN - Cyclops room handler
 - [ ] DAM-FUNCTION - Dam mechanics
 - [ ] DAM-ROOM-FCN - Dam room handler
 - [ ] DBOAT-FUNCTION - Deflated boat
@@ -109,5 +109,5 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 96 actions
-- Implemented: 20
-- Remaining: 76
+- Implemented: 21
+- Remaining: 75
