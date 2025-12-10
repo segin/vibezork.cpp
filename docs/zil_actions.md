@@ -83,8 +83,8 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] TEETH-F - Teeth scenery
 - [x] TOOL-CHEST-FCN - Tool chest container
 - [x] TORCH-ROOM-FCN - Torch room handler
-- [/] TRAP-DOOR-FCN - Trap door open/close
-- [ ] TREASURE-ROOM-FCN - Thief's lair
+- [x] TRAP-DOOR-FCN - Trap door open/close
+- [/] TREASURE-ROOM-FCN - Thief's lair
 - [ ] TROLL-FCN - Troll combat/behavior
 - [ ] TROLL-ROOM-F - Troll room handler
 - [ ] TROPHY-CASE-FCN - Trophy case scoring
@@ -109,5 +109,5 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 96 actions
-- Implemented: 75
-- Remaining: 21
+- Implemented: 76
+- Remaining: 20
