@@ -903,12 +903,11 @@ TEST(TeethF_BrushWithPuttyKillsPlayer) {
     ASSERT_TRUE(result);
 }
 
-/*
 TEST(TeethF_BrushWithoutToolPrintsMessage) {
     setupTestWorld();
     auto& g = Globals::instance();
     
-    ZObject* teeth = g.getObject(TEETH);
+    ZObject* teeth = g.getObject(ObjectIds::TEETH);
     ASSERT_TRUE(teeth != nullptr);
     
     // Setup BRUSH TEETH with no instrument
@@ -924,7 +923,10 @@ TEST(TeethF_BrushWithoutToolPrintsMessage) {
     ASSERT_TRUE(output.find("Dental hygiene") != std::string::npos);
 }
 
+
+/*
 TEST(TeethF_ExaminePrintsDescription) {
+
     setupTestWorld();
     auto& g = Globals::instance();
     
