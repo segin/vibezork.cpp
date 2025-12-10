@@ -8,7 +8,9 @@
 
 // Helper for STUPID-CONTAINER logic (Bag of Coins, Trunk)
 // Returns true if handled
-bool stupidContainerAction(const std::string& contentName) {
+// Helper for simple "stupid containers" that refuse insertion
+// Updated to check containerId against PRSI
+static bool stupidContainerAction(ObjectId containerId, const std::string& contentName) {
     auto& g = Globals::instance();
     
     if (g.prsa == V_OPEN || g.prsa == V_CLOSE) {
@@ -25,9 +27,13 @@ bool stupidContainerAction(const std::string& contentName) {
         return true;
     }
     
-    if (g.prsa == V_PUT || g.prsa == V_PUT_ON) { // PUT X IN Y
-        if (g.prsi == g.prso) { // If putting INTO this container (self-reference check)
-             printLine("Don't be silly. It wouldn't be a bag of coins anymore.");
+    // Logic: If putting X into THIS CONTAINER
+    // ZIL: <AND <VERB? PUT> <EQUAL? ,PRSI .OBJ>>
+    if (g.prsa == V_PUT || g.prsa == V_PUT_ON) { 
+        if (g.prsi && g.prsi->getId() == containerId) {
+             print("Don't be silly. It wouldn't be a ");
+             print(g.prsi->getDesc()); // Use object name
+             printLine(" anymore."); 
              return true;
         }
     }
@@ -36,11 +42,13 @@ bool stupidContainerAction(const std::string& contentName) {
 }
 
 bool bagOfCoinsAction() {
-    return stupidContainerAction("coins");
+    return stupidContainerAction(ObjectIds::BAG_OF_COINS, "coins");
 }
 
 bool trunkAction() {
-    return stupidContainerAction("jewels");
+    // FIXME: TRUNK object ID not defined yet. Commented out to fix compilation.
+    // return stupidContainerAction(ObjectIds::TRUNK, "jewels");
+    return false;
 }
 
 // WEAPON-FUNCTION helper (shared by AXE-F and STILETTO-FUNCTION)
@@ -666,7 +674,7 @@ bool sandAction() {
 
 // SANDWICH-BAG-FCN
 bool sandwichBagAction() {
-    return stupidContainerAction("food");
+    return stupidContainerAction(ObjectIds::SANDWICH_BAG, "food");
 }
 
 // SCEPTRE-FUNCTION

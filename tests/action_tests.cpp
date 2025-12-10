@@ -208,6 +208,35 @@ TEST(BagOfCoinsF_TakeReturnsFalse) {
     ASSERT_FALSE(result);
 }
 
+TEST(BagOfCoinsF_PutSomethingInBagReturnsMessage) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* bag = g.getObject(ObjectIds::BAG_OF_COINS);
+    ZObject* coin = g.getObject(ObjectIds::COINS); // Use COINS (assuming from ZIL)
+    
+    // Create dummy coin if needed (just for test)
+    if (!coin) {
+        // If COINS ID not valid, use a fallback
+        // Checking build error: 'COIN' is not member. 'COINS' suggested.
+        auto newCoin = std::make_unique<ZObject>(ObjectIds::COINS, "coin");
+        g.registerObject(ObjectIds::COINS, std::move(newCoin));
+        coin = g.getObject(ObjectIds::COINS);
+    }
+
+    g.prsa = V_PUT;
+    g.prso = coin; // Putting Coin
+    g.prsi = bag;  // Into Bag
+    
+    OutputCapture cap;
+    bool result = bagOfCoinsAction();
+    
+    ASSERT_TRUE(result);
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("Don't be silly") != std::string::npos);
+    ASSERT_TRUE(output.find("bag of coins") != std::string::npos);
+}
+
 // =============================================================================
 // BARROW-DOOR-FCN Tests (1actions.zil lines 432-434)
 // ZIL Logic: OPEN/CLOSE prints "The door is too heavy."
