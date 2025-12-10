@@ -2009,9 +2009,58 @@ TEST(CyclopsFcn_SleepWake) {
              ASSERT_TRUE(cap2.getOutput().find("yawns and stares") != std::string::npos);
         } else {
              // He is awake. (Maybe persistent state).
-             // Verify "Hungry cyclops" or similar.
-             // If we can't reset state, we just verify he is reachable.
         }
+    }
+}
+
+// =============================================================================
+// CYCLOPS-ROOM-FCN Tests (1actions.zil line 1616)
+// ZIL Logic: Room M-LOOK, M-BEG Blocking
+// =============================================================================
+
+// Forward decl
+extern void cyclopsRoomAction(int rarg);
+
+TEST(CyclopsRoomFcn_Look) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    // Assuming we are in Cyclops Room
+    // Just calling the logic function
+    
+    // Check output contains "staircase leading up"
+    {
+        OutputCapture cap;
+        cyclopsRoomAction(M_LOOK);
+        ASSERT_TRUE(cap.getOutput().find("staircase leading up") != std::string::npos);
+    }
+}
+
+TEST(CyclopsRoomFcn_BlockUp) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    ZObject* cyclops = g.getObject(ObjectIds::CYCLOPS);
+    if (!cyclops) {
+         auto c = std::make_unique<ZObject>(ObjectIds::CYCLOPS, "cyclops");
+         g.registerObject(ObjectIds::CYCLOPS, std::move(c));
+         cyclops = g.getObject(ObjectIds::CYCLOPS);
+    }
+    
+    // Need Cyclops to be Awake to block
+    // If he is asleep by default (ZIL), we wake him using ALARM
+    g.prsa = V_ALARM;
+    g.prso = cyclops;
+    cyclopsAction(); // Wake him
+    
+    // Now try to Climb Up
+    g.prsa = V_CLIMB_UP;
+    g.prso = nullptr; // Or whatever CLIMB-UP sets
+    
+    {
+        OutputCapture cap;
+        cyclopsRoomAction(M_BEG); // Pre-motion check
+        std::string out = cap.getOutput();
+        // If he blocks: "refuses to let you pass"
+        ASSERT_TRUE(out.find("refuses to let you pass") != std::string::npos);
     }
 }
 // - YELLOW: GATE-FLAG = T (Power On)
