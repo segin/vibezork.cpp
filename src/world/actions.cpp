@@ -1274,19 +1274,51 @@ bool boltAction() {
     }
     
     // Handle TURN - turning the bolt with wrench
+    // ZIL: Requires WRENCH. Requires GATE-FLAG (bubble activated). Toggles GATES-OPEN.
     if (g.prsa == V_TURN) {
-        // Check if player has wrench
-        ZObject* wrench = g.getObject(ObjectIds::WRENCH);
-        if (!wrench || wrench->getLocation() != g.winner) {
-            printLine("You need a wrench to turn the bolt.");
-            return RTRUE;
+        // ZIL: <EQUAL? ,PRSI ,WRENCH>
+        if (!g.prsi || g.prsi->getId() != ObjectIds::WRENCH) {
+            // If turning with something else (or nothing/hands implied if handled by parser)
+            // ZIL uses PRSI check. If PRSI is not set, parser usually prompts "Turn with what?"
+            // But if we are here, we might need to check validation. 
+            // Simplified: If checked tool is not Wrench, fail.
+            // Actually, parser usually sets PRSI.
+            ZObject* wrench = g.getObject(ObjectIds::WRENCH);
+            bool hasWrench = (wrench && wrench->getLocation() == g.winner);
+            
+            // If we didn't specify wrench, or specified something else
+             if (!g.prsi) {
+                  printLine("You need a tool to turn the bolt.");
+                  return true;
+             }
+             if (g.prsi->getId() != ObjectIds::WRENCH) {
+                 printLine("The bolt won't turn with that.");
+                 return true;
+             }
         }
         
-        printLine("You turn the bolt with the wrench. Something clicks inside the mechanism.");
-        return RTRUE;
+        // At this point PRSI is WRENCH (or assumed correct tool context)
+        
+        // ZIL: <COND (,GATE-FLAG ... ) (T "won't turn")>
+        if (g.gateFlag) {
+            if (g.gatesOpen) {
+                // <SETG GATES-OPEN <>>
+                g.gatesOpen = false;
+                printLine("The sluice gates close and water starts to collect behind the dam.");
+                // TODO: Implement timer I-RFILL (queue 8)
+            } else {
+                // <SETG GATES-OPEN T>
+                g.gatesOpen = true;
+                printLine("The sluice gates open and water pours through the dam.");
+                 // TODO: Implement timer I-REMPTY (queue 8)
+            }
+        } else {
+            printLine("The bolt won't turn with your best effort.");
+        }
+        return true;
     }
     
-    return RFALSE;
+    return false;
 }
 
 // Bubble action - green bubble puzzle

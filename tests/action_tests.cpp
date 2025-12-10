@@ -1101,7 +1101,6 @@ TEST(BodyFcn_AttackKillMungBurnTriggersDeath) {
     g.reset();
     setupTestWorld();
     
-    // Test BURN
     g.prsa = V_BURN;
     {
         InputRedirect input("no\n");
@@ -1110,6 +1109,99 @@ TEST(BodyFcn_AttackKillMungBurnTriggersDeath) {
         ASSERT_TRUE(result);
         std::string output = cap.getOutput();
         ASSERT_TRUE(output.find("disrespect costs you your life") != std::string::npos);
+    }
+}
+
+// =============================================================================
+// BOLT-F Tests (1actions.zil line 1187)
+// ZIL Logic: Requires Wrench, Requires GATE-FLAG (Power), Toggles GATES-OPEN
+// =============================================================================
+
+TEST(BoltFcn_TurnWithoutWrenchFails) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    // Ensure player has NO wrench
+    ZObject* wrench = g.getObject(ObjectIds::WRENCH);
+    if (wrench) wrench->moveTo(nullptr);
+    
+    // Set PRSI to something else or null
+    g.prsi = nullptr; 
+    
+    g.prsa = V_TURN;
+    
+    OutputCapture cap;
+    bool result = boltAction();
+    
+    ASSERT_TRUE(result);
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("need a tool") != std::string::npos); // "turn with what?" logic simplified
+}
+
+TEST(BoltFcn_TurnWithWrenchButNoPowerFails) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* wrench = g.getObject(ObjectIds::WRENCH);
+    if (!wrench) { 
+        // Create if missing
+        auto w = std::make_unique<ZObject>(ObjectIds::WRENCH, "wrench");
+        g.registerObject(ObjectIds::WRENCH, std::move(w));
+        wrench = g.getObject(ObjectIds::WRENCH);
+    }
+    wrench->moveTo(g.player);
+    g.prsi = wrench; // Explicitly set as tool
+    
+    // Power OFF
+    g.gateFlag = false;
+    
+    g.prsa = V_TURN;
+    
+    OutputCapture cap;
+    bool result = boltAction();
+    
+    ASSERT_TRUE(result);
+    std::string output = cap.getOutput();
+    ASSERT_TRUE(output.find("won't turn") != std::string::npos);
+}
+
+TEST(BoltFcn_TurnWithWrenchAndPowerTogglesGates) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    ZObject* wrench = g.getObject(ObjectIds::WRENCH);
+    if (!wrench) { 
+        auto w = std::make_unique<ZObject>(ObjectIds::WRENCH, "wrench");
+        g.registerObject(ObjectIds::WRENCH, std::move(w));
+        wrench = g.getObject(ObjectIds::WRENCH);
+    }
+    wrench->moveTo(g.player);
+    g.prsi = wrench;
+    
+    // Power ON
+    g.gateFlag = true;
+    g.gatesOpen = false; // Start closed
+    
+    g.prsa = V_TURN;
+    
+    // 1. OPEN
+    {
+        OutputCapture cap;
+        bool result = boltAction();
+        ASSERT_TRUE(result);
+        std::string output = cap.getOutput();
+        ASSERT_TRUE(output.find("sluice gates open") != std::string::npos);
+        ASSERT_TRUE(g.gatesOpen);
+    }
+    
+    // 2. CLOSE
+    {
+        OutputCapture cap;
+        bool result = boltAction();
+        ASSERT_TRUE(result);
+        std::string output = cap.getOutput();
+        ASSERT_TRUE(output.find("sluice gates close") != std::string::npos);
+        ASSERT_FALSE(g.gatesOpen);
     }
 }
 

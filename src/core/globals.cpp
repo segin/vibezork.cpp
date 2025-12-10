@@ -45,6 +45,8 @@ void Globals::reset() {
     lampWarned = false;
     rugMoved = false;
     lldFlag = false;
+    gateFlag = false;
+    gatesOpen = false;
     
     // Reset display modes to defaults (Requirement 65.5)
     verboseMode = true;

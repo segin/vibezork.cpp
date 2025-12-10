@@ -44,6 +44,8 @@ public:
     // Puzzle state flags
     bool rugMoved = false;             // Has the rug been moved to reveal trap door?
     bool lldFlag = false;              // Land of Living Dead flag (ceremony complete?)
+    bool gateFlag = false;             // Dam control panel activated (Green Bubble light)
+    bool gatesOpen = false;            // Are dam sluice gates open?
     
     // Display modes
     bool verboseMode = true;           // Full descriptions
