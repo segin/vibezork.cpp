@@ -2292,6 +2292,84 @@ TEST(PuncturedBoatFcn) {
     
     { OutputCapture cap; ASSERT_TRUE(puncturedBoatAction()); ASSERT_TRUE(cap.getOutput().find("boat is repaired") != std::string::npos); }
 }
+
+// =============================================================================
+// DEAD-FUNCTION Tests (1actions.zil line 3113)
+// ZIL Logic: Spirit behavior (Denied limits, Special Look)
+// =============================================================================
+
+// Forward decl
+extern bool deadFunction();
+
+TEST(DeadFcn_DeniedVerbs) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    // Attacks
+    g.prsa = V_ATTACK;
+    { OutputCapture cap; ASSERT_TRUE(deadFunction()); ASSERT_TRUE(cap.getOutput().find("vain in your condition") != std::string::npos); }
+
+    // Physical
+    g.prsa = V_EAT;
+    { OutputCapture cap; ASSERT_TRUE(deadFunction()); ASSERT_TRUE(cap.getOutput().find("beyond your capabilities") != std::string::npos); }
+    
+    // Score
+    g.prsa = V_SCORE;
+    { OutputCapture cap; ASSERT_TRUE(deadFunction()); ASSERT_TRUE(cap.getOutput().find("You're dead!") != std::string::npos); }
+    
+    // Take
+    g.prsa = V_TAKE;
+    { OutputCapture cap; ASSERT_TRUE(deadFunction()); ASSERT_TRUE(cap.getOutput().find("hand passes through") != std::string::npos); }
+    
+    // Inventory
+    g.prsa = V_INVENTORY;
+    { OutputCapture cap; ASSERT_TRUE(deadFunction()); ASSERT_TRUE(cap.getOutput().find("no possessions") != std::string::npos); }
+}
+
+TEST(DeadFcn_LookDesc) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    g.prsa = V_LOOK;
+    g.lit = true;
+    { 
+        OutputCapture cap; 
+        ASSERT_TRUE(deadFunction()); 
+        std::string out = cap.getOutput();
+        ASSERT_TRUE(out.find("strange and unearthly") != std::string::npos);
+        ASSERT_TRUE(out.find("indistinct") != std::string::npos);
+        ASSERT_TRUE(out.find("dimly illuminated") == std::string::npos);
+    }
+    
+    g.lit = false;
+    { 
+        OutputCapture cap; 
+        ASSERT_TRUE(deadFunction()); 
+        ASSERT_TRUE(cap.getOutput().find("dimly illuminated") != std::string::npos);
+    }
+}
+
+TEST(DeadFcn_WalkRestrictions) {
+    setupTestWorld();
+    auto& g = Globals::instance();
+    
+    // Default Walk allowed (returns false)
+    g.prsa = V_WALK;
+    g.here = RoomIds::ENTRANCE_TO_HADES; // Random room
+    g.prso = P_NORTH;
+    ASSERT_FALSE(deadFunction());
+    
+    // Timber Room West Blocked
+    g.here = RoomIds::TIMBER_ROOM;
+    g.prso = P_WEST;
+    {
+        OutputCapture cap;
+        ASSERT_TRUE(deadFunction());
+        ASSERT_TRUE(cap.getOutput().find("Cannot enter in your condition") != std::string::npos); 
+    }
+}
+// Correction for above test block:
+// ASSERT_TRUE(out.find(...) != npos);
 // - YELLOW: GATE-FLAG = T (Power On)
 // - BROWN: GATE-FLAG = F (Power Off)
 // - RED: Toggle Lights (ONBIT)

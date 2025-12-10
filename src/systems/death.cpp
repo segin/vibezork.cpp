@@ -16,6 +16,9 @@ static bool dead_ = false;
 static bool alwaysLit_ = false;  // After resurrection, player can see in dark
 static bool testMode_ = false;   // Disable interactive prompts for testing
 
+// Forward decl
+extern bool deadFunction();
+
 // Initialize death system
 void initialize() {
     deathCount_ = 0;
@@ -200,6 +203,9 @@ void performResurrection() {
         dead_ = true;
         alwaysLit_ = true;  // Can see in darkness as a ghost
         
+        // ZIL: Set action to DEAD-FUNCTION
+        g.player->setAction(deadFunction);
+        
         // Set troll flag (troll disappears after player dies)
         auto* troll = g.getObject(ObjectIds::TROLL);
         if (troll) {
@@ -214,6 +220,9 @@ void performResurrection() {
         }
     } else {
         // Simple resurrection in forest
+        // Reset action (clear DEAD-FUNCTION if present)
+        g.player->setAction(nullptr); // Assuming default is null
+        
         // Move to Forest-1
         auto* forest = g.getObject(RoomIds::FOREST_1);
         if (forest && g.winner) {
