@@ -30,3 +30,17 @@ For specifications and task definitions, see [`.kiro/specs/`](.kiro/specs/).
   - Never skip testing to "catch up" on checklist marking
   - Each individual item requires: implement → test → verify tests pass → commit → push → mark checkbox
   - This rule applies even if it seems tedious or time-consuming
+
+- **Checklist progress tracking workflow**: When working through checklists, use the following status markers:
+  - `[ ]` = Not started
+  - `[/]` = In progress (currently being worked on)
+  - `[x]` = Complete (verified and committed)
+  
+  **Workflow order:**
+  1. Mark next item as `[/]` BEFORE starting work on it
+  2. Implement and test the item
+  3. Verify tests pass
+  4. Commit and push the changes
+  5. Change `[/]` to `[x]` for completed item
+  6. Update progress counters
+  7. Repeat from step 1 for next item
