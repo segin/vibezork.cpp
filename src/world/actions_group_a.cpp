@@ -1382,13 +1382,56 @@ bool mountainRangeAction() {
 }
 
 // MSWITCH-FUNCTION (Machine switch)
+// ZIL: TURN with SCREWDRIVER on closed machine -> transforms contents
+// Source: 1actions.zil lines 2531-2551
 bool machineSwitchAction() {
     auto& g = Globals::instance();
-    if (g.prsa == V_TURN || g.prsa == V_PUSH) {
-        printLine("Click.");
-        // Toggle machine state
-        return true;
+    
+    if (g.prsa == V_TURN) {
+        // Requires SCREWDRIVER
+        if (g.prsi && g.prsi->getId() == ObjectIds::SCREWDRIVER) {
+            ZObject* machine = g.getObject(ObjectIds::MACHINE);
+            if (machine && machine->hasFlag(ObjectFlag::OPENBIT)) {
+                // Machine lid is open - doesn't work
+                printLine("The machine doesn't seem to want to do anything.");
+                return true;
+            }
+            
+            // Machine lid is closed - run transformation
+            printLine("The machine comes to life (figuratively) with a dazzling display of colored lights and bizarre noises. After a few moments, the excitement abates.");
+            
+            // Check for COAL inside machine
+            ZObject* coal = g.getObject(ObjectIds::COAL);
+            if (machine && coal && coal->getLocation() == machine) {
+                // Transform COAL to DIAMOND
+                coal->moveTo(nullptr); // Remove coal
+                ZObject* diamond = g.getObject(ObjectIds::DIAMOND);
+                if (diamond) {
+                    diamond->moveTo(machine);
+                }
+            } else if (machine) {
+                // Remove all contents and add GUNK
+                auto contents = machine->getContents();
+                for (ZObject* obj : contents) {
+                    obj->moveTo(nullptr);
+                }
+                ZObject* gunk = g.getObject(ObjectIds::GUNK);
+                if (gunk) {
+                    gunk->moveTo(machine);
+                }
+            }
+            return true;
+        } else {
+            // Wrong tool
+            if (g.prsi) {
+                printLine("It seems that a " + g.prsi->getDesc() + " won't do.");
+            } else {
+                printLine("You need a tool to turn the switch.");
+            }
+            return true;
+        }
     }
+    
     return false;
 }
 
