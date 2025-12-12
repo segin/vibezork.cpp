@@ -56,8 +56,8 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] MACHINE-ROOM-FCN - Machine room handler
 - [x] MAILBOX-F - Mailbox container
 - [/] MATCH-FUNCTION - Match lighting
-- [ ] MAZE-11-FCN - Maze room 11 (grating)
-- [ ] MOUNTAIN-RANGE-F - Mountain range scenery
+- [x] MAZE-11-FCN - Maze room 11 (grating)
+- [x] MOUNTAIN-RANGE-F - Mountain range scenery
 - [x] MSWITCH-FUNCTION - Machine switch
 - [x] PAINTING-FCN - Painting interactions
 - [x] PUTTY-FCN - Putty interactions
