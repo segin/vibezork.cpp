@@ -59,7 +59,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] MAZE-11-FCN - Maze room 11 (grating)
 - [x] MOUNTAIN-RANGE-F - Mountain range scenery
 - [x] MSWITCH-FUNCTION - Machine switch
-- [ ] PAINTING-FCN - Painting interactions
+- [/] PAINTING-FCN - Painting interactions
 - [ ] PUTTY-FCN - Putty interactions
 - [ ] RAINBOW-FCN - Rainbow/pot of gold
 - [ ] RBOAT-FUNCTION - Punctured boat

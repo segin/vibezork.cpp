@@ -184,4 +184,8 @@ if(BUILD_TESTS)
     # Action Tests (ZIL action routines)
     add_executable(action_tests tests/action_tests.cpp ${LIB_SOURCES})
     add_test(NAME ActionTests COMMAND action_tests)
+    
+    # PAINTING-FCN Tests (ZIL action verification)
+    add_executable(painting_tests tests/painting_tests.cpp ${LIB_SOURCES})
+    add_test(NAME PaintingTests COMMAND painting_tests)
 endif()
