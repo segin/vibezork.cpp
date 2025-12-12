@@ -3,6 +3,17 @@
 #include <vector>
 #include <functional>
 #include <iostream>
+#include <sstream>
+
+// Redirect implementation for testing input
+class InputRedirect {
+public:
+    InputRedirect(const std::string& input) : old_(std::cin.rdbuf(ss_.rdbuf())), ss_(input) {}
+    ~InputRedirect() { std::cin.rdbuf(old_); }
+private:
+    std::streambuf* old_;
+    std::stringstream ss_;
+};
 
 // Simple test framework for Zork
 class TestFramework {

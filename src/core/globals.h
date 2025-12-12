@@ -29,6 +29,7 @@ public:
     ZObject* prso = nullptr;           ///< Parser Result Subject Object - direct object (ZIL: ,PRSO)
     ZObject* prsi = nullptr;           ///< Parser Result Subject Indirect - indirect object (ZIL: ,PRSI)
     VerbId prsa = 0;                   ///< Parser Result Subject Action - current verb (ZIL: ,PRSA)
+    ZObject* it = nullptr;             ///< Last referenced object (ZIL: ,P-IT-OBJECT)
     
     // Game state
     bool lit = false;                  // Is current room lit?
@@ -51,6 +52,7 @@ public:
     bool grunlock = false;             // Is grate unlocked? (ZIL: GRUNLOCK)
     int waterLevel = 0;                // Water level in Maintenance Room (0=Dry, >0=Rising)
     bool grateRevealed = false;        // Has the grating been revealed in the Clearing?
+    int matchCount = 5;                // Number of matches in matchbook
     
     // Display modes
     bool verboseMode = true;           // Full descriptions

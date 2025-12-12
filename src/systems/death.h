@@ -55,4 +55,8 @@ void performResurrection();
 // Reset death state for new game
 void reset();
 
+// Test Helpers
+void setTestMode(bool mode);
+void setDead(bool dead);
+
 } // namespace DeathSystem

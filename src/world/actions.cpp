@@ -197,6 +197,49 @@ bool bagAction() {
     return RFALSE;
 }
 
+// MATCH-FUNCTION - Matchbook interactions
+// ZIL: COUNT/EXAMINE -> # matches. LIGHT -> Light one, decrement.
+// Source: 1actions.zil lines 2300+
+bool matchesAction() {
+    auto& g = Globals::instance();
+    
+    if (g.prsa == V_COUNT || g.prsa == V_EXAMINE) {
+        if (g.matchCount > 0)
+             printLine("You have " + std::to_string(g.matchCount) + " match" + (g.matchCount == 1 ? "" : "es") + ".");
+        else
+             printLine("You have no matches.");
+        return RTRUE;
+    }
+    
+    if (g.prsa == V_LAMP_ON || g.prsa == V_BURN) {
+        if (g.matchCount <= 0) {
+             printLine("You're out of matches.");
+             return RTRUE;
+        }
+        
+        g.matchCount--;
+        printLine("One of the matches strikes and burns with a bright flame.");
+        
+        // ZIL logic: <FCLEAR ,MATCH ,INVISIBLE> <FSET ,MATCH ,ONBIT> ... <Enable I-MATCH>
+        // Use MATCH object for the lit match.
+        ZObject* match = g.getObject(ObjectIds::MATCH);
+        if (match) {
+             match->clearFlag(ObjectFlag::INVISIBLE);
+             match->setFlag(ObjectFlag::ONBIT);
+             match->setFlag(ObjectFlag::FLAMEBIT);
+             match->setFlag(ObjectFlag::LIGHTBIT);
+             // Move to player? Or just remain in abstract?
+             // ZIL: <MOVE ,MATCH ,WINNER>
+             match->moveTo(g.winner);
+             
+             // TODO: Enable I-MATCH timer (Queue 90)
+        }
+        return RTRUE;
+    }
+    
+    return RFALSE;
+}
+
 // BOTTLE-FUNCTION - Bottle interactions
 // ZIL: THROW/MUNG destroys bottle. SHAKE spills water if open.
 // Source: 1actions.zil lines 1491-1507
@@ -217,15 +260,27 @@ bool bottleAction() {
     }
     // SHAKE - Spills water if open
     else if (g.prsa == V_SHAKE) {
-        if (g.prso->hasFlag(ObjectFlag::OPENBIT) && g.prso->contains(ObjectIds::WATER)) {
-            spilled = true;
+        if (g.prso->hasFlag(ObjectFlag::OPENBIT)) {
+            bool hasWater = false;
+            for (auto* item : g.prso->getContents()) {
+                if (item->getId() == ObjectIds::WATER) { hasWater = true; break; }
+            }
+            if (hasWater) {
+                spilled = true;
+            }
         }
     }
 
     if (destroyed) {
         // Check for water before removing bottle contents via destruction
-        if (g.prso->contains(ObjectIds::WATER)) {
-            spilled = true;
+        if (g.prso) {
+            bool hasWater = false;
+            for (auto* item : g.prso->getContents()) {
+                if (item->getId() == ObjectIds::WATER) { hasWater = true; break; }
+            }
+            if (hasWater) {
+                spilled = true;
+            }
         }
         g.prso->moveTo(nullptr); // Remove bottle
     }
@@ -291,7 +346,7 @@ bool forestAction() {
         if (g.here->getId() == RoomIds::WEST_OF_HOUSE || 
             g.here->getId() == RoomIds::NORTH_OF_HOUSE ||
             g.here->getId() == RoomIds::SOUTH_OF_HOUSE ||
-            g.here->getId() == RoomIds::EAST_OF_HOUSE) {
+            g.here->getId() == RoomIds::BEHIND_HOUSE) {
             printLine("You aren't even in the forest.");
             return true;
         }
@@ -303,7 +358,7 @@ bool forestAction() {
             RoomIds::FOREST_1, 
             RoomIds::FOREST_2, 
             RoomIds::FOREST_3, 
-            RoomIds::PATH, 
+            RoomIds::FOREST_PATH, 
             RoomIds::CLEARING
         };
         
@@ -691,7 +746,7 @@ bool candlesAction() {
 
         if (!tool) {
              printLine("You should say what to light them with.");
-             return RFATAL;
+             return RTRUE;
         }
 
         if (tool->getId() == ObjectIds::TORCH) { // Vaporize
@@ -724,7 +779,7 @@ bool candlesAction() {
         CandleSystem::disableCandleTimer();
         if (g.prso->hasFlag(ObjectFlag::ONBIT)) {
              printLine("The flame is extinguished.");
-             g.prso->unsetFlag(ObjectFlag::ONBIT);
+             g.prso->clearFlag(ObjectFlag::ONBIT);
              // TODO: Check darkness "It's really dark in here..."
              return RTRUE;
         } else {
@@ -750,71 +805,6 @@ bool candlesAction() {
          return RTRUE;
     }
 
-    return RFALSE;
-}
-        return RTRUE;
-    }
-    
-    if (g.prsa == V_EXAMINE && g.prso && g.prso->getId() == ObjectIds::CANDLES) {
-        int wax = g.prso->getProperty(P_STRENGTH);
-        if (g.prso->hasFlag(ObjectFlag::ONBIT)) {
-            if (wax <= 5) {
-                printLine("The candles are lit, but they're almost burned down.");
-            } else {
-                printLine("The candles are lit and burning brightly.");
-            }
-        } else {
-            if (wax <= 0) {
-                printLine("The candles are burned down to nothing.");
-            } else {
-                printLine("The candles are not lit.");
-            }
-        }
-        return RTRUE;
-    }
-    
-    return RFALSE;
-}
-
-// Matches action - one-time use light source
-bool matchesAction() {
-    auto& g = Globals::instance();
-    
-    if (g.prsa == V_LAMP_ON && g.prso && g.prso->getId() == ObjectIds::MATCH) {
-        // Check if matches have been used
-        if (g.prso->hasFlag(ObjectFlag::ONBIT)) {
-            printLine("The matches have already been used.");
-            return RTRUE;
-        }
-        
-        // Check if matches are still available
-        int count = g.prso->getProperty(P_STRENGTH);
-        if (count <= 0) {
-            printLine("There are no matches left.");
-            return RTRUE;
-        }
-        
-        // Use a match
-        g.prso->setProperty(P_STRENGTH, count - 1);
-        if (count - 1 <= 0) {
-            g.prso->setFlag(ObjectFlag::ONBIT);  // Mark as used up
-            printLine("You light a match. It burns brightly for a moment, then goes out. You have no more matches.");
-        } else {
-            printLine("You light a match. It burns brightly for a moment, then goes out.");
-        }
-        return RTRUE;
-    }
-    
-    if (g.prsa == V_EXAMINE && g.prso && g.prso->getId() == ObjectIds::MATCH) {
-        int count = g.prso->getProperty(P_STRENGTH);
-        if (count <= 0) {
-            printLine("There are no matches left.");
-        } else {
-            printLine("You have " + std::to_string(count) + " match" + (count != 1 ? "es" : "") + " left.");
-        }
-        return RTRUE;
-    }
-    
     return RFALSE;
 }
 
@@ -1341,48 +1331,28 @@ bool machineAction() {
 // Requirements: 42
 bool mirrorAction() {
     auto& g = Globals::instance();
-    
-    // Handle both mirror objects
-    bool isMirror1 = g.prso && g.prso->getId() == ObjectIds::MIRROR_1;
-    bool isMirror2 = g.prso && g.prso->getId() == ObjectIds::MIRROR_2;
-    
-    if (!isMirror1 && !isMirror2) {
-        return RFALSE;
-    }
-    
-    // Handle EXAMINE - show reflection
-    if (g.prsa == V_EXAMINE) {
-        // Check if player has lamp on
-        ZObject* lamp = g.getObject(ObjectIds::LAMP);
-        bool hasLight = lamp && lamp->hasFlag(ObjectFlag::ONBIT) && 
-                       (lamp->getLocation() == g.winner || lamp->getLocation() == g.here);
-        
-        if (!hasLight && !g.lit) {
-            printLine("It's too dark to see your reflection.");
-            return RTRUE;
-        }
-        
-        // Different reflections for different mirrors
-        if (isMirror1) {
-            printLine("You see yourself in the mirror. You look tired and dirty from your adventures.");
-        } else {
-            printLine("You see yourself in the mirror, but something seems odd about the reflection.");
-        }
-        return RTRUE;
-    }
-    
-    // Handle TAKE - mirrors are anchored
+    bool isMirror = (g.prso && (g.prso->getId() == ObjectIds::MIRROR_1 || g.prso->getId() == ObjectIds::MIRROR_2));
+    if (!isMirror) return RFALSE;
+
     if (g.prsa == V_TAKE) {
         printLine("The mirror is firmly attached to the wall.");
         return RTRUE;
     }
-    
-    // Handle ATTACK - breaking the mirror
     if (g.prsa == V_ATTACK) {
         printLine("You have a nagging feeling that breaking the mirror would be bad luck.");
         return RTRUE;
     }
-    
+    if (g.prsa == V_EXAMINE) {
+        if (!g.lit) {
+             printLine("It's too dark to see your reflection.");
+             return RTRUE;
+        }
+        if (g.prso->getId() == ObjectIds::MIRROR_1)
+            printLine("You see yourself in the mirror. You look tired and dirty from your adventures.");
+        else
+            printLine("You see yourself in the mirror, but something seems odd about the reflection.");
+        return RTRUE;
+    }
     return RFALSE;
 }
 
@@ -1406,15 +1376,13 @@ bool damAction() {
     
     // Check V_PLUG existence first?
     // Assuming V_PLUG exists based on ZIL. If not, compilation fails.
-    // I'll assume usage is correct.
     if (g.prsa == V_PLUG) {
         if (g.prsi && g.prsi->getId() == ObjectIds::HANDS) {
              printLine("Are you the little Dutch boy, then? Sorry, this is a big dam.");
         } else if (g.prsi) {
-             printLine("With a " + g.prsi->getShortDescription() + "? Do you know how big this dam is? You could only stop a tiny leak with that.");
+             printLine("With a " + g.prsi->getDesc() + "? Do you know how big this dam is? You could only stop a tiny leak with that.");
         } else {
              // PLUG without object? Parser usually enforces PLUG OBJECT WITH OBJECT?
-             // If not, generic failure.
              printLine("You must specify what to plug it with.");
         }
         return RTRUE;
@@ -1541,7 +1509,7 @@ bool buttonAction() {
         else if (isRed) {
             print("The lights within the room ");
             if (g.here->hasFlag(ObjectFlag::ONBIT)) {
-                g.here->unsetFlag(ObjectFlag::ONBIT);
+                g.here->clearFlag(ObjectFlag::ONBIT);
                 printLine("shut off.");
             } else {
                 g.here->setFlag(ObjectFlag::ONBIT);
@@ -1563,34 +1531,5 @@ bool buttonAction() {
     
     return false;
 }
-            printLine("You press the blue button. Nothing obvious happens.");
-        }
-        return RTRUE;
-    }
-    
-    return RFALSE;
-}
 
-// Gunk action - vitreous slag
-// Requirements: 42
-bool gunkAction() {
-    auto& g = Globals::instance();
-    
-    if (!g.prso || g.prso->getId() != ObjectIds::GUNK) {
-        return RFALSE;
-    }
-    
-    // Handle EXAMINE
-    if (g.prsa == V_EXAMINE) {
-        printLine("It's a pile of vitreous slag, a glassy substance left over from some industrial process.");
-        return RTRUE;
-    }
-    
-    // Handle TAKE
-    if (g.prsa == V_TAKE) {
-        printLine("The gunk is too hot and sticky to handle.");
-        return RTRUE;
-    }
-    
-    return RFALSE;
-}
+// Gunk action moved to actions_group_a.cpp

@@ -1233,7 +1233,7 @@ bool cyclopsAction() {
         ZObject* item = g.prso;
         // Lunch
         if (item && item->getId() == ObjectIds::LUNCH) { // Need ObjectIds::LUNCH
-             removeObject(item); // REMOVE-CAREFULLY
+             item->moveTo(nullptr); // REMOVE-CAREFULLY
              printLine("The cyclops says \"Mmm Mmm. I love hot peppers! But oh, could I use a drink. Perhaps I could drink the blood of that thing.\"  From the gleam in his eye, it could be surmised that you are \"that thing\".");
              cyclopsState.wrathLevel = -1; // Negative for thirsty
              // Enable timer?
@@ -1248,7 +1248,7 @@ bool cyclopsAction() {
                  // Assuming standard text:
                  printLine("The cyclops takes the bottle, chugs the water, and crashes to the ground, fast asleep.");
                  cyclopsState.isAsleep = true;
-                 cyclops->unsetFlag(ObjectFlag::FIGHTBIT);
+                 cyclops->clearFlag(ObjectFlag::FIGHTBIT);
                  // Move bottle?
                  return RTRUE;
              }
@@ -1264,8 +1264,7 @@ bool cyclopsAction() {
     // Existing throw logic was decent. ZIL doesn't explicitly show THROW in the snippet (lines 1515-1560).
     // It might be further down.
     
-    return RFALSE;
-}
+
     // Handle TAKE - can't take the cyclops
     if (g.prsa == V_TAKE) {
         printLine("The cyclops doesn't take kindly to being grabbed.");

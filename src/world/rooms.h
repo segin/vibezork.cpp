@@ -302,8 +302,10 @@ private:
 };
 
 // Room action arguments (from ZIL)
-constexpr int M_LOOK = 1;
+// Room action arguments (from ZIL)
+constexpr int M_BEG = 1;
 constexpr int M_ENTER = 2;
+constexpr int M_LOOK = 3;
 constexpr int M_END = 3;
 constexpr int M_PRAY = 4;
 constexpr int M_LISTEN = 5;

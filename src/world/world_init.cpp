@@ -27,6 +27,7 @@ bool bagAction();
 bool bottleAction();
 bool whiteHouseAction();
 bool boardAction();
+extern bool kitchenAction();
 bool forestAction();
 bool rugAction();
 bool groundAction();
@@ -2505,7 +2506,6 @@ void initializeWorld() {
 
     // Create Hands global object (ZIL: HANDS in GLOBAL-OBJECTS)
     auto hands = std::make_unique<ZObject>(ObjectIds::HANDS, "pair of hands");
-    hands->setDescription("pair of hands");
     hands->addSynonym("pair");
     hands->addSynonym("hands");
     hands->addSynonym("hand");
@@ -3018,21 +3018,6 @@ void initializeWorld() {
     pump->moveTo(g.getObject(RoomIds::RESERVOIR_NORTH));
     g.registerObject(ObjectIds::PUMP, std::move(pump));
     
-    // Create INFLATABLE_BOAT (Deflated rubber boat)
-    auto boatInflatable = std::make_unique<ZObject>(ObjectIds::INFLATABLE_BOAT, "pile of plastic");
-    boatInflatable->addSynonym("boat");
-    boatInflatable->addSynonym("raft");
-    boatInflatable->addSynonym("pile");
-    boatInflatable->addSynonym("plastic");
-    boatInflatable->addAdjective("rubber");
-    boatInflatable->addAdjective("deflated");
-    boatInflatable->addAdjective("small");
-    boatInflatable->setFlag(ObjectFlag::TAKEBIT);
-    boatInflatable->setFlag(ObjectFlag::BURNBIT);
-    boatInflatable->setProperty(P_SIZE, 10);
-    // boatInflatable->setAction(boatAction); // To Be Implemented in Batch 3
-    boatInflatable->moveTo(g.getObject(RoomIds::DAM_BASE));
-    g.registerObject(ObjectIds::INFLATABLE_BOAT, std::move(boatInflatable));
 
     // Create INFLATED_BOAT (Magic Boat)
     auto boatInflated = std::make_unique<ZObject>(ObjectIds::INFLATED_BOAT, "magic boat");
@@ -3072,7 +3057,6 @@ void initializeWorld() {
     boatInflatable->addSynonym("valve");
     boatInflatable->addAdjective("plastic");
     boatInflatable->addAdjective("inflatable"); // "inflat" in ZIL
-    boatInflatable->setDescription("pile of plastic");
     boatInflatable->setFlag(ObjectFlag::TAKEBIT);
     boatInflatable->setFlag(ObjectFlag::BURNBIT);
     boatInflatable->setAction(inflatableBoatAction);

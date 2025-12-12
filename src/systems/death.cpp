@@ -8,16 +8,17 @@
 #include <cstdlib>
 #include <vector>
 
+extern bool deadFunction();
+
 namespace DeathSystem {
 
-// Static state
+// State variables
 static int deathCount_ = 0;
 static bool dead_ = false;
-static bool alwaysLit_ = false;  // After resurrection, player can see in dark
-static bool testMode_ = false;   // Disable interactive prompts for testing
+static bool alwaysLit_ = false;
+static bool testMode_ = false;
 
-// Forward decl
-extern bool deadFunction();
+// Initialize death system
 
 // Initialize death system
 void initialize() {
@@ -32,9 +33,6 @@ void setTestMode(bool enabled) {
     testMode_ = enabled;
 }
 
-void setTestMode(bool enabled) {
-    testMode_ = enabled;
-}
 
 void setDead(bool dead) {
     dead_ = dead;
@@ -212,7 +210,7 @@ void performResurrection() {
         alwaysLit_ = true;  // Can see in darkness as a ghost
         
         // ZIL: Set action to DEAD-FUNCTION
-        g.player->setAction(deadFunction);
+        g.player->setAction(::deadFunction);
         
         // Set troll flag (troll disappears after player dies)
         auto* troll = g.getObject(ObjectIds::TROLL);

@@ -5,8 +5,40 @@
 #include "world/objects.h"
 #include "world/rooms.h"
 #include "systems/death.h"
+#include "systems/npc.h"
+#include "verbs/verbs.h"
 
-// Helper for STUPID-CONTAINER logic (Bag of Coins, Trunk)
+// Helper to get direction from object (e.g. for "walk north")
+// Maps direction objects (NORTH_OBJECT etc.) to Direction enum
+static Direction getDirection(ZObject* obj) {
+    if (!obj) return Direction::IN; // Default or invalid
+    // This relies on object IDs for directions.
+    // If we don't have direction objects, we check synonyms?
+    // Simplify: The parser usually resolves direction words to Direction enum.
+    // If prso is an OBJECT, it might be "north wall" or "north".
+    // Assuming simple mapping if ID matches known direction objects.
+    // For now, if we don't have Direction Objects mapped, this helper might be limited.
+    // BUT deadFunction uses it for "TIMBER_ROOM and WEST". 
+    // If "WEST" is an object passed as PRSO?
+    // In ZIL: <EQUAL? ,PRSO ,P?WEST>.
+    // So PRSO is a DIRECTION object.
+    // I'll assume standard naming or return Direction::WEST if name is "west".
+    std::string name = obj->getDesc(); // or synonyms
+    // Fast path:
+    if (name == "north" || name == "n") return Direction::NORTH;
+    if (name == "south" || name == "s") return Direction::SOUTH;
+    if (name == "east" || name == "e") return Direction::EAST;
+    if (name == "west" || name == "w") return Direction::WEST;
+    if (name == "ne" || name == "northeast") return Direction::NE;
+    if (name == "nw" || name == "northwest") return Direction::NW;
+    if (name == "se" || name == "southeast") return Direction::SE;
+    if (name == "sw" || name == "southwest") return Direction::SW;
+    if (name == "up" || name == "u") return Direction::UP;
+    if (name == "down" || name == "d") return Direction::DOWN;
+    if (name == "in") return Direction::IN;
+    if (name == "out") return Direction::OUT;
+    return Direction::IN; // Fallback
+}
 // Returns true if handled
 // Helper for simple "stupid containers" that refuse insertion
 // Updated to check containerId against PRSI
@@ -149,7 +181,7 @@ void cellarAction(int rarg) {
     else if (rarg == M_ENTER) {
         ZObject* trapdoor = g.getObject(ObjectIds::TRAP_DOOR);
         if (trapdoor && trapdoor->hasFlag(ObjectFlag::OPENBIT) && !trapdoor->hasFlag(ObjectFlag::TOUCHBIT)) {
-            trapdoor->unsetFlag(ObjectFlag::OPENBIT);
+            trapdoor->clearFlag(ObjectFlag::OPENBIT);
             trapdoor->setFlag(ObjectFlag::TOUCHBIT);
             printLine("The trap door crashes shut, and you hear someone barring it.");
         }
@@ -199,15 +231,11 @@ bool chimneyAction() {
                  bool hasOther = false;
                  
                  // Check player contents
-                 // ZObject doesn't expose iterator directly? Use simple traversal if available or assume list.
-                 // We don't have easy child iteration method exposed in g typically?
-                 // Wait, ZObject has `child`, `sibling`.
-                 ZObject* item = g.player->child;
-                 while(item) {
+                 const auto& contents = g.player->getContents();
+                 for (ZObject* item : contents) {
                      itemCount++;
-                     if (item->getId() == ObjectIds::LANTERN) hasLamp = true;
+                     if (item->getId() == ObjectIds::LAMP) hasLamp = true;
                      else hasOther = true;
-                     item = item->sibling;
                  }
 
                  if (itemCount == 0 || (itemCount == 1 && hasLamp)) {
@@ -216,7 +244,7 @@ bool chimneyAction() {
                           // Trap Door Logic from ZIL 560
                           ZObject* trapDoor = g.getObject(ObjectIds::TRAP_DOOR);
                           if (trapDoor && !trapDoor->hasFlag(ObjectFlag::OPENBIT)) {
-                              trapDoor->unsetFlag(ObjectFlag::TOUCHBIT);
+                              trapDoor->clearFlag(ObjectFlag::TOUCHBIT);
                           }
                           
                           printLine("The chimney is tight, but you manage to squeeze up it.");
@@ -303,7 +331,7 @@ bool cretinAction() {
         return RTRUE;
     }
     
-    if (g.prsa == V_GIVE && g.prsi && g.prsi->getId() == ObjectIds::PLAYER) {
+    if (g.prsa == V_GIVE && g.prsi && g.prsi->getId() == g.player->getId()) {
         // ZIL: PERFORM V?TAKE PRSO
         // We can simulate validation or just print generic success?
         // Correct way: Redirect to TAKE.
@@ -341,7 +369,7 @@ bool cretinAction() {
         return RTRUE;
     }
     
-    if (g.prsa == V_THROW && g.prso && g.prso->getId() == ObjectIds::PLAYER) {
+    if (g.prsa == V_THROW && g.prso && g.prso->getId() == g.player->getId()) {
         printLine("Why don't you just walk like normal people?");
         return RTRUE;
     }
@@ -489,12 +517,12 @@ bool inflatableBoatAction() {
              // Transform: Remove Inflatable, Add Inflated
              // Need access to Inflated Boat (600)
              if (boat) {
-                 ObjectId loc = boat->getLocation(); // Should be HERE
-                 g.removeObject(ObjectIds::BOAT_INFLATABLE);
+                 ZObject* loc = boat->getLocation(); // Should be HERE
+                 boat->moveTo(nullptr); // Remove logic
                  
                  ZObject* inflated = g.getObject(ObjectIds::BOAT_INFLATED);
                  if (inflated) {
-                     inflated->setLocation(loc);
+                     inflated->moveTo(loc);
                  } else {
                      // Create if missing? world_init should create it.
                      // Assuming it exists but is invisible/nowhere.
@@ -505,7 +533,7 @@ bool inflatableBoatAction() {
              printLine("You don't have enough lung power to inflate it.");
              return true;
         } else if (g.prsi) {
-             printLine("With a " + g.prsi->getShortDescription() + "? Surely you jest!");
+             printLine("With a " + g.prsi->getDesc() + "? Surely you jest!");
              return true;
         }
     }
@@ -534,18 +562,18 @@ bool puncturedBoatAction() {
         
         ZObject* punctured = g.getObject(ObjectIds::BOAT_PUNCTURED);
         if (punctured) {
-             ObjectId loc = punctured->getLocation();
-             g.removeObject(ObjectIds::BOAT_PUNCTURED);
+             ZObject* loc = punctured->getLocation();
+             punctured->moveTo(nullptr); // Remove logic
              
              // Move Inflatable Boat to here
              ZObject* inflatable = g.getObject(ObjectIds::BOAT_INFLATABLE);
              if (inflatable) {
-                 inflatable->setLocation(loc);
+                 inflatable->moveTo(loc);
              }
         }
         return true;
     } else if (g.prsa == V_PLUG && g.prsi) {
-        printLine("With a " + g.prsi->getShortDescription() + "?");
+        printLine("With a " + g.prsi->getDesc() + "?");
         return true;
     }
 
@@ -560,7 +588,7 @@ bool deadFunction() {
     
     // ALLOWED Verbs (Return false to let engine handle)
     // ZIL: BRIEF, VERBOSE, SUPER-BRIEF, VERSION, RESTORE, RESTART, QUIT, SAVE (Check line 3118)
-    if (g.prsa == V_BRIEF || g.prsa == V_VERBOSE || g.prsa == V_SUPER_BRIEF || 
+    if (g.prsa == V_BRIEF || g.prsa == V_VERBOSE || g.prsa == V_SUPERBRIEF || 
         g.prsa == V_VERSION || g.prsa == V_RESTORE || g.prsa == V_RESTART || 
         g.prsa == V_QUIT || g.prsa == V_SAVE) {
         return false; 
@@ -575,7 +603,7 @@ bool deadFunction() {
         // Grep Step 7601 will verify RoomIds.
         // I'll assume safe to usage if ID exists.
         // Assuming ID is TIMBER_ROOM.
-        if (g.here == RoomIds::TIMBER_ROOM && getDirection(g.prso) == Direction::WEST) {
+        if (g.here->getId() == RoomIds::TIMBER_ROOM && getDirection(g.prso) == Direction::WEST) {
              printLine("You cannot enter in your condition.");
              return true;
         }
@@ -884,7 +912,7 @@ bool grateAction() {
              }
              // Default Unlock failure
              if (g.prsi) {
-                 printLine("Can you unlock a grating with a " + g.prsi->getName() + "?");
+                printLine("Can you unlock a grating with a " + g.prsi->getDesc() + "?");
              } else {
                  printLine("Unlock it with what?");
              }
@@ -930,7 +958,7 @@ bool hotBellAction() {
         ZObject* tool = g.prsi;
         if (tool) {
             if (tool->hasFlag(ObjectFlag::BURNBIT)) {
-                printLine("The " + tool->getName() + " burns and is consumed.");
+                printLine("The " + tool->getDesc() + " burns and is consumed.");
                 tool->moveTo(nullptr); // Consumed
                 return true;
             }
@@ -944,7 +972,7 @@ bool hotBellAction() {
     }
     
     // POUR-ON (Cooling)
-    if (g.prsa == V_POUR) {
+    if (g.prsa == V_POUR_ON) {
          // Logic assumes PRSO is Water, PRSI is Bell (context).
          // ZIL: Removes PRSO (Water).
          if (g.prso) g.prso->moveTo(nullptr);
@@ -1000,7 +1028,7 @@ bool iboatFunction() {
              if (inflatable && inflated) {
                  inflatable->moveTo(nullptr);
                  inflated->moveTo(g.here);
-                 g.setIt(inflated);
+                 g.it = inflated;
              }
              return true;
         }
@@ -1012,7 +1040,7 @@ bool iboatFunction() {
         
         // Default Tool
         if (g.prsi) {
-             printLine("With a " + g.prsi->getName() + "? Surely you jest!");
+             printLine("With a " + g.prsi->getDesc() + "? Surely you jest!");
         } else {
              printLine("Inflate it with what?");
         }
@@ -1053,7 +1081,7 @@ bool kitchenAction() {
     // M-BEG (Stairs) - Handling CLIMB on STAIRS
     if (g.prso && g.prso->getId() == ObjectIds::STAIRS) {
         if (g.prsa == V_CLIMB_UP) {
-            g.performWalk(Direction::UP);
+            Verbs::vWalkDir(Direction::UP);
             return true;
         }
         if (g.prsa == V_CLIMB_DOWN) {
@@ -1081,6 +1109,8 @@ bool knifeAction() {
         }
         // Return false to allow normal TAKE handling
     }
+    return false;
+}
 // LARGE-BAG-F
 // ZIL: Prevents interaction if Thief is present (Alive/defending).
 // Source: 1actions.zil lines 2094-2112
@@ -1158,7 +1188,7 @@ bool leakFunction() {
             }
             // PLUG with Hand/Other
             if (g.prsi) {
-                printLine("With a " + g.prsi->getName() + "? Do you know how big this dam is? You could only stop a tiny leak with that.");
+                printLine("With a " + g.prsi->getDesc() + "? Do you know how big this dam is? You could only stop a tiny leak with that.");
             } else {
                 printLine("Plug it with what?");
             }
@@ -1173,7 +1203,7 @@ bool leakAction() {
     auto& g = Globals::instance();
     
     // Only active if WATER-LEVEL > 0 (dam is leaking)
-    if (waterLevel <= 0) {
+    if (g.waterLevel <= 0) {
         return false;
     }
     
@@ -1181,7 +1211,7 @@ bool leakAction() {
     if ((g.prsa == V_PUT || g.prsa == V_PUT_ON) && 
         g.prso && g.prso->getId() == ObjectIds::PUTTY) {
         // FIX-MAINT-LEAK: repair the dam
-        waterLevel = -1;
+        g.waterLevel = -1;
         printLine("By some miracle of Zorkian technology, you have managed to stop the leak in the dam.");
         return true;
     }
@@ -1190,7 +1220,7 @@ bool leakAction() {
     if (g.prsa == V_PLUG) {
         if (g.prsi && g.prsi->getId() == ObjectIds::PUTTY) {
             // FIX-MAINT-LEAK: repair the dam
-            waterLevel = -1;
+            g.waterLevel = -1;
             printLine("By some miracle of Zorkian technology, you have managed to stop the leak in the dam.");
             return true;
         } else {
@@ -1379,15 +1409,6 @@ bool rainbowAction() {
     return false;
 }
 
-// RBOAT-FUNCTION (Rubber boat - punctured?)
-bool puncturedBoatAction() {
-    auto& g = Globals::instance();
-    if (g.prsa == V_INFLATE) {
-        printLine("The boat has a hole in it and won't hold air.");
-        return true;
-    }
-    return false;
-}
 
 // RESERVOIR-FCN
 void reservoirAction(int rarg) {
@@ -1685,15 +1706,9 @@ bool chaliceAction() {
 // ZIL: TAKE/ATTACK - if garlic present "can't reach him", else fly-me teleports player
 // Source: 1actions.zil lines 308-324
 // BAT-DROPS table
-static const std::vector<RoomId> BAT_DROPS = {
-    RoomIds::MINE_1,
-    RoomIds::MINE_2,
-    RoomIds::MINE_3,
-    RoomIds::MINE_4,
-    RoomIds::LADDER_TOP,
-    RoomIds::LADDER_BOTTOM,
-    RoomIds::SQUEEKY_ROOM,
-    RoomIds::COAL_MINE_1
+static const std::vector<ObjectId> BAT_DROPS = {
+    RoomIds::MINE_1, RoomIds::MINE_2, RoomIds::MINE_3, RoomIds::MINE_4,
+    RoomIds::LADDER_TOP, RoomIds::LADDER_BOTTOM, RoomIds::SQUEEKY_ROOM, RoomIds::MINE_1
 };
 
 // Helper for Fweep printing
@@ -1716,10 +1731,11 @@ static void flyMe() {
     // <GOTO <PICK-ONE ,BAT-DROPS> <>>
     if (!BAT_DROPS.empty()) {
         int idx = std::rand() % BAT_DROPS.size();
-        RoomId targetId = BAT_DROPS[idx];
+        ObjectId targetId = BAT_DROPS[idx];
         ZObject* target = g.getObject(targetId);
         if (target) {
-            bool moved = g.player->moveTo(target);
+            g.player->moveTo(target);
+            bool moved = true;
             if (moved) {
                 // <COND (<NOT <EQUAL? ,HERE ,ENTRANCE-TO-HADES>> <V-FIRST-LOOK>)>
                 // We assume V-FIRST-LOOK means describe room.
@@ -1783,7 +1799,7 @@ bool bellAction() {
     auto& g = Globals::instance();
     if (g.prsa == V_RING) {
         // ZIL: <COND (<AND <EQUAL? ,HERE ,LLD-ROOM> <NOT ,LLD-FLAG>> <RFALSE>) ...>
-        if (g.here && g.here->getId() == ObjectIds::LAND_OF_LIVING_DEAD && !g.lldFlag) {
+        if (g.here && g.here->getId() == RoomIds::LAND_OF_LIVING_DEAD && !g.lldFlag) {
             return false;
         }
         
@@ -1864,18 +1880,3 @@ void kitchenAction(int rarg) {
     }
 }
 
-// BODY-FUNCTION - Dead body interactions
-// ZIL: TAKE = "A force keeps you...", MUNG/BURN = Death
-// source: 1dungeon.zil line 694, 1actions.zil line 2178
-bool bodyAction() {
-    auto& g = Globals::instance();
-    if (g.prsa == V_TAKE) {
-        printLine("A force keeps you from taking the bodies.");
-        return true;
-    }
-    if (g.prsa == V_ATTACK || g.prsa == V_KILL || g.prsa == V_MUNG || g.prsa == V_BURN) {
-        DeathSystem::jigsUp("The voice of the guardian of the dungeon booms out from the darkness, \"Your disrespect costs you your life!\" and places your head on a sharp pole.");
-        return true;
-    }
-    return false;
-}
