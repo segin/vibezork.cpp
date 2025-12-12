@@ -1468,9 +1468,21 @@ bool bubbleAction() {
         return RFALSE;
     }
     
+    // Handle EXAMINE
+    if (g.prsa == V_EXAMINE) {
+        printLine("The bubble appears to be a green plastic bubble.");
+        return RTRUE;
+    }
+    
     // Handle TAKE - ZIL: INTEGRAL-PART prints this message
     if (g.prsa == V_TAKE) {
         printLine("It is an integral part of the control panel.");
+        return RTRUE;
+    }
+    
+    // Handle ATTACK/MUNG - Bubble cannot be destroyed
+    if (g.prsa == V_ATTACK || g.prsa == V_MUNG || g.prsa == V_KILL) {
+        printLine("The bubble is impervious to your attack.");
         return RTRUE;
     }
     
