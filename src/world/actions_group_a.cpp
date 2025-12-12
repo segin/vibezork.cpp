@@ -1352,8 +1352,23 @@ void machineRoomAction(int rarg) {
 }
 
 // MAZE-11-FCN (Special maze room)
+// ZIL: M-LOOK shows grating state (open/closed/hidden)
+// Source: Reference to CLEARING-FCN for grate logic
 void maze11Action(int rarg) {
-    // Contains the grating
+    auto& g = Globals::instance();
+    
+    if (rarg == M_LOOK) {
+        printLine("This is part of a maze of twisty little passages, all alike.");
+        
+        ZObject* grate = g.getObject(ObjectIds::GRATE);
+        if (grate && g.grateRevealed) {
+            if (grate->hasFlag(ObjectFlag::OPENBIT)) {
+                printLine("There is an open grating in the floor, leading down into darkness.");
+            } else {
+                printLine("There is a grating securely fastened into the ground.");
+            }
+        }
+    }
 }
 
 // MOUNTAIN-RANGE-F
