@@ -188,4 +188,8 @@ if(BUILD_TESTS)
     # PAINTING-FCN Tests (ZIL action verification)
     add_executable(painting_tests tests/painting_tests.cpp ${LIB_SOURCES})
     add_test(NAME PaintingTests COMMAND painting_tests)
+    
+    # PUTTY-FCN Tests (ZIL action verification)
+    add_executable(putty_tests tests/putty_tests.cpp ${LIB_SOURCES})
+    add_test(NAME PuttyTests COMMAND putty_tests)
 endif()
