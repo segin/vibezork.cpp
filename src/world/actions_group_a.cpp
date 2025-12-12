@@ -252,7 +252,7 @@ bool chimneyAction() {
                           return RTRUE;
                       }
                  } else {
-                      printLine("You can't get up there with what you're carrying.");
+                      printLine("The chimney is too narrow to climb with all that.");
                       return RTRUE;
                  }
              }
