@@ -60,7 +60,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] MOUNTAIN-RANGE-F - Mountain range scenery
 - [x] MSWITCH-FUNCTION - Machine switch
 - [x] PAINTING-FCN - Painting interactions
-- [/] PUTTY-FCN - Putty interactions
+- [x] PUTTY-FCN - Putty interactions
 - [ ] RAINBOW-FCN - Rainbow/pot of gold
 - [ ] RBOAT-FUNCTION - Punctured boat
 - [ ] RESERVOIR-FCN - Reservoir water handler
@@ -109,5 +109,5 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 96 actions
-- Implemented: 62
-- Remaining: 34
+- Implemented: 63
+- Remaining: 33
