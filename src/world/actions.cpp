@@ -1503,6 +1503,14 @@ bool buttonAction() {
         return RFALSE;
     }
     
+    // Handle EXAMINE
+    if (g.prsa == V_EXAMINE) {
+        if (isYellow) printLine("It's a small yellow button.");
+        else if (isBrown) printLine("It's a small brown button.");
+        else if (isRed) printLine("It's a small red button.");
+        else if (isBlue) printLine("It's a small blue button.");
+        return RTRUE;
+    }
     
     // Handle PUSH
     if (g.prsa == V_PUSH) {
