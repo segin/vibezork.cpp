@@ -68,7 +68,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [ ] RESERVOIR-SOUTH-FCN - South reservoir
 - [ ] RIVER-FUNCTION - River flow/boat mechanics
 - [ ] ROBBER-FUNCTION - Thief AI
-- [ ] ROPE-FUNCTION - Rope tie/untie
+- [/] ROPE-FUNCTION - Rope tie/untie
 - [ ] RUG-FCN - Rug/trap door
 - [ ] RUSTY-KNIFE-FCN - Rusty knife curse
 - [ ] SAND-FUNCTION - Sand digging

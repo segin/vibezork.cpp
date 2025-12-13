@@ -634,18 +634,66 @@ bool lampAction() {
 }
 
 // Rope action - used for climbing and tying
+// ROPE-FUNCTION - Rope tie/untie mechanics
+// ZIL: Handles TIE to RAILING in DOME-ROOM, CLIMB-DOWN when tied
+// Source: 1actions.zil lines 3030-3053
 bool ropeAction() {
   auto &g = Globals::instance();
 
-  if (g.prsa == V_EXAMINE && g.prso && g.prso->getId() == ObjectIds::ROPE) {
-    printLine("The rope is a large coil of strong rope, suitable for climbing "
-              "or tying.");
-    return RTRUE;
+  // If not in DOME-ROOM, clear DOME-FLAG
+  if (!g.here || g.here->getId() != RoomIds::DOME_ROOM) {
+    g.domeFlag = false;
+    // Default TIE message
+    if (g.prsa == V_TIE) {
+      printLine("You can't tie the rope to that.");
+      return RTRUE;
+    }
   }
 
-  // Rope can be used for climbing in specific locations (handled by room
-  // actions) Rope can be tied to objects (handled by TIE verb) These behaviors
-  // are location/context-specific and handled elsewhere
+  // In DOME-ROOM
+  if (g.here && g.here->getId() == RoomIds::DOME_ROOM) {
+    // Handle TIE to RAILING
+    if (g.prsa == V_TIE && g.prsi && g.prsi->getId() == ObjectIds::RAILING) {
+      if (g.domeFlag) {
+        printLine("The rope is already tied to it.");
+        return RTRUE;
+      } else {
+        printLine("The rope drops over the side and comes within ten feet of "
+                  "the floor.");
+        g.domeFlag = true;
+
+        // Set NDESCBIT on rope
+        ZObject *rope = g.getObject(ObjectIds::ROPE);
+        if (rope) {
+          rope->setFlag(ObjectFlag::NDESCBIT);
+
+          // Move rope to HERE if not in a room
+          ZObject *rloc = rope->getLocation();
+          if (!rloc || !rloc->hasFlag(ObjectFlag::RMUNGBIT)) { // Not in a room
+            rope->moveTo(g.here);
+          }
+        }
+        return RTRUE;
+      }
+    }
+  }
+
+  // Handle CLIMB-DOWN rope when tied
+  if ((g.prsa == V_CLIMB_DOWN) && g.domeFlag) {
+    if ((g.prso && (g.prso->getId() == ObjectIds::ROPE ||
+                    g.prso->getId() == RoomIds::DOME_ROOM))) {
+      // Trigger DO-WALK ,P?DOWN - this will be handled by the parser/movement
+      // system For now, just return true to indicate we handled it The actual
+      // movement should be handled by the room action or movement system
+      return RTRUE;
+    }
+  }
+
+  // Handle TIE-UP with rope as indirect object
+  if (g.prsa == V_TIE_UP && g.prsi && g.prsi->getId() == ObjectIds::ROPE) {
+    // Falls through to default handling
+    return RFALSE;
+  }
 
   return RFALSE;
 }

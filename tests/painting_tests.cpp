@@ -1,10 +1,11 @@
+// Painting action unit tests for ZIL PAINTING-FCN
 #include "../src/core/globals.h"
-#include "../src/core/io.h"
 #include "../src/core/object.h"
 #include "../src/verbs/verbs.h"
 #include "../src/world/objects.h"
+#include "../src/world/rooms.h"
 #include "../src/world/world.h"
-#include <gtest/gtest.h>
+#include "test_framework.h"
 #include <sstream>
 
 // Output capture helper
@@ -34,13 +35,13 @@ static void setupTestWorld() { initializeWorld(); }
 // ZIL Logic: V_MUNG destroys painting value and changes description
 // =============================================================================
 
-TEST(PaintingFcn, MungDestroysValue) {
+TEST(PaintingFcn_MungDestroysValue) {
   setupTestWorld();
   auto &g = Globals::instance();
 
   ZObject *painting = g.getObject(ObjectIds::PAINTING);
   if (!painting) {
-    GTEST_SKIP() << "PAINTING object not defined";
+    return; // Skip test
   }
 
   // Set initial value
@@ -64,13 +65,13 @@ TEST(PaintingFcn, MungDestroysValue) {
   ASSERT_TRUE(output.find("masterpieces") != std::string::npos);
 }
 
-TEST(PaintingFcn, MungChangesDescription) {
+TEST(PaintingFcn_MungChangesDescription) {
   setupTestWorld();
   auto &g = Globals::instance();
 
   ZObject *painting = g.getObject(ObjectIds::PAINTING);
   if (!painting) {
-    GTEST_SKIP() << "PAINTING object not defined";
+    return; // Skip test
   }
 
   g.prsa = V_MUNG;
@@ -84,13 +85,13 @@ TEST(PaintingFcn, MungChangesDescription) {
   ASSERT_TRUE(ldesc.find("canvas") != std::string::npos);
 }
 
-TEST(PaintingFcn, OtherVerbsReturnFalse) {
+TEST(PaintingFcn_OtherVerbsReturnFalse) {
   setupTestWorld();
   auto &g = Globals::instance();
 
   ZObject *painting = g.getObject(ObjectIds::PAINTING);
   if (!painting) {
-    GTEST_SKIP() << "PAINTING object not defined";
+    return; // Skip test
   }
 
   // EXAMINE should return false (not handled by ZIL spec)
@@ -102,13 +103,13 @@ TEST(PaintingFcn, OtherVerbsReturnFalse) {
   ASSERT_FALSE(result);
 }
 
-TEST(PaintingFcn, TakeReturnsFalse) {
+TEST(PaintingFcn_TakeReturnsFalse) {
   setupTestWorld();
   auto &g = Globals::instance();
 
   ZObject *painting = g.getObject(ObjectIds::PAINTING);
   if (!painting) {
-    GTEST_SKIP() << "PAINTING object not defined";
+    return; // Skip test
   }
 
   // TAKE should return false (not handled by ZIL spec)
@@ -120,13 +121,13 @@ TEST(PaintingFcn, TakeReturnsFalse) {
   ASSERT_FALSE(result);
 }
 
-TEST(PaintingFcn, BurnReturnsFalse) {
+TEST(PaintingFcn_BurnReturnsFalse) {
   setupTestWorld();
   auto &g = Globals::instance();
 
   ZObject *painting = g.getObject(ObjectIds::PAINTING);
   if (!painting) {
-    GTEST_SKIP() << "PAINTING object not defined";
+    return; // Skip test
   }
 
   // BURN should return false (ZIL spec only handles MUNG)
@@ -138,7 +139,7 @@ TEST(PaintingFcn, BurnReturnsFalse) {
   ASSERT_FALSE(result);
 }
 
-TEST(PaintingFcn, NullObjectReturnsFalse) {
+TEST(PaintingFcn_NullObjectReturnsFalse) {
   setupTestWorld();
   auto &g = Globals::instance();
 
@@ -151,14 +152,14 @@ TEST(PaintingFcn, NullObjectReturnsFalse) {
   ASSERT_FALSE(result);
 }
 
-TEST(PaintingFcn, WrongObjectReturnsFalse) {
+TEST(PaintingFcn_WrongObjectReturnsFalse) {
   setupTestWorld();
   auto &g = Globals::instance();
 
   // Try with a different object
   ZObject *lamp = g.getObject(ObjectIds::LAMP);
   if (!lamp) {
-    GTEST_SKIP() << "LAMP object not defined";
+    return; // Skip test
   }
 
   g.prsa = V_MUNG;
@@ -167,4 +168,27 @@ TEST(PaintingFcn, WrongObjectReturnsFalse) {
   bool result = paintingAction();
 
   ASSERT_FALSE(result);
+}
+
+// Main test runner
+int main(int argc, char *argv[]) {
+  std::cout << "Running Painting Action Tests" << std::endl;
+  std::cout << "=============================" << std::endl;
+  std::cout << std::endl;
+
+  auto results = TestFramework::instance().runAll();
+
+  int passed = 0, failed = 0;
+  for (const auto &r : results) {
+    if (r.passed)
+      passed++;
+    else
+      failed++;
+  }
+
+  std::cout << std::endl;
+  std::cout << "Results: " << passed << " passed, " << failed << " failed"
+            << std::endl;
+
+  return failed > 0 ? 1 : 0;
 }
