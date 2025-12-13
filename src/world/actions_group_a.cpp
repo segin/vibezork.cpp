@@ -1544,14 +1544,57 @@ bool puttyAction() {
 }
 
 // RAINBOW-FCN
+// RAINBOW-FCN - Rainbow/pot of gold interactions
+// ZIL: Handles CROSS/THROUGH (with location and rainbow flag checks) and
+// LOOK-UNDER Source: 1actions.zil lines 2634-2650
 bool rainbowAction() {
   auto &g = Globals::instance();
-  if (g.prsa == V_CLIMB_ON || g.prsa == V_WALK) {
-    // Check if pot of gold at end
-    printLine("Can you walk on a rainbow?");
-    return true;
+
+  // Handle CROSS / THROUGH
+  if (g.prsa == V_CROSS || g.prsa == V_THROUGH) {
+    // Special case: Canyon View
+    if (g.here && g.here->getId() == RoomIds::CANYON_VIEW) {
+      printLine("From here?!?");
+      return RTRUE;
+    }
+
+    // Check if rainbow is solid (RAINBOW-FLAG)
+    if (g.rainbowFlag) {
+      // Rainbow is solid, can cross
+      if (g.here && g.here->getId() == RoomIds::ARAGAIN_FALLS) {
+        // GOTO END-OF-RAINBOW
+        ZObject *endOfRainbow = g.getObject(RoomIds::END_OF_RAINBOW);
+        if (endOfRainbow) {
+          g.player->moveTo(endOfRainbow);
+          g.here = endOfRainbow;
+        }
+        return RTRUE;
+      } else if (g.here && g.here->getId() == RoomIds::END_OF_RAINBOW) {
+        // GOTO ARAGAIN-FALLS
+        ZObject *aragainFalls = g.getObject(RoomIds::ARAGAIN_FALLS);
+        if (aragainFalls) {
+          g.player->moveTo(aragainFalls);
+          g.here = aragainFalls;
+        }
+        return RTRUE;
+      } else {
+        printLine("You'll have to say which way...");
+        return RTRUE;
+      }
+    } else {
+      // Rainbow not solid
+      printLine("Can you walk on water vapor?");
+      return RTRUE;
+    }
   }
-  return false;
+
+  // Handle LOOK-UNDER
+  if (g.prsa == V_LOOK_UNDER) {
+    printLine("The Frigid River flows under the rainbow.");
+    return RTRUE;
+  }
+
+  return RFALSE;
 }
 
 // RESERVOIR-FCN

@@ -192,4 +192,8 @@ if(BUILD_TESTS)
     # PUTTY-FCN Tests (ZIL action verification)
     add_executable(putty_tests tests/putty_tests.cpp ${LIB_SOURCES})
     add_test(NAME PuttyTests COMMAND putty_tests)
+    
+    # RAINBOW-FCN Tests (ZIL action verification)
+    add_executable(rainbow_tests tests/rainbow_tests.cpp ${LIB_SOURCES})
+    add_test(NAME RainbowTests COMMAND rainbow_tests)
 endif()
