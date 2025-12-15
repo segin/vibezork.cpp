@@ -68,7 +68,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [ ] RESERVOIR-SOUTH-FCN - South reservoir
 - [ ] RIVER-FUNCTION - River flow/boat mechanics
 - [ ] ROBBER-FUNCTION - Thief AI
-- [/] ROPE-FUNCTION - Rope tie/untie
+- [x] ROPE-FUNCTION - Rope tie/untie
 - [ ] RUG-FCN - Rug/trap door
 - [ ] RUSTY-KNIFE-FCN - Rusty knife curse
 - [ ] SAND-FUNCTION - Sand digging
@@ -87,7 +87,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [ ] TREASURE-ROOM-FCN - Thief's lair
 - [ ] TROLL-FCN - Troll combat/behavior
 - [ ] TROLL-ROOM-F - Troll room handler
-- [ ] TROPHY-CASE-FCN - Trophy case scoring
+- [ ] TROPHY-CASE-FCN - Trophy case scorings
 - [ ] TRUNK-F - Trunk stupid container
 - [ ] TUBE-FUNCTION - Tube navigation
 - [ ] UP-CHIMNEY-FUNCTION - Chimney climbing
@@ -108,6 +108,6 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [ ] ZORKMID-FUNCTION - Zorkmid coin
 
 ## Progress
-- Total: 96 actions
-- Implemented: 64
-- Remaining: 32
+- Total: 94 actions (excluding legend)
+- Implemented: 65
+- Remaining: 29
