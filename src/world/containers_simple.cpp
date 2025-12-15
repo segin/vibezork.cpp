@@ -1,17 +1,22 @@
-// SANDWICH-BAG-FCN - Lunch bag container
-// ZIL: Handles SMELL when LUNCH is inside
-// Source: 1actions.zil lines 3106-3109
-bool sandwichBagAction() {
+// TRUNK-F - Trunk stupid container
+// ZIL: STUPID-CONTAINER - blocks OPEN, CLOSE (already handled), EXAMINE shows
+// contents Source: 1actions.zil lines 4140-4152
+bool trunkAction() {
   auto &g = Globals::instance();
 
-  // Handle SMELL when lunch is in bag
-  if (g.prsa == V_SMELL && g.prso) {
-    // Check if LUNCH is in the bag
-    ZObject *lunch = g.getObject(ObjectIds::LUNCH);
-    if (lunch && lunch->getLocation() == g.prso) {
-      printLine("It smells of hot peppers.");
-      return RTRUE;
-    }
+  // STUPID-CONTAINER pattern: OPEN prints message
+  if (g.prsa == V_OPEN) {
+    printLine("The cover is too clumsy for you to open. You'll have to smash "
+              "the treasure chest.");
+    return RTRUE;
+  }
+
+  // CLOSE not needed - container already closed
+
+  // EXAMINE shows contents (implicit "look inside")
+  if (g.prsa == V_EXAMINE) {
+    printLine("The treasure chest is a large metal box with an ornate cover.");
+    return RTRUE;
   }
 
   return RFALSE;
