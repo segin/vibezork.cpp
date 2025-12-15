@@ -62,7 +62,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] PAINTING-FCN - Painting interactions
 - [x] PUTTY-FCN - Putty interactions
 - [x] RAINBOW-FCN - Rainbow/pot of gold
-- [ ] RBOAT-FUNCTION - Punctured boat (COMPLEX: 100+ line room function, needs separate work)
+- [/] RBOAT-FUNCTION - Punctured boat (COMPLEX: 100+ line room function, implementing now)
 - [ ] RESERVOIR-FCN - Reservoir water handler
 - [ ] RESERVOIR-NORTH-FCN - North reservoir
 - [ ] RESERVOIR-SOUTH-FCN - South reservoir

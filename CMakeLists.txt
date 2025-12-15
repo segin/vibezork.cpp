@@ -194,6 +194,12 @@ if(BUILD_TESTS)
     add_test(NAME PuttyTests COMMAND putty_tests)
     
     # RAINBOW-FCN Tests (ZIL action verification)
-    add_executable(rainbow_tests tests/rainbow_tests.cpp ${LIB_SOURCES})
-    add_test(NAME RainbowTests COMMAND rainbow_tests)
+    add_executable(rainbow_tests tests/rainbow_tests.cpp ${COMMON_SOURCES})
+target_link_libraries(rainbow_tests ${COMMON_LIBS})
+add_test(NAME RainbowTests COMMAND rainbow_tests)
+
+# RBOAT-FUNCTION comprehensive tests
+add_executable(rboat_tests tests/rboat_tests.cpp ${COMMON_SOURCES})
+target_link_libraries(rboat_tests ${COMMON_LIBS})
+add_test(NAME RBoatTests COMMAND rboat_tests)
 endif()
