@@ -91,10 +91,10 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] TRUNK-F - Trunk stupid container
 - [ ] TUBE-FUNCTION - Tube navigation
 - [ ] UP-CHIMNEY-FUNCTION - Chimney climbing
-- [ ] WATER-F - Water interactions
+- [ ] WATER-F - Water interactions (COMPLEX: 80+ line multi-verb handler, needs separate work)
 - [ ] WEAPON-FUNCTION - Weapon blocked by NPC
 - [ ] WHITE-CLIFFS-FUNCTION - White cliffs scenery
-- [ ] WHITE-HOUSE-F - White house exterior
+- [x] WHITE-HOUSE-F - White house exterior
 
 ### Global Actions (gglobals.zil)
 - [ ] CANYON-VIEW-F - Canyon view scenery
@@ -109,5 +109,5 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 94 actions (excluding legend)
-- Implemented: 67
-- Remaining: 27
+- Implemented: 68
+- Remaining: 26
