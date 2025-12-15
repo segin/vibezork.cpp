@@ -1198,8 +1198,8 @@ bool inflatedBoatAction() {
                 "hissing noise issuing therefrom. With a pathetic sputter, "
                 "the\nboat deflates, leaving you without.");
 
-      // Check for death condition (NONLANDBIT)
-      if (g.here->hasFlag(ObjectFlag::NONLANDBIT)) {
+      // Check for death condition (RLANDBIT - can't reach land)
+      if (g.here->hasFlag(ObjectFlag::RLANDBIT)) {
         crlf();
         if (g.here->getId() == RoomIds::RESERVOIR ||
             g.here->getId() == RoomIds::IN_STREAM) {
