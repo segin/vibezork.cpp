@@ -1587,11 +1587,8 @@ bool bubbleAction() {
     return RTRUE;
   }
 
-  // Handle ATTACK/MUNG - Bubble cannot be destroyed
-  if (g.prsa == V_ATTACK || g.prsa == V_MUNG || g.prsa == V_KILL) {
-    printLine("The bubble is impervious to your attack.");
-    return RTRUE;
-  }
+  // Note: V_ATTACK/MUNG NOT handled per ZIL spec (returns RFALSE to allow
+  // default parser message)
 
   return RFALSE;
 }
