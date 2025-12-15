@@ -1111,14 +1111,236 @@ bool iboatFunction() {
 
   return false;
 }
+// RBOAT-FUNCTION - Inflated boat room function
+// ZIL: Room function for INFLATED-BOAT
+// Source: 1actions.zil lines 2722-2815
 bool inflatedBoatAction() {
   auto &g = Globals::instance();
-  if (g.prsa == V_DEFLATE) {
-    printLine("The boat deflates.");
-    // Transform back
-    return true;
+
+  // ============================================================================
+  // VERB: WALK - Direction validation
+  // ============================================================================
+  if (g.prsa == V_WALK) {
+    // Check if player is in boat (location check)
+    if (g.winner->getLocation() &&
+        g.winner->getLocation()->getId() != ObjectIds::BOAT_INFLATED) {
+      return RFALSE; // Not in boat, not handled
+    }
+
+    // TODO: Check PRSO for specific directions
+    // For now, print the label message for unsupported directions
+    printLine("Read the label for the boat's instructions.");
+    return RTRUE;
   }
-  return false;
+
+  // ============================================================================
+  // VERB: LAUNCH
+  // ============================================================================
+  if (g.prsa == V_LAUNCH) {
+    // Check if player is in boat
+    if (g.winner->getLocation() &&
+        g.winner->getLocation()->getId() != ObjectIds::BOAT_INFLATED) {
+      printLine("You're not in the boat!");
+      return RTRUE;
+    }
+
+    // Check if already on water
+    if (g.here && (g.here->getId() == RoomIds::RESERVOIR ||
+                   g.here->getId() == RoomIds::IN_STREAM ||
+                   g.here->getId() == RoomIds::RIVER_1 ||
+                   g.here->getId() == RoomIds::RIVER_2 ||
+                   g.here->getId() == RoomIds::RIVER_3 ||
+                   g.here->getId() == RoomIds::RIVER_4)) {
+      print("You are on the ");
+      if (g.here->getId() == RoomIds::RESERVOIR) {
+        print("reservoir");
+      } else if (g.here->getId() == RoomIds::IN_STREAM) {
+        print("stream");
+      } else {
+        print("river");
+      }
+      printLine(", or have you forgotten?");
+      return RTRUE;
+    }
+
+    // TODO: GO-NEXT RIVER-LAUNCH, enable I-RIVER timer
+    printLine("You can't launch it here.");
+    return RTRUE;
+  }
+
+  // ============================================================================
+  // VERB: DROP/PUT weapons - Punctures boat
+  // ============================================================================
+  if ((g.prsa == V_DROP && g.prso && g.prso->hasFlag(ObjectFlag::WEAPONBIT)) ||
+      (g.prsa == V_PUT && g.prso && g.prso->hasFlag(ObjectFlag::WEAPONBIT) &&
+       g.prsi && g.prsi->getId() == ObjectIds::BOAT_INFLATED)) {
+
+    // Puncture the boat
+    ZObject *boat = g.getObject(ObjectIds::BOAT_INFLATED);
+    ZObject *puncturedBoat = g.getObject(ObjectIds::BOAT_PUNCTURED);
+
+    if (boat && puncturedBoat && g.here) {
+      // Remove inflated boat
+      boat->moveTo(nullptr);
+
+      // Add punctured boat
+      puncturedBoat->moveTo(g.here);
+
+      // Move player out of boat
+      g.winner->moveTo(g.here);
+
+      // Print message
+      print("It seems that the ");
+      if (g.prsa == V_DROP || g.prsa == V_PUT) {
+        print(g.prso->getDesc());
+      }
+      printLine(" didn't agree with the boat, as evidenced\nby the loud "
+                "hissing noise issuing therefrom. With a pathetic sputter, "
+                "the\nboat deflates, leaving you without.");
+
+      // Check for death condition (NONLANDBIT)
+      if (g.here->hasFlag(ObjectFlag::NONLANDBIT)) {
+        crlf();
+        if (g.here->getId() == RoomIds::RESERVOIR ||
+            g.here->getId() == RoomIds::IN_STREAM) {
+          // Drowning death
+          printLine("Another pathetic sputter, this time from you, heralds "
+                    "your drowning.");
+          // TODO: JIGS-UP
+        } else {
+          // River death
+          printLine(
+              "In other words, fighting the fierce currents of the Frigid "
+              "River. You\nmanage to hold your own for a bit, but then you are "
+              "carried over a\nwaterfall and into some nasty rocks. Ouch!");
+          // TODO: JIGS-UP
+        }
+      }
+
+      return RTRUE;
+    }
+  }
+
+  // ============================================================================
+  // VERB: ATTACK/MUNG with weapons - Punctures boat
+  // ============================================================================
+  if ((g.prsa == V_ATTACK || g.prsa == V_MUNG) && g.prsi &&
+      g.prsi->hasFlag(ObjectFlag::WEAPONBIT)) {
+
+    // Same logic as DROP weapons
+    ZObject *boat = g.getObject(ObjectIds::BOAT_INFLATED);
+    ZObject *puncturedBoat = g.getObject(ObjectIds::BOAT_PUNCTURED);
+
+    if (boat && puncturedBoat && g.here) {
+      boat->moveTo(nullptr);
+      puncturedBoat->moveTo(g.here);
+      g.winner->moveTo(g.here);
+
+      print("It seems that the ");
+      print(g.prsi->getDesc());
+      printLine(" didn't agree with the boat, as evidenced\nby the loud "
+                "hissing noise issuing therefrom. With a pathetic sputter, "
+                "the\nboat deflates, leaving you without.");
+
+      if (g.here->hasFlag(ObjectFlag::NONLANDBIT)) {
+        crlf();
+        if (g.here->getId() == RoomIds::RESERVOIR ||
+            g.here->getId() == RoomIds::IN_STREAM) {
+          printLine("Another pathetic sputter, this time from you, heralds "
+                    "your drowning.");
+        } else {
+          printLine(
+              "In other words, fighting the fierce currents of the Frigid "
+              "River. You\nmanage to hold your own for a bit, but then you are "
+              "carried over a\nwaterfall and into some nasty rocks. Ouch!");
+        }
+      }
+
+      return RTRUE;
+    }
+  }
+
+  // ============================================================================
+  // VERB: BOARD - Check for sharp weapons
+  // ============================================================================
+  if (g.prsa == V_BOARD) {
+    // Check if carrying any sharp weapons
+    ZObject *sceptre = g.getObject(ObjectIds::SCEPTRE);
+    ZObject *knife = g.getObject(ObjectIds::KNIFE);
+    ZObject *sword = g.getObject(ObjectIds::SWORD);
+    ZObject *rustyKnife = g.getObject(ObjectIds::RUSTY_KNIFE);
+    ZObject *axe = g.getObject(ObjectIds::AXE);
+    ZObject *stiletto = g.getObject(ObjectIds::STILETTO);
+
+    bool hasSharpWeapon = false;
+    if ((sceptre && sceptre->getLocation() == g.winner) ||
+        (knife && knife->getLocation() == g.winner) ||
+        (sword && sword->getLocation() == g.winner) ||
+        (rustyKnife && rustyKnife->getLocation() == g.winner) ||
+        (axe && axe->getLocation() == g.winner) ||
+        (stiletto && stiletto->getLocation() == g.winner)) {
+      hasSharpWeapon = true;
+    }
+
+    if (hasSharpWeapon) {
+      printLine("Oops! Something sharp seems to have slipped and punctured the "
+                "boat.\nThe boat deflates to the sounds of hissing, "
+                "sputtering, and cursing.");
+
+      // Puncture the boat
+      ZObject *boat = g.getObject(ObjectIds::BOAT_INFLATED);
+      ZObject *puncturedBoat = g.getObject(ObjectIds::BOAT_PUNCTURED);
+
+      if (boat && puncturedBoat && g.here) {
+        boat->moveTo(nullptr);
+        puncturedBoat->moveTo(g.here);
+      }
+
+      return RTRUE;
+    }
+  }
+
+  // ============================================================================
+  // VERB: INFLATE/FILL - Already inflated
+  // ============================================================================
+  if (g.prsa == V_INFLATE || g.prsa == V_FILL) {
+    printLine("Inflating it further would probably burst it.");
+    return RTRUE;
+  }
+
+  // ============================================================================
+  // VERB: DEFLATE
+  // ============================================================================
+  if (g.prsa == V_DEFLATE) {
+    // Check if player is inside boat
+    if (g.winner->getLocation() &&
+        g.winner->getLocation()->getId() == ObjectIds::BOAT_INFLATED) {
+      printLine("You can't deflate the boat while you're in it.");
+      return RTRUE;
+    }
+
+    // Check if boat is on ground (in HERE)
+    ZObject *boat = g.getObject(ObjectIds::BOAT_INFLATED);
+    if (boat && boat->getLocation() != g.here) {
+      printLine("The boat must be on the ground to be deflated.");
+      return RTRUE;
+    }
+
+    // Deflate the boat
+    if (boat && g.here) {
+      printLine("The boat deflates.");
+      boat->moveTo(nullptr);
+
+      ZObject *deflatableBoat = g.getObject(ObjectIds::BOAT_INFLATABLE);
+      if (deflatableBoat) {
+        deflatableBoat->moveTo(g.here);
+      }
+
+      return RTRUE;
+    }
+  }
+
+  return RFALSE;
 }
 
 // KITCHEN-FCN
