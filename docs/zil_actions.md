@@ -62,7 +62,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] PAINTING-FCN - Painting interactions
 - [x] PUTTY-FCN - Putty interactions
 - [x] RAINBOW-FCN - Rainbow/pot of gold
-- [/] RBOAT-FUNCTION - Punctured boat (COMPLEX: 100+ line room function, implementing now)
+- [x] RBOAT-FUNCTION - Punctured boat (COMPLEX: Comprehensive implementation with 10 tests)
 - [ ] RESERVOIR-FCN - Reservoir water handler
 - [ ] RESERVOIR-NORTH-FCN - North reservoir
 - [ ] RESERVOIR-SOUTH-FCN - South reservoir
@@ -109,5 +109,5 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 94 actions (excluding legend)
-- Implemented: 74
-- Remaining: 20
+- Implemented: 75
+- Remaining: 19
