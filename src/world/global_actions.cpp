@@ -16,3 +16,8 @@ bool canyonViewAction() {
 
   return RFALSE;
 }
+
+// NULL-F - No-op action
+// ZIL: Always returns RFALSE
+// Source: gglobals.zil lines 85-86
+bool nullAction() { return RFALSE; }
