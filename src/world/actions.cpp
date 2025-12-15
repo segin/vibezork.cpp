@@ -1575,21 +1575,14 @@ bool bubbleAction() {
     return RFALSE;
   }
 
-  // Handle EXAMINE
-  if (g.prsa == V_EXAMINE) {
-    printLine("The bubble appears to be a green plastic bubble.");
-    return RTRUE;
-  }
-
   // Handle TAKE - ZIL: INTEGRAL-PART prints this message
+  // Source: 1actions.zil lines 1219-1221
   if (g.prsa == V_TAKE) {
     printLine("It is an integral part of the control panel.");
     return RTRUE;
   }
 
-  // Note: V_ATTACK/MUNG NOT handled per ZIL spec (returns RFALSE to allow
-  // default parser message)
-
+  // ZIL spec: Only TAKE is handled, all other verbs return RFALSE
   return RFALSE;
 }
 
