@@ -1,7 +1,21 @@
 #include "core/globals.h"
 #include "core/io.h"
 #include "verbs/verbs.h"
-#include "world/objects.h"
+
+// WHITE-CLIFFS-FUNCTION - White cliffs scenery
+// ZIL: Only handles CLIMB (blocks it)
+// Source: gglobals.zil lines 1575-1578
+bool whiteCliffsAction() {
+  auto &g = Globals::instance();
+
+  // CLIMB on white cliffs - not allowed
+  if (g.prsa == V_CLIMB || g.prsa == V_CLIMB_ON || g.prsa == V_CLIMB_UP) {
+    printLine("They're too steep and it's too far.");
+    return RTRUE;
+  }
+
+  return RFALSE;
+}
 
 // WHITE-HOUSE-F - White house exterior scenery
 // ZIL: Handles KNOCK, OPEN, READ (prevents actions on house)
