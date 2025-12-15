@@ -1242,7 +1242,7 @@ bool inflatedBoatAction() {
                 "hissing noise issuing therefrom. With a pathetic sputter, "
                 "the\nboat deflates, leaving you without.");
 
-      if (g.here->hasFlag(ObjectFlag::NONLANDBIT)) {
+      if (g.here->hasFlag(ObjectFlag::RLANDBIT)) {
         crlf();
         if (g.here->getId() == RoomIds::RESERVOIR ||
             g.here->getId() == RoomIds::IN_STREAM) {
