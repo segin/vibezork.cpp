@@ -21,3 +21,18 @@ bool canyonViewAction() {
 // ZIL: Always returns RFALSE
 // Source: gglobals.zil lines 85-86
 bool nullAction() { return RFALSE; }
+
+// STAIRS-F - Stairs navigation
+// ZIL: Handles THROUGH to prompt for direction
+// Source: gglobals.zil lines 110-113
+bool stairsAction() {
+  auto &g = Globals::instance();
+
+  // THROUGH - need to specify up or down
+  if (g.prsa == V_THROUGH) {
+    printLine("You should say whether you want to go up or down.");
+    return RTRUE;
+  }
+
+  return RFALSE;
+}
