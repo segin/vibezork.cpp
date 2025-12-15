@@ -9,7 +9,7 @@ bool whiteCliffsAction() {
   auto &g = Globals::instance();
 
   // CLIMB on white cliffs - not allowed
-  if (g.prsa == V_CLIMB || g.prsa == V_CLIMB_ON || g.prsa == V_CLIMB_UP) {
+  if (g.prsa == V_CLIMB_ON || g.prsa == V_CLIMB_UP) {
     printLine("They're too steep and it's too far.");
     return RTRUE;
   }

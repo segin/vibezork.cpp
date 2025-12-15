@@ -47,7 +47,7 @@ bool trunkAction() {
   }
 
   // PUT into trunk - silly message
-  if (g.prsa == V_PUT && g.prsi && g.prsi->getId() == ObjectIds::TRUNK) {
+  if (g.prsa == V_PUT && g.prsi) {
     printLine("Don't be silly. It wouldn't be a trunk anymore.");
     return RTRUE;
   }
