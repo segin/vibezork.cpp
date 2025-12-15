@@ -3,7 +3,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Implementation Status Legend
 - [ ] Not implemented
-- [ ] Implemented
+- [x] Implemented
 
 ## Action Routines
 
