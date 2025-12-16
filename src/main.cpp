@@ -97,20 +97,13 @@ void mainLoop1() {
   auto &g = Globals::instance();
   auto &score = ScoreSystem::instance();
 
-  // Get terminal dimensions
+  // Get terminal width (default 80)
   int termWidth = 80;
-  int termHeight = 24;
   const char *cols = std::getenv("COLUMNS");
-  const char *rows = std::getenv("LINES");
   if (cols) {
     termWidth = std::atoi(cols);
     if (termWidth < 40)
       termWidth = 80;
-  }
-  if (rows) {
-    termHeight = std::atoi(rows);
-    if (termHeight < 10)
-      termHeight = 24;
   }
 
   // Build status bar content
@@ -128,26 +121,14 @@ void mainLoop1() {
   if (padding < 1)
     padding = 1;
 
-  // Save cursor position
-  std::cout << "\033[s";
-
-  // Move to top-left (line 1) and print status bar
-  std::cout << "\033[1;1H";
-  std::cout << "\033[7m"; // Reverse video
+  // Print status bar with ANSI reverse video (simple inline - no scroll
+  // regions)
+  std::cout << "\033[7m"; // Reverse video on
   std::cout << status.str();
   for (int i = 0; i < padding; ++i)
     std::cout << ' ';
   std::cout << rightPart.str();
-  std::cout << "\033[0m"; // Reset
-
-  // Set scroll region to exclude status bar (lines 2 to termHeight)
-  std::cout << "\033[2;" << termHeight << "r";
-
-  // Restore cursor position (and ensure we're in scroll region)
-  std::cout << "\033[u";
-
-  // Ensure cursor is in scroll region (at least line 2)
-  std::cout << "\033[2;1H" << std::flush;
+  std::cout << "\033[0m" << std::endl; // Reset and newline
 
   std::cout << "> ";
   std::string input = readLine();
@@ -255,34 +236,8 @@ void initializeGame() {
   SwordSystem::initialize();  // Initialize sword glow timer (Requirement 49)
 }
 
-void initializeScreen() {
-  // Get terminal dimensions
-  int termHeight = 24;
-  const char *rows = std::getenv("LINES");
-  if (rows) {
-    termHeight = std::atoi(rows);
-    if (termHeight < 10)
-      termHeight = 24;
-  }
-
-  // Clear screen and set up scroll region (line 2 to bottom)
-  std::cout << "\033[2J";                      // Clear screen
-  std::cout << "\033[H";                       // Move to home
-  std::cout << "\033[2;" << termHeight << "r"; // Set scroll region
-  std::cout << "\033[2;1H";                    // Move cursor to line 2
-  std::cout << std::flush;
-}
-
-void cleanupScreen() {
-  // Reset scroll region to full screen
-  std::cout << "\033[r"; // Reset scroll region
-  std::cout << std::flush;
-}
-
 void go() {
   auto &g = Globals::instance();
-
-  initializeScreen();
 
   printLine("ZORK I: The Great Underground Empire");
   printLine(
@@ -293,8 +248,6 @@ void go() {
   Verbs::vLook();
 
   mainLoop();
-
-  cleanupScreen();
 }
 
 int main() {
