@@ -807,23 +807,11 @@ TEST(BottleFunction_ReturnsFalseNoSpecialBehavior) {
 
 // =============================================================================
 // BUBBLE-F Tests (1actions.zil lines 1292-1321)
-// ZIL Logic: EXAMINE/TAKE/ATTACK bubble
+// ZIL Logic: Only handles TAKE (Integral part). Per 1actions.zil lines
+// 1219-1221.
 // =============================================================================
 
 extern bool bubbleAction();
-
-TEST(BubbleF_ExaminePrintsDescription) {
-  setupTestWorld();
-  auto &g = Globals::instance();
-
-  g.prso = g.getObject(ObjectIds::BUBBLE);
-  g.prsa = V_EXAMINE;
-
-  OutputCapture cap;
-  bool result = bubbleAction();
-
-  ASSERT_TRUE(result);
-}
 
 TEST(BubbleF_TakeBlockedIntegralPart) {
   setupTestWorld();
