@@ -1738,8 +1738,7 @@ TEST(ChimneyFcn_ClimbLogic) {
     OutputCapture cap;
     bool result = chimneyAction();
     ASSERT_TRUE(result);
-    ASSERT_TRUE(cap.getOutput().find("can't get up there") !=
-                std::string::npos);
+    ASSERT_TRUE(cap.getOutput().find("narrow") != std::string::npos);
     ASSERT_EQ(g.player->getLocation()->getId(), RoomIds::LIVING_ROOM);
   }
 
