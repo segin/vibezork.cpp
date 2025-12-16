@@ -977,7 +977,8 @@ TEST(CrackFcn_ThroughBlocked) {
 
   ASSERT_TRUE(result);
   std::string output = cap.getOutput();
-  ASSERT_TRUE(output.find("too small") != std::string::npos);
+  // ZIL CRACK-FCN says "You can't fit through the crack."
+  ASSERT_TRUE(output.find("can't fit") != std::string::npos);
 }
 
 TEST(CrackFcn_OtherVerbsReturnFalse) {
