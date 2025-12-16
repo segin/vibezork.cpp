@@ -1419,6 +1419,9 @@ TEST(CandlesFcn_TorchVaporizesCandles) {
   ZObject *candles = g.getObject(ObjectIds::CANDLES);
   // Ensure candles have positive strength so they can be lit
   candles->setProperty(P_STRENGTH, 100);
+  // Ensure candles are NOT already lit (otherwise torch prints different
+  // message)
+  candles->clearFlag(ObjectFlag::ONBIT);
 
   ZObject *torch = g.getObject(ObjectIds::TORCH);
   if (!torch) {

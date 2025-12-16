@@ -813,6 +813,10 @@ bool candlesAction() {
 
   // LAMP-ON / BURN
   if (g.prsa == V_LAMP_ON || g.prsa == V_BURN) {
+    std::cerr << "[DEBUG candlesAction] V_LAMP_ON with P_STRENGTH="
+              << g.prso->getProperty(P_STRENGTH) << " prsi="
+              << (g.prsi ? std::to_string(g.prsi->getId()) : "nullptr")
+              << std::endl;
     if (g.prso->getProperty(P_STRENGTH) <= 0) { // ZIL: RMUNGBIT check
       printLine("Alas, there's not much left of the candles. Certainly not "
                 "enough to burn.");
@@ -838,7 +842,12 @@ bool candlesAction() {
       return RTRUE;
     }
 
+    std::cerr << "[DEBUG candlesAction] tool.getId()=" << tool->getId()
+              << " TORCH=" << ObjectIds::TORCH << std::endl;
+
     if (tool->getId() == ObjectIds::TORCH) { // Vaporize
+      std::cerr << "[DEBUG candlesAction] In TORCH block, ONBIT="
+                << g.prso->hasFlag(ObjectFlag::ONBIT) << std::endl;
       if (g.prso->hasFlag(ObjectFlag::ONBIT)) {
         printLine(
             "You realize, just in time, that the candles are already lighted.");
