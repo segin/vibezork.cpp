@@ -121,14 +121,11 @@ void mainLoop1() {
   if (padding < 1)
     padding = 1;
 
-  // Print status bar with ANSI reverse video (simple inline - no scroll
-  // regions)
-  std::cout << "\033[7m"; // Reverse video on
+  // Print status bar (plain text - no ANSI codes for maximum compatibility)
   std::cout << status.str();
   for (int i = 0; i < padding; ++i)
     std::cout << ' ';
-  std::cout << rightPart.str();
-  std::cout << "\033[0m" << std::endl; // Reset and newline
+  std::cout << rightPart.str() << std::endl;
 
   std::cout << "> ";
   std::string input = readLine();
