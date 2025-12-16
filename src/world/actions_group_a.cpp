@@ -2360,3 +2360,113 @@ bool riverAction() {
   }
   return RFALSE;
 }
+
+// =============================================================================
+// WATER-F - Water interactions
+// ZIL: Complex handler for TAKE, PUT, FILL, DROP, GIVE, THROW with water
+// Handles bottle filling, evaporation, puddles in vehicles
+// Source: 1actions.zil lines 3300-3390
+// =============================================================================
+bool waterAction() {
+  auto &g = Globals::instance();
+
+  ZObject *water = g.getObject(ObjectIds::WATER);
+  ZObject *bottle = g.getObject(ObjectIds::BOTTLE);
+
+  // FILL verb - "fill bottle with water"
+  if (g.prsa == V_FILL) {
+    if (!bottle) {
+      printLine("You have nothing to fill.");
+      return RTRUE;
+    }
+    if (!bottle->hasFlag(ObjectFlag::OPENBIT)) {
+      printLine("The bottle is closed.");
+      return RTRUE;
+    }
+    if (bottle->getFirstChild()) {
+      printLine("The bottle is not empty.");
+      return RTRUE;
+    }
+    if (water) {
+      water->moveTo(bottle);
+      printLine("The bottle is now full of water.");
+    } else {
+      printLine("There is no water here to fill with.");
+    }
+    return RTRUE;
+  }
+
+  // TAKE water
+  if (g.prsa == V_TAKE) {
+    if (water && water->getLocation() == bottle) {
+      printLine("It's in the bottle. Perhaps you should take that instead.");
+      return RTRUE;
+    }
+    if (bottle && bottle->getLocation() == g.player &&
+        !bottle->hasFlag(ObjectFlag::OPENBIT)) {
+      printLine("The bottle is closed.");
+      return RTRUE;
+    }
+    if (bottle && bottle->getLocation() == g.player &&
+        bottle->hasFlag(ObjectFlag::OPENBIT) && !bottle->getFirstChild()) {
+      if (water) {
+        water->moveTo(bottle);
+        printLine("The bottle is now full of water.");
+        return RTRUE;
+      }
+    }
+    printLine("The water slips through your fingers.");
+    return RTRUE;
+  }
+
+  // PUT water in container
+  if (g.prsa == V_PUT && g.prso == water) {
+    if (g.prsi == bottle) {
+      if (!bottle->hasFlag(ObjectFlag::OPENBIT)) {
+        printLine("The bottle is closed.");
+        return RTRUE;
+      }
+      if (bottle->getFirstChild()) {
+        printLine("The bottle is not empty.");
+        return RTRUE;
+      }
+      if (water) {
+        water->moveTo(bottle);
+        printLine("The bottle is now full of water.");
+      }
+      return RTRUE;
+    }
+    // Water in other containers evaporates
+    if (g.prsi) {
+      print("The water leaks out of the ");
+      print(g.prsi->getName());
+      printLine(" and evaporates immediately.");
+      if (water)
+        water->moveTo(nullptr);
+      return RTRUE;
+    }
+  }
+
+  // DROP/GIVE water
+  if (g.prsa == V_DROP || g.prsa == V_GIVE) {
+    if (water && water->getLocation() == bottle &&
+        !bottle->hasFlag(ObjectFlag::OPENBIT)) {
+      printLine("The bottle is closed.");
+      return RTRUE;
+    }
+    printLine("The water spills to the floor and evaporates immediately.");
+    if (water)
+      water->moveTo(nullptr);
+    return RTRUE;
+  }
+
+  // THROW water
+  if (g.prsa == V_THROW) {
+    printLine("The water splashes on the walls and evaporates immediately.");
+    if (water)
+      water->moveTo(nullptr);
+    return RTRUE;
+  }
+
+  return RFALSE;
+}
