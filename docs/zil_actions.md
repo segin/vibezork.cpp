@@ -56,58 +56,58 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] MACHINE-ROOM-FCN - Machine room handler
 - [x] MAILBOX-F - Mailbox container
 - [x] MATCH-FUNCTION - Match lighting
-- [x] MAZE-11-FCN - Maze room 11 (grating)
+- [x] MAZE-11-FCN - Maze room handler
 - [x] MOUNTAIN-RANGE-F - Mountain range scenery
 - [x] MSWITCH-FUNCTION - Machine switch
 - [x] PAINTING-FCN - Painting interactions
 - [x] PUTTY-FCN - Putty interactions
 - [x] RAINBOW-FCN - Rainbow/pot of gold
-- [x] RBOAT-FUNCTION - Punctured boat (COMPLEX: Comprehensive implementation with 10 tests)
-- [ ] RESERVOIR-FCN - Reservoir water handler
-- [ ] RESERVOIR-NORTH-FCN - North reservoir
-- [ ] RESERVOIR-SOUTH-FCN - South reservoir
+- [x] RBOAT-FUNCTION - Punctured boat
+- [x] RESERVOIR-FCN - Reservoir water handler
+- [x] RESERVOIR-NORTH-FCN - North reservoir
+- [x] RESERVOIR-SOUTH-FCN - South reservoir
 - [ ] RIVER-FUNCTION - River flow/boat mechanics
-- [ ] ROBBER-FUNCTION - Thief AI
+- [x] ROBBER-FUNCTION - Thief AI
 - [x] ROPE-FUNCTION - Rope tie/untie
-- [ ] RUG-FCN - Rug/trap door
-- [ ] RUSTY-KNIFE-FCN - Rusty knife curse
-- [ ] SAND-FUNCTION - Sand digging
+- [x] RUG-FCN - Rug/trap door
+- [x] RUSTY-KNIFE-FCN - Rusty knife curse
+- [x] SAND-FUNCTION - Sand digging
 - [x] SANDWICH-BAG-FCN - Lunch bag container
-- [ ] SCEPTRE-FUNCTION - Sceptre/rainbow
-- [ ] SLIDE-FUNCTION - Coal slide
+- [x] SCEPTRE-FUNCTION - Sceptre/rainbow
+- [x] SLIDE-FUNCTION - Coal slide
 - [x] SONGBIRD-F - Songbird bauble drop
-- [ ] SOUTH-TEMPLE-FCN - Temple room handler
-- [ ] STILETTO-FUNCTION - Thief's stiletto
-- [ ] STONE-BARROW-FCN - Stone barrow entry
-- [ ] SWORD-FCN - Sword glow mechanics
-- [x] TEETH-F - Teeth scenery (Implemented: Brush/Putty death logic)
-- [x] TOOL-CHEST-FCN - Tool chest container (Implemented: Scenery that crumbles, does NOT contain tools)
-- [ ] TORCH-ROOM-FCN - Torch room handler
-- [ ] TRAP-DOOR-FCN - Trap door open/close
-- [ ] TREASURE-ROOM-FCN - Thief's lair
-- [ ] TROLL-FCN - Troll combat/behavior
-- [ ] TROLL-ROOM-F - Troll room handler
-- [ ] TROPHY-CASE-FCN - Trophy case scorings
+- [x] SOUTH-TEMPLE-FCN - Temple room handler
+- [x] STILETTO-FUNCTION - Thief's stiletto
+- [x] STONE-BARROW-FCN - Stone barrow entry
+- [x] SWORD-FCN - Sword glow mechanics
+- [x] TEETH-F - Teeth scenery
+- [x] TOOL-CHEST-FCN - Tool chest container
+- [x] TORCH-ROOM-FCN - Torch room handler
+- [x] TRAP-DOOR-FCN - Trap door open/close
+- [x] TREASURE-ROOM-FCN - Thief's lair
+- [x] TROLL-FCN - Troll combat (via NPCSystem)
+- [x] TROLL-ROOM-F - Troll room handler
+- [x] TROPHY-CASE-FCN - Trophy case
 - [x] TRUNK-F - Trunk stupid container
-- [ ] TUBE-FUNCTION - Tube navigation
-- [ ] UP-CHIMNEY-FUNCTION - Chimney climbing
-- [ ] WATER-F - Water interactions (COMPLEX: 80+ line multi-verb handler, needs separate work)
+- [ ] TUBE-FUNCTION - Tube container
+- [ ] UP-CHIMNEY-FUNCTION - Chimney climbing (handled by chimneyAction)
+- [ ] WATER-F - Water interactions (COMPLEX: needs separate work)
 - [ ] WEAPON-FUNCTION - Weapon blocked by NPC
 - [x] WHITE-CLIFFS-FUNCTION - White cliffs scenery
 - [x] WHITE-HOUSE-F - White house exterior
 
 ### Global Actions (gglobals.zil)
 - [x] CANYON-VIEW-F - Canyon view scenery
-- [ ] CRETIN-FCN - Internal "cretin" function
-- [ ] GROUND-FUNCTION - Ground/floor
-- [ ] GRUE-FUNCTION - Grue darkness attack
-- [ ] NOT-HERE-OBJECT-F - Object not visible
+- [x] CRETIN-FCN - Internal "cretin" function
+- [x] GROUND-FUNCTION - Ground/floor
+- [x] GRUE-FUNCTION - Grue darkness attack
+- [x] NOT-HERE-OBJECT-F - Object not visible
 - [x] NULL-F - No-op action
-- [  ] SAILOR-FCN - "Hello Sailor" easter egg
+- [x] SAILOR-FCN - "Hello Sailor" easter egg
 - [x] STAIRS-F - Stairs navigation
 - [x] ZORKMID-FUNCTION - Zorkmid coin
 
 ## Progress
-- Total: 94 actions (excluding legend)
-- Implemented: 75
-- Remaining: 19
+- Total: 94 actions
+- Implemented: 89
+- Remaining: 5 (RIVER-FUNCTION, TUBE-FUNCTION, UP-CHIMNEY-FUNCTION, WATER-F, WEAPON-FUNCTION)
