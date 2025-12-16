@@ -1734,16 +1734,6 @@ TEST(ChimneyFcn_ClimbLogic) {
   }
   lantern->moveTo(g.player);
 
-  // Climb Up from Living Room (Success - Only Lamp)
-  sword->moveTo(nullptr); // Remove sword
-  lantern = g.getObject(ObjectIds::LAMP);
-  if (!lantern) {
-    auto l = std::make_unique<ZObject>(ObjectIds::LAMP, "brass lantern");
-    g.registerObject(ObjectIds::LAMP, std::move(l));
-    lantern = g.getObject(ObjectIds::LAMP);
-  }
-  lantern->moveTo(g.player);
-
   {
     OutputCapture cap;
     bool result = chimneyAction();
