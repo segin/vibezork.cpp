@@ -1429,6 +1429,9 @@ TEST(CandlesFcn_TorchVaporizesCandles) {
   auto &g = Globals::instance();
 
   ZObject *candles = g.getObject(ObjectIds::CANDLES);
+  // Ensure candles have positive strength so they can be lit
+  candles->setProperty(P_STRENGTH, 100);
+
   ZObject *torch = g.getObject(ObjectIds::TORCH);
   if (!torch) {
     auto t = std::make_unique<ZObject>(ObjectIds::TORCH, "ivory torch");
