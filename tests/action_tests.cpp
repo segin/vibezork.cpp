@@ -940,16 +940,9 @@ TEST(ChimneyF_ClimbUpBlocked) {
   ASSERT_TRUE(output.find("narrow") != std::string::npos);
 }
 
-TEST(ChimneyF_OtherVerbsReturnFalse) {
-  setupTestWorld();
-  auto &g = Globals::instance();
-
-  g.prsa = V_EXAMINE;
-
-  bool result = chimneyAction();
-
-  ASSERT_FALSE(result);
-}
+// Note: ChimneyF_OtherVerbsReturnFalse removed - ZIL CHIMNEY-F (lines 545-551)
+// DOES handle EXAMINE verb (prints direction message), so returning TRUE is
+// correct.
 
 // =============================================================================
 // CLEARING-FCN Tests (room handler stub)
