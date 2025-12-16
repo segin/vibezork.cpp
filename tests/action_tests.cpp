@@ -958,16 +958,19 @@ TEST(ClearingFcn_StubDoesNotCrash) {
 
 // =============================================================================
 // CRACK-FCN Tests (1actions.zil line 381-383)
-// ZIL Logic: THROUGH - can't fit through the crack
+// ZIL Logic: THROUGH - can't fit through the crack. ONLY handles THROUGH verb.
 // =============================================================================
 
 extern bool crackAction();
 
-TEST(CrackFcn_ExaminePrintsTooSmall) {
+// Note: CrackFcn_ExaminePrintsTooSmall removed - ZIL CRACK-FCN (lines 381-383)
+// only handles THROUGH verb. EXAMINE is NOT handled per ZIL spec.
+
+TEST(CrackFcn_ThroughBlocked) {
   setupTestWorld();
   auto &g = Globals::instance();
 
-  g.prsa = V_EXAMINE;
+  g.prsa = V_THROUGH;
 
   OutputCapture cap;
   bool result = crackAction();
