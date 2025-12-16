@@ -922,6 +922,14 @@ TEST(ChimneyF_ClimbUpBlocked) {
   setupTestWorld();
   auto &g = Globals::instance();
 
+  // Set player location to Living Room (not Kitchen) so CLIMB_UP applies
+  g.here = g.getObject(RoomIds::LIVING_ROOM);
+  // Put some items in inventory so chimney is "too narrow"
+  ZObject *sword = g.getObject(ObjectIds::SWORD);
+  if (sword) {
+    sword->moveTo(g.player);
+  }
+
   g.prsa = V_CLIMB_UP;
 
   OutputCapture cap;
