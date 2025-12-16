@@ -1096,6 +1096,10 @@ TEST(BoltFcn_TurnWithoutWrenchFails) {
   setupTestWorld();
   auto &g = Globals::instance();
 
+  // Set prso to BOLT - required by implementation
+  ZObject *bolt = g.getObject(ObjectIds::BOLT);
+  g.prso = bolt;
+
   // Ensure player has NO wrench
   ZObject *wrench = g.getObject(ObjectIds::WRENCH);
   if (wrench)
@@ -1118,6 +1122,10 @@ TEST(BoltFcn_TurnWithoutWrenchFails) {
 TEST(BoltFcn_TurnWithWrenchButNoPowerFails) {
   setupTestWorld();
   auto &g = Globals::instance();
+
+  // Set prso to BOLT - required by implementation
+  ZObject *bolt = g.getObject(ObjectIds::BOLT);
+  g.prso = bolt;
 
   ZObject *wrench = g.getObject(ObjectIds::WRENCH);
   if (!wrench) {
@@ -1145,6 +1153,10 @@ TEST(BoltFcn_TurnWithWrenchButNoPowerFails) {
 TEST(BoltFcn_TurnWithWrenchAndPowerTogglesGates) {
   setupTestWorld();
   auto &g = Globals::instance();
+
+  // Set prso to BOLT - required by implementation
+  ZObject *bolt = g.getObject(ObjectIds::BOLT);
+  g.prso = bolt;
 
   ZObject *wrench = g.getObject(ObjectIds::WRENCH);
   if (!wrench) {
