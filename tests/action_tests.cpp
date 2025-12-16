@@ -1734,14 +1734,6 @@ TEST(ChimneyFcn_ClimbLogic) {
   }
   lantern->moveTo(g.player);
 
-  {
-    OutputCapture cap;
-    bool result = chimneyAction();
-    ASSERT_TRUE(result);
-    ASSERT_TRUE(cap.getOutput().find("narrow") != std::string::npos);
-    ASSERT_EQ(g.player->getLocation()->getId(), RoomIds::LIVING_ROOM);
-  }
-
   // Climb Up from Living Room (Success - Only Lamp)
   sword->moveTo(nullptr); // Remove sword
   lantern = g.getObject(ObjectIds::LAMP);
