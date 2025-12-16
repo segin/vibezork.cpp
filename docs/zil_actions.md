@@ -92,7 +92,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] TUBE-FUNCTION - Tube navigation (squeeze putty logic)
 - [x] UP-CHIMNEY-FUNCTION - Chimney climbing (in chimneyAction)
 - [x] WATER-F - Water interactions (TAKE/PUT/FILL/DROP/THROW)
-- [ ] WEAPON-FUNCTION - Weapon blocked by NPC
+- [x] WEAPON-FUNCTION - Weapon blocked by NPC (weaponFunction at line 101)
 - [x] WHITE-CLIFFS-FUNCTION - White cliffs scenery
 - [x] WHITE-HOUSE-F - White house exterior
 
@@ -109,6 +109,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 94 actions
-- Implemented: 93
-- Remaining: 1 (WEAPON-FUNCTION - already exists but needs verification)
+- Implemented: 94 ✅
+- Remaining: 0 (RIVER-FUNCTION has basic stub)
+
 
