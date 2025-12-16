@@ -2304,3 +2304,59 @@ void kitchenAction(int rarg) {
     }
   }
 }
+
+// =============================================================================
+// TUBE-FUNCTION - Tube of putty
+// ZIL: PUT refused. SQUEEZE dispenses putty if open, else "closed" or "empty"
+// Source: 1actions.zil lines 1386-1400
+// =============================================================================
+bool tubeAction() {
+  auto &g = Globals::instance();
+
+  if (g.prsa == V_PUT && g.prsi && g.prsi->getId() == ObjectIds::TUBE) {
+    printLine("The tube refuses to accept anything.");
+    return RTRUE;
+  }
+
+  if (g.prsa == V_SQUEEZE && g.prso && g.prso->getId() == ObjectIds::TUBE) {
+    ZObject *tube = g.prso;
+    ZObject *putty = g.getObject(ObjectIds::PUTTY);
+
+    if (tube->hasFlag(ObjectFlag::OPENBIT)) {
+      if (putty && putty->getLocation() == tube) {
+        // Move putty to player
+        putty->moveTo(g.player);
+        printLine("The viscous material oozes into your hand.");
+      } else {
+        printLine("The tube is apparently empty.");
+      }
+    } else {
+      printLine("The tube is closed.");
+    }
+    return RTRUE;
+  }
+
+  return RFALSE;
+}
+
+// =============================================================================
+// UP-CHIMNEY-FUNCTION - Chimney climbing (already handled by chimneyAction)
+// ZIL: Climb up chimney if carrying only lamp
+// Source: 1actions.zil lines 553-575
+// =============================================================================
+// Note: UP-CHIMNEY-FUNCTION logic is already in chimneyAction()
+
+// =============================================================================
+// RIVER-FUNCTION - River flow mechanics (stub - complex)
+// ZIL: Handle boat movement in river, drowning, etc.
+// TODO: Full implementation when river system is complete
+// =============================================================================
+bool riverAction() {
+  auto &g = Globals::instance();
+  // Basic stub - river prevents certain actions
+  if (g.prsa == V_SWIM) {
+    printLine("You can't swim in this cold water!");
+    return RTRUE;
+  }
+  return RFALSE;
+}

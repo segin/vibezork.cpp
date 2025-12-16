@@ -66,7 +66,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] RESERVOIR-FCN - Reservoir water handler
 - [x] RESERVOIR-NORTH-FCN - North reservoir
 - [x] RESERVOIR-SOUTH-FCN - South reservoir
-- [ ] RIVER-FUNCTION - River flow/boat mechanics
+- [ ] RIVER-FUNCTION - River flow/boat mechanics (basic stub)
 - [x] ROBBER-FUNCTION - Thief AI
 - [x] ROPE-FUNCTION - Rope tie/untie
 - [x] RUG-FCN - Rug/trap door
@@ -89,8 +89,8 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] TROLL-ROOM-F - Troll room handler
 - [x] TROPHY-CASE-FCN - Trophy case
 - [x] TRUNK-F - Trunk stupid container
-- [ ] TUBE-FUNCTION - Tube container
-- [ ] UP-CHIMNEY-FUNCTION - Chimney climbing (handled by chimneyAction)
+- [x] TUBE-FUNCTION - Tube navigation (squeeze putty logic)
+- [x] UP-CHIMNEY-FUNCTION - Chimney climbing (in chimneyAction)
 - [ ] WATER-F - Water interactions (COMPLEX: needs separate work)
 - [ ] WEAPON-FUNCTION - Weapon blocked by NPC
 - [x] WHITE-CLIFFS-FUNCTION - White cliffs scenery
@@ -109,5 +109,5 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 94 actions
-- Implemented: 89
-- Remaining: 5 (RIVER-FUNCTION, TUBE-FUNCTION, UP-CHIMNEY-FUNCTION, WATER-F, WEAPON-FUNCTION)
+- Implemented: 92
+- Remaining: 2 (WATER-F, full RIVER-FUNCTION)
