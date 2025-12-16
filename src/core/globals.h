@@ -57,8 +57,6 @@ public:
   bool grateRevealed = false; // Has the grating been revealed in the Clearing?
   int matchCount = 5;         // Number of matches in matchbook
   bool rainbowFlag = false;   // Is rainbow solid/walkable? (ZIL: RAINBOW-FLAG)
-  int helloSailorCount = 0;   // "Hello, Sailor!" counter (ZIL: HS)
-  int beachDigCount = 0;      // Beach digging counter for scarab puzzle
 
   // Display modes
   bool verboseMode = true;     // Full descriptions
