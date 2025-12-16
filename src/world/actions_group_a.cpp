@@ -2383,7 +2383,7 @@ bool waterAction() {
       printLine("The bottle is closed.");
       return RTRUE;
     }
-    if (bottle->getFirstChild()) {
+    if (!bottle->getContents().empty()) {
       printLine("The bottle is not empty.");
       return RTRUE;
     }
@@ -2408,7 +2408,8 @@ bool waterAction() {
       return RTRUE;
     }
     if (bottle && bottle->getLocation() == g.player &&
-        bottle->hasFlag(ObjectFlag::OPENBIT) && !bottle->getFirstChild()) {
+        bottle->hasFlag(ObjectFlag::OPENBIT) &&
+        !!bottle->getContents().empty()) {
       if (water) {
         water->moveTo(bottle);
         printLine("The bottle is now full of water.");
@@ -2426,7 +2427,7 @@ bool waterAction() {
         printLine("The bottle is closed.");
         return RTRUE;
       }
-      if (bottle->getFirstChild()) {
+      if (!bottle->getContents().empty()) {
         printLine("The bottle is not empty.");
         return RTRUE;
       }
@@ -2439,7 +2440,7 @@ bool waterAction() {
     // Water in other containers evaporates
     if (g.prsi) {
       print("The water leaks out of the ");
-      print(g.prsi->getName());
+      print(g.prsi->getDesc());
       printLine(" and evaporates immediately.");
       if (water)
         water->moveTo(nullptr);
