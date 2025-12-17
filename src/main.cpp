@@ -97,35 +97,8 @@ void mainLoop1() {
   auto &g = Globals::instance();
   auto &score = ScoreSystem::instance();
 
-  // Get terminal width (default 80)
-  int termWidth = 80;
-  const char *cols = std::getenv("COLUMNS");
-  if (cols) {
-    termWidth = std::atoi(cols);
-    if (termWidth < 40)
-      termWidth = 80;
-  }
-
-  // Build status bar content
-  std::string locationName = g.here ? g.here->getDesc() : "???";
-  std::ostringstream status;
-  status << " " << locationName;
-
-  std::ostringstream rightPart;
-  rightPart << "Score: " << score.getScore() << "  Moves: " << score.getMoves()
-            << " ";
-
-  int leftLen = status.str().length();
-  int rightLen = rightPart.str().length();
-  int padding = termWidth - leftLen - rightLen;
-  if (padding < 1)
-    padding = 1;
-
-  // Print status bar (plain text - no ANSI codes for maximum compatibility)
-  std::cout << status.str();
-  for (int i = 0; i < padding; ++i)
-    std::cout << ' ';
-  std::cout << rightPart.str() << std::endl;
+  // Simple blank line before prompt (status bar removed per user request)
+  std::cout << std::endl;
 
   std::cout << "> ";
   std::string input = readLine();
