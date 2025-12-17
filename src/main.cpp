@@ -210,8 +210,8 @@ void go() {
   auto &g = Globals::instance();
 
   printLine("ZORK I: The Great Underground Empire");
-  printLine(
-      "Copyright (c) 1981, 1982, 1983 Infocom, Inc. All rights reserved.");
+  printLine("Copyright (c) 1981-2025 Infocom, Inc. (Microsoft Corporation); "
+            "All rights reserved.");
   printLine("ZORK is a registered trademark of Infocom, Inc.");
   crlf();
 
