@@ -607,12 +607,23 @@ bool vOpen() {
     print("Opening the ");
     print(g.prso->getDesc());
     print(" reveals ");
-    // Print contents inline
+    // Print contents inline with proper articles
     bool first = true;
     for (const auto *obj : contents) {
       if (!first)
         print(", ");
-      print(obj->getDesc());
+      // Add proper article
+      std::string desc = obj->getDesc();
+      char firstChar = desc.empty() ? 'a' : desc[0];
+      bool startsWithVowel =
+          (firstChar == 'a' || firstChar == 'e' || firstChar == 'i' ||
+           firstChar == 'o' || firstChar == 'u');
+      if (startsWithVowel) {
+        print("an ");
+      } else {
+        print("a ");
+      }
+      print(desc);
       first = false;
     }
     printLine(".");
