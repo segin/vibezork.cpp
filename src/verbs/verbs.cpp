@@ -252,9 +252,10 @@ bool vLook() {
         printLine(" here.");
       }
 
-      // If object is an open container, show contents
+      // If object is an open or transparent container, show contents
       if (obj->hasFlag(ObjectFlag::CONTBIT) &&
-          obj->hasFlag(ObjectFlag::OPENBIT)) {
+          (obj->hasFlag(ObjectFlag::OPENBIT) ||
+           obj->hasFlag(ObjectFlag::TRANSBIT))) {
         const auto &objContents = obj->getContents();
         if (!objContents.empty()) {
           print("The ");
@@ -283,9 +284,66 @@ bool vInventory() {
     printLine("You are empty-handed.");
   } else {
     printLine("You are carrying:");
+
+    // Helper lambda to print an object with proper article and indentation
+    std::function<void(const ZObject *, int)> printInventoryItem =
+        [&](const ZObject *obj, int indent) {
+          // Print indentation
+          for (int i = 0; i < indent; ++i) {
+            print("  ");
+          }
+
+          // Get description and add proper article
+          std::string desc = obj->getDesc();
+
+          // Capitalize first letter for display
+          char firstChar = desc.empty() ? 'A' : desc[0];
+          bool startsWithVowel =
+              (firstChar == 'a' || firstChar == 'e' || firstChar == 'i' ||
+               firstChar == 'o' || firstChar == 'u' || firstChar == 'A' ||
+               firstChar == 'E' || firstChar == 'I' || firstChar == 'O' ||
+               firstChar == 'U');
+
+          // Use "A" or "An" as appropriate (unless desc already has article)
+          bool hasArticle =
+              (desc.length() > 2 &&
+               (desc.substr(0, 2) == "a " || desc.substr(0, 3) == "an " ||
+                desc.substr(0, 4) == "the " || desc.substr(0, 5) == "some "));
+
+          if (!hasArticle) {
+            if (startsWithVowel) {
+              print("An ");
+            } else {
+              print("A ");
+            }
+          }
+          printLine(desc);
+
+          // If this is an open container with contents, list them
+          if (obj->hasFlag(ObjectFlag::CONTBIT) &&
+              (obj->hasFlag(ObjectFlag::OPENBIT) ||
+               obj->hasFlag(ObjectFlag::TRANSBIT))) {
+            const auto &objContents = obj->getContents();
+            if (!objContents.empty()) {
+              // Print container header
+              for (int i = 0; i < indent; ++i) {
+                print("  ");
+              }
+              print("  The ");
+              print(desc);
+              printLine(" contains:");
+
+              // Print each item in container
+              for (const auto *item : objContents) {
+                printInventoryItem(item, indent + 2);
+              }
+            }
+          }
+        };
+
+    // Print each inventory item
     for (const auto *obj : contents) {
-      print("  ");
-      printLine(obj->getDesc());
+      printInventoryItem(obj, 1);
     }
   }
   return RTRUE;
