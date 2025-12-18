@@ -485,6 +485,20 @@ ZObject *Parser::disambiguate(const std::vector<ZObject *> &candidates,
     return candidates[0];
   }
 
+  // GWIMBIT: "Get What I Mean" - if exactly one candidate has this flag,
+  // auto-select it as the preferred/obvious choice
+  ZObject *gwimChoice = nullptr;
+  int gwimCount = 0;
+  for (auto *candidate : candidates) {
+    if (candidate->hasFlag(ObjectFlag::GWIMBIT)) {
+      gwimChoice = candidate;
+      gwimCount++;
+    }
+  }
+  if (gwimCount == 1 && gwimChoice) {
+    return gwimChoice;
+  }
+
   // Display disambiguation prompt
   print("Which " + noun + " do you mean?\n");
 
@@ -592,6 +606,11 @@ std::vector<ZObject *> Parser::findAllApplicableObjects(VerbId verb) const {
 
     // Skip invisible objects
     if (!isObjectVisible(obj)) {
+      continue;
+    }
+
+    // Skip objects with INHIBIT flag (not selected in bulk operations)
+    if (obj->hasFlag(ObjectFlag::INHIBIT)) {
       continue;
     }
 
