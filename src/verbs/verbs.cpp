@@ -2,6 +2,7 @@
 #include "../systems/combat.h"
 #include "../systems/death.h"
 #include "../systems/npc.h"
+#include "../systems/score.h"
 #include "core/globals.h"
 #include "core/io.h"
 #include "parser/parser.h"
@@ -2173,33 +2174,17 @@ bool vSwing() {
 
 bool vScore() {
   auto &g = Globals::instance();
+  auto &scoreSystem = ScoreSystem::instance();
 
-  // Display current score
+  // Display current score using ScoreSystem (where trophy case scores are stored)
   print("Your score is ");
-  print(std::to_string(g.score));
+  print(std::to_string(scoreSystem.getScore()));
   print(" (total of 350 points), in ");
   print(std::to_string(g.moves));
   printLine(" moves.");
 
-  // Display rank based on score
-  std::string rank;
-  if (g.score >= 350) {
-    rank = "Master Adventurer";
-  } else if (g.score >= 300) {
-    rank = "Wizard";
-  } else if (g.score >= 200) {
-    rank = "Master";
-  } else if (g.score >= 100) {
-    rank = "Adventurer";
-  } else if (g.score >= 50) {
-    rank = "Junior Adventurer";
-  } else if (g.score >= 25) {
-    rank = "Novice Adventurer";
-  } else {
-    rank = "Beginner";
-  }
-
-  printLine("This gives you the rank of " + rank + ".");
+  // Display rank based on score using ScoreSystem
+  printLine("This gives you the rank of " + std::string(scoreSystem.getRank()) + ".");
 
   return RTRUE;
 }
