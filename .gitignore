@@ -10,6 +10,7 @@ zork1
 *.exe
 
 # IDE files
+.cache/
 .vscode/
 .idea/
 *.swp
