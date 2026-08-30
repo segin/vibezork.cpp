@@ -96,7 +96,7 @@ Generated from ZIL vs C++ Gap Analysis.
 - [x] PEDESTAL
 - [x] POT-OF-GOLD
 - [x] PRAYER
-- [ ] PSEUDO-OBJECT
+- [x] PSEUDO-OBJECT
 - [x] PUMP
 - [x] PUNCTURED-BOAT
 - [x] PUTTY
