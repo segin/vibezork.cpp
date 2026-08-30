@@ -75,7 +75,7 @@ Generated from ZIL vs C++ Gap Analysis.
 - [x] LARGE-BAG
 - [x] LEAK
 - [x] LEAVES
-- [ ] LOCAL-GLOBALS
+- [x] LOCAL-GLOBALS
 - [x] LOWERED-BASKET
 - [x] LUNCH
 - [x] LUNGS
