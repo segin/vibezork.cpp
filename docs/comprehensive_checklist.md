@@ -51,7 +51,7 @@ Generated from ZIL vs C++ Gap Analysis.
 - [x] FRONT-DOOR
 - [x] GARLIC
 - [x] GHOSTS
-- [ ] GLOBAL-OBJECTS
+- [x] GLOBAL-OBJECTS
 - [x] GLOBAL-WATER
 - [x] GRANITE-WALL
 - [x] GRATE
