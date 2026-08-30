@@ -63,7 +63,7 @@ Generated from ZIL vs C++ Gap Analysis.
 - [x] HOT-BELL
 - [x] INFLATABLE-BOAT
 - [x] INFLATED-BOAT
-- [ ] INTNUM
+- [x] INTNUM
 - [x] IT
 - [x] JADE
 - [x] KEYS
