@@ -92,7 +92,7 @@ Generated from ZIL vs C++ Gap Analysis.
 - [x] NOT-HERE-OBJECT
 - [x] OWNERS-MANUAL
 - [x] PAINTING
-- [ ] PATHOBJ
+- [x] PATHOBJ
 - [x] PEDESTAL
 - [x] POT-OF-GOLD
 - [x] PRAYER
