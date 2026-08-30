@@ -214,4 +214,17 @@ void initializeSpecialObjects() {
         .action = notHereObjectAction
     });
     
+    // ZIL: PATHOBJ (gglobals.zil:274-280)
+    // Passage / trail scenery object
+    extern bool pathObjectAction();
+    createObject({
+        .id = PATHOBJ,
+        .desc = "passage",
+        .synonyms = {"trail", "path"},
+        .adjectives = {"forest", "narrow", "long", "winding"},
+        .flags = {ObjectFlag::NDESCBIT},
+        .location = GLOBAL_OBJECTS,
+        .action = pathObjectAction
+    });
+    
 } // end initializeSpecialObjects

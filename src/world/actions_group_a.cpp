@@ -1127,8 +1127,22 @@ bool inflatedBoatAction() {
       return RFALSE; // Not in boat, not handled
     }
 
-    // TODO: Check PRSO for specific directions
-    // For now, print the label message for unsupported directions
+    Direction dir = getDirection(g.prso);
+    if (dir == Direction::EAST || dir == Direction::WEST) {
+      return RFALSE;
+    }
+    if (g.prso && (g.prso->getId() == ObjectIds::SAND || g.prso->getId() == ObjectIds::GROUND)) {
+      return RFALSE;
+    }
+    if (g.here && g.here->getId() == RoomIds::RESERVOIR &&
+        (dir == Direction::NORTH || dir == Direction::SOUTH)) {
+      return RFALSE;
+    }
+    if (g.here && g.here->getId() == RoomIds::IN_STREAM &&
+        dir == Direction::SOUTH) {
+      return RFALSE;
+    }
+
     printLine("Read the label for the boat's instructions.");
     return RTRUE;
   }
@@ -1743,6 +1757,25 @@ bool machineSwitchAction() {
 bool notHereObjectAction() {
   printLine("You can't see any such thing.");
   return true;
+}
+
+// ZIL: PATH-OBJECT (gglobals.zil:282-288)
+// Handles TAKE/FOLLOW, FIND, DIG for PATHOBJ
+bool pathObjectAction() {
+  auto &g = Globals::instance();
+  if (g.prsa == V_TAKE || g.prsa == V_FOLLOW) {
+    printLine("You must specify a direction to go.");
+    return RTRUE;
+  }
+  if (g.prsa == V_FIND) {
+    printLine("I can't help you there....");
+    return RTRUE;
+  }
+  if (g.prsa == V_DIG) {
+    printLine("Not a chance.");
+    return RTRUE;
+  }
+  return RFALSE;
 }
 
 // NULL-F (Does nothing, returns false)
