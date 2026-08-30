@@ -89,7 +89,7 @@ Generated from ZIL vs C++ Gap Analysis.
 - [x] MIRROR-2
 - [x] MOUNTAIN-RANGE
 - [x] NEST
-- [ ] NOT-HERE-OBJECT
+- [x] NOT-HERE-OBJECT
 - [x] OWNERS-MANUAL
 - [x] PAINTING
 - [ ] PATHOBJ
