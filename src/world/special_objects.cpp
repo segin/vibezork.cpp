@@ -174,4 +174,15 @@ void initializeSpecialObjects() {
         .location = RoomIds::DAM_ROOM
     });
     
+    // ZIL: GLOBAL-OBJECTS (gglobals.zil:7-10)
+    // Parent container for global objects
+    createObject({
+        .id = GLOBAL_OBJECTS,
+        .desc = "global objects",
+        .flags = {ObjectFlag::INVISIBLE, ObjectFlag::TOUCHBIT, ObjectFlag::SURFACEBIT,
+                  ObjectFlag::TRYTAKEBIT, ObjectFlag::OPENBIT, ObjectFlag::TRANSBIT,
+                  ObjectFlag::ONBIT, ObjectFlag::RLANDBIT, ObjectFlag::FIGHTBIT,
+                  ObjectFlag::WEARBIT}
+    });
+    
 } // end initializeSpecialObjects

@@ -216,6 +216,18 @@ constexpr ObjectId HOT_BELL = 781;
 // ============================================================================
 
 constexpr ObjectId ADVENTURER = 800;  // Player object
+constexpr ObjectId IT = 801;          // Pronoun "it"
+constexpr ObjectId ME = 802;          // Player "me"
+constexpr ObjectId SAILOR = 803;      // Global sailor
+constexpr ObjectId ZORKMID = 804;     // Unit of currency
+constexpr ObjectId ROOMS = 805;       // Rooms parent object
+constexpr ObjectId GLOBAL_OBJECTS = 806; // Global objects parent
+constexpr ObjectId LOCAL_GLOBALS = 807;  // Local globals container
+constexpr ObjectId INTNUM = 808;      // Integer number pseudo-object
+constexpr ObjectId PSEUDO_OBJECT = 809; // Pseudo object
+constexpr ObjectId NOT_HERE_OBJECT = 810; // Not here object
+constexpr ObjectId PATHOBJ = 811;     // Path / trail object
+constexpr ObjectId TRUNK = 107;       // Alias for JEWELS (trunk of jewels)
 
 } // namespace ObjectIds
 
