@@ -185,4 +185,14 @@ void initializeSpecialObjects() {
                   ObjectFlag::WEARBIT}
     });
     
+    // ZIL: INTNUM (gglobals.zil:31-35)
+    // Integer number pseudo-object for parser
+    createObject({
+        .id = INTNUM,
+        .desc = "number",
+        .synonyms = {"intnum", "number"},
+        .flags = {ObjectFlag::TOOLBIT},
+        .location = GLOBAL_OBJECTS
+    });
+    
 } // end initializeSpecialObjects
