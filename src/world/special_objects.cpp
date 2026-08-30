@@ -227,4 +227,14 @@ void initializeSpecialObjects() {
         .action = pathObjectAction
     });
     
+    // ZIL: PSEUDO-OBJECT (gglobals.zil:37-40)
+    // Parser pseudo-object using cretinAction
+    extern bool cretinAction();
+    createObject({
+        .id = PSEUDO_OBJECT,
+        .desc = "pseudo",
+        .location = LOCAL_GLOBALS,
+        .action = cretinAction
+    });
+    
 } // end initializeSpecialObjects
