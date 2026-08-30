@@ -205,4 +205,13 @@ void initializeSpecialObjects() {
         .location = GLOBAL_OBJECTS
     });
     
+    // ZIL: NOT-HERE-OBJECT (gglobals.zil:48-50)
+    // Placeholder when referenced object is not present
+    extern bool notHereObjectAction();
+    createObject({
+        .id = NOT_HERE_OBJECT,
+        .desc = "such thing",
+        .action = notHereObjectAction
+    });
+    
 } // end initializeSpecialObjects
