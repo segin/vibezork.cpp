@@ -195,4 +195,14 @@ void initializeSpecialObjects() {
         .location = GLOBAL_OBJECTS
     });
     
+    // ZIL: LOCAL-GLOBALS (gglobals.zil:12-24)
+    // Container for local global objects
+    createObject({
+        .id = LOCAL_GLOBALS,
+        .desc = "local globals",
+        .synonyms = {"zzmgck"},
+        .flags = {ObjectFlag::INVISIBLE},
+        .location = GLOBAL_OBJECTS
+    });
+    
 } // end initializeSpecialObjects
