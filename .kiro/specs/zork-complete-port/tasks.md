@@ -776,7 +776,7 @@ With rooms in place, add all objects that populate the world.
   - Set TEXT properties
   - _Requirements: 18, 25_
 
-- [ ] 24. Set up initial game state
+- [x] 24. Set up initial game state
   - Place player at WEST_OF_HOUSE
   - Set initial object locations
   - Set initial flags and properties
