@@ -324,13 +324,126 @@ bool bottleAction() {
   return false;
 }
 
+// ZIL: RANDOM TABLES FOR WALK-AROUND (1dungeon.zil:2620-2633)
+namespace WalkAroundTables {
+    inline constexpr ObjectId HOUSE_AROUND[] = {
+        RoomIds::WEST_OF_HOUSE, RoomIds::NORTH_OF_HOUSE,
+        RoomIds::EAST_OF_HOUSE, RoomIds::SOUTH_OF_HOUSE,
+        RoomIds::WEST_OF_HOUSE
+    };
+
+    inline constexpr ObjectId FOREST_AROUND[] = {
+        RoomIds::FOREST_1, RoomIds::FOREST_2, RoomIds::FOREST_3,
+        RoomIds::FOREST_PATH, RoomIds::CLEARING, RoomIds::FOREST_1
+    };
+
+    inline constexpr ObjectId IN_HOUSE_AROUND[] = {
+        RoomIds::LIVING_ROOM, RoomIds::KITCHEN, RoomIds::ATTIC, RoomIds::KITCHEN
+    };
+
+    inline constexpr ObjectId ABOVE_GROUND[] = {
+        RoomIds::WEST_OF_HOUSE, RoomIds::NORTH_OF_HOUSE,
+        RoomIds::EAST_OF_HOUSE, RoomIds::SOUTH_OF_HOUSE,
+        RoomIds::FOREST_1, RoomIds::FOREST_2, RoomIds::FOREST_3,
+        RoomIds::FOREST_PATH, RoomIds::CLEARING, RoomIds::GRATING_CLEARING,
+        RoomIds::CANYON_VIEW
+    };
+}
+
+// ZIL: <ROUTINE GO-NEXT (TBL) ...> (1actions.zil:131-134)
+inline bool goNext(std::span<const ObjectId> tbl) {
+    auto& g = Globals::instance();
+    if (!g.here || tbl.size() < 2) return false;
+    
+    for (size_t i = 0; i + 1 < tbl.size(); ++i) {
+        if (g.here->getId() == tbl[i]) {
+            ObjectId nextId = tbl[i + 1];
+            if (auto* nextRoom = g.getObject(nextId)) {
+                if (g.winner) {
+                    g.winner->moveTo(nextRoom);
+                }
+                g.here = nextRoom;
+                Verbs::vLook();
+                return true;
+            }
+            break;
+        }
+    }
+    return false;
+}
+
+// WHITE-HOUSE-F (ZIL: 1actions.zil:92-127)
 bool whiteHouseAction() {
   auto &g = Globals::instance();
+  if (!g.here) return RFALSE;
+
+  ObjectId hereId = g.here->getId();
+
+  if (hereId == RoomIds::KITCHEN || hereId == RoomIds::LIVING_ROOM || hereId == RoomIds::ATTIC) {
+    if (g.prsa == V_FIND) {
+      printLine("Why not find your brains?");
+      return RTRUE;
+    }
+    if (g.prsa == V_WALK_AROUND) {
+      goNext(WalkAroundTables::IN_HOUSE_AROUND);
+      return RTRUE;
+    }
+  } else if (hereId != RoomIds::EAST_OF_HOUSE && hereId != RoomIds::WEST_OF_HOUSE &&
+             hereId != RoomIds::NORTH_OF_HOUSE && hereId != RoomIds::SOUTH_OF_HOUSE &&
+             hereId != RoomIds::BEHIND_HOUSE) {
+    if (g.prsa == V_FIND) {
+      if (hereId == RoomIds::CLEARING) {
+        printLine("It seems to be to the west.");
+      } else {
+        printLine("It was here just a minute ago....");
+      }
+      return RTRUE;
+    }
+    printLine("You're not at the house.");
+    return RTRUE;
+  }
+
+  if (g.prsa == V_FIND) {
+    printLine("It's right here! Are you blind or something?");
+    return RTRUE;
+  }
+
+  if (g.prsa == V_WALK_AROUND) {
+    goNext(WalkAroundTables::HOUSE_AROUND);
+    return RTRUE;
+  }
+
   if (g.prsa == V_EXAMINE) {
     printLine("The house is a beautiful colonial house which is painted white. "
               "It is clear that the owners must have been extremely wealthy.");
     return RTRUE;
   }
+
+  if (g.prsa == V_ENTER || g.prsa == V_OPEN) {
+    if (hereId == RoomIds::EAST_OF_HOUSE || hereId == RoomIds::BEHIND_HOUSE) {
+      auto* window = g.getObject(ObjectIds::KITCHEN_WINDOW);
+      if (window && window->hasFlag(ObjectFlag::OPENBIT)) {
+        if (auto* kitchen = g.getObject(RoomIds::KITCHEN)) {
+          if (g.winner) g.winner->moveTo(kitchen);
+          g.here = kitchen;
+          Verbs::vLook();
+        }
+      } else {
+        printLine("The window is closed.");
+        g.it = window;
+      }
+      return RTRUE;
+    } else {
+      printLine("I can't see how to get in from here.");
+      return RTRUE;
+    }
+  }
+
+  if (g.prsa == V_BURN) {
+    printLine("You must be joking.");
+    return RTRUE;
+  }
+
   return RFALSE;
 }
 
@@ -351,70 +464,40 @@ bool boardAction() {
 // Source: 1actions.zil lines 136-150
 bool forestAction() {
   auto &g = Globals::instance();
+  if (!g.here) return RFALSE;
+
+  ObjectId hereId = g.here->getId();
+
+  if (g.prsa == V_WALK_AROUND) {
+    if (hereId == RoomIds::WEST_OF_HOUSE || hereId == RoomIds::NORTH_OF_HOUSE ||
+        hereId == RoomIds::SOUTH_OF_HOUSE || hereId == RoomIds::EAST_OF_HOUSE ||
+        hereId == RoomIds::BEHIND_HOUSE) {
+      printLine("You aren't even in the forest.");
+      return RTRUE;
+    }
+
+    if (!goNext(WalkAroundTables::FOREST_AROUND)) {
+      printLine("You aren't even in the forest.");
+    }
+    return RTRUE;
+  }
+
+  if (g.prsa == V_DISEMBARK || g.prsa == V_EXIT) {
+    printLine("You will have to specify a direction.");
+    return RTRUE;
+  }
 
   if (g.prsa == V_FIND) {
     printLine("You cannot see the forest for the trees.");
-    return true;
+    return RTRUE;
   }
 
   if (g.prsa == V_LISTEN) {
     printLine("The pines and the hemlocks seem to be murmuring.");
-    return true;
+    return RTRUE;
   }
 
-  // ZIL: DISEMBARK (EXIT?)
-  if (g.prsa == V_DISEMBARK || g.prsa == V_EXIT) {
-    printLine("You will have to specify a direction.");
-    return true;
-  }
-
-  // ZIL: WALK-AROUND
-  if (g.prsa == V_WALK_AROUND) {
-    // Rooms not in forest
-    if (g.here->getId() == RoomIds::WEST_OF_HOUSE ||
-        g.here->getId() == RoomIds::NORTH_OF_HOUSE ||
-        g.here->getId() == RoomIds::SOUTH_OF_HOUSE ||
-        g.here->getId() == RoomIds::BEHIND_HOUSE) {
-      printLine("You aren't even in the forest.");
-      return true;
-    }
-
-    // Forest Around List (ZIL: FOREST-1 FOREST-2 FOREST-3 PATH CLEARING
-    // FOREST-1) Since it's circular, we can list valid rooms and next hop. Or
-    // simple list and find + 1.
-    std::vector<ObjectId> forestRooms = {
-        RoomIds::FOREST_1, RoomIds::FOREST_2, RoomIds::FOREST_3,
-        RoomIds::FOREST_PATH, RoomIds::CLEARING};
-
-    bool found = false;
-    ObjectId nextRoom = 0;
-
-    for (size_t i = 0; i < forestRooms.size(); ++i) {
-      if (g.here->getId() == forestRooms[i]) {
-        // Determine next room (Circular)
-        nextRoom = forestRooms[(i + 1) % forestRooms.size()];
-        found = true;
-        break;
-      }
-    }
-
-    if (found) {
-      auto *target = g.getObject(nextRoom);
-      if (target && g.winner) {
-        g.winner->moveTo(target);
-        g.here = target;
-        return true;
-      }
-    }
-
-    // If not in forest list?
-    printLine("You aren't even in the forest.");
-    return true;
-  }
-
-  // Redundant V_EXAMINE removed (Object has LDESC).
-
-  return false;
+  return RFALSE;
 }
 
 // Rug action - handles MOVE/PUSH to reveal trap door (ZIL: RUG-FCN)

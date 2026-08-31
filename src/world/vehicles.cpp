@@ -23,13 +23,13 @@ void initializeVehicles() {
     });
 
     
-    // BOAT_INFLATED - Inflated rubber boat (created when inflated)
+    // BOAT_INFLATED - Inflated rubber boat (created when inflated) (ZIL: 1dungeon.zil:2643)
     createObject({
         .id = BOAT_INFLATED,
         .desc = "rubber boat",
         .synonyms = {"boat", "raft"},
         .adjectives = {"rubber", "inflated", "small"},
-        .flags = {ObjectFlag::CONTBIT, ObjectFlag::VEHBIT, ObjectFlag::OPENBIT},
+        .flags = {ObjectFlag::CONTBIT, ObjectFlag::VEHBIT, ObjectFlag::OPENBIT, ObjectFlag::NONLANDBIT},
         .size = 50,
         .capacity = 100,
         .action = boatAction

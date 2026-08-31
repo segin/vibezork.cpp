@@ -208,15 +208,45 @@ void initializeGame() {
   SwordSystem::initialize();  // Initialize sword glow timer (Requirement 49)
 }
 
+// ZIL: <ROUTINE GO () ...> (1dungeon.zil:2637-2661)
 void go() {
   auto &g = Globals::instance();
 
-  std::println("ZORK I: The Great Underground Empire");
-  std::println("Copyright (c) 1981-2025 Infocom, Inc. (Microsoft Corporation)");
-  std::println("ZORK is a registered trademark of Microsoft Corporation.\n");
+  // ZIL: <PUTP ,INFLATED-BOAT ,P?VTYPE ,NONLANDBIT>
+  if (auto *boat = g.getObject(ObjectIds::BOAT_INFLATED)) {
+    boat->setFlag(ObjectFlag::NONLANDBIT);
+  }
 
+  // ZIL: <SETG HERE ,WEST-OF-HOUSE>
+  g.here = g.getObject(RoomIds::WEST_OF_HOUSE);
+
+  // ZIL: <THIS-IS-IT ,MAILBOX>
+  g.it = g.getObject(ObjectIds::MAILBOX);
+
+  // ZIL: <COND (<NOT <FSET? ,HERE ,TOUCHBIT>> <V-VERSION> <CRLF>)>
+  if (g.here && !g.here->hasFlag(ObjectFlag::TOUCHBIT)) {
+    Verbs::vVersion();
+    std::println();
+  }
+
+  // ZIL: <SETG LIT T>
+  g.lit = true;
+
+  // ZIL: <SETG WINNER ,ADVENTURER>
+  // ZIL: <SETG PLAYER ,WINNER>
+  // ZIL: <MOVE ,WINNER ,HERE>
+  if (!g.player) {
+    g.player = g.getObject(ObjectIds::ADVENTURER);
+  }
+  g.winner = g.player;
+  if (g.winner && g.here) {
+    g.winner->moveTo(g.here);
+  }
+
+  // ZIL: <V-LOOK>
   Verbs::vLook();
 
+  // ZIL: <MAIN-LOOP>
   mainLoop();
 }
 
