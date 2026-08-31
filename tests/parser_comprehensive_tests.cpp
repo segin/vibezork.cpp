@@ -87,7 +87,7 @@ TEST(TokenizationManyWords) {
 // Test verb recognition edge cases
 TEST(VerbRecognitionUnknownVerb) {
     VerbRegistry registry;
-    auto verb = registry.lookupVerb("xyzzy");
+    auto verb = registry.lookupVerb("nonexistentverb");
     ASSERT_FALSE(verb.has_value());
 }
 

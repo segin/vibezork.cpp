@@ -49,8 +49,12 @@ std::optional<size_t> SyntaxPattern::findPrepositionIndex(
 }
 
 bool SyntaxPattern::matches(const std::vector<std::string>& tokens) const {
-    if (tokens.empty()) {
+    if (pattern_.empty()) {
         return false;
+    }
+    
+    if (tokens.empty()) {
+        return std::all_of(pattern_.begin(), pattern_.end(), [](const Element& el) { return el.optional; });
     }
     
     // Track position in tokens and pattern
@@ -124,19 +128,21 @@ bool SyntaxPattern::matches(const std::vector<std::string>& tokens) const {
                 // Consume at least one token for the object
                 if (tokenIdx < tokens.size()) {
                     tokenIdx++;
-                    // Consume additional tokens until preposition or end
-                    while (tokenIdx < tokens.size() && !foundPrep) {
-                        // Check if current token is a preposition
-                        bool isPrep = false;
-                        for (size_t i = patternIdx + 1; i < pattern_.size(); ++i) {
-                            if (pattern_[i].type == ElementType::PREPOSITION &&
-                                matchElement(pattern_[i], tokens[tokenIdx])) {
-                                isPrep = true;
-                                break;
+                    // If there's an upcoming preposition, consume additional tokens until it
+                    if (foundPrep) {
+                        while (tokenIdx < tokens.size()) {
+                            // Check if current token is a preposition
+                            bool isPrep = false;
+                            for (size_t i = patternIdx + 1; i < pattern_.size(); ++i) {
+                                if (pattern_[i].type == ElementType::PREPOSITION &&
+                                    matchElement(pattern_[i], tokens[tokenIdx])) {
+                                    isPrep = true;
+                                    break;
+                                }
                             }
+                            if (isPrep) break;
+                            tokenIdx++;
                         }
-                        if (isPrep) break;
-                        tokenIdx++;
                     }
                 }
                 patternIdx++;
@@ -158,8 +164,8 @@ bool SyntaxPattern::matches(const std::vector<std::string>& tokens) const {
         }
     }
     
-    // Successfully matched if we've processed all required pattern elements
-    return true;
+    // Successfully matched only if we've processed all tokens
+    return tokenIdx >= tokens.size();
 }
 
 ParseResult SyntaxPattern::apply(const std::vector<std::string>& tokens,

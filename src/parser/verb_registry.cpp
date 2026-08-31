@@ -61,7 +61,7 @@ void VerbRegistry::initializeVerbSynonyms() {
     registerVerb(V_UNLOCK, {"unlock"});
     
     // Movement verbs
-    registerVerb(V_WALK, {"walk", "go", "run", "proceed", "step"});
+    registerVerb(V_WALK, {"walk", "go", "run", "proceed", "step", "north", "n", "south", "s", "east", "e", "west", "w", "ne", "nw", "se", "sw", "up", "u", "down", "d", "in", "out", "land"});
     registerVerb(V_ENTER, {"enter"});
     registerVerb(V_EXIT, {"exit"});
     // registerVerb(V_CLIMB_UP, {"climb"});  // "climb up" handled by syntax
@@ -207,8 +207,7 @@ void VerbRegistry::initializeVerbSynonyms() {
     // I will register V_STRIKE and use syntax to map Object to V_ATTACK.
     registerVerb(V_PICK, {"pick"});
     registerVerb(V_APPLY, {"apply"});
-    registerVerb(V_PICK, {"pick"});
-    registerVerb(V_APPLY, {"apply"});
+    registerVerb(V_OVERBOARD, {"overboard"});
 }
 
 void VerbRegistry::registerVerb(VerbId verbId, std::vector<std::string> synonyms) {

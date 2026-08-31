@@ -278,10 +278,10 @@ int Parser::getLocationPriority(ZObject *obj) const {
     return 2;
   }
 
-  // Priority 3: Objects in open containers in room or inventory
+  // Priority 3: Objects in open or transparent containers in room or inventory
   ZObject *loc = obj->getLocation();
   if (loc && loc->hasFlag(ObjectFlag::CONTBIT) &&
-      loc->hasFlag(ObjectFlag::OPENBIT)) {
+      (loc->hasFlag(ObjectFlag::OPENBIT) || loc->hasFlag(ObjectFlag::TRANSBIT))) {
     if (loc->getLocation() == g.here || loc->getLocation() == g.winner) {
       return 1;
     }
@@ -292,6 +292,13 @@ int Parser::getLocationPriority(ZObject *obj) const {
 }
 
 bool Parser::isObjectVisible(ZObject *obj) const {
+  if (!obj) {
+    return false;
+  }
+  if (obj->hasFlag(ObjectFlag::INVISIBLE)) {
+    return false;
+  }
+
   auto &g = Globals::instance();
 
   // Special case: Kitchen window is visible from both Behind House and Kitchen
