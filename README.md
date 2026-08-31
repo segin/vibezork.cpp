@@ -1,6 +1,6 @@
 # Zork I - C++ Port
 
-A complete C++ port of the classic Zork I text adventure game, originally written in ZIL (Zork Implementation Language) by Infocom. This port faithfully recreates the original game experience using modern C++17.
+A complete C++ port of the classic Zork I text adventure game, originally written in ZIL (Zork Implementation Language) by Infocom. This port faithfully recreates the original game experience using modern C++23.
 
 ## Features
 
@@ -33,7 +33,7 @@ A complete C++ port of the classic Zork I text adventure game, originally writte
 
 ### Prerequisites
 - CMake 3.10 or higher
-- C++17 compatible compiler (GCC 7+, Clang 5+, MSVC 2017+)
+- C++23 compatible compiler (GCC 13+, Clang 17+, MSVC 2022+)
 
 ### Build the Game
 ```bash

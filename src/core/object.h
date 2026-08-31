@@ -69,8 +69,8 @@ public:
   bool performAction() { return action_ ? action_() : false; }
 
   // Serialization support (for save/restore system)
-  uint32_t getAllFlags() const { return flags_; }
-  void setAllFlags(uint32_t flags) { flags_ = flags; }
+  uint64_t getAllFlags() const { return flags_; }
+  void setAllFlags(uint64_t flags) { flags_ = flags; }
   const std::map<PropertyId, int> &getAllProperties() const {
     return properties_;
   }

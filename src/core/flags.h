@@ -44,10 +44,23 @@ enum class ObjectFlag : uint64_t {
   MAZEBIT = 1ULL << 32,    // Room is in a maze
   NONLANDBIT = 1ULL << 33, // Room is not on land (water)
   GWIMBIT = 1ULL << 34,    // "Get What I Mean" parser hint
-  INHIBIT = 1ULL << 35,    // Inhibit certain behaviors
-  MULTIBIT = 1ULL << 36,   // Parser: multiple objects allowed
-  SLOCBIT = 1ULL << 37     // Special location bit
+  INHIBIT = 1ULL << 35,    // Inhibit certain behaviors / skip in bulk take
+  MULTIBIT = 1ULL << 36,   // Parser: multiple objects allowed (ALL)
+  SLOCBIT = 1ULL << 37,    // Special location bit
+  P_SBIT = 1ULL << 38,     // Scope / search bit
+  P_P1BIT = 1ULL << 39,    // Preposition clause 1 bit
+  GBIT = 1ULL << 40,       // Global search bit
+  IBIT = 1ULL << 41,       // Indirect object search bit
+  LBIT = 1ULL << 42,       // Local search bit
+  OBIT = 1ULL << 43,       // Direct object search bit
+  RMBIT = 1ULL << 44,      // Room search bit
+  XBIT = 1ULL << 45        // Extended search bit
 };
+
+// Aliases for ZIL naming conventions
+inline constexpr ObjectFlag P_GWIMBIT = ObjectFlag::GWIMBIT;
+inline constexpr ObjectFlag P_INHIBIT = ObjectFlag::INHIBIT;
+inline constexpr ObjectFlag P_SLOCBIT = ObjectFlag::SLOCBIT;
 
 inline uint64_t operator|(ObjectFlag a, ObjectFlag b) {
   return static_cast<uint64_t>(a) | static_cast<uint64_t>(b);

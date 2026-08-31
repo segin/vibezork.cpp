@@ -7,6 +7,11 @@
 #include "parser/parser.h"
 #include "test_framework.h"
 #include "world/rooms.h"
+#include "world/world.h"
+
+static void setupTestWorld() {
+  initializeWorld();
+}
 
 // =============================================================================
 // MAZEBIT Tests - Maze room identification
@@ -246,6 +251,14 @@ TEST(Flags_64BitRange) {
   testObj.setFlag(ObjectFlag::INHIBIT);    // bit 35
   testObj.setFlag(ObjectFlag::MULTIBIT);   // bit 36
   testObj.setFlag(ObjectFlag::SLOCBIT);    // bit 37
+  testObj.setFlag(ObjectFlag::P_SBIT);     // bit 38
+  testObj.setFlag(ObjectFlag::P_P1BIT);    // bit 39
+  testObj.setFlag(ObjectFlag::GBIT);       // bit 40
+  testObj.setFlag(ObjectFlag::IBIT);       // bit 41
+  testObj.setFlag(ObjectFlag::LBIT);       // bit 42
+  testObj.setFlag(ObjectFlag::OBIT);       // bit 43
+  testObj.setFlag(ObjectFlag::RMBIT);      // bit 44
+  testObj.setFlag(ObjectFlag::XBIT);       // bit 45
 
   ASSERT_TRUE(testObj.hasFlag(ObjectFlag::MAZEBIT));
   ASSERT_TRUE(testObj.hasFlag(ObjectFlag::NONLANDBIT));
@@ -253,10 +266,38 @@ TEST(Flags_64BitRange) {
   ASSERT_TRUE(testObj.hasFlag(ObjectFlag::INHIBIT));
   ASSERT_TRUE(testObj.hasFlag(ObjectFlag::MULTIBIT));
   ASSERT_TRUE(testObj.hasFlag(ObjectFlag::SLOCBIT));
+  ASSERT_TRUE(testObj.hasFlag(ObjectFlag::P_SBIT));
+  ASSERT_TRUE(testObj.hasFlag(ObjectFlag::P_P1BIT));
+  ASSERT_TRUE(testObj.hasFlag(ObjectFlag::GBIT));
+  ASSERT_TRUE(testObj.hasFlag(ObjectFlag::IBIT));
+  ASSERT_TRUE(testObj.hasFlag(ObjectFlag::LBIT));
+  ASSERT_TRUE(testObj.hasFlag(ObjectFlag::OBIT));
+  ASSERT_TRUE(testObj.hasFlag(ObjectFlag::RMBIT));
+  ASSERT_TRUE(testObj.hasFlag(ObjectFlag::XBIT));
 }
 
 // =============================================================================
 // Run all tests
 // =============================================================================
 
-int main(int argc, char **argv) { return runAllTests(); }
+int main(int argc, char *argv[]) {
+  std::cout << "Running Parser Flag Tests" << std::endl;
+  std::cout << "=========================" << std::endl;
+  std::cout << std::endl;
+
+  auto results = TestFramework::instance().runAll();
+
+  int passed = 0, failed = 0;
+  for (const auto &r : results) {
+    if (r.passed)
+      passed++;
+    else
+      failed++;
+  }
+
+  std::cout << std::endl;
+  std::cout << "Results: " << passed << " passed, " << failed << " failed"
+            << std::endl;
+
+  return failed > 0 ? 1 : 0;
+}

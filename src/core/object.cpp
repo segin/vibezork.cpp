@@ -14,15 +14,15 @@ int ZObject::getProperty(PropertyId prop) const {
 }
 
 void ZObject::setFlag(ObjectFlag flag) {
-    flags_ |= static_cast<uint32_t>(flag);
+    flags_ |= static_cast<uint64_t>(flag);
 }
 
 void ZObject::clearFlag(ObjectFlag flag) {
-    flags_ &= ~static_cast<uint32_t>(flag);
+    flags_ &= ~static_cast<uint64_t>(flag);
 }
 
 bool ZObject::hasFlag(ObjectFlag flag) const {
-    return (flags_ & static_cast<uint32_t>(flag)) != 0;
+    return (flags_ & static_cast<uint64_t>(flag)) != 0;
 }
 
 void ZObject::moveTo(ZObject* location) {

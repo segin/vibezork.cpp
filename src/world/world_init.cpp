@@ -1337,6 +1337,7 @@ void initializeWorld() {
         "This is part of a maze of twisty little passages, all alike."
     );
     maze1->setFlag(ObjectFlag::RLANDBIT);
+    maze1->setFlag(ObjectFlag::MAZEBIT);
     maze1->setRoomAction(mazeRoomAction);
     g.registerObject(RoomIds::MAZE_1, std::move(maze1));
     
@@ -1347,6 +1348,7 @@ void initializeWorld() {
         "This is part of a maze of twisty little passages, all alike."
     );
     maze2->setFlag(ObjectFlag::RLANDBIT);
+    maze2->setFlag(ObjectFlag::MAZEBIT);
     maze2->setRoomAction(mazeRoomAction);
     g.registerObject(RoomIds::MAZE_2, std::move(maze2));
     
@@ -1357,6 +1359,7 @@ void initializeWorld() {
         "This is part of a maze of twisty little passages, all alike."
     );
     maze3->setFlag(ObjectFlag::RLANDBIT);
+    maze3->setFlag(ObjectFlag::MAZEBIT);
     maze3->setRoomAction(mazeRoomAction);
     g.registerObject(RoomIds::MAZE_3, std::move(maze3));
     
@@ -1367,6 +1370,7 @@ void initializeWorld() {
         "This is part of a maze of twisty little passages, all alike."
     );
     maze4->setFlag(ObjectFlag::RLANDBIT);
+    maze4->setFlag(ObjectFlag::MAZEBIT);
     maze4->setRoomAction(mazeRoomAction);
     g.registerObject(RoomIds::MAZE_4, std::move(maze4));
     
@@ -1377,6 +1381,7 @@ void initializeWorld() {
         "This is part of a maze of twisty little passages, all alike."
     );
     maze5->setFlag(ObjectFlag::RLANDBIT);
+    maze5->setFlag(ObjectFlag::MAZEBIT);
     maze5->setRoomAction(mazeRoomAction);
     g.registerObject(RoomIds::MAZE_5, std::move(maze5));
     
@@ -1387,6 +1392,7 @@ void initializeWorld() {
         "This is part of a maze of twisty little passages, all alike."
     );
     maze6->setFlag(ObjectFlag::RLANDBIT);
+    maze6->setFlag(ObjectFlag::MAZEBIT);
     maze6->setRoomAction(mazeRoomAction);
     g.registerObject(RoomIds::MAZE_6, std::move(maze6));
     
@@ -1397,6 +1403,7 @@ void initializeWorld() {
         "This is part of a maze of twisty little passages, all alike."
     );
     maze7->setFlag(ObjectFlag::RLANDBIT);
+    maze7->setFlag(ObjectFlag::MAZEBIT);
     maze7->setRoomAction(mazeRoomAction);
     g.registerObject(RoomIds::MAZE_7, std::move(maze7));
     
@@ -1407,6 +1414,7 @@ void initializeWorld() {
         "This is part of a maze of twisty little passages, all alike."
     );
     maze8->setFlag(ObjectFlag::RLANDBIT);
+    maze8->setFlag(ObjectFlag::MAZEBIT);
     maze8->setRoomAction(mazeRoomAction);
     g.registerObject(RoomIds::MAZE_8, std::move(maze8));
     
@@ -1417,6 +1425,7 @@ void initializeWorld() {
         "This is part of a maze of twisty little passages, all alike."
     );
     maze9->setFlag(ObjectFlag::RLANDBIT);
+    maze9->setFlag(ObjectFlag::MAZEBIT);
     maze9->setRoomAction(mazeRoomAction);
     g.registerObject(RoomIds::MAZE_9, std::move(maze9));
     
@@ -1427,6 +1436,7 @@ void initializeWorld() {
         "This is part of a maze of twisty little passages, all alike."
     );
     maze10->setFlag(ObjectFlag::RLANDBIT);
+    maze10->setFlag(ObjectFlag::MAZEBIT);
     maze10->setRoomAction(mazeRoomAction);
     g.registerObject(RoomIds::MAZE_10, std::move(maze10));
     
@@ -1437,6 +1447,7 @@ void initializeWorld() {
         "This is part of a maze of twisty little passages, all alike."
     );
     maze11->setFlag(ObjectFlag::RLANDBIT);
+    maze11->setFlag(ObjectFlag::MAZEBIT);
     maze11->setRoomAction(mazeRoomAction);
     g.registerObject(RoomIds::MAZE_11, std::move(maze11));
     
@@ -1447,6 +1458,7 @@ void initializeWorld() {
         "This is part of a maze of twisty little passages, all alike."
     );
     maze12->setFlag(ObjectFlag::RLANDBIT);
+    maze12->setFlag(ObjectFlag::MAZEBIT);
     maze12->setRoomAction(mazeRoomAction);
     g.registerObject(RoomIds::MAZE_12, std::move(maze12));
     
@@ -1457,6 +1469,7 @@ void initializeWorld() {
         "This is part of a maze of twisty little passages, all alike."
     );
     maze13->setFlag(ObjectFlag::RLANDBIT);
+    maze13->setFlag(ObjectFlag::MAZEBIT);
     maze13->setRoomAction(mazeRoomAction);
     g.registerObject(RoomIds::MAZE_13, std::move(maze13));
     
@@ -1467,6 +1480,7 @@ void initializeWorld() {
         "This is part of a maze of twisty little passages, all alike."
     );
     maze14->setFlag(ObjectFlag::RLANDBIT);
+    maze14->setFlag(ObjectFlag::MAZEBIT);
     maze14->setRoomAction(mazeRoomAction);
     g.registerObject(RoomIds::MAZE_14, std::move(maze14));
     
@@ -1477,6 +1491,7 @@ void initializeWorld() {
         "This is part of a maze of twisty little passages, all alike."
     );
     maze15->setFlag(ObjectFlag::RLANDBIT);
+    maze15->setFlag(ObjectFlag::MAZEBIT);
     maze15->setRoomAction(mazeRoomAction);
     g.registerObject(RoomIds::MAZE_15, std::move(maze15));
     

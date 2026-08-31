@@ -2,7 +2,7 @@
 
 ## Overview
 
-A complete C++ port of the original Zork I source code (released as open source by Activision), converting ~12,000 lines of ZIL (Zork Implementation Language) to modern C++17.
+A complete C++ port of the original Zork I source code (released as open source by Activision), converting ~12,000 lines of ZIL (Zork Implementation Language) to modern C++23.
 
 **Current Status**: Complete implementation with comprehensive test coverage
 
@@ -62,7 +62,7 @@ A complete C++ port of the original Zork I source code (released as open source 
 2. **Inheritance**: `ZRoom` extends `ZObject` for room-specific functionality
 3. **Callbacks**: `std::function` for action handlers enables flexible behavior
 4. **Smart Pointers**: `std::unique_ptr` for automatic memory management
-5. **Modern C++17**: `std::optional`, `std::string_view`, structured bindings
+5. **Modern C++23**: `std::optional`, `std::string_view`, structured bindings, monadic operations, concepts
 
 ---
 
@@ -189,7 +189,7 @@ ctest --output-on-failure
 
 ### Prerequisites
 - CMake 3.10+
-- C++17 compiler (GCC 7+, Clang 5+, MSVC 2017+)
+- C++23 compiler (GCC 13+, Clang 17+, MSVC 2022+)
 
 ### Build Commands
 

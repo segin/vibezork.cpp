@@ -110,7 +110,7 @@ Thanks for playing!
 | Direction exits | `RoomExit` with conditions |
 
 ### Code Quality
-- Modern C++17
+- Modern C++23
 - Clean separation of concerns
 - Type-safe enums for flags and IDs
 - Smart pointers for memory management

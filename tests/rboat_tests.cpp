@@ -52,7 +52,7 @@ TEST(RBoat_WalkLandEastWestAllowed) {
 
   // WALK LAND should return false (allowed)
   g.prsa = V_WALK;
-  g.prso = g.getObject(ObjectIds::BEACH); // Represents LAND
+  g.prso = g.getObject(ObjectIds::SAND); // Represents LAND
 
   bool result = inflatedBoatAction();
   ASSERT_FALSE(result); // Not handled, allows default movement
@@ -117,7 +117,7 @@ TEST(RBoat_LaunchNotInBoat) {
     return;
 
   // Player NOT in boat
-  g.here = g.getObject(RoomIds::BEACH);
+  g.here = g.getObject(RoomIds::SANDY_BEACH);
   boat->moveTo(g.here);
 
   g.prsa = V_LAUNCH;
@@ -144,7 +144,7 @@ TEST(RBoat_DropWeaponPuncturesBoat) {
     return;
 
   g.winner->moveTo(boat);
-  g.here = g.getObject(RoomIds::BEACH); // Safe location (not NONLANDBIT)
+  g.here = g.getObject(RoomIds::SANDY_BEACH); // Safe location (not NONLANDBIT)
   boat->moveTo(g.here);
 
   g.prsa = V_DROP;
@@ -175,7 +175,7 @@ TEST(RBoat_BoardWithSwordPunctures) {
   if (!boat || !sword)
     return;
 
-  g.here = g.getObject(RoomIds::BEACH);
+  g.here = g.getObject(RoomIds::SANDY_BEACH);
   boat->moveTo(g.here);
   sword->moveTo(g.winner); // Carrying sword
 
@@ -224,7 +224,7 @@ TEST(RBoat_DeflateWhileInsideBlocked) {
     return;
 
   g.winner->moveTo(boat); // Player inside boat
-  g.here = g.getObject(RoomIds::BEACH);
+  g.here = g.getObject(RoomIds::SANDY_BEACH);
   boat->moveTo(g.here);
 
   g.prsa = V_DEFLATE;
@@ -246,7 +246,7 @@ TEST(RBoat_DeflateSucceeds) {
   if (!boat)
     return;
 
-  g.here = g.getObject(RoomIds::BEACH);
+  g.here = g.getObject(RoomIds::SANDY_BEACH);
   boat->moveTo(g.here); // Boat on ground
   // Player NOT in boat
 

@@ -2619,7 +2619,7 @@ bool vVersion() {
   printLine("ZORK is a registered trademark of Infocom, Inc.");
 
   // Display interpreter info
-  printLine("Interpreter: C++17 Native");
+  printLine("Interpreter: C++23 Native");
 
   return RTRUE;
 }

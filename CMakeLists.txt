@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(Zork1)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(BUILD_TESTS "Build test suite" OFF)
@@ -194,12 +194,14 @@ if(BUILD_TESTS)
     add_test(NAME PuttyTests COMMAND putty_tests)
     
     # RAINBOW-FCN Tests (ZIL action verification)
-    add_executable(rainbow_tests tests/rainbow_tests.cpp ${COMMON_SOURCES})
-target_link_libraries(rainbow_tests ${COMMON_LIBS})
-add_test(NAME RainbowTests COMMAND rainbow_tests)
+    add_executable(rainbow_tests tests/rainbow_tests.cpp ${LIB_SOURCES})
+    add_test(NAME RainbowTests COMMAND rainbow_tests)
 
-# RBOAT-FUNCTION comprehensive tests
-add_executable(rboat_tests tests/rboat_tests.cpp ${COMMON_SOURCES})
-target_link_libraries(rboat_tests ${COMMON_LIBS})
-add_test(NAME RBoatTests COMMAND rboat_tests)
+    # RBOAT-FUNCTION comprehensive tests
+    add_executable(rboat_tests tests/rboat_tests.cpp ${LIB_SOURCES})
+    add_test(NAME RBoatTests COMMAND rboat_tests)
+
+    # Parser Flag Tests (All ZIL bits verification)
+    add_executable(parser_flag_tests tests/parser_flag_tests.cpp ${LIB_SOURCES})
+    add_test(NAME ParserFlagTests COMMAND parser_flag_tests)
 endif()
