@@ -1138,10 +1138,10 @@ ParsedCommand Parser::parse(const std::string &input) {
           }
         }
       } else if (verbRequiresObject(cmd.verb)) {
-        // Verb requires object but none given
-        // DON'T orphan here - let the verb handler try implied object logic
-        // first The handler will call setOrphanDirect if it can't find a single
-        // implied object Just continue with cmd.directObj = nullptr
+        // Verb requires object but none given - orphan the command
+        setOrphanDirect(cmd.verb, getVerbName(cmd.verb));
+        printLine("What do you want to " + getVerbName(cmd.verb) + "?");
+        cmd.verb = 0;
       }
     }
   }
