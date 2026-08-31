@@ -82,37 +82,48 @@ static void randomizeObjects() {
         }
     }
     
-    // Collect all rooms that are on land and not lit
-    // Rooms have IDs >= 1000 (see rooms.h)
-    std::vector<ZObject*> validRooms;
+    // ZIL: <PUTP ,SWORD ,P?TVALUE 0>
+    auto* sword = g.getObject(ObjectIds::SWORD);
+    if (sword) {
+        sword->setProperty(P_TVALUE, 0);
+    }
+    
+    // Collect all dark land rooms for treasures
+    std::vector<ZObject*> darkLandRooms;
+    std::vector<ZObject*> aboveGroundRooms;
+    
+    // Above ground room IDs: 1000..1014 (House exterior, forest, canyon view)
     for (const auto& [id, obj] : g.getAllObjects()) {
-        if (id >= 1000 &&  // Room IDs start at 1000
-            obj->hasFlag(ObjectFlag::RLANDBIT) &&
-            !obj->hasFlag(ObjectFlag::ONBIT)) {
-            validRooms.push_back(obj.get());
+        if (id >= 1000) {
+            if (obj->hasFlag(ObjectFlag::RLANDBIT) && !obj->hasFlag(ObjectFlag::ONBIT)) {
+                darkLandRooms.push_back(obj.get());
+            }
+            if (id <= 1014 && obj->hasFlag(ObjectFlag::RLANDBIT)) {
+                aboveGroundRooms.push_back(obj.get());
+            }
         }
     }
     
-    if (validRooms.empty()) {
-        return;
+    if (aboveGroundRooms.empty()) {
+        auto* westHouse = g.getObject(RoomIds::WEST_OF_HOUSE);
+        if (westHouse) aboveGroundRooms.push_back(westHouse);
+    }
+    if (darkLandRooms.empty()) {
+        darkLandRooms = aboveGroundRooms;
     }
     
     // Scatter player's inventory
     auto contents = g.winner->getContents();
     for (auto* item : contents) {
-        if (!item) continue;
+        if (!item || item == lamp || item == coffin) continue;
         
-        // Treasures go to random dark land rooms
         int tvalue = item->getProperty(P_TVALUE);
-        if (tvalue > 0) {
-            // Pick random dark room
-            int idx = rand() % validRooms.size();
-            item->moveTo(validRooms[idx]);
-        } else {
-            // Non-treasures go to random above-ground rooms
-            // For simplicity, use any valid room
-            int idx = rand() % validRooms.size();
-            item->moveTo(validRooms[idx]);
+        if (tvalue > 0 && !darkLandRooms.empty()) {
+            int idx = rand() % darkLandRooms.size();
+            item->moveTo(darkLandRooms[idx]);
+        } else if (!aboveGroundRooms.empty()) {
+            int idx = rand() % aboveGroundRooms.size();
+            item->moveTo(aboveGroundRooms[idx]);
         }
     }
 }
@@ -210,7 +221,9 @@ void performResurrection() {
         alwaysLit_ = true;  // Can see in darkness as a ghost
         
         // ZIL: Set action to DEAD-FUNCTION
-        g.player->setAction(::deadFunction);
+        if (g.player) {
+            g.player->setAction(::deadFunction);
+        }
         
         // Set troll flag (troll disappears after player dies)
         auto* troll = g.getObject(ObjectIds::TROLL);
@@ -227,7 +240,9 @@ void performResurrection() {
     } else {
         // Simple resurrection in forest
         // Reset action (clear DEAD-FUNCTION if present)
-        g.player->setAction(nullptr); // Assuming default is null
+        if (g.player) {
+            g.player->setAction(nullptr);
+        }
         
         // Move to Forest-1
         auto* forest = g.getObject(RoomIds::FOREST_1);
@@ -259,7 +274,9 @@ void jigsUp(std::string_view deathMessage, DeathCause cause) {
     auto& g = Globals::instance();
     
     // Set winner back to player
-    g.winner = g.player;
+    if (g.player) {
+        g.winner = g.player;
+    }
     
     // Check if already dead (double death)
     if (dead_) {
