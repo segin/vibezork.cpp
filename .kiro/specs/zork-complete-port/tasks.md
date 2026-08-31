@@ -2500,7 +2500,7 @@ N
   - Verify game is winnable
   - _Requirements: 96_
 
-- [ ] 77. Bug fixing and polish
+- [x] 77. Bug fixing and polish
   - Fix any remaining bugs
   - Polish user experience
   - Improve error messages
@@ -2517,7 +2517,7 @@ N
   - Ensure consistent tone
   - _Requirements: 73, 99_
 
-- [ ] 77.3 Improve user experience
+- [x] 77.3 Improve user experience
   - Add helpful hints where appropriate
   - Improve command feedback
   - _Requirements: 99_
