@@ -66,7 +66,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] RESERVOIR-FCN - Reservoir water handler
 - [x] RESERVOIR-NORTH-FCN - North reservoir
 - [x] RESERVOIR-SOUTH-FCN - South reservoir
-- [ ] RIVER-FUNCTION - River flow/boat mechanics (basic stub)
+- [x] RIVER-FUNCTION - River flow/boat mechanics
 - [x] ROBBER-FUNCTION - Thief AI
 - [x] ROPE-FUNCTION - Rope tie/untie
 - [x] RUG-FCN - Rug/trap door
@@ -109,7 +109,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 94 actions
-- Implemented: 94 ✅
-- Remaining: 0 (RIVER-FUNCTION has basic stub)
+- Implemented: 94 / 94 (100% complete) ✅
+- Remaining: 0
 
 
