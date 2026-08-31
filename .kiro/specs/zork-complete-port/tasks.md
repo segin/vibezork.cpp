@@ -2507,7 +2507,7 @@ N
   - Add quality-of-life improvements
   - _Requirements: 99_
 
-- [ ] 77.1 Fix identified bugs
+- [x] 77.1 Fix identified bugs
   - Address all known bugs
   - Test fixes thoroughly
   - _Requirements: 99_
