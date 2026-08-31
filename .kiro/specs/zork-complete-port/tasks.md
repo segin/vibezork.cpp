@@ -2565,7 +2565,7 @@ N
   - Configure for release
   - _Requirements: 89_
 
-- [ ] 79.2 Build release packages
+- [x] 79.2 Build release packages
   - Build for Linux
   - Build for macOS
   - Build for Windows
