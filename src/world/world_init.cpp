@@ -355,12 +355,12 @@ void initializeWorld() {
             printLine("You are at the top of the Great Canyon on its west wall. From here there is a marvelous view of the canyon and parts of the Frigid River upstream. Across the canyon, the walls of the White Cliffs join the mighty ramparts of the Flathead Mountains to the east. Following the Canyon upstream to the north, Aragain Falls may be seen, complete with rainbow. The mighty Frigid River flows out from a great dark cavern. To the west and south can be seen an immense forest, stretching for miles around. A path leads northwest.");
         }
     });
-    canyonView->setExit(Direction::WEST, RoomExit(RoomIds::CLEARING));
+    canyonView->setExit(Direction::WEST, RoomExit(RoomIds::FOREST_3));
+    canyonView->setExit(Direction::SOUTH, RoomExit(RoomIds::FOREST_3));
     canyonView->setExit(Direction::NW, RoomExit(RoomIds::CLEARING));
+    canyonView->setExit(Direction::DOWN, RoomExit(RoomIds::CLIFF_MIDDLE));
     canyonView->setExit(Direction::NORTH, RoomExit("The canyon is too wide to cross."));
     canyonView->setExit(Direction::EAST, RoomExit("The canyon is too wide to cross."));
-    canyonView->setExit(Direction::SOUTH, RoomExit("The canyon is too wide to cross."));
-    canyonView->setExit(Direction::DOWN, RoomExit("The canyon is too deep to climb down."));
     
     g.registerObject(RoomIds::CANYON_VIEW, std::move(canyonView));
     
@@ -1303,6 +1303,242 @@ void initializeWorld() {
     damBase->setExit(Direction::UP, RoomExit(RoomIds::DAM_ROOM));
     
     g.registerObject(RoomIds::DAM_BASE, std::move(damBase));
+    
+    // ===== FRIGID RIVER AND CANYON ROOMS =====
+    
+    // Create RIVER_1
+    auto river1 = std::make_unique<ZRoom>(
+        RoomIds::RIVER_1,
+        "Frigid River",
+        "You are on the Frigid River in the vicinity of the Dam. The river flows quietly here. There is a landing on the west shore."
+    );
+    river1->setFlag(ObjectFlag::NONLANDBIT);
+    river1->setFlag(ObjectFlag::ONBIT);
+    river1->setFlag(ObjectFlag::SACREDBIT);
+    river1->setExit(Direction::WEST, RoomExit(RoomIds::DAM_BASE));
+    river1->setExit(Direction::LAND, RoomExit(RoomIds::DAM_BASE));
+    river1->setExit(Direction::EAST, RoomExit("The White Cliffs prevent your landing here."));
+    river1->setExit(Direction::UP, RoomExit("You cannot go upstream due to strong currents."));
+    river1->setExit(Direction::DOWN, RoomExit(RoomIds::RIVER_2));
+    g.registerObject(RoomIds::RIVER_1, std::move(river1));
+
+    // Create RIVER_2
+    auto river2 = std::make_unique<ZRoom>(
+        RoomIds::RIVER_2,
+        "Frigid River",
+        "The river turns a corner here making it impossible to see the Dam. The White Cliffs loom on the east bank and large rocks prevent landing on the west."
+    );
+    river2->setFlag(ObjectFlag::NONLANDBIT);
+    river2->setFlag(ObjectFlag::ONBIT);
+    river2->setFlag(ObjectFlag::SACREDBIT);
+    river2->setExit(Direction::UP, RoomExit("You cannot go upstream due to strong currents."));
+    river2->setExit(Direction::DOWN, RoomExit(RoomIds::RIVER_3));
+    river2->setExit(Direction::EAST, RoomExit("The White Cliffs prevent your landing here."));
+    river2->setExit(Direction::LAND, RoomExit("There is no safe landing spot here."));
+    river2->setExit(Direction::WEST, RoomExit("Just in time you steer away from the rocks."));
+    g.registerObject(RoomIds::RIVER_2, std::move(river2));
+
+    // Create RIVER_3
+    auto river3 = std::make_unique<ZRoom>(
+        RoomIds::RIVER_3,
+        "Frigid River",
+        "The river descends here into a valley. There is a narrow beach on the west shore below the cliffs. In the distance a faint rumbling can be heard."
+    );
+    river3->setFlag(ObjectFlag::NONLANDBIT);
+    river3->setFlag(ObjectFlag::ONBIT);
+    river3->setFlag(ObjectFlag::SACREDBIT);
+    river3->setExit(Direction::UP, RoomExit("You cannot go upstream due to strong currents."));
+    river3->setExit(Direction::DOWN, RoomExit(RoomIds::RIVER_4));
+    river3->setExit(Direction::WEST, RoomExit(RoomIds::WHITE_CLIFFS_NORTH));
+    river3->setExit(Direction::LAND, RoomExit(RoomIds::WHITE_CLIFFS_NORTH));
+    river3->setExit(Direction::EAST, RoomExit("The White Cliffs prevent landing here."));
+    g.registerObject(RoomIds::RIVER_3, std::move(river3));
+
+    // Create RIVER_4
+    auto river4 = std::make_unique<ZRoom>(
+        RoomIds::RIVER_4,
+        "Frigid River",
+        "The river is running faster here and the sound ahead appears to be that of rushing water. On the east shore is a sandy beach. A small area of beach can also be seen below the cliffs on the west shore."
+    );
+    river4->setFlag(ObjectFlag::NONLANDBIT);
+    river4->setFlag(ObjectFlag::ONBIT);
+    river4->setFlag(ObjectFlag::SACREDBIT);
+    river4->setRoomAction([](int rarg) {
+        if (rarg == M_END) {
+            auto& g = Globals::instance();
+            auto* buoy = g.getObject(ObjectIds::BUOY);
+            if (buoy && buoy->getLocation() == g.winner && g.buoyFlag) {
+                printLine("You notice something funny about the feel of the buoy.");
+                g.buoyFlag = false;
+            }
+        }
+    });
+    river4->setExit(Direction::UP, RoomExit("You cannot go upstream due to strong currents."));
+    river4->setExit(Direction::DOWN, RoomExit(RoomIds::RIVER_5));
+    river4->setExit(Direction::LAND, RoomExit("You can land either to the east or the west."));
+    river4->setExit(Direction::WEST, RoomExit(RoomIds::WHITE_CLIFFS_SOUTH));
+    river4->setExit(Direction::EAST, RoomExit(RoomIds::SANDY_BEACH));
+    g.registerObject(RoomIds::RIVER_4, std::move(river4));
+
+    // Create RIVER_5
+    auto river5 = std::make_unique<ZRoom>(
+        RoomIds::RIVER_5,
+        "Frigid River",
+        "The sound of rushing water is nearly unbearable here. On the east shore is a large landing area."
+    );
+    river5->setFlag(ObjectFlag::NONLANDBIT);
+    river5->setFlag(ObjectFlag::ONBIT);
+    river5->setFlag(ObjectFlag::SACREDBIT);
+    river5->setExit(Direction::UP, RoomExit("You cannot go upstream due to strong currents."));
+    river5->setExit(Direction::EAST, RoomExit(RoomIds::SHORE));
+    river5->setExit(Direction::LAND, RoomExit(RoomIds::SHORE));
+    river5->setExit(Direction::DOWN, RoomExit("The river rushes over the falls to your doom!"));
+    g.registerObject(RoomIds::RIVER_5, std::move(river5));
+
+    // Create WHITE_CLIFFS_NORTH
+    auto whiteCliffsNorth = std::make_unique<ZRoom>(
+        RoomIds::WHITE_CLIFFS_NORTH,
+        "White Cliffs Beach",
+        "You are on a narrow strip of beach which runs along the base of the White Cliffs. There is a narrow path heading south along the Cliffs and a tight passage leading west into the cliffs themselves."
+    );
+    whiteCliffsNorth->setFlag(ObjectFlag::RLANDBIT);
+    whiteCliffsNorth->setFlag(ObjectFlag::SACREDBIT);
+    whiteCliffsNorth->setFlag(ObjectFlag::ONBIT);
+    whiteCliffsNorth->setExit(Direction::SOUTH, RoomExit(RoomIds::WHITE_CLIFFS_SOUTH));
+    whiteCliffsNorth->setExit(Direction::WEST, RoomExit(RoomIds::DAMP_CAVE));
+    whiteCliffsNorth->setExit(Direction::LAUNCH, RoomExit(RoomIds::RIVER_3));
+    g.registerObject(RoomIds::WHITE_CLIFFS_NORTH, std::move(whiteCliffsNorth));
+
+    // Create WHITE_CLIFFS_SOUTH
+    auto whiteCliffsSouth = std::make_unique<ZRoom>(
+        RoomIds::WHITE_CLIFFS_SOUTH,
+        "White Cliffs Beach",
+        "You are on a rocky, narrow strip of beach beside the Cliffs. A narrow path leads north along the shore."
+    );
+    whiteCliffsSouth->setFlag(ObjectFlag::RLANDBIT);
+    whiteCliffsSouth->setFlag(ObjectFlag::SACREDBIT);
+    whiteCliffsSouth->setFlag(ObjectFlag::ONBIT);
+    whiteCliffsSouth->setExit(Direction::NORTH, RoomExit(RoomIds::WHITE_CLIFFS_NORTH));
+    whiteCliffsSouth->setExit(Direction::UP, RoomExit("The cliffs are too steep to climb."));
+    whiteCliffsSouth->setExit(Direction::LAUNCH, RoomExit(RoomIds::RIVER_4));
+    g.registerObject(RoomIds::WHITE_CLIFFS_SOUTH, std::move(whiteCliffsSouth));
+
+    // Create SANDY_BEACH
+    auto sandyBeach = std::make_unique<ZRoom>(
+        RoomIds::SANDY_BEACH,
+        "Sandy Beach",
+        "You are on a large sandy beach on the east shore of the river, which is flowing quickly by. A path runs beside the river to the south here, and a passage is partially buried in sand to the northeast."
+    );
+    sandyBeach->setFlag(ObjectFlag::RLANDBIT);
+    sandyBeach->setFlag(ObjectFlag::SACREDBIT);
+    sandyBeach->setFlag(ObjectFlag::ONBIT);
+    sandyBeach->setExit(Direction::NE, RoomExit(RoomIds::SANDY_CAVE));
+    sandyBeach->setExit(Direction::SOUTH, RoomExit(RoomIds::SHORE));
+    sandyBeach->setExit(Direction::LAUNCH, RoomExit(RoomIds::RIVER_4));
+    g.registerObject(RoomIds::SANDY_BEACH, std::move(sandyBeach));
+
+    // Create SANDY_CAVE
+    auto sandyCave = std::make_unique<ZRoom>(
+        RoomIds::SANDY_CAVE,
+        "Sandy Cave",
+        "This is a sand-filled cave whose exit is to the southwest."
+    );
+    sandyCave->setFlag(ObjectFlag::RLANDBIT);
+    sandyCave->setExit(Direction::SW, RoomExit(RoomIds::SANDY_BEACH));
+    g.registerObject(RoomIds::SANDY_CAVE, std::move(sandyCave));
+
+    // Create SHORE
+    auto shore = std::make_unique<ZRoom>(
+        RoomIds::SHORE,
+        "Shore",
+        "You are on the east shore of the river. The water here seems somewhat treacherous. A path travels from north to south here, the south end quickly turning around a sharp corner."
+    );
+    shore->setFlag(ObjectFlag::RLANDBIT);
+    shore->setFlag(ObjectFlag::SACREDBIT);
+    shore->setFlag(ObjectFlag::ONBIT);
+    shore->setExit(Direction::NORTH, RoomExit(RoomIds::SANDY_BEACH));
+    shore->setExit(Direction::SOUTH, RoomExit(RoomIds::ARAGAIN_FALLS));
+    shore->setExit(Direction::LAUNCH, RoomExit(RoomIds::RIVER_5));
+    g.registerObject(RoomIds::SHORE, std::move(shore));
+
+    // Create ARAGAIN_FALLS
+    auto aragainFalls = std::make_unique<ZRoom>(
+        RoomIds::ARAGAIN_FALLS,
+        "Aragain Falls",
+        "You are at the top of Aragain Falls, an enormous cataract with a drop of several hundred feet. The roar of the water is deafening."
+    );
+    aragainFalls->setFlag(ObjectFlag::RLANDBIT);
+    aragainFalls->setFlag(ObjectFlag::SACREDBIT);
+    aragainFalls->setFlag(ObjectFlag::ONBIT);
+    aragainFalls->setRoomAction([](int rarg) {
+        if (rarg == M_LOOK) {
+            printLine("You are at the top of Aragain Falls, an enormous waterfall with a\ndrop of about 450 feet. The only path here is on the north end.");
+            auto& g = Globals::instance();
+            if (g.rainbowFlag) {
+                printLine("A solid rainbow spans the falls.");
+            } else {
+                printLine("A beautiful rainbow can be seen over the falls and to the west.");
+            }
+        }
+    });
+    aragainFalls->setExit(Direction::NORTH, RoomExit(RoomIds::SHORE));
+    aragainFalls->setExit(Direction::DOWN, RoomExit("It's a long way..."));
+    aragainFalls->setExit(Direction::WEST, RoomExit(RoomIds::ON_RAINBOW));
+    aragainFalls->setExit(Direction::UP, RoomExit(RoomIds::ON_RAINBOW));
+    g.registerObject(RoomIds::ARAGAIN_FALLS, std::move(aragainFalls));
+
+    // Create ON_RAINBOW
+    auto onRainbow = std::make_unique<ZRoom>(
+        RoomIds::ON_RAINBOW,
+        "On the Rainbow",
+        "You are on top of a rainbow (I bet you never thought you would walk on a rainbow), with a magnificent view of the Falls. The rainbow travels east-west here."
+    );
+    onRainbow->setFlag(ObjectFlag::RLANDBIT);
+    onRainbow->setFlag(ObjectFlag::ONBIT);
+    onRainbow->setFlag(ObjectFlag::SACREDBIT);
+    onRainbow->setExit(Direction::EAST, RoomExit(RoomIds::ARAGAIN_FALLS));
+    onRainbow->setExit(Direction::WEST, RoomExit(RoomIds::END_OF_RAINBOW));
+    g.registerObject(RoomIds::ON_RAINBOW, std::move(onRainbow));
+
+    // Create END_OF_RAINBOW
+    auto endOfRainbow = std::make_unique<ZRoom>(
+        RoomIds::END_OF_RAINBOW,
+        "End of Rainbow",
+        "You are on a small, rocky beach on the continuation of the Frigid River past the Falls. The beach is narrow due to the presence of the White Cliffs. The river canyon opens here and sunlight shines in from above. A rainbow crosses over the falls to the east and a narrow path continues to the southwest."
+    );
+    endOfRainbow->setFlag(ObjectFlag::RLANDBIT);
+    endOfRainbow->setFlag(ObjectFlag::ONBIT);
+    endOfRainbow->setExit(Direction::UP, RoomExit(RoomIds::ON_RAINBOW));
+    endOfRainbow->setExit(Direction::NE, RoomExit(RoomIds::ON_RAINBOW));
+    endOfRainbow->setExit(Direction::EAST, RoomExit(RoomIds::ON_RAINBOW));
+    endOfRainbow->setExit(Direction::SW, RoomExit(RoomIds::CANYON_BOTTOM));
+    g.registerObject(RoomIds::END_OF_RAINBOW, std::move(endOfRainbow));
+
+    // Create CANYON_BOTTOM
+    auto canyonBottom = std::make_unique<ZRoom>(
+        RoomIds::CANYON_BOTTOM,
+        "Canyon Bottom",
+        "You are beneath the walls of the river canyon which may be climbable here. The lesser part of the runoff of Aragain Falls flows by below. To the north is a narrow path."
+    );
+    canyonBottom->setFlag(ObjectFlag::RLANDBIT);
+    canyonBottom->setFlag(ObjectFlag::ONBIT);
+    canyonBottom->setFlag(ObjectFlag::SACREDBIT);
+    canyonBottom->setExit(Direction::UP, RoomExit(RoomIds::CLIFF_MIDDLE));
+    canyonBottom->setExit(Direction::NORTH, RoomExit(RoomIds::END_OF_RAINBOW));
+    g.registerObject(RoomIds::CANYON_BOTTOM, std::move(canyonBottom));
+
+    // Create CLIFF_MIDDLE
+    auto cliffMiddle = std::make_unique<ZRoom>(
+        RoomIds::CLIFF_MIDDLE,
+        "Rocky Ledge",
+        "You are on a ledge about halfway up the wall of the river canyon. You can see from here that the main flow from Aragain Falls twists along a passage which it is impossible for you to enter. Below you is the canyon bottom. Above you is more cliff, which appears climbable."
+    );
+    cliffMiddle->setFlag(ObjectFlag::RLANDBIT);
+    cliffMiddle->setFlag(ObjectFlag::ONBIT);
+    cliffMiddle->setFlag(ObjectFlag::SACREDBIT);
+    cliffMiddle->setExit(Direction::UP, RoomExit(RoomIds::CANYON_VIEW));
+    cliffMiddle->setExit(Direction::DOWN, RoomExit(RoomIds::CANYON_BOTTOM));
+    g.registerObject(RoomIds::CLIFF_MIDDLE, std::move(cliffMiddle));
     
     // ===== SPECIAL UNDERGROUND ROOMS =====
     

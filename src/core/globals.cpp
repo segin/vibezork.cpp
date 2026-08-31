@@ -52,6 +52,10 @@ void Globals::reset() {
     grunlock = false;       // Grate Unlocked
     waterLevel = 0;         // Maintenance Room water
     grateRevealed = false;  // Clearing Grating
+    matchCount = 5;
+    rainbowFlag = false;
+    deflate = false;
+    buoyFlag = true;
     
     // Reset display modes to defaults (Requirement 65.5)
     verboseMode = true;

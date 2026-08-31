@@ -26,9 +26,11 @@ namespace RoomIds {
     constexpr ObjectId NORTH_OF_HOUSE = 1001;
     constexpr ObjectId SOUTH_OF_HOUSE = 1002;
     constexpr ObjectId BEHIND_HOUSE = 1003;  // EAST_OF_HOUSE in ZIL
+    constexpr ObjectId EAST_OF_HOUSE = 1003;
     constexpr ObjectId STONE_BARROW = 1004;
     constexpr ObjectId CLEARING = 1005;
     constexpr ObjectId FOREST_PATH = 1006;  // PATH in ZIL
+    constexpr ObjectId PATH = 1006;
     constexpr ObjectId GRATING_CLEARING = 1007;
     constexpr ObjectId CANYON_VIEW = 1008;
     
@@ -164,7 +166,8 @@ constexpr ObjectId ROOM_FOREST_1 = RoomIds::FOREST_1;
 enum class Direction {
     NORTH, SOUTH, EAST, WEST,
     NE, NW, SE, SW,
-    UP, DOWN, IN, OUT
+    UP, DOWN, IN, OUT,
+    LAND, LAUNCH
 };
 
 /**

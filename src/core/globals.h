@@ -57,6 +57,8 @@ public:
   bool grateRevealed = false; // Has the grating been revealed in the Clearing?
   int matchCount = 5;         // Number of matches in matchbook
   bool rainbowFlag = false;   // Is rainbow solid/walkable? (ZIL: RAINBOW-FLAG)
+  bool deflate = false;       // Can squeeze through tight beach passages (ZIL: DEFLATE)
+  bool buoyFlag = true;       // Notice buoy feel on river (ZIL: BUOY-FLAG)
 
   // Display modes
   bool verboseMode = true;     // Full descriptions
