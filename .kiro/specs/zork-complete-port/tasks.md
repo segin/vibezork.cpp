@@ -2590,7 +2590,7 @@ N
   - Complete architecture docs
   - _Requirements: 95_
 
-- [ ] 80.2 Create release notes
+- [x] 80.2 Create release notes
   - Document features
   - Document known issues
   - Document system requirements
