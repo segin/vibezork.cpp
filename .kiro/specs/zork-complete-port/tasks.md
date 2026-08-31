@@ -2522,7 +2522,7 @@ N
   - Improve command feedback
   - _Requirements: 99_
 
-- [ ] 78. Final verification against original
+- [x] 78. Final verification against original
   - Play original Zork I
   - Play C++ port side-by-side
   - Verify identical behavior
@@ -2547,7 +2547,7 @@ N
   - Verify same maximum score
   - _Requirements: 100_
 
-- [ ] 78.4 Document differences
+- [x] 78.4 Document differences
   - Document any intentional differences
   - Justify any deviations from original
   - _Requirements: 100_
