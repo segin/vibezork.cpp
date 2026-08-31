@@ -20,192 +20,151 @@ if(BUILD_TESTS)
     file(GLOB_RECURSE LIB_SOURCES "src/*.cpp")
     list(REMOVE_ITEM LIB_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
     
+    # Library target for game engine (compiled once, linked by all tests)
+    add_library(zork_core STATIC ${LIB_SOURCES})
+    target_include_directories(zork_core PUBLIC src)
+    
+    macro(add_zork_test test_name target_name source_file)
+        add_executable(${target_name} ${source_file})
+        target_link_libraries(${target_name} PRIVATE zork_core)
+        add_test(NAME ${test_name} COMMAND ${target_name})
+    endmacro()
+
     # Basic tests
-    add_executable(basic_tests tests/basic_tests.cpp ${LIB_SOURCES})
-    add_test(NAME BasicTests COMMAND basic_tests)
+    add_zork_test(BasicTests basic_tests tests/basic_tests.cpp)
     
     # Transcript tests
-    add_executable(transcript_tests tests/transcript_tests.cpp ${LIB_SOURCES})
-    add_test(NAME TranscriptTests COMMAND transcript_tests)
+    add_zork_test(TranscriptTests transcript_tests tests/transcript_tests.cpp)
     
     # Room navigation tests
-    add_executable(room_navigation_tests tests/room_navigation_tests.cpp ${LIB_SOURCES})
-    add_test(NAME RoomNavigationTests COMMAND room_navigation_tests)
-    
-    # Add specific source files to LIB_SOURCES if they are not already included by GLOB_RECURSE
-    list(APPEND LIB_SOURCES
-        src/world/actions_group_a.cpp
-        src/world/consumables.cpp
-    )
+    add_zork_test(RoomNavigationTests room_navigation_tests tests/room_navigation_tests.cpp)
     
     # World initialization tests
-    add_executable(world_initialization_tests tests/world_initialization_tests.cpp ${LIB_SOURCES})
-    add_test(NAME WorldInitializationTests COMMAND world_initialization_tests)
+    add_zork_test(WorldInitializationTests world_initialization_tests tests/world_initialization_tests.cpp)
     
     # Examination verb tests
-    add_executable(examination_verb_tests tests/examination_verb_tests.cpp ${LIB_SOURCES})
-    add_test(NAME ExaminationVerbTests COMMAND examination_verb_tests)
+    add_zork_test(ExaminationVerbTests examination_verb_tests tests/examination_verb_tests.cpp)
     
     # Manipulation verb tests
-    add_executable(manipulation_verb_tests tests/manipulation_verb_tests.cpp ${LIB_SOURCES})
-    add_test(NAME ManipulationVerbTests COMMAND manipulation_verb_tests)
+    add_zork_test(ManipulationVerbTests manipulation_verb_tests tests/manipulation_verb_tests.cpp)
     
     # Interaction verb tests
-    add_executable(interaction_verb_tests tests/interaction_verb_tests.cpp ${LIB_SOURCES})
-    add_test(NAME InteractionVerbTests COMMAND interaction_verb_tests)
+    add_zork_test(InteractionVerbTests interaction_verb_tests tests/interaction_verb_tests.cpp)
     
     # Consumption verb tests
-    add_executable(consumption_verb_tests tests/consumption_verb_tests.cpp ${LIB_SOURCES})
-    add_test(NAME ConsumptionVerbTests COMMAND consumption_verb_tests)
+    add_zork_test(ConsumptionVerbTests consumption_verb_tests tests/consumption_verb_tests.cpp)
     
     # Light verb tests
-    add_executable(light_verb_tests tests/light_verb_tests.cpp ${LIB_SOURCES})
-    add_test(NAME LightVerbTests COMMAND light_verb_tests)
+    add_zork_test(LightVerbTests light_verb_tests tests/light_verb_tests.cpp)
     
     # Special action verb tests
-    add_executable(special_action_verb_tests tests/special_action_verb_tests.cpp ${LIB_SOURCES})
-    add_test(NAME SpecialActionVerbTests COMMAND special_action_verb_tests)
+    add_zork_test(SpecialActionVerbTests special_action_verb_tests tests/special_action_verb_tests.cpp)
     
     # Combat verb tests
-    add_executable(combat_verb_tests tests/combat_verb_tests.cpp ${LIB_SOURCES})
-    add_test(NAME CombatVerbTests COMMAND combat_verb_tests)
+    add_zork_test(CombatVerbTests combat_verb_tests tests/combat_verb_tests.cpp)
     
     # Meta-game verb tests
-    add_executable(meta_game_verb_tests tests/meta_game_verb_tests.cpp ${LIB_SOURCES})
-    add_test(NAME MetaGameVerbTests COMMAND meta_game_verb_tests)
+    add_zork_test(MetaGameVerbTests meta_game_verb_tests tests/meta_game_verb_tests.cpp)
     
     # Timer system tests
-    add_executable(timer_system_tests tests/timer_system_tests.cpp ${LIB_SOURCES})
-    add_test(NAME TimerSystemTests COMMAND timer_system_tests)
+    add_zork_test(TimerSystemTests timer_system_tests tests/timer_system_tests.cpp)
     
     # Sword glow tests
-    add_executable(sword_glow_tests tests/sword_glow_tests.cpp ${LIB_SOURCES})
-    add_test(NAME SwordGlowTests COMMAND sword_glow_tests)
+    add_zork_test(SwordGlowTests sword_glow_tests tests/sword_glow_tests.cpp)
     
     # Light system tests
-    add_executable(light_system_tests tests/light_system_tests.cpp ${LIB_SOURCES})
-    add_test(NAME LightSystemTests COMMAND light_system_tests)
+    add_zork_test(LightSystemTests light_system_tests tests/light_system_tests.cpp)
     
     # Score system tests
-    add_executable(score_system_tests tests/score_system_tests.cpp ${LIB_SOURCES})
-    add_test(NAME ScoreSystemTests COMMAND score_system_tests)
+    add_zork_test(ScoreSystemTests score_system_tests tests/score_system_tests.cpp)
     
     # Combat system tests
-    add_executable(combat_system_tests tests/combat_system_tests.cpp ${LIB_SOURCES})
-    add_test(NAME CombatSystemTests COMMAND combat_system_tests)
+    add_zork_test(CombatSystemTests combat_system_tests tests/combat_system_tests.cpp)
     
     # Death system tests
-    add_executable(death_system_tests tests/death_system_tests.cpp ${LIB_SOURCES})
-    add_test(NAME DeathSystemTests COMMAND death_system_tests)
+    add_zork_test(DeathSystemTests death_system_tests tests/death_system_tests.cpp)
     
     # Save system tests
-    add_executable(save_system_tests tests/save_system_tests.cpp ${LIB_SOURCES})
-    add_test(NAME SaveSystemTests COMMAND save_system_tests)
+    add_zork_test(SaveSystemTests save_system_tests tests/save_system_tests.cpp)
     
     # Object system tests
-    add_executable(object_system_tests tests/object_system_tests.cpp ${LIB_SOURCES})
-    add_test(NAME ObjectSystemTests COMMAND object_system_tests)
+    add_zork_test(ObjectSystemTests object_system_tests tests/object_system_tests.cpp)
     
     # Parser comprehensive tests
-    add_executable(parser_comprehensive_tests tests/parser_comprehensive_tests.cpp ${LIB_SOURCES})
-    add_test(NAME ParserComprehensiveTests COMMAND parser_comprehensive_tests)
+    add_zork_test(ParserComprehensiveTests parser_comprehensive_tests tests/parser_comprehensive_tests.cpp)
     
     # Verb edge case tests
-    add_executable(verb_edge_case_tests tests/verb_edge_case_tests.cpp ${LIB_SOURCES})
-    add_test(NAME VerbEdgeCaseTests COMMAND verb_edge_case_tests)
+    add_zork_test(VerbEdgeCaseTests verb_edge_case_tests tests/verb_edge_case_tests.cpp)
     
     # Inventory tests
-    add_executable(inventory_tests tests/inventory_tests.cpp ${LIB_SOURCES})
-    add_test(NAME InventoryTests COMMAND inventory_tests)
+    add_zork_test(InventoryTests inventory_tests tests/inventory_tests.cpp)
 
     # Meta-game additional tests
-    add_executable(meta_game_additional_tests tests/meta_game_additional_tests.cpp ${LIB_SOURCES})
-    add_test(NAME MetaGameAdditionalTests COMMAND meta_game_additional_tests)
+    add_zork_test(MetaGameAdditionalTests meta_game_additional_tests tests/meta_game_additional_tests.cpp)
     
     # Synonym tests
-    add_executable(synonym_tests tests/synonym_tests.cpp ${LIB_SOURCES})
-    add_test(NAME SynonymTests COMMAND synonym_tests)
+    add_zork_test(SynonymTests synonym_tests tests/synonym_tests.cpp)
 
     # Complex syntax tests
-    add_executable(complex_syntax_tests tests/complex_syntax_tests.cpp ${LIB_SOURCES})
-    add_test(NAME ComplexSyntaxTests COMMAND complex_syntax_tests)
+    add_zork_test(ComplexSyntaxTests complex_syntax_tests tests/complex_syntax_tests.cpp)
 
     # Game Command Tests
-    add_executable(game_command_tests tests/game_command_tests.cpp ${LIB_SOURCES})
-    add_test(NAME GameCommandTests COMMAND game_command_tests)
+    add_zork_test(GameCommandTests game_command_tests tests/game_command_tests.cpp)
 
     # Complex Syntax Take Tests
-    add_executable(complex_syntax_take_tests tests/complex_syntax_take_tests.cpp ${LIB_SOURCES})
-    add_test(NAME ComplexSyntaxTakeTests COMMAND complex_syntax_take_tests)
+    add_zork_test(ComplexSyntaxTakeTests complex_syntax_take_tests tests/complex_syntax_take_tests.cpp)
 
     # Complex Syntax Give Tests
-    add_executable(complex_syntax_give_tests tests/complex_syntax_give_tests.cpp ${LIB_SOURCES})
-    add_test(NAME ComplexSyntaxGiveTests COMMAND complex_syntax_give_tests)
+    add_zork_test(ComplexSyntaxGiveTests complex_syntax_give_tests tests/complex_syntax_give_tests.cpp)
 
     # Complex Syntax Attack Tests
-    add_executable(complex_syntax_attack_tests tests/complex_syntax_attack_tests.cpp ${LIB_SOURCES})
-    add_test(NAME ComplexSyntaxAttackTests COMMAND complex_syntax_attack_tests)
+    add_zork_test(ComplexSyntaxAttackTests complex_syntax_attack_tests tests/complex_syntax_attack_tests.cpp)
     
     # Complex Syntax Unlock Tests
-    add_executable(complex_syntax_unlock_tests tests/complex_syntax_unlock_tests.cpp ${LIB_SOURCES})
-    add_test(NAME ComplexSyntaxUnlockTests COMMAND complex_syntax_unlock_tests)
+    add_zork_test(ComplexSyntaxUnlockTests complex_syntax_unlock_tests tests/complex_syntax_unlock_tests.cpp)
     
     # Integration tests
-    add_executable(integration_tests tests/integration_tests.cpp ${LIB_SOURCES})
-    add_test(NAME IntegrationTests COMMAND integration_tests)
+    add_zork_test(IntegrationTests integration_tests tests/integration_tests.cpp)
     
     # Puzzle solvability tests (Task 70.1)
-    add_executable(puzzle_solvability_tests tests/puzzle_solvability_tests.cpp ${LIB_SOURCES})
-    add_test(NAME PuzzleSolvabilityTests COMMAND puzzle_solvability_tests)
+    add_zork_test(PuzzleSolvabilityTests puzzle_solvability_tests tests/puzzle_solvability_tests.cpp)
     
     # Treasure collection tests (Task 70.2)
-    add_executable(treasure_collection_tests tests/treasure_collection_tests.cpp ${LIB_SOURCES})
-    add_test(NAME TreasureCollectionTests COMMAND treasure_collection_tests)
+    add_zork_test(TreasureCollectionTests treasure_collection_tests tests/treasure_collection_tests.cpp)
     
     # Unwinnable state tests (Task 70.3)
-    add_executable(unwinnable_state_tests tests/unwinnable_state_tests.cpp ${LIB_SOURCES})
-    add_test(NAME UnwinnableStateTests COMMAND unwinnable_state_tests)
+    add_zork_test(UnwinnableStateTests unwinnable_state_tests tests/unwinnable_state_tests.cpp)
     
     # Performance tests (Task 71)
-    add_executable(performance_tests tests/performance_tests.cpp ${LIB_SOURCES})
-    add_test(NAME PerformanceTests COMMAND performance_tests)
+    add_zork_test(PerformanceTests performance_tests tests/performance_tests.cpp)
+
     # Trophy Case tests
-    add_executable(trophy_case_test tests/trophy_case_test.cpp ${LIB_SOURCES})
-    add_test(NAME TrophyCaseTest COMMAND trophy_case_test)
+    add_zork_test(TrophyCaseTest trophy_case_test tests/trophy_case_test.cpp)
 
     # Diagnose tests
-    add_executable(diagnose_test tests/diagnose_test.cpp ${LIB_SOURCES})
-    add_test(NAME DiagnoseTest COMMAND diagnose_test)
+    add_zork_test(DiagnoseTest diagnose_test tests/diagnose_test.cpp)
 
     # Critical Puzzles Tests (Egg, Canary, Basket)
-    add_executable(critical_puzzles_tests tests/critical_puzzles_tests.cpp ${LIB_SOURCES})
-    add_test(NAME CriticalPuzzlesTests COMMAND critical_puzzles_tests)
+    add_zork_test(CriticalPuzzlesTests critical_puzzles_tests tests/critical_puzzles_tests.cpp)
 
     # Action Tests (ZIL action routines)
-    add_executable(action_tests tests/action_tests.cpp ${LIB_SOURCES})
-    add_test(NAME ActionTests COMMAND action_tests)
+    add_zork_test(ActionTests action_tests tests/action_tests.cpp)
     
     # PAINTING-FCN Tests (ZIL action verification)
-    add_executable(painting_tests tests/painting_tests.cpp ${LIB_SOURCES})
-    add_test(NAME PaintingTests COMMAND painting_tests)
+    add_zork_test(PaintingTests painting_tests tests/painting_tests.cpp)
     
     # PUTTY-FCN Tests (ZIL action verification)
-    add_executable(putty_tests tests/putty_tests.cpp ${LIB_SOURCES})
-    add_test(NAME PuttyTests COMMAND putty_tests)
+    add_zork_test(PuttyTests putty_tests tests/putty_tests.cpp)
     
     # RAINBOW-FCN Tests (ZIL action verification)
-    add_executable(rainbow_tests tests/rainbow_tests.cpp ${LIB_SOURCES})
-    add_test(NAME RainbowTests COMMAND rainbow_tests)
+    add_zork_test(RainbowTests rainbow_tests tests/rainbow_tests.cpp)
 
     # RBOAT-FUNCTION comprehensive tests
-    add_executable(rboat_tests tests/rboat_tests.cpp ${LIB_SOURCES})
-    add_test(NAME RBoatTests COMMAND rboat_tests)
+    add_zork_test(RBoatTests rboat_tests tests/rboat_tests.cpp)
 
     # Parser Flag Tests (All ZIL bits verification)
-    add_executable(parser_flag_tests tests/parser_flag_tests.cpp ${LIB_SOURCES})
-    add_test(NAME ParserFlagTests COMMAND parser_flag_tests)
+    add_zork_test(ParserFlagTests parser_flag_tests tests/parser_flag_tests.cpp)
 
     # RIVER-FUNCTION Tests (ZIL action verification)
-    add_executable(river_tests tests/river_tests.cpp ${LIB_SOURCES})
-    add_test(NAME RiverTests COMMAND river_tests)
+    add_zork_test(RiverTests river_tests tests/river_tests.cpp)
 endif()

@@ -1141,6 +1141,14 @@ TEST(LockVerbBasic) {
     chest->addSynonym("chest");
     chest->setFlag(ObjectFlag::CONTBIT);
     // Note: LOCKEDBIT is NOT set (unlocked)
+    chest->setAction([]() {
+        auto& g = Globals::instance();
+        if (g.prsa == V_LOCK) {
+            g.prso->setFlag(ObjectFlag::LOCKEDBIT);
+            return true;
+        }
+        return false;
+    });
     chest->moveTo(g.here);
     ZObject* chestPtr = chest.get();
     g.registerObject(1, std::move(chest));
@@ -1322,6 +1330,14 @@ TEST(UnlockVerbBasic) {
     chest->addSynonym("chest");
     chest->setFlag(ObjectFlag::CONTBIT);
     chest->setFlag(ObjectFlag::LOCKEDBIT);  // Locked
+    chest->setAction([]() {
+        auto& g = Globals::instance();
+        if (g.prsa == V_UNLOCK) {
+            g.prso->clearFlag(ObjectFlag::LOCKEDBIT);
+            return true;
+        }
+        return false;
+    });
     chest->moveTo(g.here);
     ZObject* chestPtr = chest.get();
     g.registerObject(1, std::move(chest));
@@ -1458,6 +1474,18 @@ TEST(LockUnlockSequence) {
     auto safe = std::make_unique<ZObject>(1, "safe");
     safe->addSynonym("safe");
     safe->setFlag(ObjectFlag::CONTBIT);
+    safe->setAction([]() {
+        auto& g = Globals::instance();
+        if (g.prsa == V_LOCK) {
+            g.prso->setFlag(ObjectFlag::LOCKEDBIT);
+            return true;
+        }
+        if (g.prsa == V_UNLOCK) {
+            g.prso->clearFlag(ObjectFlag::LOCKEDBIT);
+            return true;
+        }
+        return false;
+    });
     safe->moveTo(g.here);
     ZObject* safePtr = safe.get();
     g.registerObject(1, std::move(safe));
