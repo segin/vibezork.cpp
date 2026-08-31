@@ -2380,17 +2380,57 @@ bool tubeAction() {
 // Note: UP-CHIMNEY-FUNCTION logic is already in chimneyAction()
 
 // =============================================================================
-// RIVER-FUNCTION - River flow mechanics (stub - complex)
-// ZIL: Handle boat movement in river, drowning, etc.
-// TODO: Full implementation when river system is complete
+// RIVER-FUNCTION - River interactions
+// ZIL: Handles PUT into river (objects, inflated boat, player drowning), LEAP/THROUGH
+// Source: 1actions.zil lines 2669-2690
 // =============================================================================
 bool riverAction() {
   auto &g = Globals::instance();
-  // Basic stub - river prevents certain actions
-  if (g.prsa == V_SWIM) {
-    printLine("You can't swim in this cold water!");
+
+  // ZIL: <COND (<VERB? PUT> <COND (<EQUAL? ,PRSI ,RIVER> ...)>)>
+  if (g.prsa == V_PUT) {
+    if (g.prsi && g.prsi->getId() == ObjectIds::RIVER) {
+      if (g.prso && (g.prso == g.player || g.prso->getId() == ObjectIds::ME)) {
+        // ZIL: <JIGS-UP "You splash around for a while, fighting the current, then you drown.">
+        DeathSystem::jigsUp(
+            "You splash around for a while, fighting the current, then you drown.",
+            DeathSystem::DeathCause::DROWNING);
+        return RTRUE;
+      }
+
+      if (g.prso && (g.prso->getId() == ObjectIds::BOAT_INFLATED ||
+                     g.prso->getId() == ObjectIds::INFLATED_BOAT)) {
+        // ZIL: <TELL "You should get in the boat then launch it." CR>
+        printLine("You should get in the boat then launch it.");
+        return RTRUE;
+      }
+
+      if (g.prso) {
+        std::string desc = g.prso->getDesc();
+        bool hasBurn = g.prso->hasFlag(ObjectFlag::BURNBIT);
+        g.prso->moveTo(nullptr); // REMOVE-CAREFULLY
+
+        if (hasBurn) {
+          // ZIL: "The " D ,PRSO " floats for a moment, then sinks."
+          printLine(std::format("The {} floats for a moment, then sinks.", desc));
+        } else {
+          // ZIL: "The " D ,PRSO " splashes into the water and is gone forever."
+          printLine(std::format("The {} splashes into the water and is gone forever.", desc));
+        }
+        return RTRUE;
+      }
+    }
+  }
+
+  // ZIL: <COND (<VERB? LEAP THROUGH> ...)>
+  if (g.prsa == V_JUMP || g.prsa == V_ENTER || g.prsa == V_SWIM) {
+    printLine(
+        "A look before leaping reveals that the river is wide and dangerous,\n"
+        "with swift currents and large, half-hidden rocks. You decide to forgo your\n"
+        "swim.");
     return RTRUE;
   }
+
   return RFALSE;
 }
 

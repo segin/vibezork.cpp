@@ -204,4 +204,8 @@ if(BUILD_TESTS)
     # Parser Flag Tests (All ZIL bits verification)
     add_executable(parser_flag_tests tests/parser_flag_tests.cpp ${LIB_SOURCES})
     add_test(NAME ParserFlagTests COMMAND parser_flag_tests)
+
+    # RIVER-FUNCTION Tests (ZIL action verification)
+    add_executable(river_tests tests/river_tests.cpp ${LIB_SOURCES})
+    add_test(NAME RiverTests COMMAND river_tests)
 endif()
