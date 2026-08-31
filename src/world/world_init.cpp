@@ -2902,11 +2902,15 @@ void initializeWorld() {
     chalice->addSynonym("chalice");
     chalice->addSynonym("goblet");
     chalice->addSynonym("grail");
+    chalice->addSynonym("cup");
+    chalice->addSynonym("treasure");
     chalice->addAdjective("silver");
     chalice->setFlag(ObjectFlag::TAKEBIT);
+    chalice->setFlag(ObjectFlag::CONTBIT);
     chalice->setProperty(P_VALUE, 10);
-    chalice->setProperty(P_TVALUE, 10);
+    chalice->setProperty(P_TVALUE, 5);
     chalice->setProperty(P_SIZE, 10);
+    chalice->setProperty(P_CAPACITY, 5);
     chalice->setLongDesc("There is a silver chalice, intricately engraved, here.");
     chalice->moveTo(g.getObject(RoomIds::TREASURE_ROOM));
     g.registerObject(ObjectIds::CHALICE, std::move(chalice));
@@ -2915,13 +2919,14 @@ void initializeWorld() {
     auto trident = std::make_unique<ZObject>(ObjectIds::TRIDENT, "crystal trident");
     trident->addSynonym("trident");
     trident->addSynonym("fork");
+    trident->addSynonym("treasure");
     trident->addAdjective("crystal");
     trident->addAdjective("poseidon");
     trident->setFlag(ObjectFlag::TAKEBIT);
     trident->setFlag(ObjectFlag::WEAPONBIT);
     trident->setProperty(P_VALUE, 4);
     trident->setProperty(P_TVALUE, 11);
-    trident->setProperty(P_SIZE, 10);
+    trident->setProperty(P_SIZE, 20);
     trident->moveTo(g.getObject(RoomIds::ATLANTIS_ROOM));
     g.registerObject(ObjectIds::TRIDENT, std::move(trident));
     
@@ -2931,13 +2936,16 @@ void initializeWorld() {
     jewels->addSynonym("trunk");
     jewels->addSynonym("jewelry");
     jewels->addSynonym("gems");
+    jewels->addSynonym("treasure");
     jewels->addAdjective("precious");
+    jewels->addAdjective("old");
     jewels->setFlag(ObjectFlag::TAKEBIT);
-    jewels->setProperty(P_VALUE, 5);
+    jewels->setFlag(ObjectFlag::INVISIBLE);
+    jewels->setProperty(P_VALUE, 15);
     jewels->setProperty(P_TVALUE, 5);
-    jewels->setProperty(P_SIZE, 10);
+    jewels->setProperty(P_SIZE, 35);
     jewels->setLongDesc("There is an old trunk here, bulging with assorted jewels.");
-    jewels->moveTo(g.getObject(RoomIds::TREASURE_ROOM));
+    jewels->moveTo(g.getObject(RoomIds::RESERVOIR));
     g.registerObject(ObjectIds::JEWELS, std::move(jewels));
     
     // Create COINS (Bag of coins)
@@ -2946,20 +2954,22 @@ void initializeWorld() {
     coins->addSynonym("bag");
     coins->addSynonym("coin");
     coins->addSynonym("zorkmids");
+    coins->addSynonym("treasure");
     coins->addAdjective("leather");
     coins->addAdjective("large");
     coins->setFlag(ObjectFlag::TAKEBIT);
-    coins->setProperty(P_VALUE, 5);
+    coins->setProperty(P_VALUE, 10);
     coins->setProperty(P_TVALUE, 5);
-    coins->setProperty(P_SIZE, 10);
+    coins->setProperty(P_SIZE, 15);
     coins->setLongDesc("An old leather bag, bulging with coins, is here.");
-    coins->moveTo(g.getObject(RoomIds::MAZE_11));
+    coins->moveTo(g.getObject(RoomIds::MAZE_5));
     g.registerObject(ObjectIds::COINS, std::move(coins));
     
     // Create DIAMOND (Huge diamond)
     auto diamond = std::make_unique<ZObject>(ObjectIds::DIAMOND, "huge diamond");
     diamond->addSynonym("diamond");
     diamond->addSynonym("gem");
+    diamond->addSynonym("treasure");
     diamond->addAdjective("huge");
     diamond->addAdjective("enormous");
     diamond->setFlag(ObjectFlag::TAKEBIT);
@@ -2967,20 +2977,20 @@ void initializeWorld() {
     diamond->setProperty(P_TVALUE, 10);
     diamond->setProperty(P_SIZE, 5);
     diamond->setLongDesc("There is an enormous diamond (perfectly cut) here.");
-    diamond->moveTo(g.getObject(RoomIds::EAST_OF_CHASM));
+    // Dynamic - appears when thief is defeated
     g.registerObject(ObjectIds::DIAMOND, std::move(diamond));
     
-    // Create EMERALD (Emerald bracelet)
-    auto emerald = std::make_unique<ZObject>(ObjectIds::EMERALD, "emerald bracelet");
-    emerald->addSynonym("bracelet");
+    // Create EMERALD (Large emerald)
+    auto emerald = std::make_unique<ZObject>(ObjectIds::EMERALD, "large emerald");
     emerald->addSynonym("emerald");
-    emerald->addAdjective("emerald");
-    emerald->addAdjective("beautiful");
+    emerald->addSynonym("gem");
+    emerald->addSynonym("treasure");
+    emerald->addAdjective("large");
     emerald->setFlag(ObjectFlag::TAKEBIT);
     emerald->setProperty(P_VALUE, 5);
-    emerald->setProperty(P_TVALUE, 5);
+    emerald->setProperty(P_TVALUE, 10);
     emerald->setProperty(P_SIZE, 2);
-    emerald->moveTo(g.getObject(RoomIds::SOUTH_TEMPLE));
+    emerald->moveTo(g.getObject(ObjectIds::BUOY));
     g.registerObject(ObjectIds::EMERALD, std::move(emerald));
     
     // Create PAINTING (Painting - special treasure that can be taken from wall, has back side)
@@ -3009,12 +3019,14 @@ void initializeWorld() {
     coffin->addSynonym("treasure");
     coffin->addAdjective("solid");
     coffin->addAdjective("gold");
+    coffin->addAdjective("golden");
+    coffin->addAdjective("egyptian");
     coffin->setFlag(ObjectFlag::TAKEBIT);
     coffin->setFlag(ObjectFlag::CONTBIT);
     coffin->setFlag(ObjectFlag::SACREDBIT);
     coffin->setFlag(ObjectFlag::SEARCHBIT);
     coffin->setProperty(P_VALUE, 10);
-    coffin->setProperty(P_TVALUE, 10);
+    coffin->setProperty(P_TVALUE, 15);
     coffin->setProperty(P_SIZE, 55);
     coffin->setProperty(P_CAPACITY, 35);
     coffin->setAction(coffinAction);
@@ -3027,39 +3039,45 @@ void initializeWorld() {
     jade->addSynonym("figurine");
     jade->addSynonym("jade");
     jade->addSynonym("statue");
+    jade->addSynonym("treasure");
     jade->addAdjective("jade");
     jade->addAdjective("small");
     jade->setFlag(ObjectFlag::TAKEBIT);
     jade->setProperty(P_VALUE, 5);
     jade->setProperty(P_TVALUE, 5);
-    jade->setProperty(P_SIZE, 3);
+    jade->setProperty(P_SIZE, 10);
     jade->setLongDesc("There is an exquisite jade figurine here.");
-    jade->moveTo(g.getObject(RoomIds::MAZE_15));
+    jade->moveTo(g.getObject(RoomIds::BAT_ROOM));
     g.registerObject(ObjectIds::JADE, std::move(jade));
     
-    // Create BRACELET (Sapphire bracelet)
-    auto bracelet = std::make_unique<ZObject>(ObjectIds::BRACELET, "sapphire bracelet");
+    // Create BRACELET (Sapphire-encrusted bracelet)
+    auto bracelet = std::make_unique<ZObject>(ObjectIds::BRACELET, "sapphire-encrusted bracelet");
     bracelet->addSynonym("bracelet");
     bracelet->addSynonym("sapphire");
+    bracelet->addSynonym("treasure");
     bracelet->addAdjective("sapphire");
+    bracelet->addAdjective("encrusted");
     bracelet->addAdjective("beautiful");
     bracelet->setFlag(ObjectFlag::TAKEBIT);
     bracelet->setProperty(P_VALUE, 5);
     bracelet->setProperty(P_TVALUE, 5);
-    bracelet->setProperty(P_SIZE, 2);
-    bracelet->moveTo(g.getObject(RoomIds::SOUTH_TEMPLE));
+    bracelet->setProperty(P_SIZE, 10);
+    bracelet->moveTo(g.getObject(RoomIds::GAS_ROOM));
     g.registerObject(ObjectIds::BRACELET, std::move(bracelet));
     
     // Create BAR (Platinum bar)
     auto bar = std::make_unique<ZObject>(ObjectIds::BAR, "platinum bar");
     bar->addSynonym("bar");
     bar->addSynonym("platinum");
+    bar->addSynonym("treasure");
     bar->addAdjective("platinum");
+    bar->addAdjective("large");
     bar->addAdjective("heavy");
     bar->setFlag(ObjectFlag::TAKEBIT);
+    bar->setFlag(ObjectFlag::SACREDBIT);
     bar->setProperty(P_VALUE, 10);
-    bar->setProperty(P_TVALUE, 10);
-    bar->setProperty(P_SIZE, 10);
+    bar->setProperty(P_TVALUE, 5);
+    bar->setProperty(P_SIZE, 20);
     bar->setLongDesc("On the ground is a large platinum bar.");
     bar->moveTo(g.getObject(RoomIds::LOUD_ROOM));
     g.registerObject(ObjectIds::BAR, std::move(bar));
@@ -3068,57 +3086,82 @@ void initializeWorld() {
     auto potOfGold = std::make_unique<ZObject>(ObjectIds::POT_OF_GOLD, "pot of gold");
     potOfGold->addSynonym("pot");
     potOfGold->addSynonym("gold");
+    potOfGold->addSynonym("treasure");
     potOfGold->addAdjective("gold");
     potOfGold->addAdjective("golden");
+    potOfGold->addAdjective("large");
     potOfGold->setFlag(ObjectFlag::TAKEBIT);
+    potOfGold->setFlag(ObjectFlag::INVISIBLE);
     potOfGold->setProperty(P_VALUE, 10);
     potOfGold->setProperty(P_TVALUE, 10);
-    potOfGold->setProperty(P_SIZE, 10);
+    potOfGold->setProperty(P_SIZE, 15);
     potOfGold->moveTo(g.getObject(RoomIds::END_OF_RAINBOW));
     g.registerObject(ObjectIds::POT_OF_GOLD, std::move(potOfGold));
     
     // Create SCARAB (Scarab)
-    auto scarab = std::make_unique<ZObject>(ObjectIds::SCARAB, "scarab");
+    auto scarab = std::make_unique<ZObject>(ObjectIds::SCARAB, "jewel-encrusted scarab");
     scarab->addSynonym("scarab");
     scarab->addSynonym("beetle");
+    scarab->addSynonym("treasure");
+    scarab->addAdjective("jewel");
+    scarab->addAdjective("jeweled");
+    scarab->addAdjective("encrusted");
     scarab->addAdjective("beautiful");
     scarab->addAdjective("ancient");
     scarab->setFlag(ObjectFlag::TAKEBIT);
+    scarab->setFlag(ObjectFlag::INVISIBLE);
     scarab->setProperty(P_VALUE, 5);
     scarab->setProperty(P_TVALUE, 5);
-    scarab->setProperty(P_SIZE, 2);
-    scarab->moveTo(g.getObject(RoomIds::EGYPT_ROOM));
+    scarab->setProperty(P_SIZE, 8);
+    scarab->moveTo(g.getObject(RoomIds::SANDY_CAVE));
     g.registerObject(ObjectIds::SCARAB, std::move(scarab));
     
     // Create TORCH (Ivory torch - also a light source)
     auto torch = std::make_unique<ZObject>(ObjectIds::TORCH, "ivory torch");
     torch->addSynonym("torch");
+    torch->addSynonym("treasure");
     torch->addAdjective("ivory");
     torch->setFlag(ObjectFlag::TAKEBIT);
     torch->setFlag(ObjectFlag::LIGHTBIT);
     torch->setFlag(ObjectFlag::ONBIT);
-    torch->setProperty(P_VALUE, 6);
-    torch->setProperty(P_TVALUE, 14);
-    torch->setProperty(P_SIZE, 8);
+    torch->setFlag(ObjectFlag::FLAMEBIT);
+    torch->setProperty(P_VALUE, 14);
+    torch->setProperty(P_TVALUE, 6);
+    torch->setProperty(P_SIZE, 20);
     torch->setProperty(P_STRENGTH, 30);  // Fuel remaining (0-30)
     torch->setAction(torchAction);
-    torch->moveTo(g.getObject(RoomIds::NORTH_TEMPLE));
+    torch->moveTo(g.getObject(ObjectIds::PEDESTAL));
     g.registerObject(ObjectIds::TORCH, std::move(torch));
     
     // Create SCEPTRE (Egyptian sceptre - also a weapon)
     auto sceptre = std::make_unique<ZObject>(ObjectIds::SCEPTRE, "sceptre");
     sceptre->addSynonym("sceptre");
     sceptre->addSynonym("scepter");
+    sceptre->addSynonym("treasure");
     sceptre->addAdjective("egyptian");
     sceptre->addAdjective("gold");
     sceptre->setFlag(ObjectFlag::TAKEBIT);
     sceptre->setFlag(ObjectFlag::WEAPONBIT);
     sceptre->setProperty(P_VALUE, 4);
     sceptre->setProperty(P_TVALUE, 6);
-    sceptre->setProperty(P_SIZE, 8);
+    sceptre->setProperty(P_SIZE, 3);
     sceptre->setLongDesc("An ornamented sceptre, tapering to a sharp point, is here.");
-    sceptre->moveTo(g.getObject(RoomIds::EGYPT_ROOM));
+    sceptre->moveTo(g.getObject(ObjectIds::COFFIN));
     g.registerObject(ObjectIds::SCEPTRE, std::move(sceptre));
+    
+    // Create SKULL (Crystal skull)
+    auto skull = std::make_unique<ZObject>(ObjectIds::SKULL, "crystal skull");
+    skull->addSynonym("skull");
+    skull->addSynonym("head");
+    skull->addSynonym("treasure");
+    skull->addAdjective("crystal");
+    skull->setFlag(ObjectFlag::TAKEBIT);
+    skull->setProperty(P_VALUE, 10);
+    skull->setProperty(P_TVALUE, 10);
+    skull->setProperty(P_SIZE, 15);
+    skull->setLongDesc("Lying in one corner of the room is a beautifully carved crystal skull. It appears to be grinning at you rather nastily.");
+    skull->moveTo(g.getObject(RoomIds::LAND_OF_LIVING_DEAD));
+    g.registerObject(ObjectIds::SKULL, std::move(skull));
     
     // CANARY and BAUBLE are created earlier with the egg-related objects
     
