@@ -1,5 +1,7 @@
 #include "rooms.h"
 #include "core/globals.h"
+#include <algorithm>
+#include <ranges>
 
 ZRoom::ZRoom(ObjectId id, std::string_view desc, std::string_view longDesc)
     : ZObject(id, desc), longDesc_(longDesc) {}
@@ -27,14 +29,11 @@ RoomExit RoomExit::createRequiresItem(ObjectId target, ObjectId requiredItem, st
         auto& g = Globals::instance();
         if (!g.winner) return false;
         
-        // Check if player has the required item
+        // Check if player has the required item using C++20/23 ranges
         const auto& contents = g.winner->getContents();
-        for (const auto* obj : contents) {
-            if (obj->getId() == requiredItem) {
-                return true;
-            }
-        }
-        return false;
+        return std::ranges::any_of(contents, [requiredItem](const auto* obj) {
+            return obj && obj->getId() == requiredItem;
+        });
     };
     return exit;
 }

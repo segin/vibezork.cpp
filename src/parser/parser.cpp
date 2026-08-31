@@ -1146,3 +1146,14 @@ ParsedCommand Parser::parse(const std::string &input) {
 
   return cmd;
 }
+
+ParseExpected Parser::tryParse(std::string_view input) {
+  if (input.empty()) {
+    return std::unexpected(ParseError{ParseErrorCode::EMPTY_INPUT, "Please enter a command."});
+  }
+  ParsedCommand cmd = parse(std::string(input));
+  if (cmd.verb == 0 && !cmd.isDirection) {
+    return std::unexpected(ParseError{ParseErrorCode::SYNTAX_ERROR, "I don't understand that sentence."});
+  }
+  return cmd;
+}

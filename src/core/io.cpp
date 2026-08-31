@@ -1,6 +1,7 @@
 #include "io.h"
 #include "object.h"
 #include <iostream>
+#include <print>
 #include <sstream>
 #include <string>
 
@@ -26,33 +27,33 @@ void print(std::string_view str) {
       if (!word.empty()) {
         if (currentColumn > 0 &&
             currentColumn + word.length() + 1 > WRAP_WIDTH) {
-          std::cout << '\n';
+          std::println();
           currentColumn = 0;
         }
         if (currentColumn > 0) {
-          std::cout << ' ';
+          std::print(" ");
           currentColumn++;
         }
-        std::cout << word;
+        std::print("{}", word);
         currentColumn += word.length();
         word.clear();
       }
       // Output the newline
-      std::cout << '\n';
+      std::println();
       currentColumn = 0;
     } else if (c == ' ' || c == '\t') {
       // End of word - output it
       if (!word.empty()) {
         if (currentColumn > 0 &&
             currentColumn + word.length() + 1 > WRAP_WIDTH) {
-          std::cout << '\n';
+          std::println();
           currentColumn = 0;
         }
         if (currentColumn > 0) {
-          std::cout << ' ';
+          std::print(" ");
           currentColumn++;
         }
-        std::cout << word;
+        std::print("{}", word);
         currentColumn += word.length();
         word.clear();
       }
@@ -65,7 +66,7 @@ void print(std::string_view str) {
   // Output any remaining word
   if (!word.empty()) {
     if (currentColumn > 0 && currentColumn + word.length() + 1 > WRAP_WIDTH) {
-      std::cout << '\n';
+      std::println();
       currentColumn = 0;
     }
     // Don't add space before punctuation
@@ -74,17 +75,17 @@ void print(std::string_view str) {
                            word[0] == '?' || word[0] == ':' || word[0] == ';' ||
                            word[0] == ')' || word[0] == ']'));
     if (currentColumn > 0 && !isPunctuation) {
-      std::cout << ' ';
+      std::print(" ");
       currentColumn++;
     }
-    std::cout << word;
+    std::print("{}", word);
     currentColumn += word.length();
   }
 }
 
 void printLine(std::string_view str) {
   print(str);
-  std::cout << std::endl;
+  std::println();
   currentColumn = 0;
 }
 

@@ -1,9 +1,12 @@
 #pragma once
-#include <string>
-#include <vector>
+#include <format>
 #include <functional>
 #include <iostream>
+#include <print>
 #include <sstream>
+#include <string>
+#include <string_view>
+#include <vector>
 
 // Redirect implementation for testing input
 class InputRedirect {
@@ -40,10 +43,10 @@ public:
             try {
                 test.func();
                 results.push_back({test.name, true, ""});
-                std::cout << "✓ " << test.name << std::endl;
+                std::println("✓ {}", test.name);
             } catch (const std::exception& e) {
                 results.push_back({test.name, false, e.what()});
-                std::cout << "✗ " << test.name << ": " << e.what() << std::endl;
+                std::println("✗ {}: {}", test.name, e.what());
             }
         }
         
@@ -69,13 +72,16 @@ private:
 #define ASSERT_EQ(a, b) \
     if ((a) != (b)) throw std::runtime_error("Assertion failed: " #a " == " #b)
 
+#define ASSERT_NE(a, b) \
+    if ((a) == (b)) throw std::runtime_error("Assertion failed: " #a " != " #b)
+
 #define ASSERT_CONTAINS(str, substr) \
-    if ((str).find(substr) == std::string::npos) \
-        throw std::runtime_error("String does not contain: " + std::string(substr))
+    if (!std::string_view(str).contains(substr)) \
+        throw std::runtime_error(std::format("String does not contain: {}", substr))
 
 #define ASSERT_NOT_CONTAINS(str, substr) \
-    if ((str).find(substr) != std::string::npos) \
-        throw std::runtime_error("String contains forbidden: " + std::string(substr))
+    if (std::string_view(str).contains(substr)) \
+        throw std::runtime_error(std::format("String contains forbidden: {}", substr))
 
 // Test registration macro
 #define TEST(name) \

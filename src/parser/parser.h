@@ -1,12 +1,13 @@
 #pragma once
 #include "core/types.h"
 #include "world/rooms.h"
+#include <expected>
+#include <optional>
 #include <string>
 #include <string_view>
-#include <vector>
 #include <unordered_map>
 #include <unordered_set>
-#include <optional>
+#include <vector>
 
 // Forward declaration
 class Parser;
@@ -26,6 +27,22 @@ struct ParsedCommand {
     ZObject* exceptObject = nullptr;  // Object to exclude in "all except"
 };
 
+// C++23 std::expected error types
+enum class ParseErrorCode {
+    EMPTY_INPUT,
+    UNKNOWN_WORD,
+    SYNTAX_ERROR,
+    AMBIGUOUS,
+    OBJECT_NOT_FOUND
+};
+
+struct ParseError {
+    ParseErrorCode code = ParseErrorCode::EMPTY_INPUT;
+    std::string message;
+};
+
+using ParseExpected = std::expected<ParsedCommand, ParseError>;
+
 // Forward declaration
 class VerbRegistry;
 
@@ -35,6 +52,7 @@ public:
     Parser(VerbRegistry* registry);  // Constructor with registry
     
     ParsedCommand parse(const std::string& input);
+    ParseExpected tryParse(std::string_view input);
     
     // Special command support
     void setLastCommand(const std::string& cmd);

@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <map>
+#include <print>
 #include <sstream>
 
 // Verb dispatch table
@@ -98,9 +99,10 @@ void mainLoop1() {
   auto &score = ScoreSystem::instance();
 
   // Simple blank line before prompt (status bar removed per user request)
-  std::cout << std::endl;
+  std::println();
 
-  std::cout << "> ";
+  std::print("> ");
+  std::cout.flush();
   std::string input = readLine();
 
   // Handle empty input gracefully (Requirement 72.1)
@@ -139,7 +141,7 @@ void mainLoop1() {
   // Handle "all" commands
   if (cmd.isAll) {
     if (cmd.allObjects.empty()) {
-      printLine("There's nothing here to " + std::string(cmd.words[0]) + ".");
+      printLine(std::format("There's nothing here to {}.", cmd.words[0]));
       return;
     }
 
@@ -148,7 +150,7 @@ void mainLoop1() {
       g.prso = obj;
 
       // Display what we're doing
-      print(obj->getDesc() + ": ");
+      print(std::format("{}: ", obj->getDesc()));
 
       // Execute the verb (C++17 if with initializer)
       if (auto it = verbHandlers.find(cmd.verb); it != verbHandlers.end()) {
@@ -188,7 +190,7 @@ void mainLoop() {
   while (true) {
     // Check for EOF before prompting
     if (std::cin.eof()) {
-      printLine("\nGoodbye!");
+      std::println("\nGoodbye!");
       break;
     }
 
@@ -209,10 +211,9 @@ void initializeGame() {
 void go() {
   auto &g = Globals::instance();
 
-  printLine("ZORK I: The Great Underground Empire");
-  printLine("Copyright (c) 1981-2025 Infocom, Inc. (Microsoft Corporation)");
-  printLine("ZORK is a registered trademark of Microsoft Corporation.");
-  crlf();
+  std::println("ZORK I: The Great Underground Empire");
+  std::println("Copyright (c) 1981-2025 Infocom, Inc. (Microsoft Corporation)");
+  std::println("ZORK is a registered trademark of Microsoft Corporation.\n");
 
   Verbs::vLook();
 

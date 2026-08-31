@@ -13,6 +13,13 @@ int ZObject::getProperty(PropertyId prop) const {
     return it != properties_.end() ? it->second : 0;
 }
 
+std::optional<int> ZObject::getPropertyOpt(PropertyId prop) const {
+    if (auto it = properties_.find(prop); it != properties_.end()) {
+        return it->second;
+    }
+    return std::nullopt;
+}
+
 void ZObject::setFlag(ObjectFlag flag) {
     flags_ |= static_cast<uint64_t>(flag);
 }
@@ -31,10 +38,9 @@ void ZObject::moveTo(ZObject* location) {
         return;
     }
     
-    // Remove from current location
+    // Remove from current location using C++20/23 std::erase
     if (location_) {
-        auto& contents = location_->contents_;
-        contents.erase(std::remove(contents.begin(), contents.end(), this), contents.end());
+        std::erase(location_->contents_, this);
     }
     
     // Add to new location
@@ -55,17 +61,17 @@ void ZObject::addAdjective(std::string_view adj) {
 }
 
 bool ZObject::hasSynonym(std::string_view word) const {
-    // O(1) lookup using hash set, case-insensitive
+    // O(1) lookup using hash set, case-insensitive with C++20/23 .contains()
     std::string lowerWord(word);
-    std::transform(lowerWord.begin(), lowerWord.end(), lowerWord.begin(), ::tolower);
-    return synonymSet_.find(lowerWord) != synonymSet_.end();
+    std::ranges::transform(lowerWord, lowerWord.begin(), ::tolower);
+    return synonymSet_.contains(lowerWord);
 }
 
 bool ZObject::hasAdjective(std::string_view word) const {
-    // O(1) lookup using hash set, case-insensitive
+    // O(1) lookup using hash set, case-insensitive with C++20/23 .contains()
     std::string lowerWord(word);
-    std::transform(lowerWord.begin(), lowerWord.end(), lowerWord.begin(), ::tolower);
-    return adjectiveSet_.find(lowerWord) != adjectiveSet_.end();
+    std::ranges::transform(lowerWord, lowerWord.begin(), ::tolower);
+    return adjectiveSet_.contains(lowerWord);
 }
 
 void ZObject::setText(std::string_view text) {
@@ -74,6 +80,13 @@ void ZObject::setText(std::string_view text) {
 
 const std::string& ZObject::getText() const {
     return text_;
+}
+
+std::optional<std::string_view> ZObject::getTextOpt() const {
+    if (!text_.empty()) {
+        return std::string_view(text_);
+    }
+    return std::nullopt;
 }
 
 bool ZObject::hasText() const {

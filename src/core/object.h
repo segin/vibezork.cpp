@@ -3,6 +3,8 @@
 #include "types.h"
 #include <functional>
 #include <map>
+#include <optional>
+#include <span>
 #include <string>
 #include <string_view>
 #include <unordered_set>
@@ -29,13 +31,15 @@ public:
   ZObject(ObjectId id, std::string_view desc);
   virtual ~ZObject() = default;
 
-  // Property accessors
+  // Property accessors (C++23 std::optional)
   void setProperty(PropertyId prop, int value);
   int getProperty(PropertyId prop) const;
+  std::optional<int> getPropertyOpt(PropertyId prop) const;
 
   // Text property accessors
   void setText(std::string_view text);
   const std::string &getText() const;
+  std::optional<std::string_view> getTextOpt() const;
   bool hasText() const;
 
   // Long description (for room display)
@@ -43,15 +47,26 @@ public:
   const std::string &getLongDesc() const { return longDesc_; }
   bool hasLongDesc() const { return !longDesc_.empty(); }
 
-  // Flag operations
+  // Flag operations with C++23 fold expression helpers
   void setFlag(ObjectFlag flag);
   void clearFlag(ObjectFlag flag);
   bool hasFlag(ObjectFlag flag) const;
 
-  // Location/containment
+  template <typename... Flags>
+  bool hasAllFlags(Flags... flags) const {
+    return (hasFlag(flags) && ...);
+  }
+
+  template <typename... Flags>
+  bool hasAnyFlag(Flags... flags) const {
+    return (hasFlag(flags) || ...);
+  }
+
+  // Location/containment (with C++23 std::span)
   void moveTo(ZObject *location);
   ZObject *getLocation() const { return location_; }
   const std::vector<ZObject *> &getContents() const { return contents_; }
+  std::span<ZObject *const> getContentsSpan() const { return contents_; }
 
   // Identification
   ObjectId getId() const { return id_; }
