@@ -2391,7 +2391,7 @@ Comprehensive testing and final polish to ensure quality.
   - Fix platform-specific issues
   - _Requirements: 88_
 
-- [ ] 73.1 Test Linux build
+- [x] 73.1 Test Linux build
   - Build on Linux
   - Run all tests
   - Fix any issues
