@@ -2552,7 +2552,7 @@ N
   - Justify any deviations from original
   - _Requirements: 100_
 
-- [ ] 79. Prepare release build
+- [x] 79. Prepare release build
   - Configure release build settings
   - Optimize for release
   - Create release packages
@@ -2571,7 +2571,7 @@ N
   - Build for Windows
   - _Requirements: 88, 89_
 
-- [ ] 79.3 Test release builds
+- [x] 79.3 Test release builds
   - Test each platform's release build
   - Verify performance
   - Verify functionality
