@@ -2541,7 +2541,7 @@ N
   - Verify same solutions work
   - _Requirements: 100_
 
-- [ ] 78.3 Verify scoring
+- [x] 78.3 Verify scoring
   - Compare scoring in both versions
   - Verify same point values
   - Verify same maximum score
