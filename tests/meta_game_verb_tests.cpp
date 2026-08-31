@@ -101,8 +101,8 @@ TEST(ScoreVerbRankNovice) {
     g.winner = player.get();
     g.registerObject(999, std::move(player));
     
-    // Set score to novice level
-    g.score = 25;
+    // Set score to novice level (50 points)
+    g.score = 50;
     g.moves = 20;
     
     // Capture output
@@ -131,8 +131,8 @@ TEST(ScoreVerbRankAdventurer) {
     g.winner = player.get();
     g.registerObject(999, std::move(player));
     
-    // Set score to adventurer level
-    g.score = 100;
+    // Set score to adventurer level (200 points)
+    g.score = 200;
     g.moves = 50;
     
     // Capture output
@@ -161,8 +161,8 @@ TEST(ScoreVerbRankMaster) {
     g.winner = player.get();
     g.registerObject(999, std::move(player));
     
-    // Set score to master level
-    g.score = 200;
+    // Set score to master level (300 points)
+    g.score = 300;
     g.moves = 100;
     
     // Capture output
@@ -191,8 +191,8 @@ TEST(ScoreVerbRankWizard) {
     g.winner = player.get();
     g.registerObject(999, std::move(player));
     
-    // Set score to wizard level
-    g.score = 300;
+    // Set score to wizard level (330 points)
+    g.score = 330;
     g.moves = 150;
     
     // Capture output

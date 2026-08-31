@@ -2174,15 +2174,25 @@ bool vScore() {
   auto &g = Globals::instance();
   auto &scoreSystem = ScoreSystem::instance();
 
-  // Display current score using ScoreSystem (where trophy case scores are stored)
-  print("Your score is ");
-  print(std::to_string(scoreSystem.getScore()));
-  print(" (total of 350 points), in ");
-  print(std::to_string(g.moves));
-  printLine(" moves.");
+  int currentScore = (g.score > 0) ? g.score : scoreSystem.getScore();
+  int currentMoves = (g.moves > 0) ? g.moves : scoreSystem.getMoves();
 
-  // Display rank based on score using ScoreSystem
-  printLine("This gives you the rank of " + std::string(scoreSystem.getRank()) + ".");
+  // Display current score
+  printLine(std::format("Your score is {} (total of 350 points), in {} {}.",
+                        currentScore, currentMoves,
+                        currentMoves == 1 ? "move" : "moves"));
+
+  // Display rank based on score using ScoreSystem logic (ZIL: 1actions.zil:4034-4043)
+  std::string_view rank = "Beginner";
+  if (currentScore >= 350) rank = "Master Adventurer";
+  else if (currentScore >= 330) rank = "Wizard";
+  else if (currentScore >= 300) rank = "Master";
+  else if (currentScore >= 200) rank = "Adventurer";
+  else if (currentScore >= 100) rank = "Junior Adventurer";
+  else if (currentScore >= 50) rank = "Novice Adventurer";
+  else if (currentScore >= 25) rank = "Amateur Adventurer";
+
+  printLine(std::format("This gives you the rank of {}.", rank));
 
   return RTRUE;
 }
