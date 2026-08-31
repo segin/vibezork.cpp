@@ -2530,7 +2530,7 @@ N
   - Document any intentional differences
   - _Requirements: 100_
 
-- [ ] 78.1 Side-by-side comparison
+- [x] 78.1 Side-by-side comparison
   - Test same commands in both versions
   - Compare outputs
   - Verify behavior matches
