@@ -46,20 +46,27 @@ public:
   int lampBattery = 330;   // Lamp battery life in turns (starts at 330)
   bool lampWarned = false; // Has low battery warning been shown?
 
-  // Puzzle state flags
-  bool rugMoved = false;  // Has the rug been moved to reveal trap door?
-  bool lldFlag = false;   // Land of Living Dead flag (ceremony complete?)
-  bool gateFlag = false;  // Dam control panel activated (Green Bubble light)
-  bool gatesOpen = false; // Are dam sluice gates open?
-  bool lowTide = false;   // Is water level in reservoir low? (ZIL: LOW-TIDE)
-  bool domeFlag =
-      false; // Is rope tied to railing in Dome Room? (ZIL: DOME-FLAG)
-  bool grunlock = false; // Is grate unlocked? (ZIL: GRUNLOCK)
-  int waterLevel = 0;    // Water level in Maintenance Room (0=Dry, >0=Rising)
+  // Puzzle and Conditional Exit Flags (ZIL: 1dungeon.zil:1223-1235)
+  bool cyclopsFlag = false;   // ZIL: ,CYCLOPS-FLAG (Cyclops asleep or fled)
+  bool deflate = false;       // ZIL: ,DEFLATE (Can squeeze through tight beach passages)
+  bool domeFlag = false;      // ZIL: ,DOME-FLAG (Rope tied to railing in Dome Room)
+  bool emptyHanded = false;   // ZIL: ,EMPTY-HANDED (Shaft basket lowered/raised empty)
+  bool lldFlag = false;       // ZIL: ,LLD-FLAG (Land of Living Dead spirits dispersed)
+  bool lowTide = false;       // ZIL: ,LOW-TIDE (Reservoir gates opened, water level low)
+  bool magicFlag = false;     // ZIL: ,MAGIC-FLAG (Odysseus spoken, Strange Passage open)
+  bool rainbowFlag = false;   // ZIL: ,RAINBOW-FLAG (Rainbow solidified, walkable)
+  bool trollFlag = false;     // ZIL: ,TROLL-FLAG (Troll dead/fled, Troll Room passages unblocked)
+  bool wonFlag = false;       // ZIL: ,WON-FLAG (Score-max reached, Stone Barrow entrance open)
+  bool coffinCure = false;    // ZIL: ,COFFIN-CURE (Prayer answered in Egypt Room)
+
+  // Additional puzzle state
+  bool rugMoved = false;      // Has the rug been moved to reveal trap door?
+  bool gateFlag = false;      // Dam control panel activated (Green Bubble light)
+  bool gatesOpen = false;     // Are dam sluice gates open?
+  bool grunlock = false;      // Is grate unlocked? (ZIL: GRUNLOCK)
+  int waterLevel = 0;         // Water level in Maintenance Room (0=Dry, >0=Rising)
   bool grateRevealed = false; // Has the grating been revealed in the Clearing?
   int matchCount = 5;         // Number of matches in matchbook
-  bool rainbowFlag = false;   // Is rainbow solid/walkable? (ZIL: RAINBOW-FLAG)
-  bool deflate = false;       // Can squeeze through tight beach passages (ZIL: DEFLATE)
   bool buoyFlag = true;       // Notice buoy feel on river (ZIL: BUOY-FLAG)
 
   // Display modes

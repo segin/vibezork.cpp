@@ -222,6 +222,7 @@ constexpr VerbId V_STRIKE = 221; // Intransitive STRIKE support
 constexpr VerbId V_READ_PAGE = 224; // Read object (book)
 constexpr VerbId V_PICK = 225;
 constexpr VerbId V_APPLY = 226;
+constexpr VerbId V_OVERBOARD = 227;
 
 
 
@@ -411,6 +412,7 @@ namespace Verbs {
     bool vUnrecord();
     bool vVerify();
     bool vThrowOff();
+    bool vOverboard();
     bool vJump();
     bool vCurse();
     

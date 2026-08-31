@@ -89,7 +89,8 @@ std::map<VerbId, std::function<bool()>> verbHandlers = {
     {V_SWIM, Verbs::vSwim},
     {V_BACK, Verbs::vBack},
     {V_JUMP, Verbs::vJump},
-    {V_CURSE, Verbs::vCurse}};
+    {V_CURSE, Verbs::vCurse},
+    {V_OVERBOARD, Verbs::vOverboard}};
 
 // Use global parser from parser_instance.cpp
 // Parser& getGlobalParser() is declared in parser.h

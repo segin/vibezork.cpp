@@ -47,14 +47,17 @@ void Globals::reset() {
     lldFlag = false;
     gateFlag = false;       // Dam Green Bubble status
     gatesOpen = false;      // Dam Sluice Gates
-    lowTide = false;        // Dam Reservoir Low Tide
-    domeFlag = false;       // Dome Room Rope
-    grunlock = false;       // Grate Unlocked
-    waterLevel = 0;         // Maintenance Room water
-    grateRevealed = false;  // Clearing Grating
-    matchCount = 5;
-    rainbowFlag = false;
+    cyclopsFlag = false;
+    emptyHanded = false;
+    magicFlag = false;
+    trollFlag = false;
+    wonFlag = false;
+    coffinCure = false;
     deflate = false;
+    domeFlag = false;
+    lldFlag = false;
+    lowTide = false;
+    rainbowFlag = false;
     buoyFlag = true;
     falseFlag = false;
     
