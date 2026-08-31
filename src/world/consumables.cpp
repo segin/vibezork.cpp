@@ -3,6 +3,8 @@
 
 #include "object_builder.h"
 
+extern bool waterAction();
+
 void initializeConsumables() {
     using namespace ObjectIds;
     
@@ -29,15 +31,15 @@ void initializeConsumables() {
     });
 
     
-    // WATER - Quantity of water in bottle
+    // WATER - Quantity of water in bottle (ZIL: 1dungeon.zil:100-106)
     createObject({
         .id = WATER,
         .desc = "quantity of water",
-        .synonyms = {"water", "quantity"},
-        .adjectives = {"clear"},
-        .flags = {ObjectFlag::TAKEBIT},
+        .synonyms = {"water", "quantity", "liquid", "h2o"},
+        .flags = {ObjectFlag::TRYTAKEBIT, ObjectFlag::TAKEBIT, ObjectFlag::DRINKBIT},
         .size = 4,
-        .location = BOTTLE  // Inside the bottle
+        .location = BOTTLE,  // Inside the bottle
+        .action = waterAction
     });
     
 } // end initializeConsumables

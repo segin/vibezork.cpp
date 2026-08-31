@@ -56,6 +56,7 @@ void Globals::reset() {
     rainbowFlag = false;
     deflate = false;
     buoyFlag = true;
+    falseFlag = false;
     
     // Reset display modes to defaults (Requirement 65.5)
     verboseMode = true;

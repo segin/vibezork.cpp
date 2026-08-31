@@ -182,6 +182,8 @@ void Parser::initializeVerbsAndDirections() {
   directions_["inside"] = Direction::IN;
   directions_["out"] = Direction::OUT;
   directions_["outside"] = Direction::OUT;
+  directions_["land"] = Direction::LAND;
+  directions_["launch"] = Direction::LAUNCH;
 
   // Prepositions (from gsyntax.zil)
   // Core prepositions

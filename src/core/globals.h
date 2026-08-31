@@ -33,7 +33,9 @@ public:
   VerbId prsa = 0; ///< Parser Result Subject Action - current verb (ZIL: ,PRSA)
   ZObject *it = nullptr; ///< Last referenced object (ZIL: ,P-IT-OBJECT)
 
-  // Game state
+  // Game state (ZIL: SCORE-MAX, FALSE-FLAG)
+  static constexpr int SCORE_MAX = 350;
+  bool falseFlag = false; // ZIL: ,FALSE-FLAG
   bool lit = false; // Is current room lit?
   int score = 0;
   int moves = 0;

@@ -10,21 +10,27 @@ bool forestAction();
 bool kitchenWindowAction();
 bool groundAction();
 bool bodyAction();
+bool songbirdAction();
+bool graniteWallAction();
+bool chimneyAction();
+bool mountainRangeAction();
+bool waterAction();
+bool teethAction();
 
 void initializeScenery() {
     using namespace ObjectIds;
     
-    // WHITE_HOUSE - Global object for house exterior
+    // WHITE_HOUSE - Global object for house exterior (ZIL: 1dungeon.zil:48-54)
     createObject({
         .id = WHITE_HOUSE,
         .desc = "white house",
         .synonyms = {"house"},
-        .adjectives = {"white", "beautiful", "colonial"},
+        .adjectives = {"white", "beautiful", "colonial", "beauti", "coloni"},
         .flags = {ObjectFlag::NDESCBIT},
         .action = whiteHouseAction
     });
     
-    // BOARD - Boards on windows
+    // BOARD - Boards on windows (ZIL: 1dungeon.zil:13-18)
     createObject({
         .id = BOARD,
         .desc = "board",
@@ -34,7 +40,7 @@ void initializeScenery() {
     });
 
     
-    // FOREST - Global forest object
+    // FOREST - Global forest object (ZIL: 1dungeon.zil:56-61)
     createObject({
         .id = FOREST,
         .desc = "forest",
@@ -43,7 +49,7 @@ void initializeScenery() {
         .action = forestAction
     });
     
-    // TREE - Large tree (climbable)
+    // TREE - Large tree (ZIL: 1dungeon.zil:63-68)
     createObject({
         .id = TREE,
         .desc = "tree",
@@ -52,13 +58,14 @@ void initializeScenery() {
         .flags = {ObjectFlag::NDESCBIT, ObjectFlag::CLIMBBIT}
     });
     
-    // SONGBIRD - Songbird in forest
+    // SONGBIRD - Songbird in forest (ZIL: 1dungeon.zil:40-46)
     createObject({
         .id = SONGBIRD,
         .desc = "songbird",
         .synonyms = {"bird", "songbird"},
         .adjectives = {"song"},
-        .flags = {ObjectFlag::NDESCBIT}
+        .flags = {ObjectFlag::NDESCBIT},
+        .action = songbirdAction
     });
 
     
@@ -79,13 +86,13 @@ void initializeScenery() {
         .flags = {ObjectFlag::NDESCBIT}
     });
     
-    // KITCHEN_WINDOW - Small window (slightly ajar)
+    // KITCHEN_WINDOW - Kitchen window (ZIL: 1dungeon.zil:108-113)
     createObject({
         .id = KITCHEN_WINDOW,
-        .desc = "small window",
+        .desc = "kitchen window",
         .synonyms = {"window"},
-        .adjectives = {"small", "kitchen"},
-        .flags = {ObjectFlag::NDESCBIT, ObjectFlag::DOORBIT},
+        .adjectives = {"kitchen", "small"},
+        .flags = {ObjectFlag::DOORBIT, ObjectFlag::NDESCBIT},
         .location = RoomIds::BEHIND_HOUSE,
         .action = kitchenWindowAction
     });
@@ -190,6 +197,7 @@ void initializeScenery() {
     });
     
     // WALL - Generic wall
+    // WALL - Generic wall (ZIL: 1dungeon.zil:27-31)
     createObject({
         .id = WALL,
         .desc = "surrounding wall",
@@ -198,13 +206,14 @@ void initializeScenery() {
         .flags = {ObjectFlag::NDESCBIT}
     });
     
-    // GRANITE_WALL - Granite wall
+    // GRANITE_WALL - Granite wall (ZIL: 1dungeon.zil:33-38)
     createObject({
         .id = GRANITE_WALL,
         .desc = "granite wall",
         .synonyms = {"wall"},
         .adjectives = {"granite"},
-        .flags = {ObjectFlag::NDESCBIT}
+        .flags = {ObjectFlag::NDESCBIT},
+        .action = graniteWallAction
     });
 
     
@@ -236,12 +245,14 @@ void initializeScenery() {
     });
 
     
-    // CHIMNEY - Chimney
+    // CHIMNEY - Chimney (ZIL: 1dungeon.zil:115-120)
     createObject({
         .id = CHIMNEY,
         .desc = "chimney",
         .synonyms = {"chimney"},
-        .flags = {ObjectFlag::NDESCBIT}
+        .adjectives = {"dark", "narrow"},
+        .flags = {ObjectFlag::CLIMBBIT, ObjectFlag::NDESCBIT},
+        .action = chimneyAction
     });
     
     // BARROW - Stone barrow
@@ -264,28 +275,32 @@ void initializeScenery() {
     });
 
     
-    // GLOBAL_WATER - Global water object
+    // GLOBAL_WATER - Global water object (ZIL: 1dungeon.zil:94-98)
     createObject({
         .id = GLOBAL_WATER,
         .desc = "water",
         .synonyms = {"water", "quantity"},
-        .flags = {ObjectFlag::DRINKBIT}
+        .flags = {ObjectFlag::DRINKBIT},
+        .action = waterAction
     });
     
-    // MOUNTAIN_RANGE - Mountains
+    // MOUNTAIN_RANGE - Mountains (ZIL: 1dungeon.zil:77-83)
     createObject({
         .id = MOUNTAIN_RANGE,
-        .desc = "mountains",
-        .synonyms = {"mountains", "mountain", "range"},
-        .flags = {ObjectFlag::NDESCBIT}
+        .desc = "mountain range",
+        .synonyms = {"mountain", "range"},
+        .adjectives = {"impassable", "flathead"},
+        .flags = {ObjectFlag::NDESCBIT, ObjectFlag::CLIMBBIT},
+        .action = mountainRangeAction
     });
     
-    // TEETH - Overboard teeth
+    // TEETH - Overboard teeth (ZIL: 1dungeon.zil:20-25)
     createObject({
         .id = TEETH,
         .desc = "set of teeth",
         .synonyms = {"overboard", "teeth"},
-        .flags = {ObjectFlag::NDESCBIT}
+        .flags = {ObjectFlag::NDESCBIT},
+        .action = teethAction
     });
 
     

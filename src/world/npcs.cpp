@@ -89,13 +89,15 @@ void initializeNPCs() {
     });
     
     // GHOSTS - Spirits in Entrance to Hades
+    extern bool ghostsAction();
     createObject({
         .id = GHOSTS,
         .desc = "number of ghosts",
         .synonyms = {"ghosts", "spirits", "fiends", "force"},
         .adjectives = {"invisible", "evil"},
         .flags = {ObjectFlag::ACTORBIT, ObjectFlag::NDESCBIT},
-        .location = RoomIds::ENTRANCE_TO_HADES
+        .location = RoomIds::ENTRANCE_TO_HADES,
+        .action = ghostsAction
     });
     
 } // end initializeNPCs
