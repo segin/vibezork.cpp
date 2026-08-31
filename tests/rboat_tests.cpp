@@ -9,6 +9,7 @@
 #include "../src/world/objects.h"
 #include "../src/world/rooms.h"
 #include "../src/world/world.h"
+#include "../src/systems/death.h"
 #include "test_framework.h"
 #include <sstream>
 #include <string>
@@ -32,7 +33,12 @@ private:
 // Forward declarations
 extern bool inflatedBoatAction();
 
-static void setupTestWorld() { initializeWorld(); }
+static void setupTestWorld() {
+  Globals::instance().reset();
+  initializeWorld();
+  DeathSystem::initialize();
+  DeathSystem::setTestMode(true);
+}
 
 // =============================================================================
 // RBOAT-FUNCTION Tests - WALK Verb (5 tests)
@@ -53,6 +59,7 @@ TEST(RBoat_WalkLandEastWestAllowed) {
   // WALK LAND should return false (allowed)
   g.prsa = V_WALK;
   g.prso = g.getObject(ObjectIds::SAND); // Represents LAND
+  g.prsi = nullptr;
 
   bool result = inflatedBoatAction();
   ASSERT_FALSE(result); // Not handled, allows default movement
@@ -71,11 +78,13 @@ TEST(RBoat_WalkOtherDirectionsBlocked) {
 
   // WALK UP should be blocked
   g.prsa = V_WALK;
-  // Use a non-allowed direction
+  g.prso = nullptr; // non-allowed direction
+  g.prsi = nullptr;
 
   OutputCapture cap;
   bool result = inflatedBoatAction();
 
+  ASSERT_TRUE(result);
   std::string output = cap.getOutput();
   // Should print "Read the label for the boat's instructions."
   ASSERT_TRUE(output.find("label") != std::string::npos ||

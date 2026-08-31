@@ -1116,14 +1116,19 @@ bool iboatFunction() {
 // Source: 1actions.zil lines 2722-2815
 bool inflatedBoatAction() {
   auto &g = Globals::instance();
+  ZObject *winner = g.winner ? g.winner : g.player;
+  if (!winner) {
+    winner = g.getObject(ObjectIds::ADVENTURER);
+  }
 
   // ============================================================================
   // VERB: WALK - Direction validation
   // ============================================================================
   if (g.prsa == V_WALK) {
     // Check if player is in boat (location check)
-    if (g.winner->getLocation() &&
-        g.winner->getLocation()->getId() != ObjectIds::BOAT_INFLATED) {
+    if (!winner || !winner->getLocation() ||
+        (winner->getLocation()->getId() != ObjectIds::BOAT_INFLATED &&
+         winner->getLocation()->getId() != ObjectIds::INFLATED_BOAT)) {
       return RFALSE; // Not in boat, not handled
     }
 
@@ -1152,8 +1157,9 @@ bool inflatedBoatAction() {
   // ============================================================================
   if (g.prsa == V_LAUNCH) {
     // Check if player is in boat
-    if (g.winner->getLocation() &&
-        g.winner->getLocation()->getId() != ObjectIds::BOAT_INFLATED) {
+    if (!winner || !winner->getLocation() ||
+        (winner->getLocation()->getId() != ObjectIds::BOAT_INFLATED &&
+         winner->getLocation()->getId() != ObjectIds::INFLATED_BOAT)) {
       printLine("You're not in the boat!");
       return RTRUE;
     }
@@ -1164,16 +1170,15 @@ bool inflatedBoatAction() {
                    g.here->getId() == RoomIds::RIVER_1 ||
                    g.here->getId() == RoomIds::RIVER_2 ||
                    g.here->getId() == RoomIds::RIVER_3 ||
-                   g.here->getId() == RoomIds::RIVER_4)) {
-      print("You are on the ");
+                   g.here->getId() == RoomIds::RIVER_4 ||
+                   g.here->getId() == RoomIds::RIVER_5)) {
+      std::string waterName = "river";
       if (g.here->getId() == RoomIds::RESERVOIR) {
-        print("reservoir");
+        waterName = "reservoir";
       } else if (g.here->getId() == RoomIds::IN_STREAM) {
-        print("stream");
-      } else {
-        print("river");
+        waterName = "stream";
       }
-      printLine(", or have you forgotten?");
+      printLine(std::format("You are on the {}, or have you forgotten?", waterName));
       return RTRUE;
     }
 
@@ -1327,14 +1332,18 @@ bool inflatedBoatAction() {
   // ============================================================================
   if (g.prsa == V_DEFLATE) {
     // Check if player is inside boat
-    if (g.winner->getLocation() &&
-        g.winner->getLocation()->getId() == ObjectIds::BOAT_INFLATED) {
+    if (winner && winner->getLocation() &&
+        (winner->getLocation()->getId() == ObjectIds::BOAT_INFLATED ||
+         winner->getLocation()->getId() == ObjectIds::INFLATED_BOAT)) {
       printLine("You can't deflate the boat while you're in it.");
       return RTRUE;
     }
 
     // Check if boat is on ground (in HERE)
     ZObject *boat = g.getObject(ObjectIds::BOAT_INFLATED);
+    if (!boat) {
+      boat = g.getObject(ObjectIds::INFLATED_BOAT);
+    }
     if (boat && boat->getLocation() != g.here) {
       printLine("The boat must be on the ground to be deflated.");
       return RTRUE;
@@ -1343,9 +1352,13 @@ bool inflatedBoatAction() {
     // Deflate the boat
     if (boat && g.here) {
       printLine("The boat deflates.");
+      g.deflate = true;
       boat->moveTo(nullptr);
 
       ZObject *deflatableBoat = g.getObject(ObjectIds::BOAT_INFLATABLE);
+      if (!deflatableBoat) {
+        deflatableBoat = g.getObject(ObjectIds::INFLATABLE_BOAT);
+      }
       if (deflatableBoat) {
         deflatableBoat->moveTo(g.here);
       }
