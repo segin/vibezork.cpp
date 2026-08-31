@@ -736,9 +736,8 @@ bool vLock() {
     return RTRUE;
   }
 
-  // Default LOCK behavior - lock the object if all prechecks passed
-  g.prso->setFlag(ObjectFlag::LOCKEDBIT);
-  printLine("Locked.");
+  // Default LOCK behavior per ZIL V-LOCK (gverbs.zil:855-856)
+  printLine("It doesn't seem to work.");
 
   return RTRUE;
 }
@@ -787,9 +786,8 @@ bool vUnlock() {
     return RTRUE;
   }
 
-  // Default UNLOCK behavior - unlock the object if all prechecks passed
-  g.prso->clearFlag(ObjectFlag::LOCKEDBIT);
-  printLine("Unlocked.");
+  // Default UNLOCK behavior per ZIL V-UNLOCK (gverbs.zil:1508-1509)
+  printLine("It doesn't seem to work.");
 
   return RTRUE;
 }
@@ -2826,6 +2824,34 @@ bool vCurse() {
   } else {
     printLine("Such language in a high-class establishment like this!");
   }
+  return RTRUE;
+}
+
+// V-OVERBOARD - Throw something overboard from a vehicle
+// ZIL: gverbs.zil lines 996-1009
+bool vOverboard() {
+  auto &g = Globals::instance();
+  ZObject *winner = g.winner ? g.winner : g.player;
+  ZObject *locn = winner ? winner->getLocation() : nullptr;
+
+  if (g.prsi && g.prsi->getId() == ObjectIds::TEETH) {
+    if (locn && locn->hasFlag(ObjectFlag::VEHBIT)) {
+      if (g.prso) {
+        g.prso->moveTo(locn->getLocation());
+        printLine(std::format("Ahoy -- {} overboard!", g.prso->getDesc()));
+        return RTRUE;
+      }
+    } else {
+      printLine("You're not in anything!");
+      return RTRUE;
+    }
+  }
+
+  if (locn && locn->hasFlag(ObjectFlag::VEHBIT)) {
+    return vThrow();
+  }
+
+  printLine("Huh?");
   return RTRUE;
 }
 
