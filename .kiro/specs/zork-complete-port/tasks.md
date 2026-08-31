@@ -2397,7 +2397,7 @@ Comprehensive testing and final polish to ensure quality.
   - Fix any issues
   - _Requirements: 88_
 
-- [ ] 73.2 Test macOS build
+- [x] 73.2 Test macOS build
   - Build on macOS
   - Run all tests
   - Fix any issues
