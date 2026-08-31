@@ -8,21 +8,21 @@ option(BUILD_TESTS "Build test suite" OFF)
 
 include_directories(src)
 
+# Collect library sources (everything except main.cpp)
+file(GLOB_RECURSE LIB_SOURCES "src/*.cpp")
+list(REMOVE_ITEM LIB_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
+
+# Library target for game engine (compiled once, linked by all targets)
+add_library(zork_core STATIC ${LIB_SOURCES})
+target_include_directories(zork_core PUBLIC src)
+
 # Main game executable
-file(GLOB_RECURSE SOURCES "src/*.cpp")
-add_executable(zork1 ${SOURCES})
+add_executable(zork1 src/main.cpp)
+target_link_libraries(zork1 PRIVATE zork_core)
 
 # Tests
 if(BUILD_TESTS)
     enable_testing()
-    
-    # Collect library sources (everything except main.cpp)
-    file(GLOB_RECURSE LIB_SOURCES "src/*.cpp")
-    list(REMOVE_ITEM LIB_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
-    
-    # Library target for game engine (compiled once, linked by all tests)
-    add_library(zork_core STATIC ${LIB_SOURCES})
-    target_include_directories(zork_core PUBLIC src)
     
     macro(add_zork_test test_name target_name source_file)
         add_executable(${target_name} ${source_file})

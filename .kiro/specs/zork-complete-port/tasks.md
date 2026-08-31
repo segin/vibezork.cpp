@@ -2559,7 +2559,7 @@ N
   - Test release builds
   - _Requirements: 89_
 
-- [ ] 79.1 Configure release build
+- [x] 79.1 Configure release build
   - Set optimization flags
   - Disable debug code
   - Configure for release
