@@ -2584,7 +2584,7 @@ N
   - Prepare for distribution
   - _Requirements: 95_
 
-- [ ] 80.1 Finalize documentation
+- [x] 80.1 Finalize documentation
   - Complete README
   - Complete developer guide
   - Complete architecture docs
