@@ -208,17 +208,17 @@ TEST(PuzzleBoatPump) {
         return;
     }
     
-    // Give player boat and pump
-    helper.givePlayerObject(ObjectIds::BOAT_INFLATABLE);
+    // Place boat on the ground and give player the pump
+    boat->moveTo(g.here);
     helper.givePlayerObject(ObjectIds::PUMP);
     
-    // Inflate boat
+    // Inflate boat with pump
     g.prso = boat;
     g.prsi = pump;
     g.prsa = V_INFLATE;
     Verbs::vInflate();
     
-    // Verify boat state changed (may become BOAT_INFLATED object)
+    // Verify boat state changed (becomes BOAT_INFLATED object)
     auto* inflatedBoat = g.getObject(ObjectIds::BOAT_INFLATED);
     if (inflatedBoat) {
         ASSERT_TRUE(inflatedBoat->getLocation() == g.winner || 
@@ -292,26 +292,31 @@ TEST(PuzzleEgg) {
     auto& g = Globals::instance();
     
     auto* egg = g.getObject(ObjectIds::EGG);
+    auto* sword = g.getObject(ObjectIds::SWORD);
     
-    if (!egg) {
-        std::cout << "Warning: Egg not found, skipping test\n";
+    if (!egg || !sword) {
+        std::cout << "Warning: Egg or sword not found, skipping test\n";
         return;
     }
     
-    // Give player the egg
+    // Give player the egg and sword
     helper.givePlayerObject(ObjectIds::EGG);
+    helper.givePlayerObject(ObjectIds::SWORD);
     
-    // Open egg
+    // Open egg with sword
     g.prso = egg;
+    g.prsi = sword;
     g.prsa = V_OPEN;
     Verbs::vOpen();
     
-    ASSERT_TRUE(egg->hasFlag(ObjectFlag::OPENBIT));
+    // In Zork 1, opening with a weapon/tool converts egg to BROKEN_EGG
+    auto* brokenEgg = g.getObject(ObjectIds::BROKEN_EGG);
+    ASSERT_TRUE(brokenEgg != nullptr && brokenEgg->hasFlag(ObjectFlag::OPENBIT));
     
-    // Verify canary is inside
-    auto* canary = g.getObject(ObjectIds::CANARY);
-    if (canary) {
-        ASSERT_EQ(canary->getLocation(), egg);
+    // Verify broken canary is inside broken egg
+    auto* brokenCanary = g.getObject(ObjectIds::BROKEN_CANARY);
+    if (brokenCanary) {
+        ASSERT_EQ(brokenCanary->getLocation(), brokenEgg);
     }
     
     std::cout << "✓ Egg puzzle is solvable\n";
