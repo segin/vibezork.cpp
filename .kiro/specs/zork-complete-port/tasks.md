@@ -2536,7 +2536,7 @@ N
   - Verify behavior matches
   - _Requirements: 100_
 
-- [ ] 78.2 Verify puzzle solutions
+- [x] 78.2 Verify puzzle solutions
   - Test all puzzle solutions in both versions
   - Verify same solutions work
   - _Requirements: 100_
