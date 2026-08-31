@@ -1088,15 +1088,31 @@ ParsedCommand Parser::parse(const std::string &input) {
             setLastObject(cmd.directObj);
           }
         }
-      }
 
-      if (!indirectObjWords.empty()) {
-        auto indirectMatches = findObjects(indirectObjWords, 0);
-        if (!indirectMatches.empty()) {
-          cmd.indirectObj =
-              indirectMatches.size() == 1
-                  ? indirectMatches[0]
-                  : disambiguate(indirectMatches, indirectObjWords.back());
+        if (!indirectObjWords.empty()) {
+          auto indirectMatches = findObjects(indirectObjWords, 0);
+          if (!indirectMatches.empty()) {
+            cmd.indirectObj =
+                indirectMatches.size() == 1
+                    ? indirectMatches[0]
+                    : disambiguate(indirectMatches, indirectObjWords.back());
+          }
+        }
+      } else {
+        // Preposition immediately follows verb (e.g., "turn on lamp", "look at sword", "look in box")
+        // The object after the preposition is the direct object (PRSO)
+        if (!indirectObjWords.empty()) {
+          auto matches = findObjects(indirectObjWords, 0);
+          if (!matches.empty()) {
+            cmd.directObj =
+                matches.size() == 1
+                    ? matches[0]
+                    : disambiguate(matches, indirectObjWords.back());
+
+            if (cmd.directObj) {
+              setLastObject(cmd.directObj);
+            }
+          }
         }
       }
     } else if (cmd.verb != 0) {

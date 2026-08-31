@@ -16,6 +16,14 @@ bool chimneyAction();
 bool mountainRangeAction();
 bool waterAction();
 bool teethAction();
+bool frontDoorAction();
+bool trapDoorAction();
+bool barrowDoorAction();
+bool grateAction();
+bool rugAction();
+bool slideAction();
+bool crackAction();
+bool boardedWindowAction();
 
 void initializeScenery() {
     using namespace ObjectIds;
@@ -83,7 +91,8 @@ void initializeScenery() {
         .desc = "boarded window",
         .synonyms = {"window"},
         .adjectives = {"boarded"},
-        .flags = {ObjectFlag::NDESCBIT}
+        .flags = {ObjectFlag::NDESCBIT},
+        .action = boardedWindowAction
     });
     
     // KITCHEN_WINDOW - Kitchen window (ZIL: 1dungeon.zil:108-113)
@@ -103,7 +112,8 @@ void initializeScenery() {
         .desc = "front door",
         .synonyms = {"door"},
         .adjectives = {"front"},
-        .flags = {ObjectFlag::DOORBIT, ObjectFlag::NDESCBIT}
+        .flags = {ObjectFlag::DOORBIT, ObjectFlag::NDESCBIT},
+        .action = frontDoorAction
     });
 
     
@@ -114,7 +124,8 @@ void initializeScenery() {
         .synonyms = {"door", "trapdoor", "trap-door", "cover"},
         .adjectives = {"trap", "dusty"},
         .flags = {ObjectFlag::DOORBIT, ObjectFlag::NDESCBIT, ObjectFlag::INVISIBLE},
-        .location = RoomIds::LIVING_ROOM
+        .location = RoomIds::LIVING_ROOM,
+        .action = trapDoorAction
     });
     
     // WOODEN_DOOR - Wooden door in Living Room (west)
@@ -137,7 +148,8 @@ void initializeScenery() {
         .synonyms = {"door"},
         .adjectives = {"huge", "stone"},
         .flags = {ObjectFlag::DOORBIT, ObjectFlag::NDESCBIT, ObjectFlag::OPENBIT},
-        .location = RoomIds::STONE_BARROW
+        .location = RoomIds::STONE_BARROW,
+        .action = barrowDoorAction
     });
     
     // GRATE - Grating (hidden until leaves moved)
@@ -145,7 +157,8 @@ void initializeScenery() {
         .id = GRATE,
         .desc = "grating",
         .synonyms = {"grate", "grating"},
-        .flags = {ObjectFlag::DOORBIT, ObjectFlag::NDESCBIT, ObjectFlag::INVISIBLE}
+        .flags = {ObjectFlag::DOORBIT, ObjectFlag::NDESCBIT, ObjectFlag::INVISIBLE},
+        .action = grateAction
     });
     
     // RUG - Rug in Living Room
@@ -155,7 +168,8 @@ void initializeScenery() {
         .synonyms = {"rug", "carpet"},
         .adjectives = {"oriental", "large"},
         .flags = {ObjectFlag::NDESCBIT, ObjectFlag::TRYTAKEBIT},
-        .location = RoomIds::LIVING_ROOM
+        .location = RoomIds::LIVING_ROOM,
+        .action = rugAction
     });
 
     
@@ -174,7 +188,8 @@ void initializeScenery() {
         .desc = "chute",
         .synonyms = {"chute", "ramp", "slide"},
         .adjectives = {"steep", "metal", "twisting"},
-        .flags = {ObjectFlag::CLIMBBIT}
+        .flags = {ObjectFlag::CLIMBBIT},
+        .action = slideAction
     });
     
     // STAIRS - Stairs
@@ -223,7 +238,8 @@ void initializeScenery() {
         .desc = "crack",
         .synonyms = {"crack"},
         .adjectives = {"narrow"},
-        .flags = {ObjectFlag::NDESCBIT}
+        .flags = {ObjectFlag::NDESCBIT},
+        .action = crackAction
     });
     
     // CLIMBABLE_CLIFF - Rocky cliff (climbable)
