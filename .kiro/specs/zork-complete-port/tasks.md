@@ -2577,7 +2577,7 @@ N
   - Verify functionality
   - _Requirements: 89_
 
-- [ ] 80. Final documentation and release
+- [x] 80. Final documentation and release
   - Finalize all documentation
   - Create release notes
   - Tag release version
@@ -2596,7 +2596,7 @@ N
   - Document system requirements
   - _Requirements: 95_
 
-- [ ] 80.3 Tag release
+- [x] 80.3 Tag release
   - Create git tag for release
   - Push to repository
   - _Requirements: 95_
