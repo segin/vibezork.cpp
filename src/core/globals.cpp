@@ -60,6 +60,13 @@ void Globals::reset() {
     rainbowFlag = false;
     buoyFlag = true;
     falseFlag = false;
+    pWon = false;
+    pMult = false;
+    pNotHere = 0;
+    lPrsa = 0;
+    lPrso = nullptr;
+    lPrsi = nullptr;
+    debug = false;
     
     // Reset display modes to defaults (Requirement 65.5)
     verboseMode = true;

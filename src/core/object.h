@@ -82,6 +82,13 @@ public:
   using ActionFunc = std::function<bool()>;
   void setAction(ActionFunc func) { action_ = func; }
   bool performAction() { return action_ ? action_() : false; }
+  bool hasAction() const { return action_ != nullptr; }
+
+  // Container action handler (ZIL: P?CONTFCN)
+  using ContActionFunc = std::function<bool()>;
+  void setContainerAction(ContActionFunc func) { contAction_ = func; }
+  bool performContainerAction() { return contAction_ ? contAction_() : false; }
+  bool hasContainerAction() const { return contAction_ != nullptr; }
 
   // Serialization support (for save/restore system)
   uint64_t getAllFlags() const { return flags_; }
@@ -104,4 +111,5 @@ private:
   ZObject *location_ = nullptr;
   std::vector<ZObject *> contents_;
   ActionFunc action_;
+  ContActionFunc contAction_;
 };

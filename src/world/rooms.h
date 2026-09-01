@@ -303,13 +303,3 @@ private:
     std::map<Direction, RoomExit> exits_;     ///< Exits by direction
     RoomActionFunc roomAction_;               ///< Optional action handler
 };
-
-// Room action arguments (from ZIL)
-// Room action arguments (from ZIL)
-constexpr int M_BEG = 1;
-constexpr int M_ENTER = 2;
-constexpr int M_LOOK = 3;
-constexpr int M_END = 3;
-constexpr int M_PRAY = 4;
-constexpr int M_LISTEN = 5;
-constexpr int M_YELL = 6;

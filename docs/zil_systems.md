@@ -26,7 +26,7 @@ Scanned from `zil` files. (Generic ROUTINES).
 | CLAUSE-COPY | gparser.zil | | |
 | CLIFF-OBJECT | 1actions.zil | | |
 | CLOCKER | gclock.zil | | |
-| DD-APPLY | gmain.zil | | |
+| DD-APPLY | gmain.zil | Debug object action dispatch wrapper | Invokes dApply with optional object name debug logging (gmain.zil:309-312) |
 | DEPOSIT-BOOTY | 1actions.zil | | |
 | DESCRIBE-OBJECT | gverbs.zil | | |
 | DESCRIBE-OBJECTS | gverbs.zil | | |
@@ -101,8 +101,8 @@ Scanned from `zil` files. (Generic ROUTINES).
 | LIT? | gparser.zil | | |
 | LKP | gverbs.zil | | |
 | LLD-ROOM | 1actions.zil | | |
-| MAIN-LOOP | gmain.zil | | |
-| MAIN-LOOP-1 | gmain.zil | | |
+| MAIN-LOOP | gmain.zil | Main interaction loop | Continuous command-processing loop calling MAIN-LOOP-1 (gmain.zil:34-36) |
+| MAIN-LOOP-1 | gmain.zil | Single-turn interaction loop | Parses input, processes multi-object syntax, calls PERFORM, executes end-of-turn handlers & clockers (gmain.zil:38-173) |
 | MANY-CHECK | gparser.zil | | |
 | MAZE-DIODES | 1actions.zil | | |
 | META-LOC | gparser.zil | | |
@@ -126,8 +126,7 @@ Scanned from `zil` files. (Generic ROUTINES).
 | PAINT-PSEUDO | 1actions.zil | | |
 | PARSER | gparser.zil | | |
 | PATH-OBJECT | gglobals.zil | | |
-| PERFORM | gmain.zil | | |
-| PERFORM | gmain.zil | | |
+| PERFORM | gmain.zil | Central action dispatch hierarchy | Resolves IT, sets PRSA/PRSO/PRSI, and executes 7-tier dispatch: Actor -> Room(M-BEG) -> Preactions -> PRSI -> Container -> PRSO -> Verb (gmain.zil:182-288) |
 | PICK-ONE | gmacros.zil | | |
 | PRE-BOARD | gverbs.zil | | |
 | PRE-BURN | gverbs.zil | | |
