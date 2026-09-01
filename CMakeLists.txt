@@ -173,4 +173,7 @@ if(BUILD_TESTS)
 
     # GCLOCK Tests (gclock.zil routines verification)
     add_zork_test(GClockTests gclock_tests tests/gclock_tests.cpp)
+
+    # GVERBS Tests (gverbs.zil routines and preactions verification)
+    add_zork_test(GVerbsTests gverbs_tests tests/gverbs_tests.cpp)
 endif()

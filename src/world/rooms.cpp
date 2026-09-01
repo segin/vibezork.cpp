@@ -4,7 +4,9 @@
 #include <ranges>
 
 ZRoom::ZRoom(ObjectId id, std::string_view desc, std::string_view longDesc)
-    : ZObject(id, desc), longDesc_(longDesc) {}
+    : ZObject(id, desc) {
+    setLongDesc(longDesc);
+}
 
 void ZRoom::setExit(Direction dir, const RoomExit& exit) {
     exits_[dir] = exit;

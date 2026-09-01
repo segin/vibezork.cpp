@@ -283,9 +283,6 @@ public:
     RoomExit* getExit(Direction dir);
     const RoomExit* getExit(Direction dir) const;
     
-    /// Get the long description for room display
-    const std::string& getLongDesc() const { return longDesc_; }
-    
     /// Room action handler type (receives action code like M_LOOK)
     using RoomActionFunc = std::function<void(int)>;
     
@@ -299,7 +296,6 @@ public:
     bool hasRoomAction() const { return roomAction_ != nullptr; }
     
 private:
-    std::string longDesc_;                    ///< Full room description
     std::map<Direction, RoomExit> exits_;     ///< Exits by direction
     RoomActionFunc roomAction_;               ///< Optional action handler
 };

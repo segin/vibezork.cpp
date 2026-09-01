@@ -418,4 +418,50 @@ namespace Verbs {
     
     // Helper for special movement
     bool trySpecialMovement(int verbId, Direction dir);
+
+    // ZIL: GVERBS.ZIL Preaction routines (gverbs.zil)
+    bool preBoard();
+    bool preBurn();
+    bool preDrop();
+    bool preFill();
+    bool preGive();
+    bool preMove();
+    bool preMung();
+    bool prePut();
+    bool preRead();
+    bool preSGive();
+    bool preTake();
+    bool preTurn();
+
+    // ZIL: GVERBS.ZIL System routines (gverbs.zil)
+    int ccount(const ZObject *obj);
+    void describeObject(const ZObject *obj, bool isLook = false);
+    void describeObjects(const ZObject *room);
+    void describeRoom(bool look = false);
+    bool doWalk(Direction dir);
+    ZObject *findIn(const ZObject *container, ObjectFlag flag);
+    void finish();
+    ZObject *firster(const ZObject *container);
+    bool globalIn(ObjectId objId, const ZObject *room);
+    bool goTo(ZObject *room);
+    void hackHack(std::string_view str);
+    bool isHeld(const ZObject *obj);
+    bool hitSpot();
+    bool iDrop();
+    bool iTake(bool vb = true);
+    bool lkp(std::string_view text);
+    void mungRoom(ZObject *room, std::string_view desc);
+    void noGoTell(Direction dir);
+    ZObject *otherSide(const ZObject *door);
+    void printCont(const ZObject *obj, bool checkTrans = true);
+    void printContents(const ZObject *obj);
+    void removeCarefully(ZObject *obj);
+    void scoreObj(ZObject *obj);
+    void scoreUpd(int val);
+    bool seeInside(const ZObject *obj);
+    bool shakeLoop(ZObject *obj);
+    void tellNoPrsi();
+    void thisIsIt(ZObject *obj);
+    int weight(const ZObject *obj);
+    bool yes();
 }

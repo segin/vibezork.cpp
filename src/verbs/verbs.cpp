@@ -7,6 +7,7 @@
 #include "core/io.h"
 #include "parser/parser.h"
 #include "systems/lamp.h"
+#include "systems/light.h"
 #include "world/objects.h"
 #include "world/rooms.h"
 #include "world/world.h"
@@ -3317,6 +3318,489 @@ bool vVerify() {
 bool vThrowOff() {
   // "Throw object off object" -> Throw
   return Verbs::vThrow();
+}
+
+// ============================================================================
+// ZIL: GVERBS.ZIL Preaction Routines (zil/gverbs.zil)
+// ============================================================================
+
+// ZIL: <ROUTINE PRE-BOARD ("AUX" AV) ...> (gverbs.zil:201-223)
+bool preBoard() {
+  auto &g = Globals::instance();
+  if (!g.prso) return false;
+  ZObject *av = g.winner ? g.winner->getLocation() : nullptr;
+  if (g.prso->hasFlag(ObjectFlag::VEHBIT)) {
+    if (g.prso->getLocation() != g.here) {
+      printLine(std::format("The {} must be on the ground to be boarded.", g.prso->getDesc()));
+      return true;
+    } else if (av && av->hasFlag(ObjectFlag::VEHBIT)) {
+      printLine(std::format("You are already in the {}!", av->getDesc()));
+      return true;
+    }
+    return false;
+  }
+  if (g.prso->getId() == ObjectIds::GLOBAL_WATER) {
+    vSwim();
+    return true;
+  }
+  printLine(std::format("You have a theory on how to board a {}, perhaps?", g.prso->getDesc()));
+  return true;
+}
+
+// ZIL: <ROUTINE PRE-BURN () ...> (gverbs.zil:243-250)
+bool preBurn() {
+  auto &g = Globals::instance();
+  if (!g.prsi) {
+    tellNoPrsi();
+    return true;
+  }
+  if (g.prsi->hasFlag(ObjectFlag::ONBIT) || g.prsi->hasFlag(ObjectFlag::FLAMEBIT)) {
+    return false;
+  }
+  printLine(std::format("With a {}?!?", g.prsi->getDesc()));
+  return true;
+}
+
+// ZIL: <ROUTINE PRE-DROP () ...> (gverbs.zil:474-478)
+bool preDrop() {
+  auto &g = Globals::instance();
+  if (g.winner && g.prso && g.prso == g.winner->getLocation()) {
+    return vDisembark();
+  }
+  return false;
+}
+
+// ZIL: <ROUTINE PRE-FILL ("AUX" TX) ...> (gverbs.zil:646-654)
+bool preFill() {
+  auto &g = Globals::instance();
+  if (!g.prsi) {
+    ZObject *water = g.getObject(ObjectIds::GLOBAL_WATER);
+    if (water && globalIn(ObjectIds::GLOBAL_WATER, g.here)) {
+      g.prsi = water;
+      printLine(std::format("(with {})", water->getDesc()));
+      return false;
+    }
+    printLine("There is nothing to fill it with.");
+    return true;
+  }
+  return false;
+}
+
+// ZIL: <ROUTINE PRE-GIVE () ...> (gverbs.zil:708-713)
+bool preGive() {
+  auto &g = Globals::instance();
+  if (g.prso && !isHeld(g.prso)) {
+    printLine("That's easy for you to say since you don't have it.");
+    return true;
+  }
+  return false;
+}
+
+// ZIL: <ROUTINE PRE-MOVE () ...> (gverbs.zil:910-922)
+bool preMove() {
+  auto &g = Globals::instance();
+  if (g.prso && isHeld(g.prso)) {
+    printLine("You aren't an accomplished enough juggler.");
+    return true;
+  }
+  return false;
+}
+
+// ZIL: <ROUTINE PRE-MUNG () ...> (gverbs.zil:923-937)
+bool preMung() {
+  auto &g = Globals::instance();
+  if (!g.prsi || !g.prsi->hasFlag(ObjectFlag::WEAPONBIT)) {
+    if (g.prso) {
+      if (!g.prsi) {
+        printLine(std::format("Trying to destroy the {} with your bare hands is futile.", g.prso->getDesc()));
+      } else {
+        printLine(std::format("Trying to destroy the {} with a {} is futile.", g.prso->getDesc(), g.prsi->getDesc()));
+      }
+    } else {
+      printLine("Trying to destroy things with your bare hands is futile.");
+    }
+    return true;
+  }
+  return false;
+}
+
+// ZIL: <ROUTINE PRE-PUT () ...> (gverbs.zil:1075-1081)
+bool prePut() {
+  auto &g = Globals::instance();
+  if (!g.prso) return false;
+  if (!g.prso->hasFlag(ObjectFlag::TAKEBIT)) {
+    printLine("You can't do that.");
+    return true;
+  }
+  if (!isHeld(g.prso)) {
+    printLine(std::format("You don't have the {}.", g.prso->getDesc()));
+    return true;
+  }
+  return false;
+}
+
+// ZIL: <ROUTINE PRE-READ () ...> (gverbs.zil:1137-1144)
+bool preRead() {
+  auto &g = Globals::instance();
+  if (!g.lit) {
+    printLine("It is impossible to read in the dark.");
+    return true;
+  }
+  if (g.prsi && !g.prsi->hasFlag(ObjectFlag::TRANSBIT)) {
+    printLine(std::format("How does one look through a {}?", g.prsi->getDesc()));
+    return true;
+  }
+  return false;
+}
+
+// ZIL: <ROUTINE PRE-SGIVE () ...> (gverbs.zil:1206-1210)
+bool preSGive() {
+  auto &g = Globals::instance();
+  std::swap(g.prso, g.prsi);
+  return vGive();
+}
+
+// ZIL: <ROUTINE PRE-TAKE () ...> (gverbs.zil:1353-1380)
+bool preTake() {
+  auto &g = Globals::instance();
+  if (!g.prso) return false;
+  if (g.prso->getLocation() == g.winner) {
+    if (g.prso->hasFlag(ObjectFlag::WEARBIT)) {
+      printLine("You are already wearing it.");
+    } else {
+      printLine("You already have that!");
+    }
+    return true;
+  }
+  if (ZObject *loc = g.prso->getLocation()) {
+    if (loc->hasFlag(ObjectFlag::CONTBIT) && !loc->hasFlag(ObjectFlag::OPENBIT)) {
+      printLine("You can't reach something that's inside a closed container.");
+      return true;
+    }
+  }
+  if (g.prsi) {
+    if (g.prso->getLocation() != g.prsi) {
+      printLine(std::format("The {} isn't in the {}.", g.prso->getDesc(), g.prsi->getDesc()));
+      return true;
+    }
+    g.prsi = nullptr;
+    return false;
+  }
+  if (g.winner && g.prso == g.winner->getLocation()) {
+    printLine("You're inside of it!");
+    return true;
+  }
+  return false;
+}
+
+// ZIL: <ROUTINE PRE-TURN () ...> (gverbs.zil:1488-1494)
+bool preTurn() {
+  auto &g = Globals::instance();
+  if (!g.prso || !g.prso->hasFlag(ObjectFlag::TURNBIT)) {
+    printLine("You can't turn that!");
+    return true;
+  }
+  if (g.prsi && !g.prsi->hasFlag(ObjectFlag::TOOLBIT)) {
+    printLine("You can't turn it with that!");
+    return true;
+  }
+  return false;
+}
+
+// ============================================================================
+// ZIL: GVERBS.ZIL System Routines (zil/gverbs.zil)
+// ============================================================================
+
+// ZIL: <ROUTINE CCOUNT (OBJ "AUX" (CNT 0)) ...> (gverbs.zil:273-275)
+int ccount(const ZObject *obj) {
+  if (!obj) return 0;
+  int cnt = 0;
+  for (const auto *child : obj->getContents()) {
+    if (child && !child->hasFlag(ObjectFlag::NDESCBIT)) {
+      cnt++;
+    }
+  }
+  return cnt;
+}
+
+// ZIL: <ROUTINE DESCRIBE-OBJECT (OBJ "OPTIONAL" (V? <>) "AUX" STR) ...> (gverbs.zil:408-417)
+void describeObject(const ZObject *obj, bool isLook) {
+  if (!obj) return;
+  if (obj->hasLongDesc() && !obj->hasFlag(ObjectFlag::TOUCHBIT)) {
+    printLine(obj->getLongDesc());
+  } else {
+    printLine(std::format("There is a {} here.", obj->getDesc()));
+  }
+}
+
+// ZIL: <ROUTINE DESCRIBE-OBJECTS (V?) ...> (gverbs.zil:420-433)
+void describeObjects(const ZObject *room) {
+  if (!room) return;
+  for (const auto *obj : room->getContents()) {
+    if (obj && !obj->hasFlag(ObjectFlag::NDESCBIT) && !obj->hasFlag(ObjectFlag::INVISIBLE)) {
+      describeObject(obj);
+    }
+  }
+}
+
+// ZIL: <ROUTINE DESCRIBE-ROOM ("OPTIONAL" (LOOK? <>)) ...> (gverbs.zil:435-467)
+void describeRoom(bool look) {
+  vLook();
+}
+
+// ZIL: <ROUTINE DO-WALK (DIR) ...> (gverbs.zil:470-473)
+bool doWalk(Direction dir) {
+  return vWalkDir(dir);
+}
+
+// ZIL: <ROUTINE FIND-IN (WHERE WHAT) ...> (gverbs.zil:656-663)
+ZObject *findIn(const ZObject *container, ObjectFlag flag) {
+  if (!container) return nullptr;
+  for (auto *child : container->getContents()) {
+    if (child && child->hasFlag(flag)) {
+      return child;
+    }
+  }
+  return nullptr;
+}
+
+// ZIL: <ROUTINE FINISH ("AUX" WRD) ...> (gverbs.zil:33-54)
+void finish() {
+  vScore();
+  printLine("\nWould you like to restart the game from the beginning, restore a saved");
+  printLine("game, or end this session of the game? (Type RESTART, RESTORE, or QUIT):");
+  print("> ");
+  std::string choice = readLine();
+  if (choice == "restart" || choice == "RESTART") {
+    vRestart();
+  } else if (choice == "restore" || choice == "RESTORE") {
+    vRestore();
+  } else if (choice == "quit" || choice == "QUIT" || choice == "q" || choice == "Q") {
+    vQuit();
+  }
+}
+
+// ZIL: <ROUTINE FIRSTER (OBJ) ...> (gverbs.zil:665-671)
+ZObject *firster(const ZObject *container) {
+  if (!container) return nullptr;
+  for (auto *child : container->getContents()) {
+    if (child && !child->hasFlag(ObjectFlag::NDESCBIT)) {
+      return child;
+    }
+  }
+  return nullptr;
+}
+
+// ZIL: <ROUTINE GLOBAL-IN? (OBJ WHERE) ...> (gverbs.zil:715-720)
+bool globalIn(ObjectId objId, const ZObject *room) {
+  auto &g = Globals::instance();
+  if (auto *obj = g.getObject(objId)) {
+    if (obj->getLocation() == room) return true;
+    if (auto *lg = g.getObject(ObjectIds::LOCAL_GLOBALS)) {
+      if (obj->getLocation() == lg) return true;
+    }
+    if (auto *go = g.getObject(ObjectIds::GLOBAL_OBJECTS)) {
+      if (obj->getLocation() == go) return true;
+    }
+  }
+  return false;
+}
+
+// ZIL: <ROUTINE GOTO (RM "OPTIONAL" (V? T) "AUX" (LB <>) (OLIT ,LIT) W) ...> (gverbs.zil:733-772)
+bool goTo(ZObject *room) {
+  if (!room) return false;
+  auto &g = Globals::instance();
+  if (g.winner) {
+    g.winner->moveTo(room);
+  }
+  g.here = room;
+  g.lit = LightSystem::isRoomLit(room);
+  if (auto *zroom = dynamic_cast<ZRoom *>(room)) {
+    zroom->performRoomAction(M_ENTER);
+  }
+  vLook();
+  return true;
+}
+
+// ZIL: <ROUTINE HACK-HACK (STR) ...> (gverbs.zil:720-725)
+void hackHack(std::string_view str) {
+  auto &g = Globals::instance();
+  if (g.prso) {
+    printLine(std::format("{} {}", str, g.prso->getDesc()));
+  } else {
+    printLine(std::format("{} that.", str));
+  }
+}
+
+// ZIL: <ROUTINE HELD? (CAN "AUX" (LOC <LOC .CAN>)) ...> (gverbs.zil:722-727)
+bool isHeld(const ZObject *obj) {
+  if (!obj) return false;
+  auto &g = Globals::instance();
+  const ZObject *loc = obj->getLocation();
+  while (loc) {
+    if (loc == g.winner) return true;
+    loc = loc->getLocation();
+  }
+  return false;
+}
+
+// ZIL: <ROUTINE HIT-SPOT () ...> (gverbs.zil:728-732)
+bool hitSpot() {
+  auto &g = Globals::instance();
+  if (g.prso) {
+    printLine(std::format("Fiddling with the {} doesn't seem to help.", g.prso->getDesc()));
+  } else {
+    printLine("Fiddling with that doesn't seem to help.");
+  }
+  return true;
+}
+
+// ZIL: <ROUTINE IDROP () ...> (gverbs.zil:773-780)
+bool iDrop() {
+  auto &g = Globals::instance();
+  if (!g.prso) return false;
+  if (!isHeld(g.prso)) {
+    printLine("You're not carrying that.");
+    return false;
+  }
+  g.prso->moveTo(g.here);
+  return true;
+}
+
+// ZIL: <ROUTINE ITAKE ("OPTIONAL" (VB T) "AUX" CNT) ...> (gverbs.zil:781-806)
+bool iTake(bool vb) {
+  auto &g = Globals::instance();
+  if (!g.prso) return false;
+  if (!g.prso->hasFlag(ObjectFlag::TAKEBIT) && !g.prso->hasFlag(ObjectFlag::TRYTAKEBIT)) {
+    if (vb) printLine("You can't take that!");
+    return false;
+  }
+  int objWeight = weight(g.prso);
+  int curWeight = weight(g.winner);
+  if (curWeight + objWeight > g.loadAllowed) {
+    if (vb) printLine("Your load is too heavy.");
+    return false;
+  }
+  g.prso->moveTo(g.winner);
+  scoreObj(g.prso);
+  return true;
+}
+
+// ZIL: <ROUTINE LKP (STR) ...> (gverbs.zil:880-890)
+bool lkp(std::string_view text) {
+  printLine(text);
+  return true;
+}
+
+// ZIL: <ROUTINE MUNG-ROOM (RM STR) ...> (gverbs.zil:2183-2189)
+void mungRoom(ZObject *room, std::string_view desc) {
+  if (room) {
+    room->setFlag(ObjectFlag::RMUNGBIT);
+    room->setLongDesc(desc);
+  }
+}
+
+// ZIL: <ROUTINE NO-GO-TELL (DIR) ...> (gverbs.zil:940-955)
+void noGoTell(Direction dir) {
+  printLine("You can't go that way.");
+}
+
+// ZIL: <ROUTINE OTHER-SIDE (DOOR) ...> (gverbs.zil:1050-1065)
+ZObject *otherSide(const ZObject *door) {
+  if (!door) return nullptr;
+  return door->getLocation();
+}
+
+// ZIL: <ROUTINE PRINT-CONT (OBJ "OPTIONAL" (CHECKTRANS? T) ...) ...> (gverbs.zil:1150-1204)
+void printCont(const ZObject *obj, bool checkTrans) {
+  if (!obj) return;
+  if (checkTrans && !seeInside(obj)) return;
+  printContents(obj);
+}
+
+// ZIL: <ROUTINE PRINT-CONTENTS (OBJ) ...> (gverbs.zil:1200-1204)
+void printContents(const ZObject *obj) {
+  if (!obj) return;
+  for (const auto *child : obj->getContents()) {
+    if (child && !child->hasFlag(ObjectFlag::NDESCBIT) && !child->hasFlag(ObjectFlag::INVISIBLE)) {
+      printLine(std::format("  A {}", child->getDesc()));
+    }
+  }
+}
+
+// ZIL: <ROUTINE REMOVE-CAREFULLY (OBJ) ...> (gverbs.zil:1212-1219)
+void removeCarefully(ZObject *obj) {
+  if (obj && obj->getLocation()) {
+    obj->moveTo(nullptr);
+  }
+}
+
+// ZIL: <ROUTINE SCORE-OBJ (OBJ "AUX" TEMP) ...> (gverbs.zil:1220-1234)
+void scoreObj(ZObject *obj) {
+  if (!obj) return;
+  int val = obj->getProperty(P_VALUE);
+  if (val > 0) {
+    scoreUpd(val);
+    obj->setProperty(P_VALUE, 0);
+  }
+}
+
+// ZIL: <ROUTINE SCORE-UPD (VAL) ...> (gverbs.zil:1236-1248)
+void scoreUpd(int val) {
+  auto &g = Globals::instance();
+  g.score += val;
+  if (g.score >= Globals::SCORE_MAX) {
+    g.wonFlag = true;
+  }
+}
+
+// ZIL: <ROUTINE SEE-INSIDE? (CONTAINER) ...> (gverbs.zil:1251-1258)
+bool seeInside(const ZObject *obj) {
+  if (!obj) return false;
+  if (!obj->hasFlag(ObjectFlag::CONTBIT)) return true;
+  return obj->hasFlag(ObjectFlag::OPENBIT) ||
+         obj->hasFlag(ObjectFlag::TRANSBIT) ||
+         obj->hasFlag(ObjectFlag::SURFACEBIT);
+}
+
+// ZIL: <ROUTINE SHAKE-LOOP (OBJ) ...> (gverbs.zil:1260-1280)
+bool shakeLoop(ZObject *obj) {
+  if (!obj) return false;
+  auto &g = Globals::instance();
+  if (obj->hasFlag(ObjectFlag::CONTBIT) && obj->hasFlag(ObjectFlag::OPENBIT)) {
+    auto contents = obj->getContents();
+    for (auto *child : contents) {
+      if (child) {
+        child->moveTo(g.here);
+        printLine(std::format("A {} spills out onto the floor.", child->getDesc()));
+      }
+    }
+    return true;
+  }
+  return false;
+}
+
+// ZIL: <ROUTINE TELL-NO-PRSI () ...> (gverbs.zil:240-242)
+void tellNoPrsi() {
+  printLine("You must specify what to use.");
+}
+
+// ZIL: <ROUTINE THIS-IS-IT (OBJ) ...> (gverbs.zil:1420-1424)
+void thisIsIt(ZObject *obj) {
+  auto &g = Globals::instance();
+  g.it = obj;
+}
+
+// ZIL: <ROUTINE WEIGHT (OBJ "AUX" (CONT <FIRST? .OBJ>) (WT 0)) ...> (gverbs.zil:1475-1486)
+int weight(const ZObject *obj) {
+  return calculateWeight(obj);
+}
+
+// ZIL: <ROUTINE YES? () ...> (gverbs.zil:1515-1530)
+bool yes() {
+  print("> ");
+  std::string response = readLine();
+  return response == "yes" || response == "y" || response == "YES" || response == "Y";
 }
 
 } // namespace Verbs

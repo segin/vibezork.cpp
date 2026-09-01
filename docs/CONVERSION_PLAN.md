@@ -91,7 +91,7 @@ The basic C++ framework is now working with:
 | gclock.zil | 60 | systems/timer.cpp | Done |
 | gmain.zil | 313 | main.cpp | Done |
 | gparser.zil | 1407 | parser/ | TODO |
-| gverbs.zil | 2216 | verbs/ | Started |
+| gverbs.zil | 2216 | verbs/ | Done |
 | 1actions.zil | 4177 | actions/ | TODO |
 
 ## Testing

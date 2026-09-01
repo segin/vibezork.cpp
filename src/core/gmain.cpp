@@ -211,6 +211,19 @@ void initializeAllVerbHandlers() {
   registerVerbHandler(V_READ_PAGE, Verbs::vReadPage);
   registerVerbHandler(V_PICK, Verbs::vPick);
   registerVerbHandler(V_APPLY, Verbs::vApply);
+
+  // Preactions (gverbs.zil)
+  registerPreaction(V_BOARD, Verbs::preBoard);
+  registerPreaction(V_BURN, Verbs::preBurn);
+  registerPreaction(V_DROP, Verbs::preDrop);
+  registerPreaction(V_FILL, Verbs::preFill);
+  registerPreaction(V_GIVE, Verbs::preGive);
+  registerPreaction(V_MOVE, Verbs::preMove);
+  registerPreaction(V_MUNG, Verbs::preMung);
+  registerPreaction(V_PUT, Verbs::prePut);
+  registerPreaction(V_READ, Verbs::preRead);
+  registerPreaction(V_TAKE, Verbs::preTake);
+  registerPreaction(V_TURN, Verbs::preTurn);
 }
 
 // ZIL: <DEFINE D-APPLY (STR FCN "OPTIONAL" FOO "AUX" RES) ...> (gmain.zil:290-308)
