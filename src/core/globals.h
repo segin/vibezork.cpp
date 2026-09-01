@@ -75,7 +75,7 @@ public:
   bool superbriefMode = false; // Minimal descriptions
   bool scripting = false;      // Transcript output enabled
 
-  // ZIL: GMAIN.ZIL globals
+  // ZIL: GMAIN.ZIL & GCLOCK.ZIL globals
   bool pWon = false;       ///< ZIL: ,P-WON (Parser succeeded flag)
   bool pMult = false;      ///< ZIL: ,P-MULT (Multiple object command flag)
   int pNotHere = 0;        ///< ZIL: ,P-NOT-HERE (Missing object counter)
@@ -83,6 +83,7 @@ public:
   ZObject *lPrso = nullptr;///< ZIL: ,L-PRSO (Last direct object)
   ZObject *lPrsi = nullptr;///< ZIL: ,L-PRSI (Last indirect object)
   bool debug = false;      ///< ZIL: ,DEBUG (Debug execution trace)
+  bool clockWait = false;  ///< ZIL: ,CLOCK-WAIT (Skip clocker tick for one turn)
 
   // Parser state
   bool pCont = false;

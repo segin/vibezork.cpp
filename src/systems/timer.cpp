@@ -1,139 +1,186 @@
 /**
  * @file timer.cpp
- * @brief Timer/interrupt system implementation
- * 
- * Implements the game's timer system based on ZIL's GCLOCK.ZIL.
- * Timers are used for:
- * - Lamp battery drain (I-LANTERN)
- * - Candle burning (I-CANDLES)
- * - Sword glow checking (I-SWORD)
- * - Thief movement (I-THIEF)
- * - Combat rounds (I-FIGHT)
- * - Various puzzle timers
- * 
- * Each timer has an interval, counter, and callback. The tick()
- * method is called once per turn from the main loop.
+ * @brief GCLOCK Interrupt & Demon System Implementation
+ *
+ * Source: zil/gclock.zil:1-61
  */
 
 #include "timer.h"
+#include "core/globals.h"
 #include <algorithm>
 
 namespace TimerSystem {
 
-TimerManager& TimerManager::instance() {
-    static TimerManager instance;
-    return instance;
+TimerManager &TimerManager::instance() {
+  static TimerManager instance;
+  return instance;
 }
 
-void TimerManager::registerTimer(std::string_view name, int interval, 
-                                 TimerCallback callback, bool repeating) {
-    // Create timer with specified parameters
-    // Based on INT routine in GCLOCK.ZIL
-    std::string key(name);
-    
-    // Check if timer already exists
-    auto it = timers_.find(key);
-    if (it != timers_.end()) {
-        // Update existing timer
-        it->second.interval = interval;
-        it->second.counter = interval;
-        it->second.callback = callback;
-        it->second.repeating = repeating;
-        it->second.enabled = true;
-    } else {
-        // Create new timer
-        timers_[key] = Timer(interval, callback, repeating);
+// ZIL: <ROUTINE INT (RTN "OPTIONAL" (DEMON <>) E C INT) ...> (gclock.zil:26-40)
+Timer *TimerManager::interrupt(std::string_view name, bool demon,
+                               TimerCallback callback) {
+  std::string key(name);
+  auto it = timers_.find(key);
+  if (it != timers_.end()) {
+    if (callback) {
+      it->second.callback = std::move(callback);
     }
+    if (demon) {
+      it->second.isDemon = true;
+    }
+    return &it->second;
+  }
+
+  // Allocate new interrupt entry in C-TABLE
+  timers_[key] = Timer(name, 0, std::move(callback), true, demon);
+  timerOrder_.push_back(key);
+  return &timers_[key];
+}
+
+// ZIL: <ROUTINE QUEUE (RTN TICK "AUX" CINT) ...> (gclock.zil:21-24)
+Timer *TimerManager::queue(std::string_view name, int tick) {
+  Timer *cint = interrupt(name);
+  cint->counter = tick;
+  if (cint->interval == 0) {
+    cint->interval = (tick > 0 ? tick : 1);
+  }
+  if (tick < 0) {
+    cint->isDemon = true;
+  }
+  return cint;
+}
+
+void TimerManager::registerTimer(std::string_view name, int interval,
+                                 TimerCallback callback, bool repeating,
+                                 bool isDemon) {
+  std::string key(name);
+  auto it = timers_.find(key);
+  if (it != timers_.end()) {
+    it->second.interval = interval;
+    it->second.counter = interval;
+    it->second.callback = std::move(callback);
+    it->second.repeating = repeating;
+    it->second.isDemon = isDemon;
+    it->second.enabled = true;
+  } else {
+    timers_[key] =
+        Timer(name, interval, std::move(callback), repeating, isDemon);
+    timerOrder_.push_back(key);
+  }
 }
 
 void TimerManager::enableTimer(std::string_view name) {
-    if (auto it = timers_.find(std::string(name)); it != timers_.end()) {
-        it->second.enabled = true;
-    }
+  std::string key(name);
+  if (auto it = timers_.find(key); it != timers_.end()) {
+    it->second.enabled = true;
+  } else {
+    Timer *cint = interrupt(name);
+    cint->enabled = true;
+  }
 }
 
 void TimerManager::disableTimer(std::string_view name) {
-    if (auto it = timers_.find(std::string(name)); it != timers_.end()) {
-        it->second.enabled = false;
-    }
+  if (auto it = timers_.find(std::string(name)); it != timers_.end()) {
+    it->second.enabled = false;
+  }
 }
 
 bool TimerManager::isTimerEnabled(std::string_view name) const {
-    if (auto it = timers_.find(std::string(name)); it != timers_.end()) {
-        return it->second.enabled;
-    }
-    return false;
+  if (auto it = timers_.find(std::string(name)); it != timers_.end()) {
+    return it->second.enabled;
+  }
+  return false;
 }
 
 void TimerManager::resetTimer(std::string_view name) {
-    if (auto it = timers_.find(std::string(name)); it != timers_.end()) {
-        it->second.counter = it->second.interval;
-    }
+  if (auto it = timers_.find(std::string(name)); it != timers_.end()) {
+    it->second.counter = it->second.interval;
+  }
 }
 
 void TimerManager::queueTimer(std::string_view name, int ticks) {
-    // Based on QUEUE routine in GCLOCK.ZIL
-    // Sets the timer's counter to a specific value
-    if (auto it = timers_.find(std::string(name)); it != timers_.end()) {
-        it->second.counter = ticks;
-    }
+  queue(name, ticks);
 }
 
-bool TimerManager::tick() {
-    // Based on CLOCKER routine in GCLOCK.ZIL
-    // Process all enabled timers:
-    // 1. Decrement counter
-    // 2. If counter reaches 0, fire callback
-    // 3. If repeating, reset counter; otherwise disable
-    
-    bool anyFired = false;
-    
-    for (auto& [name, timer] : timers_) {
-        // Skip disabled timers
-        if (!timer.enabled) {
-            continue;
-        }
-        
-        // Skip timers with counter at 0 (shouldn't happen, but be safe)
-        if (timer.counter <= 0) {
-            continue;
-        }
-        
-        // Decrement counter
-        timer.counter--;
-        
-        // Check if timer should fire
-        if (timer.counter == 0) {
-            // Fire the callback
-            if (timer.callback) {
-                timer.callback();
-                anyFired = true;
-            }
-            
-            // Handle repeating vs one-shot
-            if (timer.repeating) {
-                // Reset counter for next interval
-                timer.counter = timer.interval;
-            } else {
-                // One-shot timer - disable after firing
-                timer.enabled = false;
-            }
-        }
+// ZIL: <ROUTINE CLOCKER ("AUX" C E TICK (FLG <>)) ...> (gclock.zil:43-61)
+bool TimerManager::clocker() {
+  auto &g = Globals::instance();
+
+  // ZIL: <COND (,CLOCK-WAIT <SETG CLOCK-WAIT <>> <RFALSE>)>
+  if (g.clockWait) {
+    g.clockWait = false;
+    return false;
+  }
+
+  bool flg = false;
+
+  // Process entries in registration order (mirrors C-TABLE traversal)
+  for (const auto &name : timerOrder_) {
+    auto it = timers_.find(name);
+    if (it == timers_.end()) {
+      continue;
     }
-    
-    return anyFired;
+    Timer &c = it->second;
+
+    // ZIL: <COND (<NOT <0? <GET .C ,C-ENABLED?>>> ...)>
+    if (!c.enabled) {
+      continue;
+    }
+
+    // ZIL: Demons run even when P-WON is false; non-demons only run when P-WON is true
+    // ZIL: <SET C <REST ,C-TABLE <COND (,P-WON ,C-INTS) (T ,C-DEMONS)>>>
+    if (!g.pWon && g.winner != nullptr && !c.isDemon) {
+      continue;
+    }
+
+    // ZIL: <COND (<0? .TICK>) (T ...)>
+    if (c.counter == 0) {
+      continue;
+    }
+
+    if (c.counter < 0) {
+      // Continuous demon mode (tick = -1)
+      if (c.callback) {
+        c.callback();
+        flg = true;
+      }
+    } else {
+      // Countdown interrupt mode
+      c.counter--;
+      if (c.counter == 0) {
+        if (c.callback) {
+          c.callback();
+          flg = true;
+        }
+
+        if (c.repeating) {
+          c.counter = c.interval;
+        } else {
+          c.enabled = false;
+        }
+      }
+    }
+  }
+
+  return flg;
 }
 
 void TimerManager::clear() {
-    timers_.clear();
+  timers_.clear();
+  timerOrder_.clear();
 }
 
-void TimerManager::setTimerState(std::string_view name, bool enabled, int counter) {
-    if (auto it = timers_.find(std::string(name)); it != timers_.end()) {
-        it->second.enabled = enabled;
-        it->second.counter = counter;
-    }
+void TimerManager::setTimerState(std::string_view name, bool enabled,
+                                 int counter) {
+  std::string key(name);
+  if (auto it = timers_.find(key); it != timers_.end()) {
+    it->second.enabled = enabled;
+    it->second.counter = counter;
+  } else {
+    Timer *cint = interrupt(name);
+    cint->enabled = enabled;
+    cint->counter = counter;
+  }
 }
 
 } // namespace TimerSystem
-

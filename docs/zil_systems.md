@@ -25,7 +25,7 @@ Scanned from `zil` files. (Generic ROUTINES).
 | CLAUSE-ADD | gparser.zil | | |
 | CLAUSE-COPY | gparser.zil | | |
 | CLIFF-OBJECT | 1actions.zil | | |
-| CLOCKER | gclock.zil | | |
+| CLOCKER | gclock.zil | Master interrupt clock execution | Handles CLOCK-WAIT, runs demons and interrupts, decrements ticks, fires callbacks, and tracks turns (gclock.zil:43-61) |
 | DD-APPLY | gmain.zil | Debug object action dispatch wrapper | Invokes dApply with optional object name debug logging (gmain.zil:309-312) |
 | DEPOSIT-BOOTY | 1actions.zil | | |
 | DESCRIBE-OBJECT | gverbs.zil | | |
@@ -87,7 +87,7 @@ Scanned from `zil` files. (Generic ROUTINES).
 | INBUF-ADD | gparser.zil | | |
 | INBUF-STUFF | gparser.zil | | |
 | INFESTED? | 1actions.zil | | |
-| INT | gclock.zil | | |
+| INT | gclock.zil | Interrupt entry lookup/allocation | Searches C-TABLE for routine, allocates new interrupt or demon entry if not present (gclock.zil:26-40) |
 | INTEGRAL-PART | 1actions.zil | | |
 | ITAKE | gverbs.zil | | |
 | ITAKE-CHECK | gparser.zil | | |
@@ -144,7 +144,7 @@ Scanned from `zil` files. (Generic ROUTINES).
 | PREP-PRINT | gparser.zil | | |
 | PRINT-CONT | gverbs.zil | | |
 | PRINT-CONTENTS | gverbs.zil | | |
-| QUEUE | gclock.zil | | |
+| QUEUE | gclock.zil | Schedule interrupt ticks | Retrieves interrupt via INT and sets countdown tick value C-TICK (gclock.zil:21-24) |
 | RANDOM-ELEMENT | gmacros.zil | | |
 | RANDOMIZE-OBJECTS | 1actions.zil | | |
 | RECOVER-STILETTO | 1actions.zil | | |

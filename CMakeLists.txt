@@ -170,4 +170,7 @@ if(BUILD_TESTS)
 
     # GMAIN Tests (gmain.zil routines verification)
     add_zork_test(GMainTests gmain_tests tests/gmain_tests.cpp)
+
+    # GCLOCK Tests (gclock.zil routines verification)
+    add_zork_test(GClockTests gclock_tests tests/gclock_tests.cpp)
 endif()

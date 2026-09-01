@@ -1,145 +1,142 @@
 #pragma once
+#include "core/types.h"
 #include <functional>
 #include <string>
-#include <unordered_map>
 #include <string_view>
+#include <unordered_map>
+#include <vector>
 
-// Timer System - handles scheduled events and interrupts
-// Based on GCLOCK.ZIL from the original Zork I
-// 
-// The timer system manages periodic events like:
-// - Thief wandering (I-THIEF)
-// - Combat rounds (I-FIGHT)
-// - Lamp battery drain (I-LANTERN)
-// - Candle burning (I-CANDLES)
-// - Sword glow checking (I-SWORD)
-//
-// Timers are called "interrupts" in the original ZIL code.
-// Each timer has:
-// - An interval (tick count)
-// - A callback function to execute
-// - An enabled flag
-// - A repeating flag (one-shot vs repeating)
+/**
+ * @file timer.h
+ * @brief GCLOCK Interrupt & Demon System (mirrors ZIL gclock.zil)
+ *
+ * Source: zil/gclock.zil:1-61
+ *
+ * Infocom ZIL Clock architecture:
+ * - C-TABLE / C-INTS / C-DEMONS: Master table managing scheduled interrupts and demons.
+ * - INT (RTN, DEMON): Finds or registers an interrupt routine entry.
+ * - QUEUE (RTN, TICK): Sets ticks on an interrupt routine.
+ * - CLOCKER (): Main per-turn clock routine, handles demons and normal interrupts.
+ * - CLOCK-WAIT: Skip-turn flag.
+ */
 
 namespace TimerSystem {
+
+// ZIL: Constants from gclock.zil:5-19
+constexpr int C_TABLELEN = 180;
+constexpr int C_INTLEN = 6;
+constexpr int C_ENABLED_FLAG = 0; // ZIL: C-ENABLED?
+constexpr int C_TICK_OFFSET = 1;  // ZIL: C-TICK
+constexpr int C_RTN_OFFSET = 2;   // ZIL: C-RTN
 
 // Timer callback function type
 using TimerCallback = std::function<void()>;
 
-// Timer structure
-// Based on the C-TABLE structure in GCLOCK.ZIL
+// Structure representing an interrupt entry in C-TABLE (gclock.zil:26-40)
 struct Timer {
-    int interval;           // Initial interval (ticks between fires)
-    int counter;            // Current countdown counter
-    TimerCallback callback; // Function to call when timer fires
-    bool enabled;           // Is timer currently enabled?
-    bool repeating;         // Does timer repeat after firing?
-    
-    Timer() 
-        : interval(0), counter(0), callback(nullptr), enabled(false), repeating(true) {}
-    
-    Timer(int interval_, TimerCallback callback_, bool repeating_ = true)
-        : interval(interval_), counter(interval_), callback(callback_), 
-          enabled(true), repeating(repeating_) {}
+  std::string name;       ///< Identifier/Routine name (e.g. "I-LANTERN", "I-FIGHT")
+  int interval = 0;       ///< Default interval
+  int counter = 0;        ///< Current countdown counter (ZIL: C-TICK)
+  TimerCallback callback; ///< Function to execute (ZIL: C-RTN)
+  bool enabled = false;   ///< Enabled status (ZIL: C-ENABLED?)
+  bool repeating = true;  ///< Does timer reset or fire once?
+  bool isDemon = false;   ///< Is this a demon (runs every turn)?
+
+  Timer() = default;
+  Timer(std::string_view name_, int interval_, TimerCallback callback_,
+        bool repeating_ = true, bool isDemon_ = false)
+      : name(name_), interval(interval_), counter(interval_),
+        callback(std::move(callback_)), enabled(true), repeating(repeating_),
+        isDemon(isDemon_) {}
 };
 
-// Timer System class
-// Manages all game timers and processes them each turn
 class TimerManager {
 public:
-    // Get singleton instance
-    static TimerManager& instance();
-    
-    // Register a new timer
-    // name: Unique identifier for the timer (e.g., "I-THIEF", "I-LANTERN")
-    // interval: Number of turns between timer fires
-    // callback: Function to call when timer fires
-    // repeating: If true, timer resets after firing; if false, fires once and disables
-    void registerTimer(std::string_view name, int interval, 
-                      TimerCallback callback, bool repeating = true);
-    
-    // Enable a timer (starts counting down)
-    void enableTimer(std::string_view name);
-    
-    // Disable a timer (stops counting down)
-    void disableTimer(std::string_view name);
-    
-    // Check if a timer is enabled
-    bool isTimerEnabled(std::string_view name) const;
-    
-    // Reset a timer's counter to its initial interval
-    void resetTimer(std::string_view name);
-    
-    // Set a timer's counter to a specific value (for QUEUE operation)
-    void queueTimer(std::string_view name, int ticks);
-    
-    // Process all timers - call this once per game turn
-    // This is equivalent to CLOCKER in GCLOCK.ZIL
-    // Returns true if any timer fired
-    bool tick();
-    
-    // Clear all timers (for game restart)
-    void clear();
-    
-    // Get timer count (for debugging)
-    size_t getTimerCount() const { return timers_.size(); }
-    
-    // Get all timers (for serialization)
-    const std::unordered_map<std::string, Timer>& getAllTimers() const { return timers_; }
-    
-    // Set timer state (for deserialization)
-    void setTimerState(std::string_view name, bool enabled, int counter);
-    
+  static TimerManager &instance();
+
+  // ZIL: <ROUTINE INT (RTN "OPTIONAL" (DEMON <>) E C INT) ...> (gclock.zil:26-40)
+  Timer *interrupt(std::string_view name, bool demon = false,
+                   TimerCallback callback = nullptr);
+
+  // ZIL: <ROUTINE QUEUE (RTN TICK "AUX" CINT) ...> (gclock.zil:21-24)
+  Timer *queue(std::string_view name, int tick);
+
+  // ZIL: <ROUTINE CLOCKER ("AUX" C E TICK (FLG <>)) ...> (gclock.zil:43-61)
+  bool clocker();
+
+  // Timer configuration and state control
+  void registerTimer(std::string_view name, int interval,
+                     TimerCallback callback, bool repeating = true,
+                     bool isDemon = false);
+  void enableTimer(std::string_view name);
+  void disableTimer(std::string_view name);
+  bool isTimerEnabled(std::string_view name) const;
+  void resetTimer(std::string_view name);
+  void queueTimer(std::string_view name, int ticks);
+  void clear();
+
+  // Serialization helpers
+  size_t getTimerCount() const { return timers_.size(); }
+  const std::unordered_map<std::string, Timer> &getAllTimers() const {
+    return timers_;
+  }
+  void setTimerState(std::string_view name, bool enabled, int counter);
+
 private:
-    TimerManager() = default;
-    TimerManager(const TimerManager&) = delete;
-    TimerManager& operator=(const TimerManager&) = delete;
-    
-    std::unordered_map<std::string, Timer> timers_;
+  TimerManager() = default;
+  TimerManager(const TimerManager &) = delete;
+  TimerManager &operator=(const TimerManager &) = delete;
+
+  std::unordered_map<std::string, Timer> timers_;
+  std::vector<std::string> timerOrder_; // Preserves registration order in C-TABLE
 };
 
-// Convenience functions for common operations
+// Convenience free functions mirroring ZIL routines and existing APIs
 
-// Register a timer
-inline void registerTimer(std::string_view name, int interval, 
-                         TimerCallback callback, bool repeating = true) {
-    TimerManager::instance().registerTimer(name, interval, callback, repeating);
+// ZIL: <ROUTINE INT ...>
+inline Timer *interrupt(std::string_view name, bool demon = false,
+                        TimerCallback callback = nullptr) {
+  return TimerManager::instance().interrupt(name, demon, std::move(callback));
 }
 
-// Enable a timer
+// ZIL: <ROUTINE QUEUE ...>
+inline Timer *queue(std::string_view name, int tick) {
+  return TimerManager::instance().queue(name, tick);
+}
+
+// ZIL: <ROUTINE CLOCKER ...>
+inline bool clocker() { return TimerManager::instance().clocker(); }
+
+// Aliased to clocker() for turn execution
+inline bool tick() { return clocker(); }
+
+inline void registerTimer(std::string_view name, int interval,
+                          TimerCallback callback, bool repeating = true,
+                          bool isDemon = false) {
+  TimerManager::instance().registerTimer(name, interval, std::move(callback),
+                                         repeating, isDemon);
+}
+
 inline void enableTimer(std::string_view name) {
-    TimerManager::instance().enableTimer(name);
+  TimerManager::instance().enableTimer(name);
 }
 
-// Disable a timer
 inline void disableTimer(std::string_view name) {
-    TimerManager::instance().disableTimer(name);
+  TimerManager::instance().disableTimer(name);
 }
 
-// Check if timer is enabled
 inline bool isTimerEnabled(std::string_view name) {
-    return TimerManager::instance().isTimerEnabled(name);
+  return TimerManager::instance().isTimerEnabled(name);
 }
 
-// Reset a timer
 inline void resetTimer(std::string_view name) {
-    TimerManager::instance().resetTimer(name);
+  TimerManager::instance().resetTimer(name);
 }
 
-// Queue a timer with specific tick count
 inline void queueTimer(std::string_view name, int ticks) {
-    TimerManager::instance().queueTimer(name, ticks);
+  TimerManager::instance().queueTimer(name, ticks);
 }
 
-// Process all timers (call once per turn)
-inline bool tick() {
-    return TimerManager::instance().tick();
-}
-
-// Clear all timers
-inline void clear() {
-    TimerManager::instance().clear();
-}
+inline void clear() { TimerManager::instance().clear(); }
 
 } // namespace TimerSystem
-

@@ -67,6 +67,7 @@ void Globals::reset() {
     lPrso = nullptr;
     lPrsi = nullptr;
     debug = false;
+    clockWait = false;
     
     // Reset display modes to defaults (Requirement 65.5)
     verboseMode = true;

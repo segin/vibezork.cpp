@@ -54,11 +54,11 @@ The basic C++ framework is now working with:
 - [ ] Complex interactions
 
 ### Phase 6: Game Systems
-- [ ] Timer/interrupt system (gclock.zil)
-- [ ] Score tracking
-- [ ] Light/darkness mechanics
-- [ ] Inventory weight limits
-- [ ] Death and restart
+- [x] Timer/interrupt system (gclock.zil)
+- [x] Score tracking
+- [x] Light/darkness mechanics
+- [x] Inventory weight limits
+- [x] Death and restart
 
 ## Architecture Mapping
 
@@ -88,7 +88,7 @@ The basic C++ framework is now working with:
 | gsyntax.zil | 561 | parser/ | Started |
 | 1dungeon.zil | 2660 | world/ | TODO |
 | gglobals.zil | 308 | core/globals | Partial |
-| gclock.zil | 60 | core/clock | TODO |
+| gclock.zil | 60 | systems/timer.cpp | Done |
 | gmain.zil | 313 | main.cpp | Done |
 | gparser.zil | 1407 | parser/ | TODO |
 | gverbs.zil | 2216 | verbs/ | Started |
