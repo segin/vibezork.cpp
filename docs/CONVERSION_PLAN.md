@@ -84,7 +84,7 @@ The basic C++ framework is now working with:
 
 | ZIL File | Lines | C++ Target | Status |
 |----------|-------|------------|--------|
-| gmacros.zil | 154 | Inline/utilities | Partial |
+| gmacros.zil | 154 | core/gmacros.h | Done |
 | gsyntax.zil | 561 | parser/ | Started |
 | 1dungeon.zil | 2660 | world/ | TODO |
 | gglobals.zil | 308 | core/globals | Partial |

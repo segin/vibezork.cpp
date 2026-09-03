@@ -127,7 +127,7 @@ Scanned from `zil` files. (Generic ROUTINES).
 | PARSER | gparser.zil | | |
 | PATH-OBJECT | gglobals.zil | | |
 | PERFORM | gmain.zil | Central action dispatch hierarchy | Resolves IT, sets PRSA/PRSO/PRSI, and executes 7-tier dispatch: Actor -> Room(M-BEG) -> Preactions -> PRSI -> Container -> PRSO -> Verb (gmain.zil:182-288) |
-| PICK-ONE | gmacros.zil | | |
+| PICK-ONE | gmacros.zil | Non-repeating randomized cycle selector | Randomly samples without replacement until table exhausted, then restarts permutation cycle (gmacros.zil:127-140) |
 | PRE-BOARD | gverbs.zil | Boarding preaction | Validates vehicle location and player state before boarding (gverbs.zil:201-223) |
 | PRE-BURN | gverbs.zil | Burning preaction | Requires PRSI with ONBIT or FLAMEBIT (gverbs.zil:243-250) |
 | PRE-DROP | gverbs.zil | Dropping preaction | Handles disembarking if dropping currently ridden vehicle (gverbs.zil:474-478) |
@@ -145,7 +145,7 @@ Scanned from `zil` files. (Generic ROUTINES).
 | PRINT-CONT | gverbs.zil | Container content formatter | Prints formatted listing of container or surface contents (gverbs.zil:1150-1204) |
 | PRINT-CONTENTS | gverbs.zil | Object contents printer | Iterates through child objects and prints indentation list (gverbs.zil:1200-1204) |
 | QUEUE | gclock.zil | Schedule interrupt ticks | Retrieves interrupt via INT and sets countdown tick value C-TICK (gclock.zil:21-24) |
-| RANDOM-ELEMENT | gmacros.zil | | |
+| RANDOM-ELEMENT | gmacros.zil | Uniform random element picker | Selects random item from table using uniform distribution (gmacros.zil:124-125) |
 | RANDOMIZE-OBJECTS | 1actions.zil | | |
 | RECOVER-STILETTO | 1actions.zil | | |
 | REMARK | 1actions.zil | | |
@@ -198,4 +198,4 @@ Scanned from `zil` files. (Generic ROUTINES).
 | YES? | gverbs.zil | Interactive confirmation prompt | Prompts user with > and returns true if YES or Y (gverbs.zil:1515-1530) |
 | ZMEMQ | gparser.zil | | |
 | ZMEMQB | gparser.zil | | |
-| ZPROB | gmacros.zil | | |
+| ZPROB | gmacros.zil | Luck-weighted probability test | Rolls against 1-100 if lucky or 1-300 if unlucky (gmacros.zil:119-123) |
