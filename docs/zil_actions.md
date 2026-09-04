@@ -120,7 +120,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] CHAIN-PSEUDO - Draft shaft chain pseudo-object (1actions.zil:4167-4174)
 
 ### Room Actions (1actions.zil)
-- [/] EAST-HOUSE - Behind House room handler (1actions.zil:17-26)
+- [x] EAST-HOUSE - Behind House room handler (1actions.zil:17-26)
 - [ ] CAVE2-ROOM - Cave room handler (1actions.zil:2416-2430)
 - [ ] BOOM-ROOM - Gas room explosion handler (1actions.zil:2446-2467)
 - [ ] BATS-ROOM - Bats room handler (1actions.zil:2478-2486)
@@ -133,8 +133,8 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 114 actions
-- Implemented: 104 / 114 (91.2% complete)
-- In Progress: 1 (EAST-HOUSE)
+- Implemented: 105 / 114 (92.1% complete)
+- In Progress: 0
 - Remaining: 9
 
 
