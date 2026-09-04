@@ -129,12 +129,12 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] TREE-ROOM - Up a Tree room handler (1actions.zil:2880-2917)
 - [x] FOREST-ROOM - Forest room description/movement (1actions.zil:3004-3009)
 - [x] MIRROR-ROOM - Mirror Room room handler (1actions.zil:958-969)
-- [ ] LLD-ROOM - Land of Living Dead room handler (1actions.zil:1058-1077)
+- [/] LLD-ROOM - Land of Living Dead room handler (1actions.zil:1058-1077)
 
 ## Progress
 - Total: 114 actions
 - Implemented: 113 / 114 (99.1% complete)
-- In Progress: 0
-- Remaining: 1
+- In Progress: 1 (LLD-ROOM)
+- Remaining: 0
 
 
