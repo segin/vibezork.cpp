@@ -174,6 +174,9 @@ if(BUILD_TESTS)
     # LAKE-PSEUDO Tests (ZIL action verification)
     add_zork_test(LakePseudoTests lake_pseudo_tests tests/lake_pseudo_tests.cpp)
 
+    # STREAM-PSEUDO Tests (ZIL action verification)
+    add_zork_test(StreamPseudoTests stream_pseudo_tests tests/stream_pseudo_tests.cpp)
+
     # GMAIN Tests (gmain.zil routines verification)
     add_zork_test(GMainTests gmain_tests tests/gmain_tests.cpp)
 

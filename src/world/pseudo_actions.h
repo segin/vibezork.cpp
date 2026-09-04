@@ -7,3 +7,6 @@ bool nailsPseudo();
 
 // ZIL: LAKE-PSEUDO (zil/1actions.zil:3177-3184)
 bool lakePseudo();
+
+// ZIL: STREAM-PSEUDO (zil/1actions.zil:3185-3190)
+bool streamPseudo();

@@ -43,3 +43,23 @@ bool lakePseudo() {
     }
     return RFALSE;
 }
+
+// ZIL: STREAM-PSEUDO
+// Source: zil/1actions.zil:3185-3190
+// <ROUTINE STREAM-PSEUDO ()
+// 	 <COND (<VERB? SWIM THROUGH>
+// 		<TELL "You can't swim in the stream." CR>)
+// 	       (<VERB? CROSS>
+// 		<TELL "The other side is a sheer rock cliff." CR>)>>
+bool streamPseudo() {
+    auto &g = Globals::instance();
+    if (g.prsa == V_SWIM || g.prsa == V_THROUGH) {
+        printLine("You can't swim in the stream.");
+        return RTRUE;
+    }
+    if (g.prsa == V_CROSS) {
+        printLine("The other side is a sheer rock cliff.");
+        return RTRUE;
+    }
+    return RFALSE;
+}
