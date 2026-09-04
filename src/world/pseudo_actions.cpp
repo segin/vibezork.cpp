@@ -168,3 +168,23 @@ bool paintPseudo() {
     }
     return RFALSE;
 }
+
+// ZIL: GAS-PSEUDO
+// Source: zil/1actions.zil:3226-3231
+// <ROUTINE GAS-PSEUDO ()
+// 	 <COND (<VERB? BREATHE>	;"REALLY BLOW"
+// 		<TELL "There is too much gas to blow away." CR>)
+// 	       (<VERB? SMELL>
+// 		<TELL "It smells like coal gas in here." CR>)>>
+bool gasPseudo() {
+    auto &g = Globals::instance();
+    if (g.prsa == V_BREATHE) {
+        printLine("There is too much gas to blow away.");
+        return RTRUE;
+    }
+    if (g.prsa == V_SMELL) {
+        printLine("It smells like coal gas in here.");
+        return RTRUE;
+    }
+    return RFALSE;
+}

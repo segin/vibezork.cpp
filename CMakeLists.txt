@@ -192,6 +192,9 @@ if(BUILD_TESTS)
     # PAINT-PSEUDO Tests (ZIL action verification)
     add_zork_test(PaintPseudoTests paint_pseudo_tests tests/paint_pseudo_tests.cpp)
 
+    # GAS-PSEUDO Tests (ZIL action verification)
+    add_zork_test(GasPseudoTests gas_pseudo_tests tests/gas_pseudo_tests.cpp)
+
     # GMAIN Tests (gmain.zil routines verification)
     add_zork_test(GMainTests gmain_tests tests/gmain_tests.cpp)
 
