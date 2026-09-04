@@ -1587,17 +1587,7 @@ void initializeWorld() {
     );
     aragainFalls->setFlag(ObjectFlag::RLANDBIT);
     aragainFalls->setFlag(ObjectFlag::SACREDBIT);
-    aragainFalls->setRoomAction([](int rarg) {
-        if (rarg == M_LOOK) {
-            printLine("You are at the top of Aragain Falls, an enormous waterfall with a\ndrop of about 450 feet. The only path here is on the north end.");
-            auto& g = Globals::instance();
-            if (g.rainbowFlag) {
-                printLine("A solid rainbow spans the falls.");
-            } else {
-                printLine("A beautiful rainbow can be seen over the falls and to the west.");
-            }
-        }
-    });
+    aragainFalls->setRoomAction(fallsRoom);
     aragainFalls->setExit(Direction::NORTH, RoomExit(RoomIds::SHORE));
     aragainFalls->setExit(Direction::DOWN, RoomExit("It's a long way..."));
     auto rainbowCond = []() { return Globals::instance().rainbowFlag; };

@@ -14,6 +14,7 @@ void eastHouse(int rarg);
 void cave2Room(int rarg);
 void boomRoom(int rarg);
 void batsRoom(int rarg);
+void fallsRoom(int rarg);
 
 // Helper routines
 void fweep(int n);

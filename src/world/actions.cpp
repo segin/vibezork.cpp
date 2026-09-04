@@ -155,6 +155,21 @@ void batsRoom(int rarg) {
   }
 }
 
+// ZIL: FALLS-ROOM (ACTION for ARAGAIN-FALLS)
+// Source: zil/1actions.zil:2621-2632
+void fallsRoom(int rarg) {
+  if (rarg == M_LOOK) {
+    printLine("You are at the top of Aragain Falls, an enormous waterfall with a "
+              "drop of about 450 feet. The only path here is on the north end.");
+    auto &g = Globals::instance();
+    if (g.rainbowFlag) {
+      printLine("A solid rainbow spans the falls.");
+    } else {
+      printLine("A beautiful rainbow can be seen over the falls and to the west.");
+    }
+  }
+}
+
 void stoneBarrowAction(int rarg) {
   if (rarg == M_LOOK) {
     printLine("You are standing in front of a massive barrow of stone. In the "

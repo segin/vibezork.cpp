@@ -210,6 +210,9 @@ if(BUILD_TESTS)
     # BATS-ROOM Tests (ZIL action verification)
     add_zork_test(BatsRoomTests bats_room_tests tests/bats_room_tests.cpp)
 
+    # FALLS-ROOM Tests (ZIL action verification)
+    add_zork_test(FallsRoomTests falls_room_tests tests/falls_room_tests.cpp)
+
     # GMAIN Tests (gmain.zil routines verification)
     add_zork_test(GMainTests gmain_tests tests/gmain_tests.cpp)
 
