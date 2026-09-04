@@ -377,11 +377,7 @@ void initializeWorld() {
     upATree->setFlag(ObjectFlag::RLANDBIT);
     upATree->setFlag(ObjectFlag::ONBIT);
     upATree->setFlag(ObjectFlag::SACREDBIT);
-    upATree->setRoomAction([](int rarg) {
-        if (rarg == M_LOOK) {
-            printLine("You are about 10 feet above the ground nestled among some large branches. The nearest branch above you is above your reach.");
-        }
-    });
+    upATree->setRoomAction(treeRoom);
     upATree->setExit(Direction::UP, RoomExit("You cannot climb any higher."));
     upATree->setExit(Direction::DOWN, RoomExit(RoomIds::FOREST_PATH));
     

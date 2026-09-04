@@ -16,6 +16,9 @@ void boomRoom(int rarg);
 void batsRoom(int rarg);
 void fallsRoom(int rarg);
 void rivr4Room(int rarg);
+void treeRoom(int rarg);
+bool isForestRoom();
+bool iForestRoom();
 
 // Helper routines
 void fweep(int n);

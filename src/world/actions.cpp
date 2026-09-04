@@ -7,9 +7,12 @@
 #include "systems/death.h"
 #include "systems/npc.h"
 #include "systems/score.h"
+#include "systems/timer.h"
 #include "verbs/verbs.h"
 #include "world.h"
 #include <memory>
+
+void badEgg();
 
 // Global flag for winning the game
 bool wonFlag = false;
@@ -185,6 +188,123 @@ void rivr4Room(int rarg) {
       printLine("You notice something funny about the feel of the buoy.");
       g.buoyFlag = false;
     }
+  }
+}
+
+// ZIL: <ROUTINE FOREST-ROOM? () ...> (1actions.zil:2992-2994)
+bool isForestRoom() {
+  auto &g = Globals::instance();
+  if (!g.here) return false;
+  ObjectId id = g.here->getId();
+  return id == RoomIds::FOREST_1 || id == RoomIds::FOREST_2 ||
+         id == RoomIds::FOREST_3 || id == RoomIds::FOREST_PATH ||
+         id == RoomIds::UP_A_TREE;
+}
+
+// ZIL: <ROUTINE I-FOREST-ROOM () ...> (1actions.zil:2996-3002)
+bool iForestRoom() {
+  if (!isForestRoom()) {
+    TimerSystem::TimerManager::instance().disableTimer("I-FOREST-ROOM");
+    return RFALSE;
+  }
+  if (GMacros::prob(15)) {
+    printLine("You hear in the distance the chirping of a song bird.");
+    return RTRUE;
+  }
+  return RFALSE;
+}
+
+// ZIL: TREE-ROOM (ACTION for UP-A-TREE)
+// Source: zil/1actions.zil:2880-2917
+void treeRoom(int rarg) {
+  auto &g = Globals::instance();
+
+  if (rarg == M_LOOK) {
+    // ZIL: 1actions.zil:2881-2889
+    printLine("You are about 10 feet above the ground nestled among some large branches. "
+              "The nearest branch above you is above your reach.");
+
+    ZObject *path = g.getObject(RoomIds::FOREST_PATH);
+    if (path) {
+      std::vector<ZObject *> items;
+      for (auto *child : path->getContents()) {
+        if (child && !child->hasFlag(ObjectFlag::NDESCBIT) && !child->hasFlag(ObjectFlag::INVISIBLE)) {
+          items.push_back(child);
+        }
+      }
+      if (!items.empty()) {
+        std::string line = "On the ground below you can see:  ";
+        for (size_t i = 0; i < items.size(); ++i) {
+          if (i > 0) {
+            line += (i == items.size() - 1 ? ", and " : ", ");
+          }
+          line += "a " + items[i]->getDesc();
+        }
+        line += ".";
+        printLine(line);
+      }
+    }
+  } else if (rarg == M_BEG) {
+    // ZIL: 1actions.zil:2890-2916
+    if (g.prsa == V_CLIMB_DOWN && (!g.prso || g.prso->getId() == ObjectIds::TREE || g.prso->getId() == ObjectIds::ROOMS)) {
+      Verbs::doWalk(Direction::DOWN);
+      return;
+    }
+    if ((g.prsa == V_CLIMB_UP || g.prsa == V_CLIMB_FOO) && (g.prso && g.prso->getId() == ObjectIds::TREE)) {
+      Verbs::doWalk(Direction::UP);
+      return;
+    }
+    if (g.prsa == V_LEAP) {
+      DeathSystem::jigsUp("That was just a bit too far down.");
+      return;
+    }
+    if (g.prsa == V_DROP) {
+      if (!Verbs::iDrop()) {
+        return;
+      }
+      ZObject *path = g.getObject(RoomIds::FOREST_PATH);
+      if (g.prso && g.prso->getId() == ObjectIds::NEST) {
+        ZObject *egg = g.getObject(ObjectIds::EGG);
+        if (egg && egg->getLocation() == g.prso) {
+          printLine("The nest falls to the ground, and the egg spills out of it, seriously");
+          printLine("damaged.");
+          Verbs::removeCarefully(egg);
+          ZObject *brokenEgg = g.getObject(ObjectIds::BROKEN_EGG);
+          if (brokenEgg && path) {
+            brokenEgg->moveTo(path);
+          }
+          if (path) {
+            g.prso->moveTo(path);
+          }
+          return;
+        }
+      }
+      if (g.prso && g.prso->getId() == ObjectIds::EGG) {
+        print("The egg falls to the ground and springs open, seriously damaged.");
+        if (path) {
+          g.prso->moveTo(path);
+        }
+        ZObject *canary = g.getObject(ObjectIds::CANARY);
+        bool hasCanary = (canary && canary->getLocation() == g.prso);
+        badEgg();
+        if (!hasCanary) {
+          crlf();
+        }
+        return;
+      }
+      if (g.prso && g.prso != g.winner && g.prso != g.player && g.prso->getId() != ObjectIds::TREE) {
+        if (path) {
+          g.prso->moveTo(path);
+        }
+        printLine(std::format("The {} falls to the ground.", g.prso->getDesc()));
+        return;
+      }
+    }
+  } else if (rarg == M_ENTER) {
+    // ZIL: (<EQUAL? .RARG ,M-ENTER> <ENABLE <QUEUE I-FOREST-ROOM -1>>)
+    // Source: zil/1actions.zil:2917
+    TimerSystem::TimerManager::instance().registerTimer("I-FOREST-ROOM", 1, iForestRoom, true, true);
+    TimerSystem::TimerManager::instance().enableTimer("I-FOREST-ROOM");
   }
 }
 

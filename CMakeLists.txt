@@ -216,6 +216,9 @@ if(BUILD_TESTS)
     # RIVR4-ROOM Tests (ZIL action verification)
     add_zork_test(Rivr4RoomTests rivr4_room_tests tests/rivr4_room_tests.cpp)
 
+    # TREE-ROOM Tests (ZIL action verification)
+    add_zork_test(TreeRoomTests tree_room_tests tests/tree_room_tests.cpp)
+
     # GMAIN Tests (gmain.zil routines verification)
     add_zork_test(GMainTests gmain_tests tests/gmain_tests.cpp)
 
