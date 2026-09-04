@@ -4,6 +4,7 @@
 #include "room_builder.h"
 #include "objects.h"
 #include "systems/npc.h"
+#include "world.h"
 
 void initializeUndergroundRooms() {
     using namespace RoomIds;
@@ -300,7 +301,8 @@ void initializeUndergroundRooms() {
             {UP, SMELLY_ROOM},
             {EAST, LADDER_TOP}
         },
-        .flags = {RLANDBIT}  // Dark
+        .flags = {RLANDBIT}, // Dark
+        .action = boomRoom
     });
     
     // LADDER_TOP - Top of ladder

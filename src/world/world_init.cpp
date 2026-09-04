@@ -989,11 +989,7 @@ void initializeWorld() {
     // Dark room - no ONBIT flag
     gasRoom->setFlag(ObjectFlag::RLANDBIT);
     gasRoom->setFlag(ObjectFlag::SACREDBIT);
-    gasRoom->setRoomAction([](int rarg) {
-        if (rarg == M_LOOK) {
-            printLine("This is a small room which smells strongly of coal gas. There is a short climb up some stairs and a narrow tunnel leading east.");
-        }
-    });
+    gasRoom->setRoomAction(boomRoom);
     
     // Set up exits for Gas Room
     gasRoom->setExit(Direction::UP, RoomExit(RoomIds::SMELLY_ROOM));

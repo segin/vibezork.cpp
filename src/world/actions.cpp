@@ -4,6 +4,7 @@
 #include "core/io.h"
 #include "parser/gparser.h"
 #include "systems/candle.h"
+#include "systems/death.h"
 #include "systems/npc.h"
 #include "systems/score.h"
 #include "verbs/verbs.h"
@@ -86,6 +87,51 @@ void cave2Room(int rarg) {
       if (!g.lit) {
         printLine("It is now completely dark.");
       }
+    }
+  }
+}
+
+// ZIL: BOOM-ROOM (ACTION for GAS-ROOM)
+// Source: zil/1actions.zil:2446-2467
+void boomRoom(int rarg) {
+  if (rarg == M_LOOK) {
+    printLine("This is a small room which smells strongly of coal gas. There is a "
+              "short climb up some stairs and a narrow tunnel leading east.");
+  } else if (rarg == M_END) {
+    auto &g = Globals::instance();
+    bool dummy = false;
+    if ((g.prsa == V_LAMP_ON || g.prsa == V_BURN) && g.prso &&
+        (g.prso->getId() == ObjectIds::CANDLES ||
+         g.prso->getId() == ObjectIds::TORCH ||
+         g.prso->getId() == ObjectIds::MATCH)) {
+      dummy = true;
+    }
+
+    auto *candles = g.getObject(ObjectIds::CANDLES);
+    auto *torch = g.getObject(ObjectIds::TORCH);
+    auto *match = g.getObject(ObjectIds::MATCH);
+
+    bool candlesLitHeld =
+        candles && Verbs::isHeld(candles) && candles->hasFlag(ObjectFlag::ONBIT);
+    bool torchLitHeld =
+        torch && Verbs::isHeld(torch) && torch->hasFlag(ObjectFlag::ONBIT);
+    bool matchLitHeld =
+        match && Verbs::isHeld(match) && match->hasFlag(ObjectFlag::ONBIT);
+
+    if (candlesLitHeld || torchLitHeld || matchLitHeld) {
+      if (dummy) {
+        print("How sad for an aspiring adventurer to light a ");
+        if (g.prso) {
+          print(g.prso->getDesc());
+        }
+        printLine(" in a room which reeks of gas. Fortunately, there is justice "
+                  "in the world.");
+      } else {
+        printLine("Oh dear. It appears that the smell coming from this room was "
+                  "coal gas. I would have thought twice about carrying flaming "
+                  "objects in here.");
+      }
+      DeathSystem::jigsUp("\n    ** BOOOOOOOOOOOM **");
     }
   }
 }
