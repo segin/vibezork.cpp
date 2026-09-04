@@ -168,6 +168,9 @@ if(BUILD_TESTS)
     # RIVER-FUNCTION Tests (ZIL action verification)
     add_zork_test(RiverTests river_tests tests/river_tests.cpp)
 
+    # NAILS-PSEUDO Tests (ZIL action verification)
+    add_zork_test(NailsPseudoTests nails_pseudo_tests tests/nails_pseudo_tests.cpp)
+
     # GMAIN Tests (gmain.zil routines verification)
     add_zork_test(GMainTests gmain_tests tests/gmain_tests.cpp)
 
