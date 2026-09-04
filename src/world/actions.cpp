@@ -1,6 +1,8 @@
 #include "core/gglobals.h"
 #include "core/globals.h"
+#include "core/gmacros.h"
 #include "core/io.h"
+#include "parser/gparser.h"
 #include "systems/candle.h"
 #include "systems/npc.h"
 #include "systems/score.h"
@@ -63,6 +65,29 @@ void behindHouseAction(int rarg) {
 // Canonical ZIL routine alias
 void eastHouse(int rarg) {
   behindHouseAction(rarg);
+}
+
+// ZIL: CAVE2-ROOM (ACTION for TINY-CAVE)
+// Source: zil/1actions.zil:2416-2430
+void cave2Room(int rarg) {
+  if (rarg == M_LOOK) {
+    printLine("This is a tiny cave with entrances west and north, and a dark, "
+              "forbidding staircase leading down.");
+  } else if (rarg == M_END) {
+    auto &g = Globals::instance();
+    auto *candles = g.getObject(ObjectIds::CANDLES);
+    auto *winner = g.winner ? g.winner : g.player;
+    if (candles && winner && candles->getLocation() == winner &&
+        GMacros::prob(50, true) && candles->hasFlag(ObjectFlag::ONBIT)) {
+      CandleSystem::disableCandleTimer();
+      candles->clearFlag(ObjectFlag::ONBIT);
+      printLine("A gust of wind blows out your candles!");
+      g.lit = GParser::isLit(g.here);
+      if (!g.lit) {
+        printLine("It is now completely dark.");
+      }
+    }
+  }
 }
 
 void stoneBarrowAction(int rarg) {

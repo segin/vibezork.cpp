@@ -11,3 +11,4 @@ bool kitchenWindowAction();
 // Room action handlers
 void behindHouseAction(int rarg);
 void eastHouse(int rarg);
+void cave2Room(int rarg);

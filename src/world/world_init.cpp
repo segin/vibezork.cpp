@@ -2479,11 +2479,7 @@ void initializeWorld() {
         "This is a tiny cave with entrances west and north, and a dark, forbidding staircase leading down."
     );
     tinyCave->setFlag(ObjectFlag::RLANDBIT);
-    tinyCave->setRoomAction([](int rarg) {
-        if (rarg == M_LOOK) {
-            printLine("This is a tiny cave with entrances west and north, and a dark, forbidding staircase leading down.");
-        }
-    });
+    tinyCave->setRoomAction(cave2Room);
     tinyCave->setExit(Direction::NORTH, RoomExit(RoomIds::MIRROR_ROOM_2));
     tinyCave->setExit(Direction::WEST, RoomExit(RoomIds::WINDING_PASSAGE));
     tinyCave->setExit(Direction::DOWN, RoomExit(RoomIds::ENTRANCE_TO_HADES));

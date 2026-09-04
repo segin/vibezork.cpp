@@ -201,6 +201,9 @@ if(BUILD_TESTS)
     # EAST-HOUSE Tests (ZIL action verification)
     add_zork_test(EastHouseTests east_house_tests tests/east_house_tests.cpp)
 
+    # CAVE2-ROOM Tests (ZIL action verification)
+    add_zork_test(Cave2RoomTests cave2_room_tests tests/cave2_room_tests.cpp)
+
     # GMAIN Tests (gmain.zil routines verification)
     add_zork_test(GMainTests gmain_tests tests/gmain_tests.cpp)
 

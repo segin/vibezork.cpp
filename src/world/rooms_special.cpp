@@ -3,6 +3,7 @@
 
 #include "room_builder.h"
 #include "systems/npc.h"
+#include "world.h"
 
 void initializeSpecialRooms() {
     using namespace RoomIds;
@@ -236,7 +237,8 @@ void initializeSpecialRooms() {
             {WEST, WINDING_PASSAGE},
             {DOWN, ENTRANCE_TO_HADES}
         },
-        .flags = {RLANDBIT}  // Dark
+        .flags = {RLANDBIT}, // Dark
+        .action = cave2Room
     });
     
     // WINDING_PASSAGE - Passage in mirror world
