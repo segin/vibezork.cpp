@@ -39,7 +39,7 @@ The basic C++ framework is now working with:
 - [x] Forest-1 room
 - [x] Mailbox object with action handler
 - [x] Global objects (WHITE-HOUSE, BOARD, FOREST)
-- [/] Remaining ~95 rooms
+- [x] Remaining ~95 rooms
 - [/] Remaining ~145 objects
 
 ### Phase 4: Verbs (Next)
