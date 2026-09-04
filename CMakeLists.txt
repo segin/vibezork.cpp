@@ -177,6 +177,9 @@ if(BUILD_TESTS)
     # STREAM-PSEUDO Tests (ZIL action verification)
     add_zork_test(StreamPseudoTests stream_pseudo_tests tests/stream_pseudo_tests.cpp)
 
+    # CHASM-PSEUDO Tests (ZIL action verification)
+    add_zork_test(ChasmPseudoTests chasm_pseudo_tests tests/chasm_pseudo_tests.cpp)
+
     # GMAIN Tests (gmain.zil routines verification)
     add_zork_test(GMainTests gmain_tests tests/gmain_tests.cpp)
 

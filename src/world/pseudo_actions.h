@@ -10,3 +10,6 @@ bool lakePseudo();
 
 // ZIL: STREAM-PSEUDO (zil/1actions.zil:3185-3190)
 bool streamPseudo();
+
+// ZIL: CHASM-PSEUDO (zil/1actions.zil:3191-3202)
+bool chasmPseudo();
