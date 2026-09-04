@@ -171,6 +171,9 @@ if(BUILD_TESTS)
     # NAILS-PSEUDO Tests (ZIL action verification)
     add_zork_test(NailsPseudoTests nails_pseudo_tests tests/nails_pseudo_tests.cpp)
 
+    # LAKE-PSEUDO Tests (ZIL action verification)
+    add_zork_test(LakePseudoTests lake_pseudo_tests tests/lake_pseudo_tests.cpp)
+
     # GMAIN Tests (gmain.zil routines verification)
     add_zork_test(GMainTests gmain_tests tests/gmain_tests.cpp)
 

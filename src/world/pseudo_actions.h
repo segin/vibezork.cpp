@@ -4,3 +4,6 @@
 
 // ZIL: NAILS-PSEUDO (zil/1actions.zil:376-380)
 bool nailsPseudo();
+
+// ZIL: LAKE-PSEUDO (zil/1actions.zil:3177-3184)
+bool lakePseudo();
