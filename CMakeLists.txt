@@ -207,6 +207,9 @@ if(BUILD_TESTS)
     # BOOM-ROOM Tests (ZIL action verification)
     add_zork_test(BoomRoomTests boom_room_tests tests/boom_room_tests.cpp)
 
+    # BATS-ROOM Tests (ZIL action verification)
+    add_zork_test(BatsRoomTests bats_room_tests tests/bats_room_tests.cpp)
+
     # GMAIN Tests (gmain.zil routines verification)
     add_zork_test(GMainTests gmain_tests tests/gmain_tests.cpp)
 

@@ -136,6 +136,25 @@ void boomRoom(int rarg) {
   }
 }
 
+// ZIL: BATS-ROOM (ACTION for BAT-ROOM)
+// Source: zil/1actions.zil:2478-2486
+void batsRoom(int rarg) {
+  if (rarg == M_LOOK) {
+    printLine("You are in a small room which has doors only to the east and south.");
+  } else if (rarg == M_ENTER && !DeathSystem::isDead()) {
+    auto &g = Globals::instance();
+    auto *garlic = g.getObject(ObjectIds::GARLIC);
+    auto *winner = g.winner ? g.winner : g.player;
+    bool hasGarlic =
+        garlic && (garlic->getLocation() == winner || garlic->getLocation() == g.here);
+    if (!hasGarlic) {
+      Verbs::vLook();
+      crlf();
+      flyMe();
+    }
+  }
+}
+
 void stoneBarrowAction(int rarg) {
   if (rarg == M_LOOK) {
     printLine("You are standing in front of a massive barrow of stone. In the "

@@ -255,7 +255,8 @@ void initializeUndergroundRooms() {
             {SOUTH, SQUEEKY_ROOM},
             {EAST, SHAFT_ROOM}
         },
-        .flags = {RLANDBIT, SACREDBIT}  // Dark, safe
+        .flags = {RLANDBIT, SACREDBIT}, // Dark, safe
+        .action = batsRoom
     });
     
     // SHAFT_ROOM - Shaft Room with basket

@@ -927,11 +927,7 @@ void initializeWorld() {
     // Dark room - no ONBIT flag
     batRoom->setFlag(ObjectFlag::RLANDBIT);
     batRoom->setFlag(ObjectFlag::SACREDBIT);
-    batRoom->setRoomAction([](int rarg) {
-        if (rarg == M_LOOK) {
-            printLine("You are in a small room which has doors only to the east and south.");
-        }
-    });
+    batRoom->setRoomAction(batsRoom);
     
     // Set up exits for Bat Room
     batRoom->setExit(Direction::SOUTH, RoomExit(RoomIds::SQUEEKY_ROOM));

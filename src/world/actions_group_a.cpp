@@ -2086,26 +2086,23 @@ bool chaliceAction() {
 
 // BAT-F - Bat attack/defense, garlic prevents being grabbed
 // ZIL: TAKE/ATTACK - if garlic present "can't reach him", else fly-me teleports
-// player Source: 1actions.zil lines 308-324 BAT-DROPS table
-static const std::vector<ObjectId> BAT_DROPS = {
+const std::vector<ObjectId> BAT_DROPS = {
     RoomIds::MINE_1,       RoomIds::MINE_2,     RoomIds::MINE_3,
     RoomIds::MINE_4,       RoomIds::LADDER_TOP, RoomIds::LADDER_BOTTOM,
-    RoomIds::SQUEEKY_ROOM, RoomIds::MINE_1};
+    RoomIds::SQUEEKY_ROOM, RoomIds::MINE_ENTRANCE};
 
-// Helper for Fweep printing
-static void fweep(int n) {
+// Helper for Fweep printing (ZIL: FWEEP, 1actions.zil:326-330)
+void fweep(int n) {
   for (int i = 0; i < n; ++i) {
     printLine("    Fweep!");
   }
-  // ZIL CRLF is implicit in printLine usually, but ZIL does <CRLF> at end of
-  // FWEEP logic We'll just stick to printLine for each fweep.
 }
 
-// FLY-ME logic
-static void flyMe() {
+// FLY-ME logic (ZIL: FLY-ME, 1actions.zil:317-324)
+void flyMe() {
   auto &g = Globals::instance();
   fweep(4);
-  printLine(""); // CR CR in ZIL usually
+  printLine("");
   printLine(
       "The bat grabs you by the scruff of your neck and lifts you away....");
   printLine("");
@@ -2116,28 +2113,15 @@ static void flyMe() {
     ObjectId targetId = BAT_DROPS[idx];
     ZObject *target = g.getObject(targetId);
     if (target) {
-      g.player->moveTo(target);
-      bool moved = true;
-      if (moved) {
-        // <COND (<NOT <EQUAL? ,HERE ,ENTRANCE-TO-HADES>> <V-FIRST-LOOK>)>
-        // We assume V-FIRST-LOOK means describe room.
-        // In C++, moveTo updates 'here'.
-        if (target->getId() != RoomIds::ENTRANCE_TO_HADES) {
-          // Force look/describe
-          // We don't have direct access to V-FIRST-LOOK, but room description
-          // is handled by main loop usually? If this is an action, we should
-          // probably print the room desc. But for now, let's assume the game
-          // loop picks it up or we call lookAction? Actions usually return
-          // true/false. If we changed room, the main loop should describe.
-          // Wait, V-FIRST-LOOK is specific.
-          // For fidelity, we should try to trigger room description.
-          // Note: We don't have a Look function we can call easily here without
-          // circular dep? Actually, we can just return true. Main loop in
-          // main.cpp checks 'here' change? In vibezork, 'performAction' is
-          // called. If we return true, it implies handled. We should verify if
-          // looking happens automatically on room change. In main.cpp: if
-          // (g.here != oldHere) describeRoom();
-        }
+      if (g.winner) {
+        g.winner->moveTo(target);
+      }
+      if (g.player && g.player != g.winner) {
+        g.player->moveTo(target);
+      }
+      g.here = target;
+      if (target->getId() != RoomIds::ENTRANCE_TO_HADES) {
+        Verbs::vLook();
       }
     }
   }
