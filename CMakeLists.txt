@@ -182,4 +182,8 @@ if(BUILD_TESTS)
 
     # GPARSER Tests (gparser.zil routines and tables verification)
     add_zork_test(GParserTests gparser_tests tests/gparser_tests.cpp)
+
+    # GSYNTAX Tests (gsyntax.zil syntax declarations, synonyms, buzzwords)
+    add_zork_test(GSyntaxTests gsyntax_tests tests/gsyntax_tests.cpp)
 endif()
+

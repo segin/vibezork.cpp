@@ -199,3 +199,8 @@ Scanned from `zil` files. (Generic ROUTINES).
 | ZMEMQ | gparser.zil | Table membership check | Tests if item exists in vector or table (gparser.zil:1315-1322) |
 | ZMEMQB | gparser.zil | Byte table membership check | Tests if byte value exists in byte array (gparser.zil:1324-1329) |
 | ZPROB | gmacros.zil | Luck-weighted probability test | Rolls against 1-100 if lucky or 1-300 if unlucky (gmacros.zil:119-123) |
+| BUZZ-TABLE | gsyntax.zil | Parser buzzwords table | 21 command and general buzzwords ignored by parser (gsyntax.zil:9-12) |
+| DIR-SYNONYMS | gsyntax.zil | Direction synonyms table | 10 direction synonym groups mapping abbreviations to canonical directions (gsyntax.zil:25-34) |
+| PREP-SYNONYMS | gsyntax.zil | Preposition synonyms table | 4 preposition synonym groups (with, in, on, under) (gsyntax.zil:20-23) |
+| SYNTAX-TABLE | gsyntax.zil | Grammar syntax table | 267 syntax patterns defining verb structures, search scopes, find flags, and action dispatches (gsyntax.zil:40-562) |
+| VERB-SYNONYMS | gsyntax.zil | Verb synonyms table | 61 verb synonym groups mapping player inputs to canonical verbs (gsyntax.zil:45-560) |

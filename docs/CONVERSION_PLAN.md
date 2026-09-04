@@ -22,7 +22,7 @@ The basic C++ framework is now working with:
 - [x] Basic tokenization
 - [x] Verb lookup with synonyms
 - [x] Direction parsing and handling
-- [ ] Full syntax pattern matching (gsyntax.zil)
+- [x] Full syntax pattern matching (gsyntax.zil)
 - [ ] Object recognition and disambiguation
 - [ ] Preposition handling
 - [ ] Multi-word object names
@@ -85,7 +85,7 @@ The basic C++ framework is now working with:
 | ZIL File | Lines | C++ Target | Status |
 |----------|-------|------------|--------|
 | gmacros.zil | 154 | core/gmacros.h | Done |
-| gsyntax.zil | 561 | parser/ | Started |
+| gsyntax.zil | 561 | parser/gsyntax.h, parser/gsyntax.cpp | Done |
 | 1dungeon.zil | 2660 | world/ | TODO |
 | gglobals.zil | 308 | core/globals | Partial |
 | gclock.zil | 60 | systems/timer.cpp | Done |

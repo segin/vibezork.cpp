@@ -215,7 +215,7 @@ ctest
 | ZIL File | Lines | C++ Equivalent |
 |----------|-------|----------------|
 | gmacros.zil | 154 | Inline in various files |
-| gsyntax.zil | 561 | parser/, verbs/verbs.h |
+| gsyntax.zil | 561 | parser/gsyntax.h, parser/gsyntax.cpp |
 | 1dungeon.zil | 2660 | world/ |
 | gglobals.zil | 308 | core/globals.h |
 | gclock.zil | 60 | systems/timer.cpp |

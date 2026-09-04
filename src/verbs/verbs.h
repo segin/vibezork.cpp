@@ -199,7 +199,11 @@ constexpr VerbId V_CHOMP = 213;
 constexpr VerbId V_COUNT = 214;
 constexpr VerbId V_CROSS = 215;
 
-// Phase 12 Batch 2: Missing Verbs
+// Phase 12 Batch 2 & gsyntax.zil Verbs
+constexpr VerbId V_HATCH = 216;
+constexpr VerbId V_KNOCK = 217;
+constexpr VerbId V_LEAVE = 218; // Handling LEAVE vs LEAVE OBJ (Exit vs Drop)
+constexpr VerbId V_LEAN_ON = 219;
 constexpr VerbId V_OIL = 220;
 constexpr VerbId V_STAB = 221;
 constexpr VerbId V_DRINK_FROM = 222;
@@ -211,18 +215,41 @@ constexpr VerbId V_RECORD = 227;
 constexpr VerbId V_UNRECORD = 228;
 constexpr VerbId V_VERIFY = 229;
 constexpr VerbId V_THROW_OFF = 230;
-constexpr VerbId V_HATCH = 216;
-constexpr VerbId V_KNOCK = 217;
-constexpr VerbId V_LEAVE = 218; // Handling LEAVE vs LEAVE OBJ (Exit vs Drop)
-constexpr VerbId V_LEAN_ON = 219;
-constexpr VerbId V_PUMP = 220;
-constexpr VerbId V_STRIKE = 221; // Intransitive STRIKE support
-// V_RAPE exists as 157
-// V_CURSE exists as 144
-constexpr VerbId V_READ_PAGE = 224; // Read object (book)
-constexpr VerbId V_PICK = 225;
-constexpr VerbId V_APPLY = 226;
-constexpr VerbId V_OVERBOARD = 227;
+constexpr VerbId V_PUMP = 231;
+constexpr VerbId V_STRIKE = 232;
+constexpr VerbId V_READ_PAGE = 233;
+constexpr VerbId V_PICK = 234;
+constexpr VerbId V_APPLY = 235;
+constexpr VerbId V_OVERBOARD = 236;
+constexpr VerbId V_LOOK_ON = 237;
+constexpr VerbId V_SGIVE = 238;
+constexpr VerbId V_SKIP = 239;
+constexpr VerbId V_SSPRAY = 240;
+constexpr VerbId V_COMMAND_FILE = 241;
+
+// Additional initial verb aliases and mappings from gsyntax.zil
+constexpr VerbId V_ACTIVATE = V_LAMP_ON;
+constexpr VerbId V_BLOW = 242;
+constexpr VerbId V_CLIMB = V_CLIMB_UP;
+constexpr VerbId V_DESTROY = V_MUNG;
+constexpr VerbId V_EXTINGUISH = V_LAMP_OFF;
+constexpr VerbId V_INFLAT = V_INFLATE;
+constexpr VerbId V_LEAN = V_LEAN_ON;
+constexpr VerbId V_LIGHT = V_LAMP_ON;
+constexpr VerbId V_LUBRICATE = V_OIL;
+constexpr VerbId V_POKE = 243;
+constexpr VerbId V_POUR = 244;
+constexpr VerbId V_PUNCTURE = 245;
+constexpr VerbId V_ROLL = 246;
+constexpr VerbId V_SLIDE = 247;
+constexpr VerbId V_SUPER = V_SUPERBRIEF;
+constexpr VerbId V_WAKE = V_ALARM;
+
+// ZIL Name Aliases
+constexpr VerbId V_ADVENT = V_PLUGH;
+constexpr VerbId V_CURSES = V_CURSE;
+constexpr VerbId V_SUPER_BRIEF = V_SUPERBRIEF;
+
 
 
 
@@ -415,6 +442,11 @@ namespace Verbs {
     bool vOverboard();
     bool vJump();
     bool vCurse();
+    bool vLookOn();
+    bool vSgive();
+    bool vSkip();
+    bool vSspray();
+    bool vCommandFile();
     
     // Helper for special movement
     bool trySpecialMovement(int verbId, Direction dir);

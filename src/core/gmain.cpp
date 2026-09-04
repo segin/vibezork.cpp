@@ -211,6 +211,11 @@ void initializeAllVerbHandlers() {
   registerVerbHandler(V_READ_PAGE, Verbs::vReadPage);
   registerVerbHandler(V_PICK, Verbs::vPick);
   registerVerbHandler(V_APPLY, Verbs::vApply);
+  registerVerbHandler(V_LOOK_ON, Verbs::vLookOn);
+  registerVerbHandler(V_SGIVE, Verbs::vSgive);
+  registerVerbHandler(V_SKIP, Verbs::vSkip);
+  registerVerbHandler(V_SSPRAY, Verbs::vSspray);
+  registerVerbHandler(V_COMMAND_FILE, Verbs::vCommandFile);
 
   // Preactions (gverbs.zil)
   registerPreaction(V_BOARD, Verbs::preBoard);
@@ -222,6 +227,7 @@ void initializeAllVerbHandlers() {
   registerPreaction(V_MUNG, Verbs::preMung);
   registerPreaction(V_PUT, Verbs::prePut);
   registerPreaction(V_READ, Verbs::preRead);
+  registerPreaction(V_SGIVE, Verbs::preSGive);
   registerPreaction(V_TAKE, Verbs::preTake);
   registerPreaction(V_TURN, Verbs::preTurn);
 }

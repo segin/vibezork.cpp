@@ -3320,6 +3320,46 @@ bool vThrowOff() {
   return Verbs::vThrow();
 }
 
+// ZIL: <ROUTINE V-LOOK-ON () ...> (gverbs.zil:892-897)
+bool vLookOn() {
+  auto &g = Globals::instance();
+  if (!g.prso) return false;
+  if (g.prso->hasFlag(ObjectFlag::SURFACEBIT)) {
+    return vLookInside();
+  }
+  printLine(std::format("Look on a {}???", g.prso->getDesc()));
+  return true;
+}
+
+// ZIL: <ROUTINE V-SGIVE () ...> (gverbs.zil:1210-1212)
+bool vSgive() {
+  printLine("Foo!");
+  return true;
+}
+
+// ZIL: <ROUTINE V-SKIP () ...> (gverbs.zil:1269-1277)
+bool vSkip() {
+  static const std::vector<std::string> wheeeee = {
+    "Very good. Now you can go to the second grade.",
+    "Are you enjoying yourself?",
+    "Wheeeeeeeeee!!!!!"
+  };
+  printLine(wheeeee[rand() % wheeeee.size()]);
+  return true;
+}
+
+// ZIL: <ROUTINE V-SSPRAY () ...> (gverbs.zil:1294-1296)
+bool vSspray() {
+  auto &g = Globals::instance();
+  std::swap(g.prso, g.prsi);
+  return vSpray();
+}
+
+// ZIL: <ROUTINE V-COMMAND-FILE () ...> (gverbs.zil:130-132)
+bool vCommandFile() {
+  return true;
+}
+
 // ============================================================================
 // ZIL: GVERBS.ZIL Preaction Routines (zil/gverbs.zil)
 // ============================================================================
