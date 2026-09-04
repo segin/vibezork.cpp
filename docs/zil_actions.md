@@ -119,9 +119,22 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] GAS-PSEUDO - Coal mine gas pseudo-object (1actions.zil:3226-3231)
 - [x] CHAIN-PSEUDO - Draft shaft chain pseudo-object (1actions.zil:4167-4174)
 
+### Room Actions (1actions.zil)
+- [/] EAST-HOUSE - Behind House room handler (1actions.zil:17-26)
+- [ ] CAVE2-ROOM - Cave room handler (1actions.zil:2416-2430)
+- [ ] BOOM-ROOM - Gas room explosion handler (1actions.zil:2446-2467)
+- [ ] BATS-ROOM - Bats room handler (1actions.zil:2478-2486)
+- [ ] FALLS-ROOM - Aragain Falls room handler (1actions.zil:2621-2632)
+- [ ] RIVR4-ROOM - River 4 buoy room handler (1actions.zil:2844-2853)
+- [ ] TREE-ROOM - Up a Tree room handler (1actions.zil:2880-2917)
+- [ ] FOREST-ROOM - Forest room description/movement (1actions.zil:3004-3009)
+- [ ] MIRROR-ROOM - Mirror Room room handler (1actions.zil:958-969)
+- [ ] LLD-ROOM - Land of Living Dead room handler (1actions.zil:1058-1077)
+
 ## Progress
-- Total: 104 actions
-- Implemented: 104 / 104 (100% complete) ✅
-- Remaining: 0
+- Total: 114 actions
+- Implemented: 104 / 114 (91.2% complete)
+- In Progress: 1 (EAST-HOUSE)
+- Remaining: 9
 
 
