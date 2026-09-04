@@ -86,7 +86,7 @@ The basic C++ framework is now working with:
 |----------|-------|------------|--------|
 | gmacros.zil | 154 | core/gmacros.h | Done |
 | gsyntax.zil | 561 | parser/gsyntax.h, parser/gsyntax.cpp | Done |
-| 1dungeon.zil | 2660 | world/ | In Progress |
+| 1dungeon.zil | 2660 | world/ | Done |
 | gglobals.zil | 308 | core/gglobals.h, core/gglobals.cpp, core/globals | Done |
 | gclock.zil | 60 | systems/timer.cpp | Done |
 | gmain.zil | 313 | main.cpp | Done |
