@@ -59,6 +59,10 @@ public:
   bool wonFlag = false;       // ZIL: ,WON-FLAG (Score-max reached, Stone Barrow entrance open)
   bool coffinCure = false;    // ZIL: ,COFFIN-CURE (Prayer answered in Egypt Room)
 
+  // Exorcism state (ZIL: ,XB ,XC in 1actions.zil:1127-1129)
+  bool xb = false;            // ZIL: ,XB (Exorcism phase 1: Bell rung)
+  bool xc = false;            // ZIL: ,XC (Exorcism phase 2: Candles lit)
+
   // Additional puzzle state
   bool rugMoved = false;      // Has the rug been moved to reveal trap door?
   bool gateFlag = false;      // Dam control panel activated (Green Bubble light)

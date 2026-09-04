@@ -2201,22 +2201,7 @@ void initializeWorld() {
     );
     entranceToHades->setFlag(ObjectFlag::RLANDBIT);
     entranceToHades->setFlag(ObjectFlag::ONBIT);
-    entranceToHades->setRoomAction([](int rarg) {
-        if (rarg == M_LOOK) {
-            printLine("You are outside a large gateway, on which is inscribed:");
-            crlf();
-            printLine("  Abandon every hope all ye who enter here");
-            crlf();
-            printLine("The gate is open; through it you can see a desolation, with a pile of mangled bodies in one corner. Thousands of voices, lamenting some hideous fate, can be heard.");
-        } else if (rarg == M_LISTEN) {
-            printLine("You hear thousands of voices lamenting their hideous fate.");
-        } else if (rarg == M_PRAY) {
-            printLine("Your prayers are heard, but not answered. The spirits here are beyond salvation.");
-        } else if (rarg == M_ENTER) {
-            // Special behavior when entering - this is where resurrection happens
-            printLine("You pass through the gateway into the Land of the Living Dead.");
-        }
-    });
+    entranceToHades->setRoomAction(lldRoom);
     // ZIL: (UP TO TINY-CAVE) (1dungeon.zil:2030)
     entranceToHades->setExit(Direction::UP, RoomExit(RoomIds::TINY_CAVE));
     auto lldCond = []() { return Globals::instance().lldFlag; };
@@ -3560,6 +3545,45 @@ void initializeWorld() {
     bubble->setAction(bubbleAction);
     // Bubble starts not in game - appears in certain puzzle conditions
     g.registerObject(ObjectIds::BUBBLE, std::move(bubble));
+    
+    // Create BELL (Brass bell in North Temple - 1dungeon.zil:164-170)
+    extern bool bellAction();
+    auto bell = std::make_unique<ZObject>(ObjectIds::BELL, "brass bell");
+    bell->addSynonym("bell");
+    bell->addAdjective("small");
+    bell->addAdjective("brass");
+    bell->setFlag(ObjectFlag::TAKEBIT);
+    bell->setAction(bellAction);
+    bell->moveTo(g.getObject(RoomIds::NORTH_TEMPLE));
+    g.registerObject(ObjectIds::BELL, std::move(bell));
+
+    // Create HOT_BELL (Red hot brass bell - 1dungeon.zil:172-178)
+    extern bool hotBellAction();
+    auto hotBell = std::make_unique<ZObject>(ObjectIds::HOT_BELL, "red hot brass bell");
+    hotBell->addSynonym("bell");
+    hotBell->addAdjective("brass");
+    hotBell->addAdjective("hot");
+    hotBell->addAdjective("red");
+    hotBell->addAdjective("small");
+    hotBell->setFlag(ObjectFlag::TRYTAKEBIT);
+    hotBell->setAction(hotBellAction);
+    hotBell->setLongDesc("On the ground is a red hot bell.");
+    g.registerObject(ObjectIds::HOT_BELL, std::move(hotBell));
+
+    // Create GHOSTS (Spirits in Entrance to Hades - 1dungeon.zil:109-115)
+    extern bool ghostsAction();
+    auto ghosts = std::make_unique<ZObject>(ObjectIds::GHOSTS, "number of ghosts");
+    ghosts->addSynonym("ghosts");
+    ghosts->addSynonym("spirits");
+    ghosts->addSynonym("fiends");
+    ghosts->addSynonym("force");
+    ghosts->addAdjective("invisible");
+    ghosts->addAdjective("evil");
+    ghosts->setFlag(ObjectFlag::ACTORBIT);
+    ghosts->setFlag(ObjectFlag::NDESCBIT);
+    ghosts->setAction(ghostsAction);
+    ghosts->moveTo(g.getObject(RoomIds::ENTRANCE_TO_HADES));
+    g.registerObject(ObjectIds::GHOSTS, std::move(ghosts));
     
     // Create YELLOW_BUTTON
     auto yellowButton = std::make_unique<ZObject>(ObjectIds::YELLOW_BUTTON, "yellow button");

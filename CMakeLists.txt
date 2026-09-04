@@ -225,6 +225,9 @@ if(BUILD_TESTS)
     # MIRROR-ROOM Tests (ZIL action verification)
     add_zork_test(MirrorRoomTests mirror_room_tests tests/mirror_room_tests.cpp)
 
+    # LLD-ROOM Tests (ZIL action verification)
+    add_zork_test(LLDRoomTests lld_room_tests tests/lld_room_tests.cpp)
+
     # GMAIN Tests (gmain.zil routines verification)
     add_zork_test(GMainTests gmain_tests tests/gmain_tests.cpp)
 

@@ -56,6 +56,8 @@ void Globals::reset() {
     deflate = false;
     domeFlag = false;
     lldFlag = false;
+    xb = false;
+    xc = false;
     lowTide = false;
     rainbowFlag = false;
     buoyFlag = true;

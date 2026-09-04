@@ -347,6 +347,140 @@ void mirrorRoom(int rarg) {
   }
 }
 
+// ZIL: LLD-ROOM (ACTION for ENTRANCE-TO-HADES)
+// Source: zil/1actions.zil:1058-1125
+void lldRoom(int rarg) {
+  auto &g = Globals::instance();
+
+  if (rarg == M_LOOK) {
+    printLine("You are outside a large gateway, on which is inscribed\n\n"
+              "  Abandon every hope\n"
+              "all ye who enter here!\n\n"
+              "The gate is open; through it you can see a desolation, with a pile of "
+              "mangled bodies in one corner. Thousands of voices, lamenting some "
+              "hideous fate, can be heard.");
+    if (!g.lldFlag && !DeathSystem::isDead()) {
+      printLine("The way through the gate is barred by evil spirits, who jeer at your "
+                "attempts to pass.");
+    }
+  } else if (rarg == M_BEG) {
+    if (g.prsa == V_EXORCISE) {
+      if (!g.lldFlag) {
+        auto *winner = g.winner ? g.winner : g.player;
+        auto *bell = g.getObject(ObjectIds::BELL);
+        auto *book = g.getObject(ObjectIds::BOOK);
+        auto *candles = g.getObject(ObjectIds::CANDLES);
+        if (bell && book && candles && winner &&
+            bell->getLocation() == winner &&
+            book->getLocation() == winner &&
+            candles->getLocation() == winner) {
+          printLine("You must perform the ceremony.");
+        } else {
+          printLine("You aren't equipped for an exorcism.");
+        }
+      }
+    } else if (!g.lldFlag && g.prsa == V_RING && g.prso &&
+               g.prso->getId() == ObjectIds::BELL) {
+      g.xb = true;
+      auto *bell = g.getObject(ObjectIds::BELL);
+      auto *hotBell = g.getObject(ObjectIds::HOT_BELL);
+      auto *candles = g.getObject(ObjectIds::CANDLES);
+      auto *winner = g.winner ? g.winner : g.player;
+
+      if (bell) {
+        Verbs::removeCarefully(bell);
+      }
+      if (hotBell) {
+        Verbs::thisIsIt(hotBell);
+        hotBell->moveTo(g.here);
+      }
+      printLine("The bell suddenly becomes red hot and falls to the ground. The "
+                "wraiths, as if paralyzed, stop their jeering and slowly turn to face "
+                "you. On their ashen faces, the expression of a long-forgotten terror "
+                "takes shape.");
+      if (candles && winner && candles->getLocation() == winner) {
+        printLine("In your confusion, the candles drop to the ground (and they are out).");
+        candles->moveTo(g.here);
+        candles->clearFlag(ObjectFlag::ONBIT);
+        CandleSystem::disableCandleTimer();
+      }
+      TimerSystem::TimerManager::instance().interrupt("I-XB", false, iXb);
+      TimerSystem::queue("I-XB", 6);
+      TimerSystem::enableTimer("I-XB");
+
+      TimerSystem::TimerManager::instance().interrupt("I-XBH", false, iXbh);
+      TimerSystem::queue("I-XBH", 20);
+      TimerSystem::enableTimer("I-XBH");
+    } else if (g.xc && g.prsa == V_READ && g.prso &&
+               g.prso->getId() == ObjectIds::BOOK && !g.lldFlag) {
+      printLine("Each word of the prayer reverberates through the hall in a deafening "
+                "confusion. As the last word fades, a voice, loud and commanding, "
+                "speaks: \"Begone, fiends!\" A heart-stopping scream fills the cavern, "
+                "and the spirits, sensing a greater power, flee through the walls.");
+      auto *ghosts = g.getObject(ObjectIds::GHOSTS);
+      if (ghosts) {
+        Verbs::removeCarefully(ghosts);
+      }
+      g.lldFlag = true;
+      TimerSystem::disableTimer("I-XC");
+    }
+  } else if (rarg == M_END) {
+    auto *candles = g.getObject(ObjectIds::CANDLES);
+    auto *winner = g.winner ? g.winner : g.player;
+    if (g.xb && candles && winner && candles->getLocation() == winner &&
+        candles->hasFlag(ObjectFlag::ONBIT) && !g.xc) {
+      g.xc = true;
+      printLine("The flames flicker wildly and appear to dance. The earth beneath "
+                "your feet trembles, and your legs nearly buckle beneath you. "
+                "The spirits cower at your unearthly power.");
+      TimerSystem::disableTimer("I-XB");
+      TimerSystem::TimerManager::instance().interrupt("I-XC", false, iXc);
+      TimerSystem::queue("I-XC", 3);
+      TimerSystem::enableTimer("I-XC");
+    }
+  }
+}
+
+// ZIL: I-XB
+// Source: zil/1actions.zil:1131-1137
+bool iXb() {
+  auto &g = Globals::instance();
+  if (!g.xc && g.here && g.here->getId() == RoomIds::ENTRANCE_TO_HADES) {
+    printLine("The tension of this ceremony is broken, and the wraiths, amused but "
+              "shaken at your clumsy attempt, resume their hideous jeering.");
+  }
+  g.xb = false;
+  return false;
+}
+
+// ZIL: I-XC
+// Source: zil/1actions.zil:1139-1141
+bool iXc() {
+  auto &g = Globals::instance();
+  g.xc = false;
+  return iXb();
+}
+
+// ZIL: I-XBH
+// Source: zil/1actions.zil:1143-1148
+bool iXbh() {
+  auto &g = Globals::instance();
+  auto *hotBell = g.getObject(ObjectIds::HOT_BELL);
+  auto *bell = g.getObject(ObjectIds::BELL);
+  auto *entranceToHades = g.getObject(RoomIds::ENTRANCE_TO_HADES);
+  if (hotBell) {
+    Verbs::removeCarefully(hotBell);
+  }
+  if (bell && entranceToHades) {
+    bell->moveTo(entranceToHades);
+  }
+  if (g.here && g.here->getId() == RoomIds::ENTRANCE_TO_HADES) {
+    printLine("The bell appears to have cooled down.");
+  }
+  return false;
+}
+
+
 void stoneBarrowAction(int rarg) {
   if (rarg == M_LOOK) {
     printLine("You are standing in front of a massive barrow of stone. In the "

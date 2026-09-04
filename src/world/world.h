@@ -20,8 +20,12 @@ void rivr4Room(int rarg);
 void treeRoom(int rarg);
 void forestRoom(int rarg);
 void mirrorRoom(int rarg);
+void lldRoom(int rarg);
 bool isForestRoom();
 bool iForestRoom();
+bool iXb();
+bool iXc();
+bool iXbh();
 
 // Helper routines
 void fweep(int n);
