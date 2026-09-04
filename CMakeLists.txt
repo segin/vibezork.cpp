@@ -180,6 +180,9 @@ if(BUILD_TESTS)
     # CHASM-PSEUDO Tests (ZIL action verification)
     add_zork_test(ChasmPseudoTests chasm_pseudo_tests tests/chasm_pseudo_tests.cpp)
 
+    # DOME-PSEUDO Tests (ZIL action verification)
+    add_zork_test(DomePseudoTests dome_pseudo_tests tests/dome_pseudo_tests.cpp)
+
     # GMAIN Tests (gmain.zil routines verification)
     add_zork_test(GMainTests gmain_tests tests/gmain_tests.cpp)
 

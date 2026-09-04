@@ -99,3 +99,17 @@ bool chasmPseudo() {
     }
     return RFALSE;
 }
+
+// ZIL: DOME-PSEUDO
+// Source: zil/1actions.zil:3203-3206
+// <ROUTINE DOME-PSEUDO ()
+// 	 <COND (<VERB? KISS>
+// 		<TELL "No." CR>)>>
+bool domePseudo() {
+    auto &g = Globals::instance();
+    if (g.prsa == V_KISS) {
+        printLine("No.");
+        return RTRUE;
+    }
+    return RFALSE;
+}

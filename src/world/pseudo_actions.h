@@ -13,3 +13,6 @@ bool streamPseudo();
 
 // ZIL: CHASM-PSEUDO (zil/1actions.zil:3191-3202)
 bool chasmPseudo();
+
+// ZIL: DOME-PSEUDO (zil/1actions.zil:3203-3206)
+bool domePseudo();
