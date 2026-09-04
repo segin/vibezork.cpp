@@ -81,6 +81,7 @@ A complete C++ port of the original Zork I source code (released as open source 
 | Score System | ✓ Complete | Points, ranks, treasure tracking |
 | Save/Restore | ✓ Complete | Full game state serialization |
 | Death System | ✓ Complete | Death handling and resurrection |
+| Global Systems (gglobals.zil) | ✓ Complete | Global objects (18), global variables, canonical routines |
 
 ### Game Content ✓
 

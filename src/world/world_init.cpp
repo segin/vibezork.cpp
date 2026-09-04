@@ -3,6 +3,7 @@
 #include "objects.h"
 #include "rooms.h"
 #include "world_objects.h"
+#include "core/gglobals.h"
 #include "core/globals.h"
 #include "core/io.h"
 #include "verbs/verbs.h"
@@ -3742,6 +3743,9 @@ void initializeWorld() {
     // Initialize tool objects
     void initializeTools(); // Forward declaration
     initializeTools();
+    
+    // Initialize global objects from gglobals.zil
+    GGlobals::initGlobalObjects(g);
 }
 
 

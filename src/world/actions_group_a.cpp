@@ -1,3 +1,4 @@
+#include "core/gglobals.h"
 #include "core/globals.h"
 #include "core/io.h"
 #include "core/object.h"
@@ -150,10 +151,9 @@ bool axeAction() {
   return weaponFunction(g.prso, troll);
 }
 
-// GRUE-FUNCTION - Called when player is in darkness
+// GRUE-FUNCTION - (gglobals.zil:191-206)
 bool grueAction() {
-  printLine("It is pitch black. You are likely to be eaten by a grue.");
-  return true;
+  return GGlobals::grueFunction();
 }
 
 // BARROW-DOOR-FCN - Barrow door is too heavy to open/close
@@ -337,74 +337,9 @@ bool crackAction() {
 }
 
 // CRETIN-FCN (handles "me", "self", "cretin")
-// CRETIN-FCN (handles "me", "self", "cretin")
-// ZIL: Handles TELL, GIVE, MAKE, DISEMBARK, EAT, ATTACK (Suicide), THROW, TAKE,
-// EXAMINE. Source: gglobals.zil lines 221-265
+// CRETIN-FCN (handles "me", "self", "cretin") - (gglobals.zil:221-265)
 bool cretinAction() {
-  auto &g = Globals::instance();
-
-  if (g.prsa == V_TELL) {
-    printLine("Talking to yourself is said to be a sign of impending mental "
-              "collapse.");
-    return RTRUE;
-  }
-
-  if (g.prsa == V_GIVE && g.prsi && g.prsi->getId() == g.player->getId()) {
-    // ZIL: PERFORM V?TAKE PRSO
-    // We can simulate validation or just print generic success?
-    // Correct way: Redirect to TAKE.
-    // For now, let's just claim it's taken or fail if complex.
-    // Given complexity of re-entrance, we return false to let 'TAKE' handler
-    // pick up? No, GIVE is the verb. We'll print "Done." or standard take
-    // message simulation if easy. Actually, easiest is to allow fallback or
-    // just not handle GIVE if redirect is hard. But ZIL *does* handle it. We'll
-    // skip complex GIVE for now and focus on output fidelity for others.
-    return RFALSE;
-  }
-
-  if (g.prsa == V_MAKE) {
-    printLine("Only you can do that.");
-    return RTRUE;
-  }
-
-  if (g.prsa == V_DISEMBARK) {
-    printLine("You'll have to do that on your own.");
-    return RTRUE;
-  }
-
-  if (g.prsa == V_EAT) {
-    printLine("Auto-cannibalism is not the answer.");
-    return RTRUE;
-  }
-
-  if (g.prsa == V_ATTACK || g.prsa == V_KILL || g.prsa == V_MUNG) {
-    if (g.prsi && g.prsi->hasFlag(ObjectFlag::WEAPONBIT)) {
-      printLine("If you insist.... Poof, you're dead!");
-      // TODO: Trigger JIGS-UP / Death
-    } else {
-      printLine("Suicide is not the answer.");
-    }
-    return RTRUE;
-  }
-
-  if (g.prsa == V_THROW && g.prso && g.prso->getId() == g.player->getId()) {
-    printLine("Why don't you just walk like normal people?");
-    return RTRUE;
-  }
-
-  if (g.prsa == V_TAKE) {
-    printLine("How romantic!");
-    return RTRUE;
-  }
-
-  if (g.prsa == V_EXAMINE) {
-    // Miror logic skipped for now (ZORK 1/3 specifics)
-    // Default:
-    printLine("That's difficult unless your eyes are prehensile.");
-    return RTRUE;
-  }
-
-  return RFALSE;
+  return GGlobals::cretinFcn();
 }
 
 // CYCLOPS-ROOM-FCN (Room action)
@@ -1766,33 +1701,21 @@ bool machineSwitchAction() {
   return false;
 }
 
-// NOT-HERE-OBJECT-F
+// NOT-HERE-OBJECT-F (gglobals.zil:52-74)
 bool notHereObjectAction() {
-  printLine("You can't see any such thing.");
-  return true;
+  return GGlobals::notHereObjectF();
 }
 
 // ZIL: PATH-OBJECT (gglobals.zil:282-288)
 // Handles TAKE/FOLLOW, FIND, DIG for PATHOBJ
 bool pathObjectAction() {
-  auto &g = Globals::instance();
-  if (g.prsa == V_TAKE || g.prsa == V_FOLLOW) {
-    printLine("You must specify a direction to go.");
-    return RTRUE;
-  }
-  if (g.prsa == V_FIND) {
-    printLine("I can't help you there....");
-    return RTRUE;
-  }
-  if (g.prsa == V_DIG) {
-    printLine("Not a chance.");
-    return RTRUE;
-  }
-  return RFALSE;
+  return GGlobals::pathObject();
 }
 
-// NULL-F (Does nothing, returns false)
-bool nullAction() { return false; }
+// NULL-F (gglobals.zil:85-87)
+bool nullAction() {
+  return GGlobals::nullF();
+}
 
 // PUTTY-FCN
 // PUTTY-FCN - Putty interactions
@@ -1925,10 +1848,9 @@ bool rustyKnifeAction() {
   return false;
 }
 
-// SAILOR-FCN
+// SAILOR-FCN (gglobals.zil:122-162)
 bool sailorAction() {
-  // Handles "Hello, Sailor!" easter egg
-  return false;
+  return GGlobals::sailorFcn();
 }
 
 // SAND-FUNCTION
@@ -1987,14 +1909,9 @@ void southTempleAction(int rarg) {
   // Stub
 }
 
-// STAIRS-F
+// STAIRS-F (gglobals.zil:110-113)
 bool stairsAction() {
-  auto &g = Globals::instance();
-  if (g.prsa == V_CLIMB_UP || g.prsa == V_CLIMB_DOWN) {
-    printLine("Use up or down instead.");
-    return true;
-  }
-  return false;
+  return GGlobals::stairsF();
 }
 
 // STILETTO-FUNCTION (Thief's knife)

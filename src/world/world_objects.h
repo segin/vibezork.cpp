@@ -1,6 +1,8 @@
 // World objects initialization - clean, consolidated object creation
 // Replaces the messy world_init.cpp + missing_objects.cpp pattern
 #pragma once
+#include "core/gglobals.h"
+#include "core/globals.h"
 
 // Forward declarations for object initialization functions
 void initializeTreasures();
@@ -25,6 +27,7 @@ void initializeMineRooms();
 
 // Master initialization function - call this to create all objects and rooms
 inline void initializeAllObjects() {
+    GGlobals::initGlobalObjects(Globals::instance());
     // Order matters: containers before items that go in them
     initializeContainers();
     initializeTreasures();

@@ -1,3 +1,4 @@
+#include "core/gglobals.h"
 #include "core/globals.h"
 #include "core/io.h"
 #include "systems/candle.h"
@@ -539,30 +540,9 @@ bool rugAction() {
   return RFALSE;
 }
 
-// Ground action - handles PUT X ON GROUND -> DROP (ZIL: GROUND-FUNCTION)
+// Ground action - (ZIL: GROUND-FUNCTION gglobals.zil:170-183)
 bool groundAction() {
-  auto &g = Globals::instance();
-
-  // PUT X ON/IN GROUND -> DROP X
-  if ((g.prsa == V_PUT || g.prsa == V_PUT_ON) && g.prsi &&
-      g.prsi->getId() == ObjectIds::GROUND) {
-    // Redirect to DROP
-    g.prsa = V_DROP;
-    g.prsi = nullptr;
-    return Verbs::vDrop();
-  }
-
-  if (g.prsa == V_DIG) {
-    printLine("The ground is too hard for digging here.");
-    return RTRUE;
-  }
-
-  if (g.prsa == V_EXAMINE) {
-    printLine("There's nothing special about the ground.");
-    return RTRUE;
-  }
-
-  return RFALSE;
+  return GGlobals::groundFunction();
 }
 
 // Global flag to track if window has been opened (per ZIL KITCHEN-WINDOW-FLAG)

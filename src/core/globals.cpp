@@ -79,6 +79,13 @@ void Globals::reset() {
     pSlocbits = 0;
     pGwimbit = 0;
     pItObject = nullptr;
+    loadMax = 100;
+    loadAllowed = 100;
+    hs = 0;
+    pXadjn.clear();
+    pXnam.clear();
+    pNc1.clear();
+    pNc2.clear();
     
     // Reset display modes to defaults (Requirement 65.5)
     verboseMode = true;

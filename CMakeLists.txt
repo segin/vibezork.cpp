@@ -185,5 +185,8 @@ if(BUILD_TESTS)
 
     # GSYNTAX Tests (gsyntax.zil syntax declarations, synonyms, buzzwords)
     add_zork_test(GSyntaxTests gsyntax_tests tests/gsyntax_tests.cpp)
+
+    # GGLOBALS Tests (gglobals.zil routines, variables, and global objects)
+    add_zork_test(GGlobalsTests gglobals_tests tests/gglobals_tests.cpp)
 endif()
 

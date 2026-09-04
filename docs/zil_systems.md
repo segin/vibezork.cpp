@@ -19,6 +19,7 @@ Scanned from `zil` files. (Generic ROUTINES).
 | CANT-USE | gparser.zil | Word syntax error | Reports unrecognized grammatical usage of word (gparser.zil:677-686) |
 | CAVE2-ROOM | 1actions.zil | | |
 | CCOUNT | gverbs.zil | Container item counter | Counts non-NDESC items within a container (gverbs.zil:273-275) |
+| CRETIN-FCN | gglobals.zil | Self / player pseudo handler | Handles TELL, GIVE, MAKE, DISEMBARK, EAT, ATTACK, THROW, TAKE, EXAMINE for player/self (gglobals.zil:221-265) |
 | CHAIN-PSEUDO | 1actions.zil | | |
 | CHASM-PSEUDO | 1actions.zil | | |
 | CLAUSE | gparser.zil | Noun clause scanner | Scans noun phrase tokens and records starting position in ITBL (gparser.zil:440-510) |
@@ -60,6 +61,8 @@ Scanned from `zil` files. (Generic ROUTINES).
 | GO | 1dungeon.zil | | |
 | GO-NEXT | 1actions.zil | | |
 | GOTO | gverbs.zil | Room movement engine | Moves winner, updates lighting/darkness, triggers M-ENTER & M-LOOK (gverbs.zil:733-772) |
+| GROUND-FUNCTION | gglobals.zil | Ground interaction handler | Handles PUT/PUT-ON redirecting to DROP, Sandy Cave sand handling, and digging (gglobals.zil:170-183) |
+| GRUE-FUNCTION | gglobals.zil | Grue examination & lore handler | Handles EXAMINE, FIND, and LISTEN for grue (gglobals.zil:191-206) |
 | GRATING-EXIT | 1dungeon.zil | | |
 | GWIM | gparser.zil | Contextual object inference | Infers unambiguous candidate matching required bits (gparser.zil:901-926) |
 | HACK-HACK | gverbs.zil | Boilerplate action handler | Prints boilerplate response for nonsensical commands (gverbs.zil:720-725) |
@@ -115,7 +118,9 @@ Scanned from `zil` files. (Generic ROUTINES).
 | NCLAUSE-WIN | gparser.zil | Noun orphan resolution | Merges completed noun phrase into pending orphan command (gparser.zil:645-653) |
 | NO-GO-TELL | gverbs.zil | Direction blocked printer | Displays message when direction has no exit (gverbs.zil:940-955) |
 | NO-OBJS | 1actions.zil | | |
-| NOT-HERE-PRINT | gglobals.zil | | |
+| NOT-HERE-OBJECT-F | gglobals.zil | Missing object error handler | Handles commands targeting non-present items with customized error messages (gglobals.zil:52-74) |
+| NOT-HERE-PRINT | gglobals.zil | Missing item name printer | Outputs missing noun phrase or orphan adjective/noun tokens (gglobals.zil:76-84) |
+| NULL-F | gglobals.zil | No-op false routine | Dummy routine taking optional arguments and always returning false (gglobals.zil:85-87) |
 | NUMBER? | gparser.zil | Number & time parser | Parses integers and HH:MM time expressions into P-NUMBER (gparser.zil:512-535) |
 | OBJ-FOUND | gparser.zil | Candidate match recorder | Appends resolved object to candidate table without duplicates (gparser.zil:1239-1242) |
 | OPEN-CLOSE | 1actions.zil | | |
@@ -125,7 +130,7 @@ Scanned from `zil` files. (Generic ROUTINES).
 | OTVAL-FROB | 1actions.zil | | |
 | PAINT-PSEUDO | 1actions.zil | | |
 | PARSER | gparser.zil | Master parser pipeline | Tokenizes and validates grammar, resolves objects, and directs action execution (gparser.zil:109-380) |
-| PATH-OBJECT | gglobals.zil | | |
+| PATH-OBJECT | gglobals.zil | Path / trail handler | Handles TAKE/FOLLOW, FIND, DIG for PATHOBJ (gglobals.zil:282-288) |
 | PERFORM | gmain.zil | Central action dispatch hierarchy | Resolves IT, sets PRSA/PRSO/PRSI, and executes 7-tier dispatch: Actor -> Room(M-BEG) -> Preactions -> PRSI -> Container -> PRSO -> Verb (gmain.zil:182-288) |
 | PICK-ONE | gmacros.zil | Non-repeating randomized cycle selector | Randomly samples without replacement until table exhausted, then restarts permutation cycle (gmacros.zil:127-140) |
 | PRE-BOARD | gverbs.zil | Boarding preaction | Validates vehicle location and player state before boarding (gverbs.zil:201-223) |
@@ -153,6 +158,7 @@ Scanned from `zil` files. (Generic ROUTINES).
 | RIVR4-ROOM | 1actions.zil | | |
 | ROB | 1actions.zil | | |
 | ROB-MAZE | 1actions.zil | | |
+| SAILOR-FCN | gglobals.zil | Sailor interaction handler | Handles TELL, EXAMINE, and HELLO Sailor counter progression (gglobals.zil:122-162) |
 | SCORE-OBJ | gverbs.zil | Object value scoring | Awards score points from object P?VALUE and clears value to 0 (gverbs.zil:1220-1234) |
 | SCORE-UPD | gverbs.zil | Score modification & win check | Adds points to player score and checks against SCORE-MAX for victory (gverbs.zil:1236-1248) |
 | SEARCH-LIST | gparser.zil | Containment hierarchy search | Recursively descends object containers matching search criteria (gparser.zil:1216-1237) |
@@ -163,6 +169,7 @@ Scanned from `zil` files. (Generic ROUTINES).
 | SNARF-OBJECTS | gparser.zil | Clause objects resolution | Resolves direct and indirect noun phrases for parser (gparser.zil:928-943) |
 | SNARFEM | gparser.zil | Noun phrase parser | Extracts nouns, adjectives, ALL, BUT, and coordinates from tokens (gparser.zil:978-1030) |
 | STEAL-JUNK | 1actions.zil | | |
+| STAIRS-F | gglobals.zil | Stairs navigation helper | Prompts player to specify up or down when moving THROUGH stairs (gglobals.zil:110-113) |
 | STOLE-LIGHT? | 1actions.zil | | |
 | STREAM-PSEUDO | 1actions.zil | | |
 | STUFF | gparser.zil | Lexv buffer transfer | Copies parsed token structures between parser lexv buffers (gparser.zil:387-399) |
@@ -199,6 +206,7 @@ Scanned from `zil` files. (Generic ROUTINES).
 | ZMEMQ | gparser.zil | Table membership check | Tests if item exists in vector or table (gparser.zil:1315-1322) |
 | ZMEMQB | gparser.zil | Byte table membership check | Tests if byte value exists in byte array (gparser.zil:1324-1329) |
 | ZPROB | gmacros.zil | Luck-weighted probability test | Rolls against 1-100 if lucky or 1-300 if unlucky (gmacros.zil:119-123) |
+| ZORKMID-FUNCTION | gglobals.zil | Currency examination handler | Handles EXAMINE and FIND for Zorkmid currency (gglobals.zil:296-302) |
 | BUZZ-TABLE | gsyntax.zil | Parser buzzwords table | 21 command and general buzzwords ignored by parser (gsyntax.zil:9-12) |
 | DIR-SYNONYMS | gsyntax.zil | Direction synonyms table | 10 direction synonym groups mapping abbreviations to canonical directions (gsyntax.zil:25-34) |
 | PREP-SYNONYMS | gsyntax.zil | Preposition synonyms table | 4 preposition synonym groups (with, in, on, under) (gsyntax.zil:20-23) |

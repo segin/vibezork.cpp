@@ -98,6 +98,15 @@ public:
   uint64_t pGwimbit = 0;   ///< ZIL: ,P-GWIMBIT (GWIM required bit)
   ZObject *pItObject = nullptr; ///< ZIL: ,P-IT-OBJECT (Pronoun IT target)
 
+  // gglobals.zil globals
+  int hs = 0;              ///< ZIL: ,HS (Hello sailor counter, gglobals.zil:137)
+
+  // gglobals.zil / gparser.zil orphan and clause buffers for NOT-HERE-PRINT
+  std::string pXadjn;      ///< ZIL: ,P-XADJN (Orphaned adjective word)
+  std::string pXnam;       ///< ZIL: ,P-XNAM (Orphaned noun word)
+  std::vector<std::string> pNc1; ///< ZIL: ,P-ITBL P-NC1 (Direct object noun phrase tokens)
+  std::vector<std::string> pNc2; ///< ZIL: ,P-ITBL P-NC2 (Indirect object noun phrase tokens)
+
   // Object registry - using unordered_map for O(1) lookup
   void registerObject(ObjectId id, std::unique_ptr<ZObject> obj);
   ZObject *getObject(ObjectId id);
