@@ -117,12 +117,11 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] DOOR-PSEUDO - Studio door pseudo-object (1actions.zil:3216-3221)
 - [x] PAINT-PSEUDO - Studio paint pseudo-object (1actions.zil:3222-3225)
 - [x] GAS-PSEUDO - Coal mine gas pseudo-object (1actions.zil:3226-3231)
-- [/] CHAIN-PSEUDO - Draft shaft chain pseudo-object (1actions.zil:4167-4174)
+- [x] CHAIN-PSEUDO - Draft shaft chain pseudo-object (1actions.zil:4167-4174)
 
 ## Progress
 - Total: 104 actions
-- Implemented: 103 / 104 (99.0% complete)
-- In Progress: 1 (CHAIN-PSEUDO)
+- Implemented: 104 / 104 (100% complete) ✅
 - Remaining: 0
 
 
