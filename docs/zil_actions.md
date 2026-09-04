@@ -123,7 +123,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] EAST-HOUSE - Behind House room handler (1actions.zil:17-26)
 - [x] CAVE2-ROOM - Cave room handler (1actions.zil:2416-2430)
 - [x] BOOM-ROOM - Gas room explosion handler (1actions.zil:2446-2467)
-- [ ] BATS-ROOM - Bats room handler (1actions.zil:2478-2486)
+- [/] BATS-ROOM - Bats room handler (1actions.zil:2478-2486)
 - [ ] FALLS-ROOM - Aragain Falls room handler (1actions.zil:2621-2632)
 - [ ] RIVR4-ROOM - River 4 buoy room handler (1actions.zil:2844-2853)
 - [ ] TREE-ROOM - Up a Tree room handler (1actions.zil:2880-2917)
@@ -134,7 +134,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 ## Progress
 - Total: 114 actions
 - Implemented: 107 / 114 (93.9% complete)
-- In Progress: 0
-- Remaining: 7
+- In Progress: 1 (BATS-ROOM)
+- Remaining: 6
 
 
