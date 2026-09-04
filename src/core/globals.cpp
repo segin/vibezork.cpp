@@ -69,6 +69,16 @@ void Globals::reset() {
     debug = false;
     clockWait = false;
     lucky = true;
+    pCont = false;
+    quoteFlag = false;
+    pOflag = false;
+    pMerged = false;
+    pNumber = 0;
+    pDirection = 0;
+    pGetFlags = 0;
+    pSlocbits = 0;
+    pGwimbit = 0;
+    pItObject = nullptr;
     
     // Reset display modes to defaults (Requirement 65.5)
     verboseMode = true;

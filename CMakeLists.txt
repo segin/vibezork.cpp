@@ -179,4 +179,7 @@ if(BUILD_TESTS)
 
     # GMACROS Tests (gmacros.zil macros and routines verification)
     add_zork_test(GMacrosTests gmacros_tests tests/gmacros_tests.cpp)
+
+    # GPARSER Tests (gparser.zil routines and tables verification)
+    add_zork_test(GParserTests gparser_tests tests/gparser_tests.cpp)
 endif()

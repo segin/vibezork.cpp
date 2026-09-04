@@ -90,7 +90,7 @@ The basic C++ framework is now working with:
 | gglobals.zil | 308 | core/globals | Partial |
 | gclock.zil | 60 | systems/timer.cpp | Done |
 | gmain.zil | 313 | main.cpp | Done |
-| gparser.zil | 1407 | parser/ | TODO |
+| gparser.zil | 1407 | parser/gparser.cpp | Done |
 | gverbs.zil | 2216 | verbs/ | Done |
 | 1actions.zil | 4177 | actions/ | TODO |
 

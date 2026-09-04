@@ -3789,6 +3789,7 @@ void tellNoPrsi() {
 void thisIsIt(ZObject *obj) {
   auto &g = Globals::instance();
   g.it = obj;
+  g.pItObject = obj;
 }
 
 // ZIL: <ROUTINE WEIGHT (OBJ "AUX" (CONT <FIRST? .OBJ>) (WT 0)) ...> (gverbs.zil:1475-1486)

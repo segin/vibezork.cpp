@@ -89,6 +89,14 @@ public:
   // Parser state
   bool pCont = false;
   bool quoteFlag = false;
+  bool pOflag = false;     ///< ZIL: ,P-OFLAG (Orphan flag)
+  bool pMerged = false;    ///< ZIL: ,P-MERGED (Merged sentence flag)
+  int pNumber = 0;         ///< ZIL: ,P-NUMBER (Numeric input value)
+  int pDirection = 0;      ///< ZIL: ,P-DIRECTION (Parsed direction)
+  int pGetFlags = 0;       ///< ZIL: ,P-GETFLAGS (P-ALL, P-ONE, P-INHIBIT)
+  int pSlocbits = 0;       ///< ZIL: ,P-SLOCBITS (Search location bits)
+  uint64_t pGwimbit = 0;   ///< ZIL: ,P-GWIMBIT (GWIM required bit)
+  ZObject *pItObject = nullptr; ///< ZIL: ,P-IT-OBJECT (Pronoun IT target)
 
   // Object registry - using unordered_map for O(1) lookup
   void registerObject(ObjectId id, std::unique_ptr<ZObject> obj);
