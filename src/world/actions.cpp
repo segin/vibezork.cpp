@@ -308,6 +308,30 @@ void treeRoom(int rarg) {
   }
 }
 
+// ZIL: FOREST-ROOM (ACTION for FOREST-1, FOREST-2, FOREST-3, PATH, CLEARING)
+// Source: zil/1actions.zil:3004-3009
+void forestRoom(int rarg) {
+  auto &g = Globals::instance();
+
+  if (rarg == M_ENTER) {
+    // ZIL: (<EQUAL? .RARG ,M-ENTER> <ENABLE <QUEUE I-FOREST-ROOM -1>>)
+    // Source: zil/1actions.zil:3005
+    TimerSystem::TimerManager::instance().registerTimer("I-FOREST-ROOM", 1, iForestRoom, true, true);
+    TimerSystem::TimerManager::instance().enableTimer("I-FOREST-ROOM");
+  } else if (rarg == M_BEG) {
+    // ZIL: (<AND <VERB? CLIMB-FOO CLIMB-UP> <EQUAL? ,PRSO ,TREE>> <DO-WALK ,P?UP>)
+    // Source: zil/1actions.zil:3007-3009
+    if ((g.prsa == V_CLIMB_FOO || g.prsa == V_CLIMB_UP) && (g.prso && g.prso->getId() == ObjectIds::TREE)) {
+      Verbs::doWalk(Direction::UP);
+      return;
+    }
+  } else if (rarg == M_LOOK) {
+    if (g.here && !g.here->getLongDesc().empty()) {
+      printLine(g.here->getLongDesc());
+    }
+  }
+}
+
 void stoneBarrowAction(int rarg) {
   if (rarg == M_LOOK) {
     printLine("You are standing in front of a massive barrow of stone. In the "

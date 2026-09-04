@@ -212,11 +212,7 @@ void initializeWorld() {
     forest1->setFlag(ObjectFlag::RLANDBIT);
     forest1->setFlag(ObjectFlag::ONBIT);
     forest1->setFlag(ObjectFlag::SACREDBIT);
-    forest1->setRoomAction([](int rarg) {
-        if (rarg == M_LOOK) {
-            printLine("This is a forest, with trees in all directions. To the east, there appears to be sunlight.");
-        }
-    });
+    forest1->setRoomAction(forestRoom);
     // Exits will be set up in forest navigation section
     forest1->setExit(Direction::UP, RoomExit("There is no tree here suitable for climbing."));
     forest1->setExit(Direction::WEST, RoomExit("You would need a machete to go further west."));
@@ -232,11 +228,7 @@ void initializeWorld() {
     forest2->setFlag(ObjectFlag::RLANDBIT);
     forest2->setFlag(ObjectFlag::ONBIT);
     forest2->setFlag(ObjectFlag::SACREDBIT);
-    forest2->setRoomAction([](int rarg) {
-        if (rarg == M_LOOK) {
-            printLine("This is a dimly lit forest, with large trees all around.");
-        }
-    });
+    forest2->setRoomAction(forestRoom);
     // Exits will be set up in forest navigation section
     forest2->setExit(Direction::UP, RoomExit("There is no tree here suitable for climbing."));
     forest2->setExit(Direction::NORTH, RoomExit("The forest becomes impenetrable to the north."));
@@ -252,11 +244,7 @@ void initializeWorld() {
     forest3->setFlag(ObjectFlag::RLANDBIT);
     forest3->setFlag(ObjectFlag::ONBIT);
     forest3->setFlag(ObjectFlag::SACREDBIT);
-    forest3->setRoomAction([](int rarg) {
-        if (rarg == M_LOOK) {
-            printLine("This is a dimly lit forest, with large trees all around.");
-        }
-    });
+    forest3->setRoomAction(forestRoom);
     // Exits will be set up in forest navigation section
     forest3->setExit(Direction::UP, RoomExit("There is no tree here suitable for climbing."));
     forest3->setExit(Direction::EAST, RoomExit("The rank undergrowth prevents eastward movement."));
@@ -296,11 +284,7 @@ void initializeWorld() {
     clearing->setFlag(ObjectFlag::RLANDBIT);
     clearing->setFlag(ObjectFlag::ONBIT);
     clearing->setFlag(ObjectFlag::SACREDBIT);
-    clearing->setRoomAction([](int rarg) {
-        if (rarg == M_LOOK) {
-            printLine("You are in a small clearing in a well marked forest path that extends to the east and west.");
-        }
-    });
+    clearing->setRoomAction(forestRoom);
     // Exits will be set up in forest navigation section
     clearing->setExit(Direction::UP, RoomExit("There is no tree here suitable for climbing."));
     clearing->setExit(Direction::EAST, RoomExit(RoomIds::CANYON_VIEW));
@@ -348,11 +332,7 @@ void initializeWorld() {
     forestPath->setFlag(ObjectFlag::RLANDBIT);
     forestPath->setFlag(ObjectFlag::ONBIT);
     forestPath->setFlag(ObjectFlag::SACREDBIT);
-    forestPath->setRoomAction([](int rarg) {
-        if (rarg == M_LOOK) {
-            printLine("This is a path winding through a dimly lit forest. The path heads north-south here. One particularly large tree with some low branches stands at the edge of the path.");
-        }
-    });
+    forestPath->setRoomAction(forestRoom);
     // Exits (ZIL: 1dungeon.zil:1363-1377)
     forestPath->setExit(Direction::UP, RoomExit(RoomIds::UP_A_TREE));
     forestPath->setExit(Direction::NORTH, RoomExit(RoomIds::GRATING_CLEARING));
