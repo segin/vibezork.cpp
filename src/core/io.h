@@ -16,7 +16,7 @@ void printLine(std::string_view str);
 void printDesc(const ZObject* obj);
 
 inline void crlf() {
-    std::cout << std::endl;
+    print("\n");
 }
 
 namespace detail {

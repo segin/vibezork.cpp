@@ -42,12 +42,27 @@ void southHouseAction(int rarg) {
   }
 }
 
+// ZIL: EAST-HOUSE (ACTION for BEHIND-HOUSE)
+// Source: zil/1actions.zil:17-26
 void behindHouseAction(int rarg) {
   if (rarg == M_LOOK) {
-    printLine("You are behind the white house. A path leads into the forest to "
-              "the east. In one corner of the house there is a small window "
-              "which is slightly ajar.");
+    auto &g = Globals::instance();
+    auto *kitchenWindow = g.getObject(ObjectIds::KITCHEN_WINDOW);
+    print("You are behind the white house. A path leads into the forest to "
+          "the east. In one corner of the house there is a small window "
+          "which is ");
+    if (kitchenWindow && kitchenWindow->hasFlag(ObjectFlag::OPENBIT)) {
+      print("open.");
+    } else {
+      print("slightly ajar.");
+    }
+    crlf();
   }
+}
+
+// Canonical ZIL routine alias
+void eastHouse(int rarg) {
+  behindHouseAction(rarg);
 }
 
 void stoneBarrowAction(int rarg) {

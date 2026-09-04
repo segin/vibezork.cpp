@@ -153,16 +153,26 @@ std::string executeCommand(const std::string& command) {
     return buffer.str();
 }
 
-// Helper to check if output contains expected text (case-insensitive)
+// Helper to check if output contains expected text (case-insensitive, whitespace-normalized)
 bool outputContains(const std::string& output, const std::string& expected) {
-    std::string lowerOutput = output;
-    std::string lowerExpected = expected;
-    
-    // Convert to lowercase
-    for (char& c : lowerOutput) c = std::tolower(c);
-    for (char& c : lowerExpected) c = std::tolower(c);
-    
-    return lowerOutput.find(lowerExpected) != std::string::npos;
+    auto normalize = [](const std::string& s) {
+        std::string norm;
+        bool inSpace = false;
+        for (char c : s) {
+            if (std::isspace(static_cast<unsigned char>(c))) {
+                if (!inSpace && !norm.empty()) {
+                    norm += ' ';
+                    inSpace = true;
+                }
+            } else {
+                norm += std::tolower(static_cast<unsigned char>(c));
+                inSpace = false;
+            }
+        }
+        return norm;
+    };
+
+    return normalize(output).find(normalize(expected)) != std::string::npos;
 }
 
 // Helper to run a transcript sequence

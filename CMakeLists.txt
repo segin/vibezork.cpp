@@ -198,6 +198,9 @@ if(BUILD_TESTS)
     # CHAIN-PSEUDO Tests (ZIL action verification)
     add_zork_test(ChainPseudoTests chain_pseudo_tests tests/chain_pseudo_tests.cpp)
 
+    # EAST-HOUSE Tests (ZIL action verification)
+    add_zork_test(EastHouseTests east_house_tests tests/east_house_tests.cpp)
+
     # GMAIN Tests (gmain.zil routines verification)
     add_zork_test(GMainTests gmain_tests tests/gmain_tests.cpp)
 
