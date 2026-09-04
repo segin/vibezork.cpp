@@ -188,3 +188,29 @@ bool gasPseudo() {
     }
     return RFALSE;
 }
+
+// ZIL: CHAIN-PSEUDO
+// Source: zil/1actions.zil:4167-4174
+// <ROUTINE CHAIN-PSEUDO ()
+// 	 <COND (<VERB? TAKE MOVE>
+// 		<TELL "The chain is secure." CR>)
+// 	       (<VERB? RAISE LOWER>
+// 		<TELL "Perhaps you should do that to the basket." CR>)
+// 	       (<VERB? EXAMINE>
+// 		<TELL "The chain secures a basket within the shaft." CR>)>>
+bool chainPseudo() {
+    auto &g = Globals::instance();
+    if (g.prsa == V_TAKE || g.prsa == V_MOVE) {
+        printLine("The chain is secure.");
+        return RTRUE;
+    }
+    if (g.prsa == V_RAISE || g.prsa == V_LOWER) {
+        printLine("Perhaps you should do that to the basket.");
+        return RTRUE;
+    }
+    if (g.prsa == V_EXAMINE) {
+        printLine("The chain secures a basket within the shaft.");
+        return RTRUE;
+    }
+    return RFALSE;
+}

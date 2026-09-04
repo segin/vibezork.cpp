@@ -28,3 +28,6 @@ bool paintPseudo();
 
 // ZIL: GAS-PSEUDO (zil/1actions.zil:3226-3231)
 bool gasPseudo();
+
+// ZIL: CHAIN-PSEUDO (zil/1actions.zil:4167-4174)
+bool chainPseudo();

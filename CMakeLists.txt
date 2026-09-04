@@ -195,6 +195,9 @@ if(BUILD_TESTS)
     # GAS-PSEUDO Tests (ZIL action verification)
     add_zork_test(GasPseudoTests gas_pseudo_tests tests/gas_pseudo_tests.cpp)
 
+    # CHAIN-PSEUDO Tests (ZIL action verification)
+    add_zork_test(ChainPseudoTests chain_pseudo_tests tests/chain_pseudo_tests.cpp)
+
     # GMAIN Tests (gmain.zil routines verification)
     add_zork_test(GMainTests gmain_tests tests/gmain_tests.cpp)
 
