@@ -113,3 +113,24 @@ bool domePseudo() {
     }
     return RFALSE;
 }
+
+// ZIL: GATE-PSEUDO
+// Source: zil/1actions.zil:3207-3215
+// <ROUTINE GATE-PSEUDO ()
+// 	 <COND (<VERB? THROUGH>
+// 		<DO-WALK ,P?IN>
+// 		<RTRUE>)
+// 	       (T
+// 		<TELL
+// "The gate is protected by an invisible force. It makes your
+// teeth ache to touch it." CR>)>>
+bool gatePseudo() {
+    auto &g = Globals::instance();
+    if (g.prsa == V_THROUGH) {
+        Verbs::doWalk(Direction::IN);
+        return RTRUE;
+    }
+    printLine("The gate is protected by an invisible force. It makes your "
+              "teeth ache to touch it.");
+    return RTRUE;
+}

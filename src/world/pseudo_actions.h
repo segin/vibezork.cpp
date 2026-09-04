@@ -16,3 +16,6 @@ bool chasmPseudo();
 
 // ZIL: DOME-PSEUDO (zil/1actions.zil:3203-3206)
 bool domePseudo();
+
+// ZIL: GATE-PSEUDO (zil/1actions.zil:3207-3215)
+bool gatePseudo();
