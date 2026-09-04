@@ -110,7 +110,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 ### Pseudo-Object Actions (1actions.zil)
 - [x] NAILS-PSEUDO - Nails in door (1actions.zil:376-380)
 - [x] LAKE-PSEUDO - Lake pseudo-object (1actions.zil:3177-3184)
-- [ ] STREAM-PSEUDO - Stream pseudo-object (1actions.zil:3185-3190)
+- [/] STREAM-PSEUDO - Stream pseudo-object (1actions.zil:3185-3190)
 - [ ] CHASM-PSEUDO - Chasm pseudo-object (1actions.zil:3191-3202)
 - [ ] DOME-PSEUDO - Dome pseudo-object (1actions.zil:3203-3206)
 - [ ] GATE-PSEUDO - Gate pseudo-object (1actions.zil:3207-3215)
@@ -122,6 +122,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 ## Progress
 - Total: 104 actions
 - Implemented: 96 / 104 (92.3% complete)
-- Remaining: 8
+- In Progress: 1 (STREAM-PSEUDO)
+- Remaining: 7
 
 
