@@ -40,7 +40,7 @@ The basic C++ framework is now working with:
 - [x] Mailbox object with action handler
 - [x] Global objects (WHITE-HOUSE, BOARD, FOREST)
 - [x] Remaining ~95 rooms
-- [/] Remaining ~145 objects
+- [x] Remaining ~145 objects
 
 ### Phase 4: Verbs (Next)
 - [ ] Convert gverbs.zil (~2200 lines)
