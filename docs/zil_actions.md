@@ -107,9 +107,22 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] STAIRS-F - Stairs navigation
 - [x] ZORKMID-FUNCTION - Zorkmid coin
 
+### Pseudo-Object Actions (1actions.zil)
+- [/] NAILS-PSEUDO - Nails in door (1actions.zil:376-380)
+- [ ] LAKE-PSEUDO - Lake pseudo-object (1actions.zil:3177-3184)
+- [ ] STREAM-PSEUDO - Stream pseudo-object (1actions.zil:3185-3190)
+- [ ] CHASM-PSEUDO - Chasm pseudo-object (1actions.zil:3191-3202)
+- [ ] DOME-PSEUDO - Dome pseudo-object (1actions.zil:3203-3206)
+- [ ] GATE-PSEUDO - Gate pseudo-object (1actions.zil:3207-3215)
+- [ ] DOOR-PSEUDO - Studio door pseudo-object (1actions.zil:3216-3221)
+- [ ] PAINT-PSEUDO - Studio paint pseudo-object (1actions.zil:3222-3225)
+- [ ] GAS-PSEUDO - Coal mine gas pseudo-object (1actions.zil:3226-3231)
+- [ ] CHAIN-PSEUDO - Draft shaft chain pseudo-object (1actions.zil:4167-4174)
+
 ## Progress
-- Total: 94 actions
-- Implemented: 94 / 94 (100% complete) ✅
-- Remaining: 0
+- Total: 104 actions
+- Implemented: 94 / 104 (90.4% complete)
+- In Progress: 1 (NAILS-PSEUDO)
+- Remaining: 9
 
 
