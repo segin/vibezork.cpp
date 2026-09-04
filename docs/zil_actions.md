@@ -108,7 +108,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 - [x] ZORKMID-FUNCTION - Zorkmid coin
 
 ### Pseudo-Object Actions (1actions.zil)
-- [/] NAILS-PSEUDO - Nails in door (1actions.zil:376-380)
+- [x] NAILS-PSEUDO - Nails in door (1actions.zil:376-380)
 - [ ] LAKE-PSEUDO - Lake pseudo-object (1actions.zil:3177-3184)
 - [ ] STREAM-PSEUDO - Stream pseudo-object (1actions.zil:3185-3190)
 - [ ] CHASM-PSEUDO - Chasm pseudo-object (1actions.zil:3191-3202)
@@ -121,8 +121,7 @@ Scanned from `zil` files. Track implementation progress for Object Action Routin
 
 ## Progress
 - Total: 104 actions
-- Implemented: 94 / 104 (90.4% complete)
-- In Progress: 1 (NAILS-PSEUDO)
+- Implemented: 95 / 104 (91.3% complete)
 - Remaining: 9
 
 
