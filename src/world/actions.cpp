@@ -170,6 +170,24 @@ void fallsRoom(int rarg) {
   }
 }
 
+// ZIL: RIVR4-ROOM (ACTION for RIVER-4)
+// Source: zil/1actions.zil:2844-2853
+void rivr4Room(int rarg) {
+  if (rarg == M_LOOK) {
+    printLine("The river is running faster here and the sound ahead appears to be "
+              "that of rushing water. On the east shore is a sandy beach. A small "
+              "area of beach can also be seen below the cliffs on the west shore.");
+  } else if (rarg == M_END) {
+    auto &g = Globals::instance();
+    auto *buoy = g.getObject(ObjectIds::BUOY);
+    auto *winner = g.winner ? g.winner : g.player;
+    if (buoy && buoy->getLocation() == winner && g.buoyFlag) {
+      printLine("You notice something funny about the feel of the buoy.");
+      g.buoyFlag = false;
+    }
+  }
+}
+
 void stoneBarrowAction(int rarg) {
   if (rarg == M_LOOK) {
     printLine("You are standing in front of a massive barrow of stone. In the "

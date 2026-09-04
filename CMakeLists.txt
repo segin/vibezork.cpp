@@ -213,6 +213,9 @@ if(BUILD_TESTS)
     # FALLS-ROOM Tests (ZIL action verification)
     add_zork_test(FallsRoomTests falls_room_tests tests/falls_room_tests.cpp)
 
+    # RIVR4-ROOM Tests (ZIL action verification)
+    add_zork_test(Rivr4RoomTests rivr4_room_tests tests/rivr4_room_tests.cpp)
+
     # GMAIN Tests (gmain.zil routines verification)
     add_zork_test(GMainTests gmain_tests tests/gmain_tests.cpp)
 

@@ -1464,16 +1464,7 @@ void initializeWorld() {
     river4->setFlag(ObjectFlag::NONLANDBIT);
     river4->setFlag(ObjectFlag::ONBIT);
     river4->setFlag(ObjectFlag::SACREDBIT);
-    river4->setRoomAction([](int rarg) {
-        if (rarg == M_END) {
-            auto& g = Globals::instance();
-            auto* buoy = g.getObject(ObjectIds::BUOY);
-            if (buoy && buoy->getLocation() == g.winner && g.buoyFlag) {
-                printLine("You notice something funny about the feel of the buoy.");
-                g.buoyFlag = false;
-            }
-        }
-    });
+    river4->setRoomAction(rivr4Room);
     river4->setExit(Direction::UP, RoomExit("You cannot go upstream due to strong currents."));
     river4->setExit(Direction::DOWN, RoomExit(RoomIds::RIVER_5));
     river4->setExit(Direction::LAND, RoomExit("You can land either to the east or the west."));
