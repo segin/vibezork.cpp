@@ -332,6 +332,21 @@ void forestRoom(int rarg) {
   }
 }
 
+// ZIL: MIRROR-ROOM (ACTION for MIRROR-ROOM-1, MIRROR-ROOM-2)
+// Source: zil/1actions.zil:958-966
+void mirrorRoom(int rarg) {
+  auto &g = Globals::instance();
+
+  if (rarg == M_LOOK) {
+    printLine("You are in a large square room with tall ceilings. On the south wall "
+              "is an enormous mirror which fills the entire wall. There are exits "
+              "on the other three sides of the room.");
+    if (g.mirrorMung) {
+      printLine("Unfortunately, the mirror has been destroyed by your recklessness.");
+    }
+  }
+}
+
 void stoneBarrowAction(int rarg) {
   if (rarg == M_LOOK) {
     printLine("You are standing in front of a massive barrow of stone. In the "
@@ -1768,9 +1783,8 @@ bool machineAction() {
   return RFALSE;
 }
 
-// Mirror action - shows different reflections
-// Based on MIRROR-OBJECT from 1actions.zil
-// Requirements: 42
+// ZIL: MIRROR-MIRROR (ACTION for MIRROR-1, MIRROR-2)
+// Source: zil/1actions.zil:971-1012
 bool mirrorAction() {
   auto &g = Globals::instance();
   bool isMirror = (g.prso && (g.prso->getId() == ObjectIds::MIRROR_1 ||
@@ -1778,28 +1792,63 @@ bool mirrorAction() {
   if (!isMirror)
     return RFALSE;
 
-  if (g.prsa == V_TAKE) {
-    printLine("The mirror is firmly attached to the wall.");
-    return RTRUE;
-  }
-  if (g.prsa == V_ATTACK) {
-    printLine("You have a nagging feeling that breaking the mirror would be "
-              "bad luck.");
-    return RTRUE;
-  }
-  if (g.prsa == V_EXAMINE) {
-    if (!g.lit) {
-      printLine("It's too dark to see your reflection.");
+  if (!g.mirrorMung && g.prsa == V_RUB) {
+    if (g.prsi && g.prsi->getId() != ObjectIds::HANDS) {
+      printLine(std::format("You feel a faint tingling transmitted through the {}.", g.prsi->getDesc()));
       return RTRUE;
     }
-    if (g.prso->getId() == ObjectIds::MIRROR_1)
-      printLine("You see yourself in the mirror. You look tired and dirty from "
-                "your adventures.");
-    else
-      printLine("You see yourself in the mirror, but something seems odd about "
-                "the reflection.");
+    ObjectId targetRoomId = (g.here && g.here->getId() == RoomIds::MIRROR_ROOM_2)
+                                ? RoomIds::MIRROR_ROOM_1
+                                : RoomIds::MIRROR_ROOM_2;
+    ZObject *rm2 = g.getObject(targetRoomId);
+    if (rm2 && g.here) {
+      auto hereContents = g.here->getContents();
+      auto rm2Contents = rm2->getContents();
+      for (auto *obj : hereContents) {
+        if (obj && obj->getId() != ObjectIds::MIRROR_1 && obj->getId() != ObjectIds::MIRROR_2) {
+          obj->moveTo(rm2);
+        }
+      }
+      for (auto *obj : rm2Contents) {
+        if (obj && obj->getId() != ObjectIds::MIRROR_1 && obj->getId() != ObjectIds::MIRROR_2) {
+          obj->moveTo(g.here);
+        }
+      }
+      if (g.winner) {
+        g.winner->moveTo(rm2);
+      }
+      g.here = rm2;
+      printLine("There is a rumble from deep within the earth and the room shakes.");
+      return RTRUE;
+    }
+  }
+
+  if (g.prsa == V_LOOK_INSIDE || g.prsa == V_EXAMINE) {
+    if (g.mirrorMung) {
+      printLine("The mirror is broken into many pieces.");
+    } else {
+      printLine("There is an ugly person staring back at you.");
+    }
     return RTRUE;
   }
+
+  if (g.prsa == V_TAKE) {
+    printLine("The mirror is many times your size. Give up.");
+    return RTRUE;
+  }
+
+  if (g.prsa == V_MUNG || g.prsa == V_THROW || g.prsa == V_ATTACK) {
+    if (g.mirrorMung) {
+      printLine("Haven't you done enough damage already?");
+    } else {
+      g.mirrorMung = true;
+      g.lucky = false;
+      printLine("You have broken the mirror. I hope you have a seven years' supply of");
+      printLine("good luck handy.");
+    }
+    return RTRUE;
+  }
+
   return RFALSE;
 }
 

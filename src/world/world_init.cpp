@@ -2375,11 +2375,7 @@ void initializeWorld() {
         "You are in a large square room with tall ceilings. On the south wall is an enormous mirror which fills the entire wall. There are exits on the other three sides of the room."
     );
     mirrorRoom1->setFlag(ObjectFlag::RLANDBIT);
-    mirrorRoom1->setRoomAction([](int rarg) {
-        if (rarg == M_LOOK) {
-            printLine("You are in a large square room with tall ceilings. On the south wall is an enormous mirror which fills the entire wall. There are exits on the other three sides of the room.");
-        }
-    });
+    mirrorRoom1->setRoomAction(mirrorRoom);
     mirrorRoom1->setExit(Direction::NORTH, RoomExit(RoomIds::COLD_PASSAGE));
     mirrorRoom1->setExit(Direction::WEST, RoomExit(RoomIds::TWISTING_PASSAGE));
     mirrorRoom1->setExit(Direction::EAST, RoomExit(RoomIds::SMALL_CAVE));
@@ -2393,11 +2389,7 @@ void initializeWorld() {
     );
     mirrorRoom2->setFlag(ObjectFlag::RLANDBIT);
     mirrorRoom2->setFlag(ObjectFlag::ONBIT);
-    mirrorRoom2->setRoomAction([](int rarg) {
-        if (rarg == M_LOOK) {
-            printLine("You are in a large square room with tall ceilings. On the south wall is an enormous mirror which fills the entire wall. There are exits on the other three sides of the room.");
-        }
-    });
+    mirrorRoom2->setRoomAction(mirrorRoom);
     mirrorRoom2->setExit(Direction::WEST, RoomExit(RoomIds::WINDING_PASSAGE));
     mirrorRoom2->setExit(Direction::NORTH, RoomExit(RoomIds::NARROW_PASSAGE));
     mirrorRoom2->setExit(Direction::EAST, RoomExit(RoomIds::TINY_CAVE));

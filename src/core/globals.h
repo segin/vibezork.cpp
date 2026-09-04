@@ -85,6 +85,7 @@ public:
   bool debug = false;      ///< ZIL: ,DEBUG (Debug execution trace)
   bool clockWait = false;  ///< ZIL: ,CLOCK-WAIT (Skip clocker tick for one turn)
   bool lucky = true;       ///< ZIL: ,LUCKY (Luck status flag, gmacros.zil:121)
+  bool mirrorMung = false; ///< ZIL: ,MIRROR-MUNG (1actions.zil:968)
 
   // Parser state
   bool pCont = false;
