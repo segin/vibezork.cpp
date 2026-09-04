@@ -134,3 +134,23 @@ bool gatePseudo() {
               "teeth ache to touch it.");
     return RTRUE;
 }
+
+// ZIL: DOOR-PSEUDO
+// Source: zil/1actions.zil:3216-3221
+// <ROUTINE DOOR-PSEUDO () ;"in Studio"
+// 	 <COND (<VERB? OPEN CLOSE>
+// 		<TELL "The door won't budge." CR>)
+// 	       (<VERB? THROUGH>
+// 		<DO-WALK ,P?SOUTH>)>>
+bool doorPseudo() {
+    auto &g = Globals::instance();
+    if (g.prsa == V_OPEN || g.prsa == V_CLOSE) {
+        printLine("The door won't budge.");
+        return RTRUE;
+    }
+    if (g.prsa == V_THROUGH) {
+        Verbs::doWalk(Direction::SOUTH);
+        return RTRUE;
+    }
+    return RFALSE;
+}

@@ -186,6 +186,9 @@ if(BUILD_TESTS)
     # GATE-PSEUDO Tests (ZIL action verification)
     add_zork_test(GatePseudoTests gate_pseudo_tests tests/gate_pseudo_tests.cpp)
 
+    # DOOR-PSEUDO Tests (ZIL action verification)
+    add_zork_test(DoorPseudoTests door_pseudo_tests tests/door_pseudo_tests.cpp)
+
     # GMAIN Tests (gmain.zil routines verification)
     add_zork_test(GMainTests gmain_tests tests/gmain_tests.cpp)
 

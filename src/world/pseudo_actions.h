@@ -19,3 +19,6 @@ bool domePseudo();
 
 // ZIL: GATE-PSEUDO (zil/1actions.zil:3207-3215)
 bool gatePseudo();
+
+// ZIL: DOOR-PSEUDO (zil/1actions.zil:3216-3221)
+bool doorPseudo();
