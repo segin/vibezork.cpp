@@ -154,3 +154,17 @@ bool doorPseudo() {
     }
     return RFALSE;
 }
+
+// ZIL: PAINT-PSEUDO
+// Source: zil/1actions.zil:3222-3225
+// <ROUTINE PAINT-PSEUDO ()
+// 	 <COND (<VERB? MUNG>
+// 		<TELL "Some paint chips away, revealing more paint." CR>)>>
+bool paintPseudo() {
+    auto &g = Globals::instance();
+    if (g.prsa == V_MUNG) {
+        printLine("Some paint chips away, revealing more paint.");
+        return RTRUE;
+    }
+    return RFALSE;
+}

@@ -22,3 +22,6 @@ bool gatePseudo();
 
 // ZIL: DOOR-PSEUDO (zil/1actions.zil:3216-3221)
 bool doorPseudo();
+
+// ZIL: PAINT-PSEUDO (zil/1actions.zil:3222-3225)
+bool paintPseudo();

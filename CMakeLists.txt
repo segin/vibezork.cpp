@@ -189,6 +189,9 @@ if(BUILD_TESTS)
     # DOOR-PSEUDO Tests (ZIL action verification)
     add_zork_test(DoorPseudoTests door_pseudo_tests tests/door_pseudo_tests.cpp)
 
+    # PAINT-PSEUDO Tests (ZIL action verification)
+    add_zork_test(PaintPseudoTests paint_pseudo_tests tests/paint_pseudo_tests.cpp)
+
     # GMAIN Tests (gmain.zil routines verification)
     add_zork_test(GMainTests gmain_tests tests/gmain_tests.cpp)
 
