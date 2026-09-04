@@ -3,6 +3,7 @@
 #include "objects.h"
 #include "rooms.h"
 #include "world_objects.h"
+#include "dungeon.h"
 #include "core/gglobals.h"
 #include "core/globals.h"
 #include "core/io.h"
@@ -14,6 +15,7 @@
 // Forward declarations for action handlers (defined in actions.cpp)
 extern bool wonFlag;
 void westHouseAction(int rarg);
+void trollRoomAction(int rarg);
 void northHouseAction(int rarg);
 void southHouseAction(int rarg);
 void behindHouseAction(int rarg);
@@ -84,7 +86,21 @@ void initializeWorld() {
     westOfHouse->setExit(Direction::SE, RoomExit(ROOM_SOUTH_OF_HOUSE));
     westOfHouse->setExit(Direction::WEST, RoomExit(ROOM_FOREST_1));
     westOfHouse->setExit(Direction::EAST, RoomExit("The door is boarded and you can't remove the boards."));
-    // SW and IN to STONE_BARROW require WON-FLAG - will be handled by conditional exits later
+    // ZIL: (SW TO STONE-BARROW IF WON-FLAG), (IN TO STONE-BARROW IF WON-FLAG)
+    // Source: zil/1dungeon.zil:1248-1249
+    westOfHouse->setExit(Direction::SW, RoomExit::createConditional(
+        RoomIds::STONE_BARROW,
+        []() { return Globals::instance().wonFlag; }
+    ));
+    westOfHouse->setExit(Direction::IN, RoomExit::createConditional(
+        RoomIds::STONE_BARROW,
+        []() { return Globals::instance().wonFlag; }
+    ));
+    
+    // ZIL: (GLOBAL WHITE-HOUSE BOARD FOREST) (1dungeon.zil:1252)
+    westOfHouse->addGlobal(ObjectIds::WHITE_HOUSE);
+    westOfHouse->addGlobal(ObjectIds::BOARD);
+    westOfHouse->addGlobal(ObjectIds::FOREST);
     
     g.here = westOfHouse.get();
     g.registerObject(ROOM_WEST_OF_HOUSE, std::move(westOfHouse));
@@ -108,6 +124,11 @@ void initializeWorld() {
     northOfHouse->setExit(Direction::NORTH, RoomExit(RoomIds::FOREST_PATH));  // Path to forest
     northOfHouse->setExit(Direction::SOUTH, RoomExit("The windows are all boarded."));
     
+    // ZIL: (GLOBAL WHITE-HOUSE BOARD FOREST) (1dungeon.zil:1275)
+    northOfHouse->addGlobal(ObjectIds::WHITE_HOUSE);
+    northOfHouse->addGlobal(ObjectIds::BOARD);
+    northOfHouse->addGlobal(ObjectIds::FOREST);
+    
     g.registerObject(ROOM_NORTH_OF_HOUSE, std::move(northOfHouse));
     
     // Create South of House room
@@ -129,6 +150,11 @@ void initializeWorld() {
     southOfHouse->setExit(Direction::SOUTH, RoomExit(RoomIds::FOREST_3));  // Forest to south
     southOfHouse->setExit(Direction::NORTH, RoomExit("The windows are all boarded."));
     
+    // ZIL: (GLOBAL WHITE-HOUSE BOARD FOREST) (1dungeon.zil:1313)
+    southOfHouse->addGlobal(ObjectIds::WHITE_HOUSE);
+    southOfHouse->addGlobal(ObjectIds::BOARD);
+    southOfHouse->addGlobal(ObjectIds::FOREST);
+    
     g.registerObject(ROOM_SOUTH_OF_HOUSE, std::move(southOfHouse));
     
     // Create Behind House room (EAST_OF_HOUSE in ZIL)
@@ -142,14 +168,21 @@ void initializeWorld() {
     behindHouse->setFlag(ObjectFlag::SACREDBIT);
     behindHouse->setRoomAction(behindHouseAction);
     
-    // Set up exits
+    // Set up exits (ZIL: 1dungeon.zil:1316-1327)
     behindHouse->setExit(Direction::NORTH, RoomExit(ROOM_NORTH_OF_HOUSE));
     behindHouse->setExit(Direction::SOUTH, RoomExit(ROOM_SOUTH_OF_HOUSE));
     behindHouse->setExit(Direction::SW, RoomExit(ROOM_SOUTH_OF_HOUSE));
     behindHouse->setExit(Direction::NW, RoomExit(ROOM_NORTH_OF_HOUSE));
     behindHouse->setExit(Direction::EAST, RoomExit(RoomIds::CLEARING));
-    behindHouse->setExit(Direction::WEST, RoomExit(RoomIds::KITCHEN));  // Through window
-    behindHouse->setExit(Direction::IN, RoomExit(RoomIds::KITCHEN));  // Through window
+    behindHouse->setExit(Direction::NE, RoomExit(RoomIds::CLEARING));
+    behindHouse->setExit(Direction::SE, RoomExit(RoomIds::CLEARING));
+    behindHouse->setExit(Direction::WEST, RoomExit::createDoor(RoomIds::KITCHEN, ObjectIds::KITCHEN_WINDOW));
+    behindHouse->setExit(Direction::IN, RoomExit::createDoor(RoomIds::KITCHEN, ObjectIds::KITCHEN_WINDOW));
+    
+    // ZIL: (GLOBAL WHITE-HOUSE KITCHEN-WINDOW FOREST) (1dungeon.zil:1327)
+    behindHouse->addGlobal(ObjectIds::WHITE_HOUSE);
+    behindHouse->addGlobal(ObjectIds::KITCHEN_WINDOW);
+    behindHouse->addGlobal(ObjectIds::FOREST);
     
     g.registerObject(ROOM_EAST_OF_HOUSE, std::move(behindHouse));
     
@@ -291,12 +324,18 @@ void initializeWorld() {
             printLine("You are in a clearing, with a forest surrounding you on all sides. A path leads south.");
         }
     });
-    // Exits will be set up in forest navigation section
+    // Exits (ZIL: 1dungeon.zil:1388-1398)
     gratingClearing->setExit(Direction::NORTH, RoomExit("The forest becomes impenetrable to the north."));
-    gratingClearing->setExit(Direction::EAST, RoomExit(RoomIds::FOREST_2));
+    gratingClearing->setExit(Direction::EAST, RoomExit(RoomIds::CANYON_VIEW));
     gratingClearing->setExit(Direction::WEST, RoomExit(RoomIds::FOREST_1));
+    gratingClearing->setExit(Direction::SW, RoomExit(RoomIds::FOREST_2));
     gratingClearing->setExit(Direction::SOUTH, RoomExit(RoomIds::FOREST_PATH));
-    // DOWN to underground will be added when grating is implemented
+    // ZIL: (DOWN PER GRATING-EXIT) (1dungeon.zil:1395)
+    gratingClearing->setExit(Direction::DOWN, RoomExit::createProcedural(Dungeon::gratingExit));
+    
+    // ZIL: (GLOBAL WHITE-HOUSE GRATE) (1dungeon.zil:1398)
+    gratingClearing->addGlobal(ObjectIds::WHITE_HOUSE);
+    gratingClearing->addGlobal(ObjectIds::GRATE);
     
     g.registerObject(RoomIds::GRATING_CLEARING, std::move(gratingClearing));
     
@@ -314,12 +353,18 @@ void initializeWorld() {
             printLine("This is a path winding through a dimly lit forest. The path heads north-south here. One particularly large tree with some low branches stands at the edge of the path.");
         }
     });
-    // Exits will be set up in forest navigation section
+    // Exits (ZIL: 1dungeon.zil:1363-1377)
     forestPath->setExit(Direction::UP, RoomExit(RoomIds::UP_A_TREE));
     forestPath->setExit(Direction::NORTH, RoomExit(RoomIds::GRATING_CLEARING));
     forestPath->setExit(Direction::EAST, RoomExit(RoomIds::FOREST_2));
     forestPath->setExit(Direction::SOUTH, RoomExit(ROOM_NORTH_OF_HOUSE));
     forestPath->setExit(Direction::WEST, RoomExit(RoomIds::FOREST_1));
+    
+    // ZIL: (GLOBAL TREE SONGBIRD WHITE-HOUSE FOREST) (1dungeon.zil:1377)
+    forestPath->addGlobal(ObjectIds::TREE);
+    forestPath->addGlobal(ObjectIds::SONGBIRD);
+    forestPath->addGlobal(ObjectIds::WHITE_HOUSE);
+    forestPath->addGlobal(ObjectIds::FOREST);
     
     g.registerObject(RoomIds::FOREST_PATH, std::move(forestPath));
     
@@ -340,6 +385,12 @@ void initializeWorld() {
     upATree->setExit(Direction::UP, RoomExit("You cannot climb any higher."));
     upATree->setExit(Direction::DOWN, RoomExit(RoomIds::FOREST_PATH));
     
+    // ZIL: (GLOBAL TREE FOREST SONGBIRD WHITE-HOUSE) (1dungeon.zil:1386)
+    upATree->addGlobal(ObjectIds::TREE);
+    upATree->addGlobal(ObjectIds::FOREST);
+    upATree->addGlobal(ObjectIds::SONGBIRD);
+    upATree->addGlobal(ObjectIds::WHITE_HOUSE);
+    
     g.registerObject(RoomIds::UP_A_TREE, std::move(upATree));
     
     // Create Canyon View room
@@ -351,17 +402,19 @@ void initializeWorld() {
     canyonView->setFlag(ObjectFlag::RLANDBIT);
     canyonView->setFlag(ObjectFlag::ONBIT);
     canyonView->setFlag(ObjectFlag::SACREDBIT);
-    canyonView->setRoomAction([](int rarg) {
-        if (rarg == M_LOOK) {
-            printLine("You are at the top of the Great Canyon on its west wall. From here there is a marvelous view of the canyon and parts of the Frigid River upstream. Across the canyon, the walls of the White Cliffs join the mighty ramparts of the Flathead Mountains to the east. Following the Canyon upstream to the north, Aragain Falls may be seen, complete with rainbow. The mighty Frigid River flows out from a great dark cavern. To the west and south can be seen an immense forest, stretching for miles around. A path leads northwest.");
-        }
-    });
+    // ZIL: (ACTION CANYON-VIEW-F) (1dungeon.zil:2404-2411)
+    canyonView->setRoomAction(Dungeon::canyonViewRoomAction);
     canyonView->setExit(Direction::WEST, RoomExit(RoomIds::FOREST_3));
-    canyonView->setExit(Direction::SOUTH, RoomExit(RoomIds::FOREST_3));
+    canyonView->setExit(Direction::SOUTH, RoomExit("Storm-tossed trees block your way."));
     canyonView->setExit(Direction::NW, RoomExit(RoomIds::CLEARING));
     canyonView->setExit(Direction::DOWN, RoomExit(RoomIds::CLIFF_MIDDLE));
     canyonView->setExit(Direction::NORTH, RoomExit("The canyon is too wide to cross."));
     canyonView->setExit(Direction::EAST, RoomExit("The canyon is too wide to cross."));
+    
+    // ZIL: (GLOBAL CLIMBABLE-CLIFF RIVER RAINBOW) (1dungeon.zil:2403)
+    canyonView->addGlobal(ObjectIds::CLIMBABLE_CLIFF);
+    canyonView->addGlobal(ObjectIds::RIVER);
+    canyonView->addGlobal(ObjectIds::RAINBOW);
     
     g.registerObject(RoomIds::CANYON_VIEW, std::move(canyonView));
     
@@ -382,10 +435,19 @@ void initializeWorld() {
         }
     });
     
-    // Set up exits for Living Room
+    // Set up exits for Living Room (ZIL: 1dungeon.zil:1449-1460)
     livingRoom->setExit(Direction::EAST, RoomExit(RoomIds::KITCHEN));
-    livingRoom->setExit(Direction::WEST, RoomExit("The door is nailed shut."));
-    livingRoom->setExit(Direction::DOWN, RoomExit(RoomIds::CELLAR));  // Through trap door (will need rug moved)
+    // ZIL: (WEST TO STRANGE-PASSAGE IF MAGIC-FLAG ELSE "The door is nailed shut.") (1dungeon.zil:1455)
+    livingRoom->setExit(Direction::WEST, RoomExit::createConditional(
+        RoomIds::STRANGE_PASSAGE,
+        []() { return Globals::instance().magicFlag; },
+        "The door is nailed shut."
+    ));
+    // ZIL: (DOWN PER TRAP-DOOR-EXIT) (1dungeon.zil:1456)
+    livingRoom->setExit(Direction::DOWN, RoomExit::createProcedural(Dungeon::trapDoorExit));
+    
+    // ZIL: (GLOBAL STAIRS) (1dungeon.zil:1460)
+    livingRoom->addGlobal(ObjectIds::STAIRS);
     
     g.registerObject(RoomIds::LIVING_ROOM, std::move(livingRoom));
     
@@ -404,12 +466,22 @@ void initializeWorld() {
         }
     });
     
-    // Set up exits for Kitchen
+    // Set up exits for Kitchen (ZIL: 1dungeon.zil:1429-1442)
     kitchen->setExit(Direction::WEST, RoomExit(RoomIds::LIVING_ROOM));
-    kitchen->setExit(Direction::EAST, RoomExit(ROOM_EAST_OF_HOUSE));  // Through window
-    kitchen->setExit(Direction::OUT, RoomExit(ROOM_EAST_OF_HOUSE));   // Through window (go out)
+    kitchen->setExit(Direction::EAST, RoomExit::createDoor(ROOM_EAST_OF_HOUSE, ObjectIds::KITCHEN_WINDOW));
+    kitchen->setExit(Direction::OUT, RoomExit::createDoor(ROOM_EAST_OF_HOUSE, ObjectIds::KITCHEN_WINDOW));
     kitchen->setExit(Direction::UP, RoomExit(RoomIds::ATTIC));
-    kitchen->setExit(Direction::DOWN, RoomExit("Only Santa Claus climbs down chimneys."));
+    // ZIL: (DOWN TO STUDIO IF FALSE-FLAG ELSE "Only Santa Claus climbs down chimneys.") (1dungeon.zil:1438)
+    kitchen->setExit(Direction::DOWN, RoomExit::createConditional(
+        RoomIds::STUDIO,
+        []() { return false; },
+        "Only Santa Claus climbs down chimneys."
+    ));
+    
+    // ZIL: (GLOBAL KITCHEN-WINDOW STAIRS CHIMNEY) (1dungeon.zil:1442)
+    kitchen->addGlobal(ObjectIds::KITCHEN_WINDOW);
+    kitchen->addGlobal(ObjectIds::STAIRS);
+    kitchen->addGlobal(ObjectIds::CHIMNEY);
     
     kitchen->setAction(kitchenAction);
     g.registerObject(RoomIds::KITCHEN, std::move(kitchen));
@@ -429,8 +501,10 @@ void initializeWorld() {
         }
     });
     
-    // Set up exits for Attic
+    // Set up exits for Attic (ZIL: 1dungeon.zil:1444-1447)
     attic->setExit(Direction::DOWN, RoomExit(RoomIds::KITCHEN));
+    // ZIL: (GLOBAL STAIRS) (1dungeon.zil:1447)
+    attic->addGlobal(ObjectIds::STAIRS);
     
     g.registerObject(RoomIds::ATTIC, std::move(attic));
     
@@ -449,12 +523,22 @@ void initializeWorld() {
         }
     });
     
-    // Set up exits for Cellar
-    cellar->setExit(Direction::NORTH, RoomExit(RoomIds::TROLL_ROOM));  // To underground
+    // Set up exits for Cellar (ZIL: 1dungeon.zil:1475-1486)
+    cellar->setExit(Direction::NORTH, RoomExit(RoomIds::TROLL_ROOM));
     cellar->setExit(Direction::SOUTH, RoomExit("The crawlway is too small to enter."));
     cellar->setExit(Direction::WEST, RoomExit("The ramp is too steep to climb."));
-    cellar->setExit(Direction::UP, RoomExit(RoomIds::LIVING_ROOM));  // Through trap door
-    cellar->setExit(Direction::EAST, RoomExit(RoomIds::TROLL_ROOM));  // Alternative to north
+    // ZIL: (UP TO LIVING-ROOM IF TRAP-DOOR IS OPEN) (1dungeon.zil:1481)
+    cellar->setExit(Direction::UP, RoomExit::createConditional(
+        RoomIds::LIVING_ROOM,
+        []() {
+            auto* trap = Globals::instance().getObject(ObjectIds::TRAP_DOOR);
+            return trap && trap->hasFlag(ObjectFlag::OPENBIT);
+        },
+        "The trap door is closed."
+    ));
+    
+    // ZIL: (GLOBAL TRAP-DOOR) (1dungeon.zil:1486)
+    cellar->addGlobal(ObjectIds::TRAP_DOOR);
     
     g.registerObject(RoomIds::CELLAR, std::move(cellar));
     
@@ -494,9 +578,13 @@ void initializeWorld() {
         }
     });
     
-    // Set up exits for Studio
+    // Set up exits for Studio (ZIL: 1dungeon.zil:1526-1532)
     studio->setExit(Direction::SOUTH, RoomExit(RoomIds::GALLERY));
-    studio->setExit(Direction::UP, RoomExit("The chimney is too narrow and sooty."));
+    // ZIL: (UP PER UP-CHIMNEY-FUNCTION) (1dungeon.zil:1529)
+    studio->setExit(Direction::UP, RoomExit::createProcedural(Dungeon::upChimneyFunction));
+    
+    // ZIL: (GLOBAL CHIMNEY) (1dungeon.zil:1532)
+    studio->addGlobal(ObjectIds::CHIMNEY);
     
     g.registerObject(RoomIds::STUDIO, std::move(studio));
     
@@ -525,26 +613,18 @@ void initializeWorld() {
     // Set up exits for Troll Room
     trollRoom->setExit(Direction::SOUTH, RoomExit(RoomIds::CELLAR));
     
-    // East and West exits are blocked by troll until he's defeated
-    // Use conditional exits that check if troll is dead
-    trollRoom->setExit(Direction::EAST, RoomExit::createConditional(
-        RoomIds::EW_PASSAGE,
-        []() {
-            ZObject* troll = Globals::instance().getObject(ObjectIds::TROLL);
-            return !troll || troll->hasFlag(ObjectFlag::DEADBIT) || 
-                   !NPCSystem::isTrollActive();
-        },
-        "The troll blocks your way."
-    ));
-    trollRoom->setExit(Direction::WEST, RoomExit::createConditional(
-        RoomIds::MAZE_1,
-        []() {
-            ZObject* troll = Globals::instance().getObject(ObjectIds::TROLL);
-            return !troll || troll->hasFlag(ObjectFlag::DEADBIT) || 
-                   !NPCSystem::isTrollActive();
-        },
-        "The troll blocks your way."
-    ));
+    // East and West exits are blocked by troll until he's defeated (ZIL: 1dungeon.zil:1534-1544)
+    auto trollExitCond = []() {
+        auto& g = Globals::instance();
+        ZObject* troll = g.getObject(ObjectIds::TROLL);
+        return g.trollFlag || !troll || troll->hasFlag(ObjectFlag::DEADBIT) || !NPCSystem::isTrollActive();
+    };
+    const std::string trollExitMsg = "The troll fends you off with a menacing gesture.";
+    trollRoom->setExit(Direction::EAST, RoomExit::createConditional(RoomIds::EW_PASSAGE, trollExitCond, trollExitMsg));
+    trollRoom->setExit(Direction::WEST, RoomExit::createConditional(RoomIds::MAZE_1, trollExitCond, trollExitMsg));
+    
+    // ZIL: (GLOBAL TROLL) (1dungeon.zil:1543)
+    trollRoom->addGlobal(ObjectIds::TROLL);
     
     g.registerObject(RoomIds::TROLL_ROOM, std::move(trollRoom));
     
@@ -977,9 +1057,19 @@ void initializeWorld() {
         }
     });
     
-    // Set up exits for Timber Room
+    // Set up exits for Timber Room (ZIL: 1dungeon.zil:2528-2534)
     timberRoom->setExit(Direction::EAST, RoomExit(RoomIds::LADDER_BOTTOM));
-    timberRoom->setExit(Direction::WEST, RoomExit("You cannot fit through this passage with that load."));  // Requires empty hands
+    auto emptyHandedCond = []() {
+        auto& g = Globals::instance();
+        if (!g.winner) return true;
+        for (auto* item : g.winner->getContents()) {
+            if (item && Verbs::weight(item) > 4) return false;
+        }
+        return true;
+    };
+    const std::string loadMsg = "You cannot fit through this passage with that load.";
+    // ZIL: (WEST TO LOWER-SHAFT IF EMPTY-HANDED ELSE "You cannot fit through this passage with that load.")
+    timberRoom->setExit(Direction::WEST, RoomExit::createConditional(RoomIds::LOWER_SHAFT, emptyHandedCond, loadMsg));
     
     g.registerObject(RoomIds::TIMBER_ROOM, std::move(timberRoom));
     
@@ -998,10 +1088,12 @@ void initializeWorld() {
         }
     });
     
-    // Set up exits for Lower Shaft
+    // Set up exits for Lower Shaft (ZIL: 1dungeon.zil:2543-2550)
     lowerShaft->setExit(Direction::SOUTH, RoomExit(RoomIds::MACHINE_ROOM));
-    lowerShaft->setExit(Direction::OUT, RoomExit("You cannot fit through this passage with that load."));  // Requires empty hands
-    lowerShaft->setExit(Direction::EAST, RoomExit("You cannot fit through this passage with that load."));  // Requires empty hands
+    // ZIL: (OUT TO TIMBER-ROOM IF EMPTY-HANDED ELSE "...")
+    lowerShaft->setExit(Direction::OUT, RoomExit::createConditional(RoomIds::TIMBER_ROOM, emptyHandedCond, loadMsg));
+    // ZIL: (EAST TO TIMBER-ROOM IF EMPTY-HANDED ELSE "...")
+    lowerShaft->setExit(Direction::EAST, RoomExit::createConditional(RoomIds::TIMBER_ROOM, emptyHandedCond, loadMsg));
     
     g.registerObject(RoomIds::LOWER_SHAFT, std::move(lowerShaft));
     
@@ -1128,12 +1220,19 @@ void initializeWorld() {
         }
     });
     
-    // Set up exits for Reservoir South
-    reservoirSouth->setExit(Direction::SE, RoomExit(RoomIds::DEEP_CANYON));
+    // Set up exits for Reservoir South (ZIL: 1dungeon.zil:1807-1815)
+    reservoirSouth->setExit(Direction::SOUTH, RoomExit(RoomIds::DEEP_CANYON));
+    reservoirSouth->setExit(Direction::SE, RoomExit(RoomIds::DAM_LOBBY));
     reservoirSouth->setExit(Direction::SW, RoomExit(RoomIds::CHASM_ROOM));
-    reservoirSouth->setExit(Direction::EAST, RoomExit(RoomIds::DAM_ROOM));
     reservoirSouth->setExit(Direction::WEST, RoomExit(RoomIds::STREAM_VIEW));
-    reservoirSouth->setExit(Direction::NORTH, RoomExit("You would drown."));  // Requires LOW-TIDE flag
+    // ZIL: (NORTH TO RESERVOIR IF LOW-TIDE ELSE "You would drown.") (1dungeon.zil:1810)
+    reservoirSouth->setExit(Direction::NORTH, RoomExit::createConditional(
+        RoomIds::RESERVOIR,
+        []() { return Globals::instance().lowTide; },
+        "You would drown."
+    ));
+    // ZIL: (GLOBAL GLOBAL-WATER) (1dungeon.zil:1816)
+    reservoirSouth->addGlobal(ObjectIds::GLOBAL_WATER);
     
     g.registerObject(RoomIds::RESERVOIR_SOUTH, std::move(reservoirSouth));
     
@@ -1150,12 +1249,14 @@ void initializeWorld() {
         }
     });
     
-    // Set up exits for Reservoir
+    // Set up exits for Reservoir (ZIL: 1dungeon.zil:1820-1821)
     reservoir->setExit(Direction::NORTH, RoomExit(RoomIds::RESERVOIR_NORTH));
     reservoir->setExit(Direction::SOUTH, RoomExit(RoomIds::RESERVOIR_SOUTH));
     reservoir->setExit(Direction::UP, RoomExit(RoomIds::IN_STREAM));
     reservoir->setExit(Direction::WEST, RoomExit(RoomIds::IN_STREAM));
     reservoir->setExit(Direction::DOWN, RoomExit("The dam blocks your way."));
+    // ZIL: (GLOBAL GLOBAL-WATER) (1dungeon.zil:1824)
+    reservoir->addGlobal(ObjectIds::GLOBAL_WATER);
     
     g.registerObject(RoomIds::RESERVOIR, std::move(reservoir));
     
@@ -1173,9 +1274,16 @@ void initializeWorld() {
         }
     });
     
-    // Set up exits for Reservoir North
+    // Set up exits for Reservoir North (ZIL: 1dungeon.zil:1828-1830)
     reservoirNorth->setExit(Direction::NORTH, RoomExit(RoomIds::ATLANTIS_ROOM));
-    reservoirNorth->setExit(Direction::SOUTH, RoomExit("You would drown."));  // Requires LOW-TIDE flag
+    // ZIL: (SOUTH TO RESERVOIR IF LOW-TIDE ELSE "You would drown.") (1dungeon.zil:1829)
+    reservoirNorth->setExit(Direction::SOUTH, RoomExit::createConditional(
+        RoomIds::RESERVOIR,
+        []() { return Globals::instance().lowTide; },
+        "You would drown."
+    ));
+    // ZIL: (GLOBAL GLOBAL-WATER) (1dungeon.zil:1833)
+    reservoirNorth->addGlobal(ObjectIds::GLOBAL_WATER);
     
     g.registerObject(RoomIds::RESERVOIR_NORTH, std::move(reservoirNorth));
     
@@ -1396,7 +1504,7 @@ void initializeWorld() {
     river5->setExit(Direction::DOWN, RoomExit("The river rushes over the falls to your doom!"));
     g.registerObject(RoomIds::RIVER_5, std::move(river5));
 
-    // Create WHITE_CLIFFS_NORTH
+    // Create WHITE_CLIFFS_NORTH (ZIL: 1dungeon.zil:2233-2244)
     auto whiteCliffsNorth = std::make_unique<ZRoom>(
         RoomIds::WHITE_CLIFFS_NORTH,
         "White Cliffs Beach",
@@ -1404,13 +1512,26 @@ void initializeWorld() {
     );
     whiteCliffsNorth->setFlag(ObjectFlag::RLANDBIT);
     whiteCliffsNorth->setFlag(ObjectFlag::SACREDBIT);
-    whiteCliffsNorth->setFlag(ObjectFlag::ONBIT);
-    whiteCliffsNorth->setExit(Direction::SOUTH, RoomExit(RoomIds::WHITE_CLIFFS_SOUTH));
-    whiteCliffsNorth->setExit(Direction::WEST, RoomExit(RoomIds::DAMP_CAVE));
+    auto deflateCond = []() {
+        auto& g = Globals::instance();
+        if (auto* boat = g.getObject(ObjectIds::BOAT_INFLATED)) {
+            if (boat->getLocation() == g.winner) return false;
+        }
+        return g.deflate;
+    };
+    const std::string narrowMsg = "The path is too narrow.";
+    // ZIL: (SOUTH TO WHITE-CLIFFS-SOUTH IF DEFLATE ELSE "The path is too narrow.")
+    whiteCliffsNorth->setExit(Direction::SOUTH, RoomExit::createConditional(RoomIds::WHITE_CLIFFS_SOUTH, deflateCond, narrowMsg));
+    // ZIL: (WEST TO DAMP-CAVE IF DEFLATE ELSE "The path is too narrow.")
+    whiteCliffsNorth->setExit(Direction::WEST, RoomExit::createConditional(RoomIds::DAMP_CAVE, deflateCond, narrowMsg));
     whiteCliffsNorth->setExit(Direction::LAUNCH, RoomExit(RoomIds::RIVER_3));
+    // ZIL: (GLOBAL GLOBAL-WATER WHITE-CLIFF RIVER) (1dungeon.zil:2244)
+    whiteCliffsNorth->addGlobal(ObjectIds::GLOBAL_WATER);
+    whiteCliffsNorth->addGlobal(ObjectIds::WHITE_CLIFF);
+    whiteCliffsNorth->addGlobal(ObjectIds::RIVER);
     g.registerObject(RoomIds::WHITE_CLIFFS_NORTH, std::move(whiteCliffsNorth));
 
-    // Create WHITE_CLIFFS_SOUTH
+    // Create WHITE_CLIFFS_SOUTH (ZIL: 1dungeon.zil:2246-2256)
     auto whiteCliffsSouth = std::make_unique<ZRoom>(
         RoomIds::WHITE_CLIFFS_SOUTH,
         "White Cliffs Beach",
@@ -1418,10 +1539,14 @@ void initializeWorld() {
     );
     whiteCliffsSouth->setFlag(ObjectFlag::RLANDBIT);
     whiteCliffsSouth->setFlag(ObjectFlag::SACREDBIT);
-    whiteCliffsSouth->setFlag(ObjectFlag::ONBIT);
-    whiteCliffsSouth->setExit(Direction::NORTH, RoomExit(RoomIds::WHITE_CLIFFS_NORTH));
+    // ZIL: (NORTH TO WHITE-CLIFFS-NORTH IF DEFLATE ELSE "The path is too narrow.")
+    whiteCliffsSouth->setExit(Direction::NORTH, RoomExit::createConditional(RoomIds::WHITE_CLIFFS_NORTH, deflateCond, narrowMsg));
     whiteCliffsSouth->setExit(Direction::UP, RoomExit("The cliffs are too steep to climb."));
     whiteCliffsSouth->setExit(Direction::LAUNCH, RoomExit(RoomIds::RIVER_4));
+    // ZIL: (GLOBAL GLOBAL-WATER WHITE-CLIFF RIVER) (1dungeon.zil:2256)
+    whiteCliffsSouth->addGlobal(ObjectIds::GLOBAL_WATER);
+    whiteCliffsSouth->addGlobal(ObjectIds::WHITE_CLIFF);
+    whiteCliffsSouth->addGlobal(ObjectIds::RIVER);
     g.registerObject(RoomIds::WHITE_CLIFFS_SOUTH, std::move(whiteCliffsSouth));
 
     // Create SANDY_BEACH
@@ -1462,7 +1587,7 @@ void initializeWorld() {
     shore->setExit(Direction::LAUNCH, RoomExit(RoomIds::RIVER_5));
     g.registerObject(RoomIds::SHORE, std::move(shore));
 
-    // Create ARAGAIN_FALLS
+    // Create ARAGAIN_FALLS (ZIL: 1dungeon.zil:2287-2296)
     auto aragainFalls = std::make_unique<ZRoom>(
         RoomIds::ARAGAIN_FALLS,
         "Aragain Falls",
@@ -1470,7 +1595,6 @@ void initializeWorld() {
     );
     aragainFalls->setFlag(ObjectFlag::RLANDBIT);
     aragainFalls->setFlag(ObjectFlag::SACREDBIT);
-    aragainFalls->setFlag(ObjectFlag::ONBIT);
     aragainFalls->setRoomAction([](int rarg) {
         if (rarg == M_LOOK) {
             printLine("You are at the top of Aragain Falls, an enormous waterfall with a\ndrop of about 450 feet. The only path here is on the north end.");
@@ -1484,8 +1608,15 @@ void initializeWorld() {
     });
     aragainFalls->setExit(Direction::NORTH, RoomExit(RoomIds::SHORE));
     aragainFalls->setExit(Direction::DOWN, RoomExit("It's a long way..."));
-    aragainFalls->setExit(Direction::WEST, RoomExit(RoomIds::ON_RAINBOW));
-    aragainFalls->setExit(Direction::UP, RoomExit(RoomIds::ON_RAINBOW));
+    auto rainbowCond = []() { return Globals::instance().rainbowFlag; };
+    // ZIL: (WEST TO ON-RAINBOW IF RAINBOW-FLAG)
+    aragainFalls->setExit(Direction::WEST, RoomExit::createConditional(RoomIds::ON_RAINBOW, rainbowCond, "You can't go that way."));
+    // ZIL: (UP TO ON-RAINBOW IF RAINBOW-FLAG)
+    aragainFalls->setExit(Direction::UP, RoomExit::createConditional(RoomIds::ON_RAINBOW, rainbowCond, "You can't go that way."));
+    // ZIL: (GLOBAL GLOBAL-WATER RIVER RAINBOW) (1dungeon.zil:2296)
+    aragainFalls->addGlobal(ObjectIds::GLOBAL_WATER);
+    aragainFalls->addGlobal(ObjectIds::RIVER);
+    aragainFalls->addGlobal(ObjectIds::RAINBOW);
     g.registerObject(RoomIds::ARAGAIN_FALLS, std::move(aragainFalls));
 
     // Create ON_RAINBOW
@@ -1501,18 +1632,23 @@ void initializeWorld() {
     onRainbow->setExit(Direction::WEST, RoomExit(RoomIds::END_OF_RAINBOW));
     g.registerObject(RoomIds::ON_RAINBOW, std::move(onRainbow));
 
-    // Create END_OF_RAINBOW
+    // Create END_OF_RAINBOW (ZIL: 1dungeon.zil:2307-2316)
     auto endOfRainbow = std::make_unique<ZRoom>(
         RoomIds::END_OF_RAINBOW,
         "End of Rainbow",
         "You are on a small, rocky beach on the continuation of the Frigid River past the Falls. The beach is narrow due to the presence of the White Cliffs. The river canyon opens here and sunlight shines in from above. A rainbow crosses over the falls to the east and a narrow path continues to the southwest."
     );
     endOfRainbow->setFlag(ObjectFlag::RLANDBIT);
-    endOfRainbow->setFlag(ObjectFlag::ONBIT);
-    endOfRainbow->setExit(Direction::UP, RoomExit(RoomIds::ON_RAINBOW));
-    endOfRainbow->setExit(Direction::NE, RoomExit(RoomIds::ON_RAINBOW));
-    endOfRainbow->setExit(Direction::EAST, RoomExit(RoomIds::ON_RAINBOW));
+    endOfRainbow->setFlag(ObjectFlag::SACREDBIT);
+    // ZIL: (UP TO ON-RAINBOW IF RAINBOW-FLAG)
+    endOfRainbow->setExit(Direction::UP, RoomExit::createConditional(RoomIds::ON_RAINBOW, rainbowCond, "You can't go that way."));
+    // ZIL: (NE TO ON-RAINBOW IF RAINBOW-FLAG)
+    endOfRainbow->setExit(Direction::NE, RoomExit::createConditional(RoomIds::ON_RAINBOW, rainbowCond, "You can't go that way."));
+    // ZIL: (EAST TO ON-RAINBOW IF RAINBOW-FLAG)
+    endOfRainbow->setExit(Direction::EAST, RoomExit::createConditional(RoomIds::ON_RAINBOW, rainbowCond, "You can't go that way."));
     endOfRainbow->setExit(Direction::SW, RoomExit(RoomIds::CANYON_BOTTOM));
+    // ZIL: (GLOBAL RAINBOW) (1dungeon.zil:2316)
+    endOfRainbow->addGlobal(ObjectIds::RAINBOW);
     g.registerObject(RoomIds::END_OF_RAINBOW, std::move(endOfRainbow));
 
     // Create CANYON_BOTTOM
@@ -1829,185 +1965,175 @@ void initializeWorld() {
     // The maze is intentionally disorienting with non-intuitive paths
     // Solution path exists but requires careful mapping
     
-    // MAZE_1 - Entrance from Troll Room
+    // MAZE_1 - Entrance from Troll Room (ZIL: 1dungeon.zil:1546-1553)
     auto* m1 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::MAZE_1));
     if (m1) {
-        m1->setExit(Direction::SOUTH, RoomExit(RoomIds::MAZE_2));
+        m1->setExit(Direction::NORTH, RoomExit(RoomIds::MAZE_1));
+        m1->setExit(Direction::EAST, RoomExit(RoomIds::TROLL_ROOM));
         m1->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_4));
-        m1->setExit(Direction::UP, RoomExit(RoomIds::MAZE_3));
-        m1->setExit(Direction::NORTH, RoomExit(RoomIds::MAZE_1));  // Loops back
-        m1->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_1));   // Loops back
+        m1->setExit(Direction::SOUTH, RoomExit(RoomIds::MAZE_2));
     }
     
-    // MAZE_2
+    // MAZE_2 (ZIL: 1dungeon.zil:1555-1563)
     auto* m2 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::MAZE_2));
     if (m2) {
-        m2->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_3));
-        m2->setExit(Direction::SOUTH, RoomExit(RoomIds::MAZE_5));
-        m2->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_2));   // Loops back
-        m2->setExit(Direction::DOWN, RoomExit(RoomIds::MAZE_6));
+        m2->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_3));
+        m2->setExit(Direction::SOUTH, RoomExit(RoomIds::MAZE_1));
+        m2->setExit(Direction::DOWN, RoomExit::createProcedural(Dungeon::mazeDiodes));
     }
     
-    // MAZE_3
+    // MAZE_3 (ZIL: 1dungeon.zil:1565-1573)
     auto* m3 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::MAZE_3));
     if (m3) {
-        m3->setExit(Direction::UP, RoomExit(RoomIds::MAZE_4));
-        m3->setExit(Direction::NORTH, RoomExit(RoomIds::MAZE_5));
-        m3->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_3));   // Loops back
-        m3->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_3));   // Loops back
+        m3->setExit(Direction::NORTH, RoomExit(RoomIds::MAZE_4));
+        m3->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_2));
+        m3->setExit(Direction::UP, RoomExit(RoomIds::MAZE_5));
     }
     
-    // MAZE_4
+    // MAZE_4 (ZIL: 1dungeon.zil:1575-1583)
     auto* m4 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::MAZE_4));
     if (m4) {
-        m4->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_5));
-        m4->setExit(Direction::SOUTH, RoomExit(RoomIds::DEAD_END_1));
-        m4->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_6));
-        m4->setExit(Direction::UP, RoomExit(RoomIds::MAZE_4));     // Loops back
+        m4->setExit(Direction::NORTH, RoomExit(RoomIds::MAZE_1));
+        m4->setExit(Direction::EAST, RoomExit(RoomIds::DEAD_END_1));
+        m4->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_3));
     }
     
-    // MAZE_5
+    // MAZE_5 (ZIL: 1dungeon.zil:1585-1593)
     auto* m5 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::MAZE_5));
     if (m5) {
+        m5->setExit(Direction::NORTH, RoomExit(RoomIds::MAZE_3));
+        m5->setExit(Direction::EAST, RoomExit(RoomIds::DEAD_END_2));
         m5->setExit(Direction::SW, RoomExit(RoomIds::MAZE_6));
-        m5->setExit(Direction::NE, RoomExit(RoomIds::MAZE_7));
-        m5->setExit(Direction::SE, RoomExit(RoomIds::MAZE_8));
-        m5->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_5));   // Loops back
     }
     
-    // MAZE_6
+    // MAZE_6 (ZIL: 1dungeon.zil:1595-1605)
     auto* m6 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::MAZE_6));
     if (m6) {
         m6->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_7));
-        m6->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_8));
+        m6->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_6));
         m6->setExit(Direction::UP, RoomExit(RoomIds::MAZE_9));
-        m6->setExit(Direction::SOUTH, RoomExit(RoomIds::MAZE_6));  // Loops back
+        m6->setExit(Direction::DOWN, RoomExit(RoomIds::MAZE_5));
     }
     
-    // MAZE_7
+    // MAZE_7 (ZIL: 1dungeon.zil:1607-1619)
     auto* m7 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::MAZE_7));
     if (m7) {
-        m7->setExit(Direction::SOUTH, RoomExit(RoomIds::MAZE_8));
-        m7->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_9));
-        m7->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_10));
-        m7->setExit(Direction::UP, RoomExit(RoomIds::MAZE_7));     // Loops back
+        m7->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_8));
+        m7->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_6));
+        m7->setExit(Direction::SOUTH, RoomExit(RoomIds::MAZE_15));
+        m7->setExit(Direction::UP, RoomExit(RoomIds::MAZE_14));
+        m7->setExit(Direction::DOWN, RoomExit::createProcedural(Dungeon::mazeDiodes));
     }
     
-    // MAZE_8
+    // MAZE_8 (ZIL: 1dungeon.zil:1621-1631)
     auto* m8 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::MAZE_8));
     if (m8) {
-        m8->setExit(Direction::NE, RoomExit(RoomIds::MAZE_9));
-        m8->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_10));
-        m8->setExit(Direction::DOWN, RoomExit(RoomIds::MAZE_11));
-        m8->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_8));   // Loops back
+        m8->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_8));
+        m8->setExit(Direction::NE, RoomExit(RoomIds::MAZE_7));
+        m8->setExit(Direction::SE, RoomExit(RoomIds::DEAD_END_3));
     }
     
-    // MAZE_9
+    // MAZE_9 (ZIL: 1dungeon.zil:1633-1645)
     auto* m9 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::MAZE_9));
     if (m9) {
-        m9->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_10));
-        m9->setExit(Direction::SOUTH, RoomExit(RoomIds::DEAD_END_2));
-        m9->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_12));
-        m9->setExit(Direction::NORTH, RoomExit(RoomIds::MAZE_9));  // Loops back
+        m9->setExit(Direction::NORTH, RoomExit(RoomIds::MAZE_6));
+        m9->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_10));
+        m9->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_12));
+        m9->setExit(Direction::SOUTH, RoomExit(RoomIds::MAZE_13));
+        m9->setExit(Direction::NW, RoomExit(RoomIds::MAZE_9));
+        m9->setExit(Direction::DOWN, RoomExit::createProcedural(Dungeon::mazeDiodes));
     }
     
-    // MAZE_10
+    // MAZE_10 (ZIL: 1dungeon.zil:1647-1657)
     auto* m10 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::MAZE_10));
     if (m10) {
-        m10->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_11));
-        m10->setExit(Direction::DOWN, RoomExit(RoomIds::MAZE_12));
-        m10->setExit(Direction::SOUTH, RoomExit(RoomIds::MAZE_13));
-        m10->setExit(Direction::NORTH, RoomExit(RoomIds::MAZE_10)); // Loops back
+        m10->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_9));
+        m10->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_13));
+        m10->setExit(Direction::UP, RoomExit(RoomIds::MAZE_11));
     }
     
-    // MAZE_11
+    // MAZE_11 (ZIL: 1dungeon.zil:1659-1671)
     auto* m11 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::MAZE_11));
     if (m11) {
-        m11->setExit(Direction::NORTH, RoomExit(RoomIds::MAZE_12));
-        m11->setExit(Direction::SOUTH, RoomExit(RoomIds::MAZE_13));
-        m11->setExit(Direction::WEST, RoomExit(RoomIds::DEAD_END_3));
-        m11->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_11));  // Loops back
+        m11->setExit(Direction::NE, RoomExit(RoomIds::GRATING_ROOM));
+        m11->setExit(Direction::NW, RoomExit(RoomIds::MAZE_13));
+        m11->setExit(Direction::SW, RoomExit(RoomIds::MAZE_12));
+        m11->setExit(Direction::DOWN, RoomExit(RoomIds::MAZE_10));
+        m11->addGlobal(ObjectIds::GRATE);
     }
     
-    // MAZE_12
+    // MAZE_12 (ZIL: 1dungeon.zil:1673-1685)
     auto* m12 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::MAZE_12));
     if (m12) {
-        m12->setExit(Direction::SOUTH, RoomExit(RoomIds::MAZE_13));
-        m12->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_14));
-        m12->setExit(Direction::UP, RoomExit(RoomIds::MAZE_15));
-        m12->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_12));  // Loops back
+        m12->setExit(Direction::NORTH, RoomExit(RoomIds::DEAD_END_4));
+        m12->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_13));
+        m12->setExit(Direction::SW, RoomExit(RoomIds::MAZE_11));
+        m12->setExit(Direction::UP, RoomExit(RoomIds::MAZE_9));
+        m12->setExit(Direction::DOWN, RoomExit::createProcedural(Dungeon::mazeDiodes));
     }
     
-    // MAZE_13
+    // MAZE_13 (ZIL: 1dungeon.zil:1687-1697)
     auto* m13 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::MAZE_13));
     if (m13) {
-        m13->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_14));
-        m13->setExit(Direction::DOWN, RoomExit(RoomIds::MAZE_15));
-        m13->setExit(Direction::EAST, RoomExit(RoomIds::DEAD_END_4));
-        m13->setExit(Direction::NORTH, RoomExit(RoomIds::MAZE_13)); // Loops back
+        m13->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_9));
+        m13->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_11));
+        m13->setExit(Direction::SOUTH, RoomExit(RoomIds::MAZE_10));
+        m13->setExit(Direction::DOWN, RoomExit(RoomIds::MAZE_12));
     }
     
-    // MAZE_14
+    // MAZE_14 (ZIL: 1dungeon.zil:1699-1709)
     auto* m14 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::MAZE_14));
     if (m14) {
-        m14->setExit(Direction::NW, RoomExit(RoomIds::MAZE_15));
-        m14->setExit(Direction::SW, RoomExit(RoomIds::GRATING_ROOM));  // Exit to grating room
-        m14->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_14));  // Loops back
-        m14->setExit(Direction::UP, RoomExit(RoomIds::MAZE_14));    // Loops back
+        m14->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_15));
+        m14->setExit(Direction::SOUTH, RoomExit(RoomIds::MAZE_7));
+        m14->setExit(Direction::NE, RoomExit(RoomIds::MAZE_7));
+        m14->setExit(Direction::NW, RoomExit(RoomIds::MAZE_14));
     }
     
-    // MAZE_15
+    // MAZE_15 (ZIL: 1dungeon.zil:1711-1720)
     auto* m15 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::MAZE_15));
     if (m15) {
-        m15->setExit(Direction::NORTH, RoomExit(RoomIds::GRATING_ROOM));  // Exit to grating room
-        m15->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_15));  // Loops back
-        m15->setExit(Direction::SOUTH, RoomExit(RoomIds::MAZE_15)); // Loops back
-        m15->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_15));  // Loops back
+        m15->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_14));
+        m15->setExit(Direction::SOUTH, RoomExit(RoomIds::MAZE_7));
+        m15->setExit(Direction::SE, RoomExit(RoomIds::CYCLOPS_ROOM));
     }
     
-    // Dead ends in maze - all lead back to their source
+    // Dead ends in maze (ZIL: 1dungeon.zil:1783-1809)
     auto* de1 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::DEAD_END_1));
     if (de1) {
-        de1->setExit(Direction::NORTH, RoomExit(RoomIds::MAZE_4));
+        de1->setExit(Direction::SOUTH, RoomExit(RoomIds::MAZE_4));
     }
     
     auto* de2 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::DEAD_END_2));
     if (de2) {
-        de2->setExit(Direction::NORTH, RoomExit(RoomIds::MAZE_9));
+        de2->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_5));
     }
     
     auto* de3 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::DEAD_END_3));
     if (de3) {
-        de3->setExit(Direction::EAST, RoomExit(RoomIds::MAZE_11));
+        de3->setExit(Direction::NORTH, RoomExit(RoomIds::MAZE_8));
     }
     
     auto* de4 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::DEAD_END_4));
     if (de4) {
-        de4->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_13));
+        de4->setExit(Direction::SOUTH, RoomExit(RoomIds::MAZE_12));
     }
     
-    // Grating Room - connects maze to main underground
+    // Grating Room - connects maze to surface (ZIL: 1dungeon.zil:1776-1785)
     auto* gratingRm = dynamic_cast<ZRoom*>(g.getObject(RoomIds::GRATING_ROOM));
     if (gratingRm) {
-        gratingRm->setExit(Direction::SOUTH, RoomExit(RoomIds::MAZE_14));
-        gratingRm->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_15));
-        gratingRm->setExit(Direction::UP, RoomExit(RoomIds::GRATING_CLEARING));  // To surface via grating
-        // Note: UP exit will require grating to be open in actual gameplay
-    }
-    
-    // Update Troll Room to have entrance to maze (west exit)
-    // This was already set up in the Troll Room creation, but verify it's correct
-    auto* trollRm = dynamic_cast<ZRoom*>(g.getObject(RoomIds::TROLL_ROOM));
-    if (trollRm) {
-        // West exit to maze entrance (MAZE_1) - requires troll to be defeated
-        trollRm->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_1));
-    }
-    
-    // Update Grating Clearing to have down exit to Grating Room
-    auto* gratingClearingPtr = dynamic_cast<ZRoom*>(g.getObject(RoomIds::GRATING_CLEARING));
-    if (gratingClearingPtr) {
-        gratingClearingPtr->setExit(Direction::DOWN, RoomExit(RoomIds::GRATING_ROOM));
-        // Note: DOWN exit will require grating to be open in actual gameplay
+        gratingRm->setExit(Direction::SW, RoomExit(RoomIds::MAZE_11));
+        // ZIL: (UP TO GRATING-CLEARING IF GRATE IS OPEN ELSE "The grating is closed.")
+        gratingRm->setExit(Direction::UP, RoomExit::createConditional(
+            RoomIds::GRATING_CLEARING,
+            []() {
+                auto* grate = Globals::instance().getObject(ObjectIds::GRATE);
+                return grate && grate->hasFlag(ObjectFlag::OPENBIT);
+            },
+            "The grating is closed."
+        ));
+        // ZIL: (GLOBAL GRATE) (1dungeon.zil:1784)
+        gratingRm->addGlobal(ObjectIds::GRATE);
     }
     
     // ===== SPECIAL AREA ROOMS =====
@@ -2045,28 +2171,35 @@ void initializeWorld() {
             }
         }
     });
-    cyclopsRoom->setExit(Direction::WEST, RoomExit(RoomIds::STRANGE_PASSAGE));
+    // ZIL: 1dungeon.zil:1722-1736
+    cyclopsRoom->setExit(Direction::NORTH, RoomExit("The cyclops doesn't look like he'll let you past."));
+    cyclopsRoom->setExit(Direction::WEST, RoomExit(RoomIds::MAZE_15));
+    cyclopsRoom->setExit(Direction::NW, RoomExit(RoomIds::MAZE_15));
     // UP exit is conditional - blocked by cyclops unless asleep or fled
     cyclopsRoom->setExit(Direction::UP, RoomExit::createConditional(
         RoomIds::TREASURE_ROOM,
         []() {
+            auto& g = Globals::instance();
             auto& cyclopsState = NPCSystem::getCyclopsState();
-            return cyclopsState.isAsleep || cyclopsState.hasFled;
+            return g.cyclopsFlag || cyclopsState.isAsleep || cyclopsState.hasFled;
         },
-        "The cyclops blocks your way."
+        "The cyclops doesn't look like he'll let you past."
     ));
-    // EAST exit only available after cyclops flees (creates hole in wall)
+    // EAST exit only available after magic flag / cyclops fled
     cyclopsRoom->setExit(Direction::EAST, RoomExit::createConditional(
         RoomIds::STRANGE_PASSAGE,
         []() {
+            auto& g = Globals::instance();
             auto& cyclopsState = NPCSystem::getCyclopsState();
-            return cyclopsState.hasFled;
+            return g.magicFlag || cyclopsState.hasFled;
         },
-        "There is no exit in that direction."
+        "The east wall is solid rock."
     ));
+    // ZIL: (GLOBAL CYCLOPS) (1dungeon.zil:1735)
+    cyclopsRoom->addGlobal(ObjectIds::CYCLOPS);
     g.registerObject(RoomIds::CYCLOPS_ROOM, std::move(cyclopsRoom));
     
-    // Create Strange Passage
+    // Create Strange Passage (ZIL: 1dungeon.zil:1738-1750)
     auto strangePassage = std::make_unique<ZRoom>(
         RoomIds::STRANGE_PASSAGE,
         "Strange Passage",
@@ -2078,11 +2211,15 @@ void initializeWorld() {
             printLine("This is a long passage. To the west is one entrance. On the east there is an old wooden door, with a large hole in it (about cyclops sized).");
         }
     });
+    strangePassage->setExit(Direction::NORTH, RoomExit(RoomIds::LIVING_ROOM));
+    strangePassage->setExit(Direction::EAST, RoomExit(RoomIds::LIVING_ROOM));
+    strangePassage->setExit(Direction::OUT, RoomExit(RoomIds::LIVING_ROOM));
+    strangePassage->setExit(Direction::SOUTH, RoomExit(RoomIds::CYCLOPS_ROOM));
     strangePassage->setExit(Direction::WEST, RoomExit(RoomIds::CYCLOPS_ROOM));
-    // East exit will be added when connecting to other underground areas
+    strangePassage->setExit(Direction::IN, RoomExit(RoomIds::CYCLOPS_ROOM));
     g.registerObject(RoomIds::STRANGE_PASSAGE, std::move(strangePassage));
     
-    // Create Treasure Room (Thief's Lair)
+    // Create Treasure Room (Thief's Lair) (ZIL: 1dungeon.zil:1752-1761)
     auto treasureRoom = std::make_unique<ZRoom>(
         RoomIds::TREASURE_ROOM,
         "Treasure Room",
@@ -2103,9 +2240,11 @@ void initializeWorld() {
         }
     });
     treasureRoom->setExit(Direction::DOWN, RoomExit(RoomIds::CYCLOPS_ROOM));
+    // ZIL: (GLOBAL CHALICE) (1dungeon.zil:1759)
+    treasureRoom->addGlobal(ObjectIds::CHALICE);
     g.registerObject(RoomIds::TREASURE_ROOM, std::move(treasureRoom));
     
-    // Create Entrance to Hades
+    // Create Entrance to Hades (ZIL: 1dungeon.zil:1763-1774)
     auto entranceToHades = std::make_unique<ZRoom>(
         RoomIds::ENTRANCE_TO_HADES,
         "Entrance to Hades",
@@ -2129,10 +2268,16 @@ void initializeWorld() {
             printLine("You pass through the gateway into the Land of the Living Dead.");
         }
     });
+    // ZIL: (UP TO TINY-CAVE) (1dungeon.zil:2030)
     entranceToHades->setExit(Direction::UP, RoomExit(RoomIds::TINY_CAVE));
-    entranceToHades->setExit(Direction::IN, RoomExit(RoomIds::LAND_OF_LIVING_DEAD));
-    entranceToHades->setExit(Direction::SOUTH, RoomExit(RoomIds::LAND_OF_LIVING_DEAD));
-    // Note: IN and SOUTH exits will be conditional on LLD-FLAG in actual gameplay
+    auto lldCond = []() { return Globals::instance().lldFlag; };
+    const std::string lldMsg = "Some invisible force prevents you from passing through the gate.";
+    // ZIL: (SOUTH TO LAND-OF-LIVING-DEAD IF LLD-FLAG ELSE "...") (1dungeon.zil:1768)
+    entranceToHades->setExit(Direction::SOUTH, RoomExit::createConditional(RoomIds::LAND_OF_LIVING_DEAD, lldCond, lldMsg));
+    // ZIL: (IN TO LAND-OF-LIVING-DEAD IF LLD-FLAG ELSE "...") (1dungeon.zil:1770)
+    entranceToHades->setExit(Direction::IN, RoomExit::createConditional(RoomIds::LAND_OF_LIVING_DEAD, lldCond, lldMsg));
+    // ZIL: (GLOBAL BODIES) (1dungeon.zil:1772)
+    entranceToHades->addGlobal(ObjectIds::BODIES);
     g.registerObject(RoomIds::ENTRANCE_TO_HADES, std::move(entranceToHades));
     
     // Create Land of the Living Dead
@@ -2152,7 +2297,7 @@ void initializeWorld() {
     landOfLivingDead->setExit(Direction::NORTH, RoomExit(RoomIds::ENTRANCE_TO_HADES));
     g.registerObject(RoomIds::LAND_OF_LIVING_DEAD, std::move(landOfLivingDead));
     
-    // Create Dome Room
+    // Create Dome Room (ZIL: 1dungeon.zil:1982-1988)
     auto domeRoom = std::make_unique<ZRoom>(
         RoomIds::DOME_ROOM,
         "Dome Room",
@@ -2165,11 +2310,17 @@ void initializeWorld() {
         }
     });
     domeRoom->setExit(Direction::WEST, RoomExit(RoomIds::ENGRAVINGS_CAVE));
-    domeRoom->setExit(Direction::DOWN, RoomExit(RoomIds::TORCH_ROOM));
-    // Note: DOWN exit will be conditional on DOME-FLAG (rope tied) in actual gameplay
+    // ZIL: (DOWN TO TORCH-ROOM IF DOME-FLAG ELSE "You cannot go down without fracturing many bones.")
+    domeRoom->setExit(Direction::DOWN, RoomExit::createConditional(
+        RoomIds::TORCH_ROOM,
+        []() { return Globals::instance().domeFlag; },
+        "You cannot go down without fracturing many bones."
+    ));
+    // ZIL: (GLOBAL RAILING) (1dungeon.zil:1987)
+    domeRoom->addGlobal(ObjectIds::RAILING);
     g.registerObject(RoomIds::DOME_ROOM, std::move(domeRoom));
     
-    // Create Torch Room
+    // Create Torch Room (ZIL: 1dungeon.zil:1990-1998)
     auto torchRoom = std::make_unique<ZRoom>(
         RoomIds::TORCH_ROOM,
         "Torch Room",
@@ -2184,6 +2335,9 @@ void initializeWorld() {
     torchRoom->setExit(Direction::UP, RoomExit("You cannot reach the rope."));
     torchRoom->setExit(Direction::SOUTH, RoomExit(RoomIds::NORTH_TEMPLE));
     torchRoom->setExit(Direction::DOWN, RoomExit(RoomIds::NORTH_TEMPLE));
+    // ZIL: (GLOBAL PEDESTAL RAILING) (1dungeon.zil:1996)
+    torchRoom->addGlobal(ObjectIds::PEDESTAL);
+    torchRoom->addGlobal(ObjectIds::RAILING);
     g.registerObject(RoomIds::TORCH_ROOM, std::move(torchRoom));
     
     // Create North Temple
@@ -2212,7 +2366,7 @@ void initializeWorld() {
     northTemple->setExit(Direction::SOUTH, RoomExit(RoomIds::SOUTH_TEMPLE));
     g.registerObject(RoomIds::NORTH_TEMPLE, std::move(northTemple));
     
-    // Create South Temple (Altar)
+    // Create South Temple (Altar) (ZIL: 1dungeon.zil:2116-2129)
     auto southTemple = std::make_unique<ZRoom>(
         RoomIds::SOUTH_TEMPLE,
         "Altar",
@@ -2231,8 +2385,18 @@ void initializeWorld() {
         }
     });
     southTemple->setExit(Direction::NORTH, RoomExit(RoomIds::NORTH_TEMPLE));
-    southTemple->setExit(Direction::DOWN, RoomExit(RoomIds::TINY_CAVE));
-    // Note: DOWN exit will be conditional on COFFIN-CURE flag in actual gameplay
+    // ZIL: (DOWN TO TINY-CAVE IF COFFIN-CURE ELSE "You haven't a prayer of getting the coffin down there.")
+    southTemple->setExit(Direction::DOWN, RoomExit::createConditional(
+        RoomIds::TINY_CAVE,
+        []() {
+            auto& g = Globals::instance();
+            if (auto* coffin = g.getObject(ObjectIds::COFFIN)) {
+                if (coffin->getLocation() == g.winner) return false;
+            }
+            return true;
+        },
+        "You haven't a prayer of getting the coffin down there."
+    ));
     g.registerObject(RoomIds::SOUTH_TEMPLE, std::move(southTemple));
     
     // Create Egyptian Room
@@ -2627,17 +2791,18 @@ void initializeWorld() {
     
     g.registerObject(ObjectIds::BASKET, std::move(loweredBasket));
     
-    // Create BUOY (Red buoy - portable container)
+    // Create BUOY (Red buoy - portable container) (ZIL: 1dungeon.zil:782-796)
     auto buoy = std::make_unique<ZObject>(ObjectIds::BUOY, "red buoy");
     buoy->addSynonym("buoy");
     buoy->addAdjective("red");
     buoy->setFlag(ObjectFlag::TAKEBIT);
     buoy->setFlag(ObjectFlag::CONTBIT);
-    buoy->setFlag(ObjectFlag::OPENBIT);
+    buoy->setFlag(ObjectFlag::SEARCHBIT);
     buoy->setProperty(P_CAPACITY, 20);
     buoy->setProperty(P_SIZE, 10);
-    // TODO: Add action handler
-    // Will be placed in River-4 when that room is created
+    buoy->setText("There is a red buoy here (probably a warning).");
+    buoy->setAction(Dungeon::treasureInsideAction);
+    buoy->moveTo(g.getObject(RoomIds::RIVER_4));
     
     g.registerObject(ObjectIds::BUOY, std::move(buoy));
     

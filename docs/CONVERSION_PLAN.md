@@ -39,8 +39,8 @@ The basic C++ framework is now working with:
 - [x] Forest-1 room
 - [x] Mailbox object with action handler
 - [x] Global objects (WHITE-HOUSE, BOARD, FOREST)
-- [ ] Remaining ~95 rooms
-- [ ] Remaining ~145 objects
+- [/] Remaining ~95 rooms
+- [/] Remaining ~145 objects
 
 ### Phase 4: Verbs (Next)
 - [ ] Convert gverbs.zil (~2200 lines)
@@ -86,7 +86,7 @@ The basic C++ framework is now working with:
 |----------|-------|------------|--------|
 | gmacros.zil | 154 | core/gmacros.h | Done |
 | gsyntax.zil | 561 | parser/gsyntax.h, parser/gsyntax.cpp | Done |
-| 1dungeon.zil | 2660 | world/ | TODO |
+| 1dungeon.zil | 2660 | world/ | In Progress |
 | gglobals.zil | 308 | core/gglobals.h, core/gglobals.cpp, core/globals | Done |
 | gclock.zil | 60 | systems/timer.cpp | Done |
 | gmain.zil | 313 | main.cpp | Done |

@@ -5,6 +5,9 @@
 #include <string_view>
 #include <map>
 #include <functional>
+#include <algorithm>
+#include <vector>
+#include <span>
 
 /**
  * @brief Room ID Constants
@@ -185,7 +188,8 @@ enum class ExitType {
     DOOR,          ///< Door that can be opened/closed/locked
     SPECIAL,       ///< Requires special verb (CLIMB, ENTER, etc.)
     CONDITIONAL,   ///< Requires game state condition
-    ONE_WAY        ///< Can only travel in one direction
+    ONE_WAY,       ///< Can only travel in one direction
+    PROCEDURAL     ///< Procedural exit returning destination room or 0 (ZIL: PER routine)
 };
 
 // Room exit structure
@@ -193,6 +197,7 @@ struct RoomExit {
     ObjectId targetRoom = 0;
     std::string message;  // For blocked exits
     std::function<bool()> condition;  // Optional condition
+    std::function<ObjectId()> procedural; // Optional procedural exit routine (ZIL: PER routine)
     ExitType type = ExitType::NORMAL;
     
     // Door-specific fields
@@ -240,6 +245,14 @@ struct RoomExit {
         RoomExit exit;
         exit.targetRoom = target;
         exit.type = ExitType::ONE_WAY;
+        return exit;
+    }
+    
+    // Procedural exit constructor (ZIL: PER routine)
+    static RoomExit createProcedural(std::function<ObjectId()> proc) {
+        RoomExit exit;
+        exit.type = ExitType::PROCEDURAL;
+        exit.procedural = std::move(proc);
         return exit;
     }
     
@@ -295,7 +308,19 @@ public:
     /// Check if room has an action handler
     bool hasRoomAction() const { return roomAction_ != nullptr; }
     
+    /// Add a global object accessible in this room (ZIL: (GLOBAL ...))
+    void addGlobal(ObjectId objId) { globals_.push_back(objId); }
+    
+    /// Check if this room contains the given global object
+    bool hasGlobal(ObjectId objId) const {
+        return std::find(globals_.begin(), globals_.end(), objId) != globals_.end();
+    }
+    
+    /// Get all global objects accessible in this room
+    std::span<const ObjectId> getGlobals() const { return globals_; }
+    
 private:
     std::map<Direction, RoomExit> exits_;     ///< Exits by direction
     RoomActionFunc roomAction_;               ///< Optional action handler
+    std::vector<ObjectId> globals_;           ///< Global objects in room (ZIL: GLOBAL)
 };

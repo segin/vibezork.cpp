@@ -869,6 +869,20 @@ bool vWalkDir(Direction dir) {
     break;
   }
 
+  case ExitType::PROCEDURAL: {
+    if (exit->procedural) {
+      ObjectId target = exit->procedural();
+      if (target == 0) {
+        return RTRUE; // Movement blocked or output handled by procedural routine
+      }
+      exit->targetRoom = target;
+    } else {
+      printLine("You can't go that way.");
+      return RTRUE;
+    }
+    break;
+  }
+
   case ExitType::ONE_WAY:
   case ExitType::NORMAL:
   default:
@@ -3636,8 +3650,16 @@ bool globalIn(ObjectId objId, const ZObject *room) {
   auto &g = Globals::instance();
   if (auto *obj = g.getObject(objId)) {
     if (obj->getLocation() == room) return true;
+    if (auto *zroom = dynamic_cast<const ZRoom *>(room)) {
+      if (zroom->hasGlobal(objId)) return true;
+    }
     if (auto *lg = g.getObject(ObjectIds::LOCAL_GLOBALS)) {
-      if (obj->getLocation() == lg) return true;
+      if (obj->getLocation() == lg) {
+        if (auto *zroom = dynamic_cast<const ZRoom *>(room)) {
+          return zroom->hasGlobal(objId);
+        }
+        return true;
+      }
     }
     if (auto *go = g.getObject(ObjectIds::GLOBAL_OBJECTS)) {
       if (obj->getLocation() == go) return true;

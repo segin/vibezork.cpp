@@ -188,5 +188,8 @@ if(BUILD_TESTS)
 
     # GGLOBALS Tests (gglobals.zil routines, variables, and global objects)
     add_zork_test(GGlobalsTests gglobals_tests tests/gglobals_tests.cpp)
+
+    # DUNGEON Tests (1dungeon.zil rooms, objects, exits, tables, and routines)
+    add_zork_test(DungeonTests dungeon_tests tests/dungeon_tests.cpp)
 endif()
 
