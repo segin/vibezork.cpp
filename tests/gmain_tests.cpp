@@ -566,7 +566,9 @@ void testItSubstitution() {
 
   // 6. NOT-HERE-OBJECT as PRSO runs NOT-HERE-OBJECT-F instead of the verb.
   defaultCalls = 0;
-  g.pNc1 = {"lamp"};
+  GParser::read("take lamp");
+  GParser::state().itbl.nc1 = GParser::Ptr::lex(1);
+  GParser::state().itbl.nc1l = GParser::Ptr::lex(2);
   cmd.prsoTable = {notHere};
   {
     std::stringstream buf;
@@ -811,7 +813,7 @@ void testEmptyInput() {
   g.winner = playerObj.get();
   g.here = roomObj.get();
   g.pWon = true;
-  g.pCont = true;
+  g.pCont = 0; // a fresh READ (P-CONT would continue the previous input)
   g.moves = 0;
 
   std::stringstream in("   \n");

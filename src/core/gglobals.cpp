@@ -63,14 +63,6 @@ void notHerePrint(bool prso) {
     if (!g.pXnam.empty()) {
       print(g.pXnam);
     }
-  } else if (!g.pNc1.empty() || !g.pNc2.empty()) {
-    // Interim: the hand-written parser still supplies the noun clauses as
-    // token lists (removed with it in B11).
-    const auto &toks = prso ? g.pNc1 : g.pNc2;
-    for (size_t i = 0; i < toks.size(); ++i) {
-      if (i > 0) print(" ");
-      print(toks[i]);
-    }
   } else {
     // <BUFFER-PRINT <GET ,P-ITBL ,P-NC1> <GET ,P-ITBL ,P-NC1L> <>>
     auto &s = GParser::state();

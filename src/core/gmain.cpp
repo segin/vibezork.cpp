@@ -421,38 +421,15 @@ void mainLoop1() {
   initializeAllVerbHandlers();
   auto &g = Globals::instance();
 
-  // ZIL: <COND (<NOT ,SUPER-BRIEF> <CRLF>)> <TELL ">"> <READ ,P-INBUF ,P-LEXV>
-  // (gparser.zil:152-154)
-  if (!g.superbriefMode) {
-    crlf();
-  }
-  print(">");
-  std::string input = readLine();
-
-  size_t start = input.find_first_not_of(" \t\r\n");
-  size_t end = input.find_last_not_of(" \t\r\n");
-  if (start == std::string::npos) {
-    // ZIL: <COND (<ZERO? <SET LEN <GETB ,P-LEXV ,P-LEXWORDS>>>
-    //             <TELL "I beg your pardon?" CR> <RFALSE>)> (gparser.zil:174-176)
-    if (!std::cin.eof()) {
-      printLine("I beg your pardon?");
-    }
-    g.pWon = false;
-    g.pCont = false;
-    return;
-  }
-  input = input.substr(start, end - start + 1);
-
-  ParsedCommand cmd = getGlobalParser().parse(input);
-
-  if (cmd.verb == 0) {
-    // ZIL: (T <SETG P-CONT <>>) -- parse failure (gmain.zil:162-163)
-    g.pWon = false;
-    g.pCont = false;
+  // ZIL: <COND (<SETG P-WON <PARSER>> ...) (T <SETG P-CONT <>>)>
+  // PARSER prints the prompt and READs (gparser.zil:147-154).
+  g.pWon = GParser::parser();
+  if (!g.pWon) {
+    g.pCont = 0;
     return;
   }
 
-  g.pWon = true;
+  ParsedCommand cmd = buildParsedCommand();
   executeCommand(cmd);
 
   // Update last action (ZIL: lines 158-160)

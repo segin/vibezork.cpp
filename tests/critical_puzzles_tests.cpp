@@ -8,6 +8,7 @@
 #include "../src/world/objects.h"
 #include "../src/world/world.h"
 #include "../src/parser/parser.h"
+#include "../src/parser/gparser.h"
 #include "../src/systems/score.h"
 #include "../src/verbs/verbs.h"
 
@@ -17,6 +18,12 @@ void resetGame() {
     initializeWorld(); // Initialize all objects
     // For now we just move player to a known location
     g.here = g.getObject(RoomIds::LIVING_ROOM);
+    // The parser derives HERE from the player's location and LIT from the
+    // room; these are mechanics tests, so keep the player where the test
+    // says and light everything (ALWAYS-LIT, gparser.zil:1331).
+    g.winner = g.player;
+    if (g.player && g.here) g.player->moveTo(g.here);
+    GParser::state().alwaysLit = true;
     g.prso = nullptr;
     g.prsi = nullptr;
 }

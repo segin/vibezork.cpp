@@ -10,6 +10,7 @@ Globals& Globals::instance() {
 
 void Globals::registerObject(ObjectId id, std::unique_ptr<ZObject> obj) {
     objects_[id] = std::move(obj);
+    ++vocabGeneration;
 }
 
 ZObject* Globals::getObject(ObjectId id) {
@@ -18,6 +19,7 @@ ZObject* Globals::getObject(ObjectId id) {
 }
 
 void Globals::reset() {
+    ++vocabGeneration;
     // End any active combat
     if (CombatSystem::isInCombat()) {
         CombatSystem::endCombat();
@@ -87,8 +89,6 @@ void Globals::reset() {
     hs = 0;
     pXadjn.clear();
     pXnam.clear();
-    pNc1.clear();
-    pNc2.clear();
     
     // Reset display modes to defaults (Requirement 65.5)
     verboseMode = true;

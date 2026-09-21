@@ -4,7 +4,6 @@
 #include "../src/world/rooms.h"
 #include "../src/world/objects.h"
 #include "../src/parser/parser.h"
-#include "../src/parser/verb_registry.h"
 #include <sstream>
 
 // Output capture helpers (need to be cleaner, maybe move to framework later)
@@ -62,8 +61,7 @@ TEST(TakeFromContainerSuccess) {
     ZObject* ballPtr = ball.get();
     g.registerObject(201, std::move(ball));
     
-    VerbRegistry registry;
-    Parser parser(&registry);
+    Parser parser;
     
     // "take ball from box"
     // We need to simulate the PARSED command execution or just run vTake?

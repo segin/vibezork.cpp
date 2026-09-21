@@ -262,6 +262,9 @@ bool parser();
 // Makes the next READ inside PARSER return this line instead of reading
 // stdin (tests and the oracle harness).
 void setNextInput(std::string line);
+// Whether PARSER prints the CRLF and ">" before READ (off for the test
+// facade).
+void setPromptEnabled(bool enabled);
 // READ: fills P-INBUF and P-LEXV from a line the way the Z-machine does.
 void read(std::string_view line);
 

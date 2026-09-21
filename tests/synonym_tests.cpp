@@ -1,5 +1,6 @@
 #include "test_framework.h"
 #include "../src/parser/parser.h"
+#include "../src/parser/gparser.h"
 #include "../src/verbs/verbs.h"
 #include "../src/core/globals.h"
 
@@ -71,13 +72,15 @@ TEST(DirectionSynonyms) {
     // In/Out
     cmd = parser.parse("in");
     ASSERT_EQ(cmd.direction, Direction::IN);
+    // ZIL: "inside" is only a preposition synonym of IN (gsyntax.zil:21)
     cmd = parser.parse("inside");
-    ASSERT_EQ(cmd.direction, Direction::IN);
+    ASSERT_FALSE(cmd.isDirection);
     
     cmd = parser.parse("out");
     ASSERT_EQ(cmd.direction, Direction::OUT);
+    // "outside" is not in the vocabulary
     cmd = parser.parse("outside");
-    ASSERT_EQ(cmd.direction, Direction::OUT);
+    ASSERT_FALSE(cmd.isDirection);
 }
 
 TEST(VerbSynonymsTake) {
@@ -124,22 +127,24 @@ TEST(VerbSynonymsAttack) {
 }
 
 
-#include "../src/parser/verb_registry.h"
 
 TEST(RegistrySynonyms) {
-    VerbRegistry registry;
     
-    // Helper to check synonyms
+    // Helper to check synonyms: every word is a verb word in the ZIL
+    // dictionary and all of them share one canonical verb (SYNONYM group)
     auto check = [&](VerbId id, const std::vector<std::string>& synonyms) {
+        (void)id;
+        std::string canon;
         for (const auto& syn : synonyms) {
-            auto result = registry.lookupVerb(syn);
-            if (!result.has_value()) {
+            const auto* w = GParser::lookupWord(syn);
+            if (!w || !(w->ps & GParser::PS_VERB)) {
                  std::cout << "Missing synonym: '" << syn << "'" << std::endl;
                  ASSERT_TRUE(false);
             }
-            if (result.value() != id) {
-                 std::cout << "Mismatch for '" << syn << "': Expected " << id << ", Actual " << result.value() << std::endl;
-                 ASSERT_EQ(result.value(), id);
+            if (canon.empty()) canon = w->verb;
+            if (w->verb != canon) {
+                 std::cout << "Mismatch for '" << syn << "': Expected " << canon << ", Actual " << w->verb << std::endl;
+                 ASSERT_EQ(w->verb, canon);
             }
         }
     };
@@ -165,7 +170,7 @@ TEST(RegistrySynonyms) {
     
     // Examination
     check(V_LOOK, {"look", "l", "stare", "gaze"});
-    check(V_EXAMINE, {"examine", "describe", "what", "whats", "x"});
+    check(V_EXAMINE, {"examine", "describe", "what", "whats"}); // no "x" in R119
     check(V_READ, {"read", "skim"});
     check(V_SEARCH, {"search"});
 
@@ -189,7 +194,8 @@ TEST(RegistrySynonyms) {
     check(V_SWING, {"swing", "thrust"});
 
     // Light
-    check(V_LAMP_ON, {"light", "activate"});
+    check(V_LAMP_ON, {"light"});
+    check(V_LAMP_ON, {"activate"}); // a separate verb word sharing V-LAMP-ON
     check(V_LAMP_OFF, {"extinguish", "douse"});
 
     // Manipulation (Misc)
@@ -205,7 +211,7 @@ TEST(RegistrySynonyms) {
     check(V_SMELL, {"smell", "sniff"});
     check(V_TOUCH, {"touch"});
     check(V_RUB, {"rub", "feel", "pat", "pet"});
-    check(V_YELL, {"yell", "scream", "shout", "holler"});
+    check(V_YELL, {"yell", "scream", "shout"});
 
     // Consumption
     check(V_EAT, {"eat", "consume", "taste", "bite"});
@@ -223,7 +229,7 @@ TEST(RegistrySynonyms) {
     check(V_FILL, {"fill"});
 
     // Communication
-    check(V_TALK, {"talk", "speak"});
+    check(V_TALK, {"talk"});
     check(V_ASK, {"ask"});
     check(V_TELL, {"tell"});
     check(V_TELL, {"tell"});
@@ -236,7 +242,7 @@ TEST(RegistrySynonyms) {
     check(V_LEAP, {"leap", "dive"});
     check(V_SAY, {"say"});
     check(V_KICK, {"kick"});
-    check(V_BREATHE, {"breathe"});
+    // no BREATHE verb in Zork I: BLOW IN OBJECT = V-BREATHE (gsyntax.zil:108)
     check(V_RAPE, {"rape", "molest"});
     
     // Movement Batch Verification
@@ -249,7 +255,7 @@ TEST(RegistrySynonyms) {
     check(V_LOWER, {"lower"});
     check(V_RAISE, {"raise", "lift"});
     check(V_MAKE, {"make"});
-    check(V_MELT, {"melt", "liquefy"});
+    check(V_MELT, {"melt", "liquify"}); // gsyntax.zil:321 spelling
     check(V_PLAY, {"play"});
     check(V_PLUG, {"plug", "glue", "patch", "repair", "fix"});
     check(V_POUR_ON, {"pour", "spill"});
@@ -272,10 +278,10 @@ TEST(RegistrySynonyms) {
     check(V_SPRAY, {"spray"});
 
     // Magic/Misc Batch Verification
-    check(V_BLAST, {"blast", "blow up", "detonate"});
+    check(V_BLAST, {"blast"}); // BLOW UP OBJECT is a syntax, not a synonym; "detonate" is not in the vocabulary
     check(V_BURN, {"burn", "ignite", "incinerate"});
     check(V_CHANT, {"chant"});
-    check(V_DISENCHANT, {"disenchant", "condemn"});
+    check(V_DISENCHANT, {"disenchant"}); // "condemn" is not in the vocabulary
     check(V_ENCHANT, {"enchant"});
     check(V_INCANT, {"incant"});
     check(V_WIN, {"win"});

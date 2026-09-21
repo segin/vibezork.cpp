@@ -11,6 +11,7 @@
 #include "core/globals.h"
 #include "core/object.h"
 #include "parser/parser.h"
+#include "parser/gparser.h"
 #include "systems/death.h"
 #include "verbs/verbs.h"
 #include "world/objects.h"
@@ -73,7 +74,9 @@ TEST(NotHereObjectF_PlayerWinner_DirectObject) {
   g.prsi = nullptr;
   g.winner = g.player;
   g.pOflag = false;
-  g.pNc1 = {"brass", "lantern"};
+  GParser::read("take brass lantern");
+  GParser::state().itbl.nc1 = GParser::Ptr::lex(1);
+  GParser::state().itbl.nc1l = GParser::Ptr::lex(3);
 
   OutputCapture cap;
   bool res = GGlobals::notHereObjectF();
@@ -93,7 +96,9 @@ TEST(NotHereObjectF_PlayerWinner_IndirectObject) {
   g.prsi = notHere;
   g.winner = g.player;
   g.pOflag = false;
-  g.pNc2 = {"rusty", "knife"};
+  GParser::read("put x in rusty knife");
+  GParser::state().itbl.nc2 = GParser::Ptr::lex(3);
+  GParser::state().itbl.nc2l = GParser::Ptr::lex(5);
 
   OutputCapture cap;
   bool res = GGlobals::notHereObjectF();
@@ -114,7 +119,9 @@ TEST(NotHereObjectF_NPCWinner) {
   g.prsi = nullptr;
   g.winner = thief;
   g.pOflag = false;
-  g.pNc1 = {"gold", "coin"};
+  GParser::read("take gold coin");
+  GParser::state().itbl.nc1 = GParser::Ptr::lex(1);
+  GParser::state().itbl.nc1l = GParser::Ptr::lex(3);
 
   OutputCapture cap;
   bool res = GGlobals::notHereObjectF();
@@ -354,9 +361,12 @@ TEST(GrueFunction_Findable) {
   assert(grue->getDesc() == "lurking grue");
   assert(grue->getLocation() == g.getObject(ObjectIds::GLOBAL_OBJECTS));
   assert(!grue->hasFlag(ObjectFlag::INVISIBLE));
+  g.winner = g.player;
+  g.here = g.getObject(RoomIds::WEST_OF_HOUSE);
+  if (g.player && g.here) g.player->moveTo(g.here);
   Parser parser;
-  auto matches = parser.findObjects({"grue"}, 0);
-  assert(matches.size() == 1 && matches[0] == grue);
+  auto cmd = parser.parse("examine grue");
+  assert(cmd.verb == V_EXAMINE && cmd.directObj == grue);
   g.reset();
 }
 
@@ -817,8 +827,6 @@ TEST(GlobalVariables_DefaultsAndReset) {
   g.hs = 42;
   g.pXadjn = "adj";
   g.pXnam = "nam";
-  g.pNc1 = {"token1"};
-  g.pNc2 = {"token2"};
 
   g.reset();
   assert(g.loadMax == 100);
@@ -826,8 +834,6 @@ TEST(GlobalVariables_DefaultsAndReset) {
   assert(g.hs == 0);
   assert(g.pXadjn.empty());
   assert(g.pXnam.empty());
-  assert(g.pNc1.empty());
-  assert(g.pNc2.empty());
 }
 
 int main() {

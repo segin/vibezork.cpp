@@ -1,6 +1,5 @@
 #include "test_framework.h"
 #include "../src/parser/parser.h"
-#include "../src/parser/verb_registry.h"
 #include "../src/verbs/verbs.h"
 #include "../src/core/globals.h"
 #include "../src/world/objects.h"
@@ -8,6 +7,17 @@
 TEST(ComplexSyntaxPutIn) {
     auto& g = Globals::instance();
     g.reset();
+    // A lit room with the player in it: PARSER derives HERE and LIT from them
+    auto room = std::make_unique<ZRoom>(900, "Test Room", "A test room.");
+    room->setFlag(ObjectFlag::ONBIT);
+    ZObject* roomPtr = room.get();
+    g.registerObject(900, std::move(room));
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.player = player.get();
+    g.winner = g.player;
+    g.registerObject(999, std::move(player));
+    g.player->moveTo(roomPtr);
+    g.here = roomPtr;
     
     // Create container and object
     auto container = std::make_unique<ZObject>(100, "box");
@@ -54,6 +64,17 @@ TEST(ComplexSyntaxPutIn) {
 TEST(ComplexSyntaxPutOn) {
     auto& g = Globals::instance();
     g.reset();
+    // A lit room with the player in it: PARSER derives HERE and LIT from them
+    auto room = std::make_unique<ZRoom>(900, "Test Room", "A test room.");
+    room->setFlag(ObjectFlag::ONBIT);
+    ZObject* roomPtr = room.get();
+    g.registerObject(900, std::move(room));
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.player = player.get();
+    g.winner = g.player;
+    g.registerObject(999, std::move(player));
+    g.player->moveTo(roomPtr);
+    g.here = roomPtr;
     
     // Create surface (table) and object (lamp)
     auto table = std::make_unique<ZObject>(200, "table");
@@ -78,8 +99,7 @@ TEST(ComplexSyntaxPutOn) {
     g.registerObject(200, std::move(table));
     g.registerObject(201, std::move(lamp));
     
-    VerbRegistry registry;
-    Parser parser(&registry);
+    Parser parser;
     
     // Test "put lamp on table"
     auto cmd = parser.parse("put lamp on table");

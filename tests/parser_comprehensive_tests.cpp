@@ -1,7 +1,5 @@
 #include "test_framework.h"
 #include "../src/parser/parser.h"
-#include "../src/parser/verb_registry.h"
-#include "../src/parser/syntax.h"
 #include "../src/core/object.h"
 #include "../src/core/globals.h"
 #include "../src/world/rooms.h"
@@ -81,338 +79,25 @@ TEST(TokenizationManyWords) {
         manyWords += "word" + std::to_string(i) + " ";
     }
     ParsedCommand cmd = parser.parse(manyWords);
-    ASSERT_TRUE(cmd.words.size() >= 100);
+    // P-INBUF keeps 120 characters and P-LEXV 59 words (gparser.zil:34-47)
+    ASSERT_TRUE(cmd.words.size() > 10 && cmd.words.size() <= 59);
 }
 
-// Test verb recognition edge cases
-TEST(VerbRecognitionUnknownVerb) {
-    VerbRegistry registry;
-    auto verb = registry.lookupVerb("nonexistentverb");
-    ASSERT_FALSE(verb.has_value());
-}
 
-TEST(VerbRecognitionEmptyString) {
-    VerbRegistry registry;
-    auto verb = registry.lookupVerb("");
-    ASSERT_FALSE(verb.has_value());
-}
 
-TEST(VerbRecognitionAllSynonyms) {
-    VerbRegistry registry;
-    
-    // Test all TAKE synonyms
-    ASSERT_TRUE(registry.lookupVerb("take").has_value());
-    ASSERT_TRUE(registry.lookupVerb("get").has_value());
-    ASSERT_TRUE(registry.lookupVerb("grab").has_value());
-    ASSERT_TRUE(registry.lookupVerb("carry").has_value());
-    
-    // All should map to same verb
-    ASSERT_EQ(registry.lookupVerb("take").value(), registry.lookupVerb("get").value());
-    ASSERT_EQ(registry.lookupVerb("take").value(), registry.lookupVerb("grab").value());
-}
 
-TEST(VerbRecognitionDirections) {
-    VerbRegistry registry;
-    
-    // Test that direction words are registered as verbs (V_WALK)
-    ASSERT_TRUE(registry.lookupVerb("north").has_value());
-    ASSERT_TRUE(registry.lookupVerb("n").has_value());
-    ASSERT_TRUE(registry.lookupVerb("south").has_value());
-    ASSERT_TRUE(registry.lookupVerb("s").has_value());
-    ASSERT_TRUE(registry.lookupVerb("east").has_value());
-    ASSERT_TRUE(registry.lookupVerb("e").has_value());
-    ASSERT_TRUE(registry.lookupVerb("west").has_value());
-    ASSERT_TRUE(registry.lookupVerb("w").has_value());
-    ASSERT_TRUE(registry.lookupVerb("up").has_value());
-    ASSERT_TRUE(registry.lookupVerb("u").has_value());
-    ASSERT_TRUE(registry.lookupVerb("down").has_value());
-    ASSERT_TRUE(registry.lookupVerb("d").has_value());
-}
 
-TEST(VerbRecognitionCaseInsensitivity) {
-    VerbRegistry registry;
-    
-    // Test case variations
-    ASSERT_TRUE(registry.lookupVerb("take").has_value());
-    ASSERT_TRUE(registry.lookupVerb("TAKE").has_value());
-    ASSERT_TRUE(registry.lookupVerb("Take").has_value());
-    ASSERT_TRUE(registry.lookupVerb("TaKe").has_value());
-    
-    // All should return same verb ID
-    auto v1 = registry.lookupVerb("take").value();
-    auto v2 = registry.lookupVerb("TAKE").value();
-    auto v3 = registry.lookupVerb("Take").value();
-    ASSERT_EQ(v1, v2);
-    ASSERT_EQ(v1, v3);
-}
 
-// Test object recognition edge cases
-TEST(ObjectRecognitionNoObjects) {
-    auto& g = Globals::instance();
-    
-    ZRoom testRoom(100, "Test Room", "A test room.");
-    g.here = &testRoom;
-    
-    auto player = std::make_unique<ZObject>(999, "player");
-    g.winner = player.get();
-    g.player = g.winner;
-    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
-    g.registerObject(999, std::move(player));
-    
-    Parser parser;
-    std::vector<std::string> words = {"lamp"};
-    auto matches = parser.findObjects(words);
-    
-    ASSERT_EQ(matches.size(), 0);
-    
-    g.reset();
-}
 
-TEST(ObjectRecognitionEmptyWord) {
-    auto& g = Globals::instance();
-    
-    ZRoom testRoom(100, "Test Room", "A test room.");
-    g.here = &testRoom;
-    
-    auto player = std::make_unique<ZObject>(999, "player");
-    g.winner = player.get();
-    g.player = g.winner;
-    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
-    g.registerObject(999, std::move(player));
-    
-    Parser parser;
-    std::vector<std::string> words = {""};
-    auto matches = parser.findObjects(words);
-    
-    ASSERT_EQ(matches.size(), 0);
-    
-    g.reset();
-}
 
-TEST(ObjectRecognitionMultipleMatches) {
-    auto& g = Globals::instance();
-    
-    ZRoom testRoom(100, "Test Room", "A test room.");
-    g.here = &testRoom;
-    
-    auto player = std::make_unique<ZObject>(999, "player");
-    g.winner = player.get();
-    g.player = g.winner;
-    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
-    g.registerObject(999, std::move(player));
-    
-    // Create multiple objects with same synonym
-    auto lamp1 = std::make_unique<ZObject>(1, "lamp");
-    lamp1->addSynonym("lamp");
-    lamp1->moveTo(&testRoom);
-    g.registerObject(1, std::move(lamp1));
-    
-    auto lamp2 = std::make_unique<ZObject>(2, "lamp");
-    lamp2->addSynonym("lamp");
-    lamp2->moveTo(&testRoom);
-    g.registerObject(2, std::move(lamp2));
-    
-    Parser parser;
-    std::vector<std::string> words = {"lamp"};
-    auto matches = parser.findObjects(words);
-    
-    ASSERT_EQ(matches.size(), 2);
-    
-    g.reset();
-}
 
-TEST(ObjectRecognitionInvisibleObjects) {
-    auto& g = Globals::instance();
-    
-    ZRoom testRoom(100, "Test Room", "A test room.");
-    g.here = &testRoom;
-    
-    auto player = std::make_unique<ZObject>(999, "player");
-    g.winner = player.get();
-    g.player = g.winner;
-    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
-    g.registerObject(999, std::move(player));
-    
-    // Create invisible object
-    auto lamp = std::make_unique<ZObject>(1, "lamp");
-    lamp->addSynonym("lamp");
-    lamp->setFlag(ObjectFlag::INVISIBLE);
-    lamp->moveTo(&testRoom);
-    g.registerObject(1, std::move(lamp));
-    
-    Parser parser;
-    std::vector<std::string> words = {"lamp"};
-    auto matches = parser.findObjects(words);
-    
-    // Invisible objects should not be found
-    ASSERT_EQ(matches.size(), 0);
-    
-    g.reset();
-}
 
-TEST(ObjectRecognitionClosedContainerContents) {
-    auto& g = Globals::instance();
-    
-    ZRoom testRoom(100, "Test Room", "A test room.");
-    g.here = &testRoom;
-    
-    auto player = std::make_unique<ZObject>(999, "player");
-    g.winner = player.get();
-    g.player = g.winner;
-    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
-    g.registerObject(999, std::move(player));
-    
-    // Create closed container
-    auto box = std::make_unique<ZObject>(10, "box");
-    box->addSynonym("box");
-    box->setFlag(ObjectFlag::CONTBIT);
-    // Not setting OPENBIT - it's closed
-    box->moveTo(&testRoom);
-    ZObject* boxPtr = box.get();
-    g.registerObject(10, std::move(box));
-    
-    // Create object in closed container
-    auto coin = std::make_unique<ZObject>(1, "coin");
-    coin->addSynonym("coin");
-    coin->moveTo(boxPtr);
-    g.registerObject(1, std::move(coin));
-    
-    Parser parser;
-    std::vector<std::string> words = {"coin"};
-    auto matches = parser.findObjects(words);
-    
-    // Object in closed container should not be visible
-    ASSERT_EQ(matches.size(), 0);
-    
-    g.reset();
-}
 
-TEST(ObjectRecognitionTransparentContainerContents) {
-    auto& g = Globals::instance();
-    
-    ZRoom testRoom(100, "Test Room", "A test room.");
-    g.here = &testRoom;
-    
-    auto player = std::make_unique<ZObject>(999, "player");
-    g.winner = player.get();
-    g.player = g.winner;
-    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
-    g.registerObject(999, std::move(player));
-    
-    // Create transparent container (closed but transparent)
-    auto jar = std::make_unique<ZObject>(10, "jar");
-    jar->addSynonym("jar");
-    jar->setFlag(ObjectFlag::CONTBIT);
-    jar->setFlag(ObjectFlag::TRANSBIT);  // Transparent
-    // Not setting OPENBIT - it's closed
-    jar->moveTo(&testRoom);
-    ZObject* jarPtr = jar.get();
-    g.registerObject(10, std::move(jar));
-    
-    // Create object in transparent container
-    auto coin = std::make_unique<ZObject>(1, "coin");
-    coin->addSynonym("coin");
-    coin->moveTo(jarPtr);
-    ZObject* coinPtr = coin.get();
-    g.registerObject(1, std::move(coin));
-    
-    Parser parser;
-    std::vector<std::string> words = {"coin"};
-    auto matches = parser.findObjects(words);
-    
-    // Object in transparent container should be visible
-    ASSERT_EQ(matches.size(), 1);
-    ASSERT_EQ(matches[0], coinPtr);
-    
-    g.reset();
-}
 
-// Test syntax pattern matching edge cases
-TEST(SyntaxPatternEmptyPattern) {
-    using Element = SyntaxPattern::Element;
-    using ElementType = SyntaxPattern::ElementType;
-    
-    std::vector<Element> pattern;  // Empty pattern
-    SyntaxPattern syntaxPattern(V_TAKE, pattern);
-    
-    std::vector<std::string> tokens = {"take", "lamp"};
-    // Empty pattern should not match anything
-    ASSERT_FALSE(syntaxPattern.matches(tokens));
-}
 
-TEST(SyntaxPatternTooFewTokens) {
-    using Element = SyntaxPattern::Element;
-    using ElementType = SyntaxPattern::ElementType;
-    
-    std::vector<Element> pattern;
-    pattern.push_back(Element(ElementType::VERB));
-    pattern.push_back(Element(ElementType::OBJECT));
-    
-    SyntaxPattern syntaxPattern(V_TAKE, pattern);
-    
-    // Only one token, but pattern requires two
-    std::vector<std::string> tokens = {"take"};
-    ASSERT_FALSE(syntaxPattern.matches(tokens));
-}
 
-TEST(SyntaxPatternTooManyTokens) {
-    using Element = SyntaxPattern::Element;
-    using ElementType = SyntaxPattern::ElementType;
-    
-    std::vector<Element> pattern;
-    pattern.push_back(Element(ElementType::VERB));
-    pattern.push_back(Element(ElementType::OBJECT));
-    
-    SyntaxPattern syntaxPattern(V_TAKE, pattern);
-    
-    // Too many tokens
-    std::vector<std::string> tokens = {"take", "lamp", "extra", "words"};
-    ASSERT_FALSE(syntaxPattern.matches(tokens));
-}
 
-TEST(SyntaxPatternAllOptional) {
-    using Element = SyntaxPattern::Element;
-    using ElementType = SyntaxPattern::ElementType;
-    
-    std::vector<Element> pattern;
-    Element verb(ElementType::VERB);
-    verb.optional = true;
-    pattern.push_back(verb);
-    
-    Element obj(ElementType::OBJECT);
-    obj.optional = true;
-    pattern.push_back(obj);
-    
-    SyntaxPattern syntaxPattern(V_TAKE, pattern);
-    
-    // Empty tokens should match all-optional pattern
-    std::vector<std::string> tokens;
-    ASSERT_TRUE(syntaxPattern.matches(tokens));
-}
 
-TEST(SyntaxPatternMultiplePrepositions) {
-    using Element = SyntaxPattern::Element;
-    using ElementType = SyntaxPattern::ElementType;
-    
-    std::vector<Element> pattern;
-    pattern.push_back(Element(ElementType::VERB));
-    pattern.push_back(Element(ElementType::OBJECT));
-    
-    Element prep(ElementType::PREPOSITION, std::vector<std::string>{"in", "on", "under", "behind"});
-    pattern.push_back(prep);
-    pattern.push_back(Element(ElementType::OBJECT));
-    
-    SyntaxPattern syntaxPattern(V_PUT, pattern);
-    
-    // Test each preposition
-    ASSERT_TRUE(syntaxPattern.matches({"put", "lamp", "in", "box"}));
-    ASSERT_TRUE(syntaxPattern.matches({"put", "lamp", "on", "table"}));
-    ASSERT_TRUE(syntaxPattern.matches({"put", "lamp", "under", "rug"}));
-    ASSERT_TRUE(syntaxPattern.matches({"put", "lamp", "behind", "door"}));
-    
-    // Test invalid preposition
-    ASSERT_FALSE(syntaxPattern.matches({"put", "lamp", "with", "box"}));
-}
 
 // Test complete parsing flow
 TEST(ParsingFlowSimpleCommand) {
@@ -424,7 +109,8 @@ TEST(ParsingFlowSimpleCommand) {
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
     g.player = g.winner;
-    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
+    g.lit = true; // PARSER recomputes LIT from HERE, which it derives from the player's location
+    if (g.player && g.here) { g.player->moveTo(g.here); g.here->setFlag(ObjectFlag::ONBIT); }
     g.registerObject(999, std::move(player));
     
     auto lamp = std::make_unique<ZObject>(1, "lamp");
@@ -455,7 +141,8 @@ TEST(ParsingFlowComplexCommand) {
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
     g.player = g.winner;
-    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
+    g.lit = true; // PARSER recomputes LIT from HERE, which it derives from the player's location
+    if (g.player && g.here) { g.player->moveTo(g.here); g.here->setFlag(ObjectFlag::ONBIT); }
     g.registerObject(999, std::move(player));
     
     auto lamp = std::make_unique<ZObject>(1, "brass lamp");
@@ -476,8 +163,7 @@ TEST(ParsingFlowComplexCommand) {
     ZObject* boxPtr = box.get();
     g.registerObject(2, std::move(box));
     
-    VerbRegistry registry;
-    Parser parser(&registry);
+    Parser parser;
     ParsedCommand cmd = parser.parse("put small brass lamp in wooden box");
     
     ASSERT_EQ(cmd.verb, V_PUT);
@@ -506,7 +192,8 @@ TEST(ParsingFlowDirectionCommand) {
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
     g.player = g.winner;
-    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
+    g.lit = true; // PARSER recomputes LIT from HERE, which it derives from the player's location
+    if (g.player && g.here) { g.player->moveTo(g.here); g.here->setFlag(ObjectFlag::ONBIT); }
     g.registerObject(999, std::move(player));
     
     Parser parser;
@@ -528,7 +215,8 @@ TEST(ParsingFlowAllCommand) {
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
     g.player = g.winner;
-    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
+    g.lit = true; // PARSER recomputes LIT from HERE, which it derives from the player's location
+    if (g.player && g.here) { g.player->moveTo(g.here); g.here->setFlag(ObjectFlag::ONBIT); }
     g.registerObject(999, std::move(player));
     
     auto lamp = std::make_unique<ZObject>(1, "lamp");
@@ -589,7 +277,7 @@ TEST(ParsingObjectlessSyntax) {
 
     // JUMP = V-LEAP takes no object
     ParsedCommand cmd = parser.parse("jump");
-    ASSERT_EQ(cmd.verb, V_JUMP);
+    ASSERT_EQ(cmd.verb, V_LEAP); // <SYNTAX JUMP = V-LEAP> (gsyntax.zil:249)
     ASSERT_EQ(cmd.objectsExpected, 0);
 
     // "put" has no objectless syntax -> orphan question

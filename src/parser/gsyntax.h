@@ -10,8 +10,6 @@
 #include <optional>
 #include <span>
 
-class VerbRegistry;
-
 /**
  * @brief Complete C++23 port of ZIL syntax declarations from zil/gsyntax.zil.
  * 
@@ -84,8 +82,5 @@ std::vector<const ZilSyntax*> getSyntaxesForVerb(std::string_view verbWord);
 const ZilSyntax* matchSyntax(std::string_view verbWord,
                              const std::vector<std::string>& prepositions,
                              size_t objectCount);
-
-// Populate VerbRegistry
-void populateVerbRegistry(VerbRegistry& registry);
 
 } // namespace GSyntax

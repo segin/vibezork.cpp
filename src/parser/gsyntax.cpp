@@ -1,6 +1,4 @@
 #include "gsyntax.h"
-#include "parser/verb_registry.h"
-#include "parser/syntax.h"
 #include "core/flags.h"
 #include "verbs/verbs.h"
 
@@ -8541,31 +8539,6 @@ const ZilSyntax* matchSyntax(std::string_view verbWord,
         }
     }
     return nullptr;
-}
-
-void populateVerbRegistry(VerbRegistry& registry) {
-    initialize();
-
-    using ET = SyntaxPattern::ElementType;
-    using Elem = SyntaxPattern::Element;
-
-    for (const auto& syn : g_syntaxes) {
-        std::vector<Elem> patElements;
-        for (const auto& el : syn.elements) {
-            if (el.type == SyntaxElement::Type::VERB) {
-                patElements.emplace_back(ET::VERB);
-            } else if (el.type == SyntaxElement::Type::PREPOSITION) {
-                patElements.emplace_back(ET::PREPOSITION, el.synonyms);
-            } else if (el.type == SyntaxElement::Type::OBJECT) {
-                if (el.findFlag.has_value()) {
-                    patElements.emplace_back(ET::OBJECT, *el.findFlag);
-                } else {
-                    patElements.emplace_back(ET::OBJECT);
-                }
-            }
-        }
-        registry.registerSyntax(syn.verbId, SyntaxPattern(syn.actionId, std::move(patElements)));
-    }
 }
 
 } // namespace GSyntax

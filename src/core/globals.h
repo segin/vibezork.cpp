@@ -117,11 +117,12 @@ public:
   // gglobals.zil / gparser.zil orphan and clause buffers for NOT-HERE-PRINT
   std::string pXadjn;      ///< ZIL: ,P-XADJN (Orphaned adjective word)
   std::string pXnam;       ///< ZIL: ,P-XNAM (Orphaned noun word)
-  std::vector<std::string> pNc1; ///< ZIL: ,P-ITBL P-NC1 (Direct object noun phrase tokens)
-  std::vector<std::string> pNc2; ///< ZIL: ,P-ITBL P-NC2 (Indirect object noun phrase tokens)
 
   // Object registry - using unordered_map for O(1) lookup
   void registerObject(ObjectId id, std::unique_ptr<ZObject> obj);
+  /// Bumped whenever the object set changes; the parser dictionary rebuilds
+  /// its object vocabulary when it sees a new value.
+  uint64_t vocabGeneration = 0;
   ZObject *getObject(ObjectId id);
   const std::unordered_map<ObjectId, std::unique_ptr<ZObject>> &
   getAllObjects() const {

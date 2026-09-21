@@ -41,6 +41,7 @@ struct Dictionary {
   std::vector<const DictWord *> prepositions;  // PREPOSITIONS: index = prep number
   std::unordered_map<std::string, int> prepNumbers;
   size_t objectCount = 0;
+  uint64_t generation = 0;
   bool built = false;
 };
 
@@ -108,7 +109,7 @@ void invalidateDictionary() {
 void buildDictionary() {
   auto &g = Globals::instance();
   auto &d = dict();
-  if (d.built && d.objectCount == g.getAllObjects().size()) return;
+  if (d.built && d.objectCount == g.getAllObjects().size() && d.generation == g.vocabGeneration) return;
   // Dictionary words are never removed (pointers into the map stay valid
   // across rebuilds); a rebuild only adds the words of new objects.
   if (!d.built) {
@@ -129,6 +130,7 @@ void buildDictionary() {
       }
     }
     d.objectCount = g.getAllObjects().size();
+    d.generation = g.vocabGeneration;
     return;
   }
 
@@ -226,6 +228,7 @@ void buildDictionary() {
   }
 
   d.objectCount = g.getAllObjects().size();
+  d.generation = g.vocabGeneration;
   d.built = true;
 }
 
@@ -320,9 +323,11 @@ std::string_view textAt(const Ptr &p) {
 
 namespace {
 std::optional<std::string> g_nextInput;
+bool g_promptEnabled = true;
 }
 
 void setNextInput(std::string line) { g_nextInput = std::move(line); }
+void setPromptEnabled(bool enabled) { g_promptEnabled = enabled; }
 
 // The Z-machine READ opcode: the line is lowercased and truncated to the
 // buffer size; words are split at spaces and at the word separators in
@@ -338,7 +343,8 @@ void read(std::string_view line) {
   size_t i = 0;
   while (i < text.size() && s.lexv.count < P_LEXV_SIZE) {
     char c = text[i];
-    if (c == ' ') {
+    auto isSpace = [](char ch) { return ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n'; };
+    if (isSpace(c)) {
       ++i;
       continue;
     }
@@ -347,7 +353,7 @@ void read(std::string_view line) {
       tok.push_back(c);
       ++i;
     } else {
-      while (i < text.size() && text[i] != ' ' && text[i] != '.' && text[i] != ',' && text[i] != '"') {
+      while (i < text.size() && !isSpace(text[i]) && text[i] != '.' && text[i] != ',' && text[i] != '"') {
         tok.push_back(text[i]);
         ++i;
       }
@@ -787,14 +793,22 @@ bool parser() {
       g.here = g.winner->getLocation();
     }
     g.lit = isLit(g.here);
-    if (!g.superbriefMode) crlf();
-    print(">");
+    if (g_promptEnabled) {
+      if (!g.superbriefMode) crlf();
+      print(">");
+    }
     if (g_nextInput) {
       std::string line = std::move(*g_nextInput);
       g_nextInput.reset();
       read(line);
     } else {
-      read(readLine());
+      std::string line = readLine();
+      if (std::cin.eof() && line.empty()) {
+        // End of input: the interpreter quits; no "I beg your pardon?"
+        s.lexv.count = 0;
+        return false;
+      }
+      read(line);
     }
   }
   s.len = s.lexv.count;

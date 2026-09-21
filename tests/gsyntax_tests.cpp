@@ -1,5 +1,4 @@
 #include "parser/gsyntax.h"
-#include "parser/verb_registry.h"
 #include "verbs/verbs.h"
 #include "core/flags.h"
 
@@ -315,31 +314,6 @@ void testSyntaxMatching() {
     std::println("✓ Syntax matching verified");
 }
 
-void testVerbRegistryPopulation() {
-    std::println("Testing VerbRegistry Integration...");
-    VerbRegistry registry;
-    GSyntax::populateVerbRegistry(registry);
-
-    // Check registered patterns
-    assert(registry.hasPatterns(V_TAKE));
-    assert(registry.hasPatterns(V_PUT));
-    assert(registry.hasPatterns(V_ATTACK));
-    assert(registry.hasPatterns(V_OPEN));
-    assert(registry.hasPatterns(V_CLOSE));
-
-    // Check prepositions
-    assert(registry.isPrepositionValidForVerb(V_TAKE, "from"));
-    assert(registry.isPrepositionValidForVerb(V_PUT, "in"));
-    assert(registry.isPrepositionValidForVerb(V_PUT, "on"));
-    assert(registry.isPrepositionValidForVerb(V_ATTACK, "with"));
-
-    // Check syntax disambiguation (e.g. PUT ON)
-    auto putOnId = registry.getVerbIdForSyntax(V_PUT, "on");
-    assert(putOnId.has_value());
-    assert(*putOnId == V_PUT_ON);
-
-    std::println("✓ VerbRegistry integration verified");
-}
 
 int main() {
     std::println("========================================");
@@ -353,7 +327,6 @@ int main() {
     testAllSyntaxesCompleteness();
     testSpecificSyntaxPatterns();
     testSyntaxMatching();
-    testVerbRegistryPopulation();
 
     std::println("========================================");
     std::println("All GSYNTAX tests passed successfully! ✓");

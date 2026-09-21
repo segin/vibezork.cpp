@@ -4,7 +4,6 @@
 #include "../src/world/rooms.h"
 #include "../src/world/objects.h"
 #include "../src/parser/parser.h"
-#include "../src/parser/verb_registry.h"
 #include <sstream>
 
 // Output capture helpers
