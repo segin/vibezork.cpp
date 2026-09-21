@@ -1,5 +1,6 @@
 #include "parser/gparser.h"
 #include "core/globals.h"
+#include "core/gmacros.h"
 #include "core/io.h"
 #include "core/object.h"
 #include "verbs/verbs.h"
@@ -1435,7 +1436,7 @@ bool getObject(std::vector<ZObject *> &tbl, bool vrb) {
       // every match is kept
     } else if ((g.pGetFlags & P_ONE) && len != 0) {
       if (len != 1) {
-        int pick = (std::rand() % len) + 1; // <RANDOM .LEN>
+        int pick = GMacros::random(len); // <RANDOM .LEN>
         tbl[0] = tbl[pick - 1];              // <PUT .TBL 1 <GET .TBL <RANDOM .LEN>>>
         print("(How about the ");
         printDesc(tbl[0]);

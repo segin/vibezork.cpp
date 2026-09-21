@@ -10,7 +10,7 @@ test, build, commit, push; then mark `[x]` and update the counters. Every routin
 ported carries `// ZIL:` and `// Source: <file>:<lines>` comments. Never simplify
 away a ZIL behaviour.
 
-Progress: 23/74 (31%)
+Progress: 24/74 (32%)
 
 ## Phase A: engine foundations (src/core, src/systems/timer)
 
@@ -40,7 +40,7 @@ Progress: 23/74 (31%)
 - [x] B9 NUMBER? with all rejection rules and W?INTNUM substitution; INTNUM object (gparser.zil:512-534)
 - [x] B10 LIT? via the object search with P-GWIMBIT=ONBIT, THIS-IT? byte adjective matching, ACCESSIBLE?/META-LOC, ALWAYS-LIT (gparser.zil:1315-1407)
 - [x] B11 Wire GParser/GSyntax as the runtime parser; delete the hand-typed Parser vocabulary, VerbRegistry duplicates, numbered disambiguation menu, INHIBIT flag, "everything", GWIMBIT auto-select, extra prepositions, and every invented parser message (parser.cpp, verb_registry.cpp)
-- [ ] B12 Debug syntaxes $VERIFY, #RANDOM, #COMMAND, #RECORD, #UNRECORD with their prefixes; V-COMMAND-FILE/V-RECORD/V-UNRECORD/V-RANDOM/V-VERIFY per gverbs.zil:123-147
+- [x] B12 Debug syntaxes $VERIFY, #RANDOM, #COMMAND, #RECORD, #UNRECORD with their prefixes; V-COMMAND-FILE/V-RECORD/V-UNRECORD/V-RANDOM/V-VERIFY per gverbs.zil:123-147
 
 ## Phase C: generic verbs (src/verbs, gverbs.zil)
 

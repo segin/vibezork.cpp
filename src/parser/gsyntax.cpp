@@ -957,8 +957,8 @@ void initialize() {
     {
         ZilSyntax s;
         s.zilSource = "zil/gsyntax.zil:71";
-        s.patternString = "\\#RANDOM OBJECT";
-        s.verb = "\\#RANDOM";
+        s.patternString = "#RANDOM OBJECT";
+        s.verb = "#RANDOM";
         s.verbId = V_RANDOM;
         s.actionName = "V-RANDOM";
         s.actionId = V_RANDOM;
@@ -967,7 +967,7 @@ void initialize() {
         {
             SyntaxElement e;
             e.type = SyntaxElement::Type::VERB;
-            e.value = "\\#RANDOM";
+            e.value = "#RANDOM";
             s.elements.push_back(std::move(e));
         }
         {
@@ -980,8 +980,8 @@ void initialize() {
     {
         ZilSyntax s;
         s.zilSource = "zil/gsyntax.zil:73";
-        s.patternString = "\\#COMMAND";
-        s.verb = "\\#COMMAND";
+        s.patternString = "#COMMAND";
+        s.verb = "#COMMAND";
         s.verbId = V_COMMAND;
         s.actionName = "V-COMMAND-FILE";
         s.actionId = V_COMMAND_FILE;
@@ -990,7 +990,7 @@ void initialize() {
         {
             SyntaxElement e;
             e.type = SyntaxElement::Type::VERB;
-            e.value = "\\#COMMAND";
+            e.value = "#COMMAND";
             s.elements.push_back(std::move(e));
         }
         g_syntaxes.push_back(std::move(s));
@@ -998,8 +998,8 @@ void initialize() {
     {
         ZilSyntax s;
         s.zilSource = "zil/gsyntax.zil:75";
-        s.patternString = "\\#RECORD";
-        s.verb = "\\#RECORD";
+        s.patternString = "#RECORD";
+        s.verb = "#RECORD";
         s.verbId = V_RECORD;
         s.actionName = "V-RECORD";
         s.actionId = V_RECORD;
@@ -1008,7 +1008,7 @@ void initialize() {
         {
             SyntaxElement e;
             e.type = SyntaxElement::Type::VERB;
-            e.value = "\\#RECORD";
+            e.value = "#RECORD";
             s.elements.push_back(std::move(e));
         }
         g_syntaxes.push_back(std::move(s));
@@ -1016,8 +1016,8 @@ void initialize() {
     {
         ZilSyntax s;
         s.zilSource = "zil/gsyntax.zil:77";
-        s.patternString = "\\#UNRECORD";
-        s.verb = "\\#UNRECORD";
+        s.patternString = "#UNRECORD";
+        s.verb = "#UNRECORD";
         s.verbId = V_UNRECORD;
         s.actionName = "V-UNRECORD";
         s.actionId = V_UNRECORD;
@@ -1026,7 +1026,7 @@ void initialize() {
         {
             SyntaxElement e;
             e.type = SyntaxElement::Type::VERB;
-            e.value = "\\#UNRECORD";
+            e.value = "#UNRECORD";
             s.elements.push_back(std::move(e));
         }
         g_syntaxes.push_back(std::move(s));

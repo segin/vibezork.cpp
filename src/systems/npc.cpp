@@ -1,3 +1,4 @@
+#include "core/gmacros.h"
 #include "npc.h"
 #include "core/globals.h"
 #include "core/io.h"
@@ -13,16 +14,15 @@ namespace NPCSystem {
 // Global thief state
 static ThiefState thiefState;
 
-// Random number generator
-static std::mt19937 rng(std::random_device{}());
 
 ThiefState& getThiefState() {
     return thiefState;
 }
 
 int randomRange(int min, int max) {
-    std::uniform_int_distribution<int> dist(min, max);
-    return dist(rng);
+    // The game's single RANDOM generator (seedable with #RANDOM)
+    if (max < min) return min;
+    return min + GMacros::random(max - min + 1) - 1;
 }
 
 ZObject* getThief() {

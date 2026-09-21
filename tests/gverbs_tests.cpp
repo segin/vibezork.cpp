@@ -1,4 +1,5 @@
 #include "core/globals.h"
+#include "core/gmacros.h"
 #include "core/gmain.h"
 #include "verbs/verbs.h"
 #include "world/objects.h"
@@ -6,6 +7,8 @@
 #include <cassert>
 #include <iostream>
 #include <print>
+#include <sstream>
+#include <vector>
 
 // ZIL: Test suite for gverbs.zil preactions and system routines
 // Source: zil/gverbs.zil:1-1530
@@ -141,6 +144,65 @@ void testGVerbsSystemRoutines() {
   std::println("✓ System routines verified against gverbs.zil");
 }
 
+// ZIL: the debug verbs of gverbs.zil:123-147
+void testDebugVerbs() {
+  std::println("Testing V-VERIFY, V-RANDOM, V-RECORD, V-UNRECORD, V-COMMAND-FILE...");
+  auto &g = Globals::instance();
+  g.reset();
+  auto intnum = std::make_unique<ZObject>(ObjectIds::INTNUM, "number");
+  ZObject *intnumPtr = intnum.get();
+  g.registerObject(ObjectIds::INTNUM, std::move(intnum));
+  auto other = std::make_unique<ZObject>(7001, "rock");
+  ZObject *otherPtr = other.get();
+  g.registerObject(7001, std::move(other));
+  {
+    std::stringstream buf;
+    auto *old = std::cout.rdbuf(buf.rdbuf());
+    assert(Verbs::vVerify());
+    std::cout.rdbuf(old);
+    assert(buf.str() == "Verifying disk...\nThe disk is correct.\n");
+  }
+  g.prso = otherPtr;
+  {
+    std::stringstream buf;
+    auto *old = std::cout.rdbuf(buf.rdbuf());
+    assert(!Verbs::vRandom());
+    std::cout.rdbuf(old);
+    assert(buf.str() == "Illegal call to #RND.\n");
+  }
+  // #RANDOM seeds the one generator: the same seed gives the same sequence
+  g.prso = intnumPtr;
+  g.pNumber = 1984;
+  {
+    std::stringstream buf;
+    auto *old = std::cout.rdbuf(buf.rdbuf());
+    assert(Verbs::vRandom());
+    std::cout.rdbuf(old);
+    assert(buf.str().empty());
+  }
+  std::vector<int> first;
+  for (int i = 0; i < 8; ++i) first.push_back(GMacros::random(100));
+  bool probFirst = GMacros::prob(50);
+  assert(Verbs::vRandom());
+  for (int i = 0; i < 8; ++i) assert(GMacros::random(100) == first[i]);
+  assert(GMacros::prob(50) == probFirst);
+  for (int v : first) assert(v >= 1 && v <= 100);
+  // A different seed gives a different sequence (with overwhelming probability)
+  g.pNumber = 7;
+  assert(Verbs::vRandom());
+  std::vector<int> second;
+  for (int i = 0; i < 8; ++i) second.push_back(GMacros::random(100));
+  assert(first != second);
+  {
+    std::stringstream buf;
+    auto *old = std::cout.rdbuf(buf.rdbuf());
+    assert(Verbs::vRecord() && Verbs::vUnrecord() && Verbs::vCommandFile());
+    std::cout.rdbuf(old);
+    assert(buf.str().empty());
+  }
+  std::println("✓ Debug verbs verified against gverbs.zil:123-147");
+}
+
 int main() {
   std::println("========================================");
   std::println("Running GVERBS Tests (gverbs.zil)");
@@ -148,6 +210,7 @@ int main() {
 
   testGVerbsPreactions();
   testGVerbsSystemRoutines();
+  testDebugVerbs();
 
   std::println("========================================");
   std::println("All GVERBS Tests Passed successfully!");

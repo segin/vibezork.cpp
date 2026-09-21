@@ -4,6 +4,7 @@
 #include "../systems/npc.h"
 #include "../systems/score.h"
 #include "core/globals.h"
+#include "core/gmacros.h"
 #include "core/gmain.h"
 #include "core/io.h"
 #include "parser/parser.h"
@@ -3248,23 +3249,33 @@ bool vFirstLook() {
   return Verbs::vLook();
 }
 
+// ZIL: <ROUTINE V-RANDOM () ...> (gverbs.zil:134-139)
+// #RANDOM n: <RANDOM <- 0 ,P-NUMBER>> reseeds the interpreter's generator.
 bool vRandom() {
-  printLine("Randomness toggled (simulated).");
+  auto &g = Globals::instance();
+  if (!g.prso || g.prso->getId() != ObjectIds::INTNUM) {
+    printLine("Illegal call to #RND.");
+    return RFALSE;
+  }
+  GMacros::seedRandom(static_cast<uint32_t>(g.pNumber));
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-RECORD () <DIROUT 4> <RTRUE>> (gverbs.zil:141-143)
+// The interpreter's command-recording stream has no equivalent here.
 bool vRecord() {
-  printLine("Feature not supported.");
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-UNRECORD () <DIROUT -4> <RTRUE>> (gverbs.zil:145-147)
 bool vUnrecord() {
-  printLine("Feature not supported.");
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-VERIFY () ...> (gverbs.zil:123-128)
 bool vVerify() {
-  printLine("Game file integrity verified.");
+  printLine("Verifying disk...");
+  printLine("The disk is correct.");
   return RTRUE;
 }
 
@@ -3297,7 +3308,7 @@ bool vSkip() {
     "Are you enjoying yourself?",
     "Wheeeeeeeeee!!!!!"
   };
-  printLine(wheeeee[rand() % wheeeee.size()]);
+  printLine(wheeeee[GMacros::random(static_cast<int>(wheeeee.size())) - 1]);
   return true;
 }
 
@@ -3308,9 +3319,10 @@ bool vSspray() {
   return vSpray();
 }
 
-// ZIL: <ROUTINE V-COMMAND-FILE () ...> (gverbs.zil:130-132)
+// ZIL: <ROUTINE V-COMMAND-FILE () <DIRIN 1> <RTRUE>> (gverbs.zil:130-132)
+// The interpreter's command-file input stream has no equivalent here.
 bool vCommandFile() {
-  return true;
+  return RTRUE;
 }
 
 // ============================================================================

@@ -1,3 +1,4 @@
+#include "core/gmacros.h"
 #include "death.h"
 #include "score.h"
 #include "timer.h"
@@ -119,10 +120,10 @@ static void randomizeObjects() {
         
         int tvalue = item->getProperty(P_TVALUE);
         if (tvalue > 0 && !darkLandRooms.empty()) {
-            int idx = rand() % darkLandRooms.size();
+            int idx = GMacros::random(static_cast<int>(darkLandRooms.size())) - 1;
             item->moveTo(darkLandRooms[idx]);
         } else if (!aboveGroundRooms.empty()) {
-            int idx = rand() % aboveGroundRooms.size();
+            int idx = GMacros::random(static_cast<int>(aboveGroundRooms.size())) - 1;
             item->moveTo(aboveGroundRooms[idx]);
         }
     }

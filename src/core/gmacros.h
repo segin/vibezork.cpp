@@ -132,10 +132,28 @@ constexpr int rfatal() {
 // Probability and Randomization (gmacros.zil:115-123)
 // ============================================================================
 
+// The Z-machine RANDOM opcode: one generator for the whole game so that a
+// seed (#RANDOM n, V-RANDOM) makes every later RANDOM, PROB and PICK-ONE
+// sequence repeatable.
+inline std::mt19937 &randomEngine() {
+  static std::mt19937 engine{std::random_device{}()};
+  return engine;
+}
+
+// ZIL: <RANDOM n> returns 1..n (n >= 1)
+inline int random(int n) {
+  if (n < 1) return 1;
+  std::uniform_int_distribution<int> dist(1, n);
+  return dist(randomEngine());
+}
+
+// ZIL: <RANDOM <- 0 seed>>: a non-positive argument reseeds the generator
+inline void seedRandom(uint32_t seed) { randomEngine().seed(seed); }
+
 // ZIL: <ROUTINE ZPROB (BASE) ...> (gmacros.zil:119-123)
 inline bool zprob(int base) {
   int limit = Globals::instance().lucky ? 100 : 300;
-  int roll = (std::rand() % limit) + 1; // 1 to limit
+  int roll = random(limit); // <RANDOM 100> / <RANDOM 300>
   return base > roll;
 }
 
@@ -144,7 +162,7 @@ inline bool prob(int base, bool hasLoser = false) {
   if (hasLoser) {
     return zprob(base);
   }
-  int roll = (std::rand() % 100) + 1; // 1 to 100
+  int roll = random(100); // <RANDOM 100>
   return base > roll;
 }
 
@@ -159,7 +177,7 @@ inline const T &randomElement(std::span<const T> table) {
     static const T defaultVal{};
     return defaultVal;
   }
-  size_t idx = std::rand() % table.size();
+  size_t idx = static_cast<size_t>(random(static_cast<int>(table.size())) - 1);
   return table[idx];
 }
 
@@ -200,7 +218,7 @@ public:
 
     // Pick from remaining unselected items [counter_, l - 1]
     size_t remaining = l - counter_;
-    size_t rndOffset = std::rand() % remaining;
+    size_t rndOffset = static_cast<size_t>(random(static_cast<int>(remaining)) - 1);
     size_t chosenIdx = counter_ + rndOffset;
 
     // Swap chosen item into current slot

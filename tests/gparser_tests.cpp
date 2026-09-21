@@ -1059,6 +1059,40 @@ void testLitThisItAccessible() {
   std::println("✓ LIT?");
 }
 
+// ---------------------------------------------------------------------------
+// B12: debug syntaxes keep their $ and # prefixes
+// ---------------------------------------------------------------------------
+
+void testDebugSyntaxes() {
+  std::println("Testing $VERIFY / #RANDOM / #COMMAND / #RECORD / #UNRECORD...");
+  setupWorld();
+  auto &g = Globals::instance();
+  auto &s = GParser::state();
+  auto r = runParser("$verify");
+  assert(r.first && g.prsa == V_VERIFY);
+  r = runParser("verify");
+  assert(!r.first && r.second == "\n>I don't know the word \"verify\".\n");
+  // NUMBER? rejects values above 1000 (gparser.zil:528), so seeds are small
+  r = runParser("#random 999");
+  assert(r.first && g.prsa == V_RANDOM);
+  assert(s.prso.size() == 1 && s.prso[0] == g.getObject(ObjectIds::INTNUM));
+  assert(g.pNumber == 999);
+  r = runParser("#random 1984");
+  assert(!r.first && r.second == "\n>I don't know the word \"1984\".\n");
+  r = runParser("#random");
+  // the orphan question echoes the typed verb word
+  assert(!r.first && r.second == "\n>What do you want to #random?\n");
+  r = runParser("#command");
+  assert(r.first && g.prsa == V_COMMAND_FILE);
+  r = runParser("#record");
+  assert(r.first && g.prsa == V_RECORD);
+  r = runParser("#unrecord");
+  assert(r.first && g.prsa == V_UNRECORD);
+  r = runParser("random 5");
+  assert(!r.first);
+  std::println("✓ debug syntaxes");
+}
+
 } // namespace
 
 int main() {
@@ -1082,6 +1116,7 @@ int main() {
   testManyAndTakeCheck();
   testNumber();
   testLitThisItAccessible();
+  testDebugSyntaxes();
   std::println("All gparser tests passed.");
   return 0;
 }

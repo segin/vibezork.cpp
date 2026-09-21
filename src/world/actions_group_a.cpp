@@ -1,3 +1,4 @@
+#include "core/gmacros.h"
 #include "core/gglobals.h"
 #include "core/globals.h"
 #include "core/io.h"
@@ -2121,7 +2122,7 @@ void flyMe() {
 
   // <GOTO <PICK-ONE ,BAT-DROPS> <>>
   if (!BAT_DROPS.empty()) {
-    int idx = std::rand() % BAT_DROPS.size();
+    int idx = GMacros::random(static_cast<int>(BAT_DROPS.size())) - 1;
     ObjectId targetId = BAT_DROPS[idx];
     ZObject *target = g.getObject(targetId);
     if (target) {

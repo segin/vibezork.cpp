@@ -1,3 +1,4 @@
+#include "core/gmacros.h"
 #include "combat.h"
 #include "timer.h"
 #include "death.h"
@@ -186,7 +187,7 @@ int CombatManager::calculateDamage(const Combatant& attacker, const Combatant& d
     if (variance < 1) {
         variance = 1;
     }
-    int randomFactor = (rand() % (variance * 2 + 1)) - variance;
+    int randomFactor = (GMacros::random(variance * 2 + 1) - 1) - variance;
     int damage = baseDamage + randomFactor;
     
     // Ensure minimum damage of 1
@@ -230,7 +231,7 @@ bool CombatManager::attackSucceeds(const Combatant& attacker, const Combatant& d
     }
     
     // Roll for hit
-    int roll = rand() % 100;
+    int roll = GMacros::random(100) - 1;
     return roll < hitChance;
 }
 
@@ -247,7 +248,7 @@ bool CombatManager::shouldEnemyFlee(const Combatant& enemy) {
     if (enemy.health < enemy.maxHealth * 3 / 10) {
         // Higher chance to flee when more wounded
         int fleeChance = 40 + ((enemy.maxHealth - enemy.health) * 20 / enemy.maxHealth);
-        return (rand() % 100) < fleeChance;
+        return (GMacros::random(100) - 1) < fleeChance;
     }
     return false;
 }
