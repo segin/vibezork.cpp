@@ -2,7 +2,6 @@
 #include "world.h"
 #include "objects.h"
 #include "rooms.h"
-#include "world_objects.h"
 #include "dungeon.h"
 #include "pseudo_actions.h"
 #include "zil_loader.h"
