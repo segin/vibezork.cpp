@@ -908,6 +908,51 @@ void testManyAndTakeCheck() {
   std::println("✓ TAKE-CHECK");
 }
 
+// ---------------------------------------------------------------------------
+// B9: NUMBER?
+// ---------------------------------------------------------------------------
+
+void testNumber() {
+  std::println("Testing NUMBER?...");
+  setupWorld();
+  auto &g = Globals::instance();
+  auto &s = GParser::state();
+  ZObject *intnum = g.getObject(ObjectIds::INTNUM);
+  assert(intnum);
+  auto r = runParser("take 1000");
+  assert(r.first && s.prso.size() == 1 && s.prso[0] == intnum);
+  assert(g.pNumber == 1000);
+  r = runParser("take 0");
+  assert(r.first && g.pNumber == 0);
+  // Times: hh:mm, hours below 8 are afternoon
+  r = runParser("take 12:30");
+  assert(r.first && g.pNumber == 750);
+  r = runParser("take 7:30");
+  assert(r.first && g.pNumber == 1170);
+  // Rejections read back as unknown words
+  r = runParser("take 1001");
+  assert(!r.first && r.second == "\n>I don't know the word \"1001\".\n");
+  r = runParser("take 25:00");
+  assert(!r.first && r.second == "\n>I don't know the word \"25:00\".\n");
+  r = runParser("take 100000");
+  assert(!r.first && r.second == "\n>I don't know the word \"100000\".\n");
+  r = runParser("take 12a");
+  assert(!r.first && r.second == "\n>I don't know the word \"12a\".\n");
+  // P-NUMBER is reset by any new sentence that is not AGAIN
+  r = runParser("take 5");
+  assert(g.pNumber == 5);
+  r = runParser("look");
+  assert(g.pNumber == 0);
+  // The number prints through BUFFER-PRINT as its value
+  r = runParser("take 42");
+  {
+    OutputCapture cap;
+    GParser::thingPrint(true, true);
+    assert(cap.str() == "42");
+  }
+  std::println("✓ NUMBER?");
+}
+
 } // namespace
 
 int main() {
@@ -929,6 +974,7 @@ int main() {
   testGetObject();
   testGlobalCheckAndWhichPrint();
   testManyAndTakeCheck();
+  testNumber();
   std::println("All gparser tests passed.");
   return 0;
 }

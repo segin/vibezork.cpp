@@ -601,7 +601,6 @@ bool isLit(ZObject *rm, bool rmbit) {
 // Routines ported in later items (B2-B10)
 // ============================================================================
 
-const DictWord *numberQ(int) { return nullptr; }
 bool cantOrphan() {
   printLine("\"I don't understand! What are you referring to?\"");
   return false;
@@ -1649,6 +1648,49 @@ bool manyCheck() {
     return false;
   }
   return true;
+}
+
+
+// ============================================================================
+// NUMBER? (gparser.zil:512-535)
+// ============================================================================
+
+// ZIL: <ROUTINE NUMBER? (PTR ...> (gparser.zil:512-535)
+// Reads the typed characters of entry PTR as a number or hh:mm time. The
+// entry's word becomes W?INTNUM before the final range checks, exactly as
+// the ZIL does; P-NUMBER holds the value.
+const DictWord *numberQ(int ptr) {
+  auto &g = Globals::instance();
+  auto &s = state();
+  const DictWord *intnum = W("intnum");
+  if (ptr < 0 || ptr >= static_cast<int>(s.lexv.e.size())) return nullptr;
+  const std::string &text = s.lexv.e[ptr].text;
+  int sum = 0;
+  std::optional<int> tim;
+  for (char chr : text) {
+    if (chr == ':') {
+      tim = sum;
+      sum = 0;
+    } else if (sum > 10000) {
+      return nullptr;
+    } else if (chr >= '0' && chr <= '9') {
+      sum = sum * 10 + (chr - '0');
+    } else {
+      return nullptr;
+    }
+  }
+  s.lexv.e[ptr].w = intnum; // <PUT ,P-LEXV .PTR ,W?INTNUM>
+  if (sum > 1000) return nullptr;
+  if (tim) {
+    if (*tim < 8) {
+      tim = *tim + 12;
+    } else if (*tim > 23) {
+      return nullptr;
+    }
+    sum += *tim * 60;
+  }
+  g.pNumber = sum;
+  return intnum;
 }
 
 } // namespace GParser
