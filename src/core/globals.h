@@ -96,7 +96,7 @@ public:
   bool mirrorMung = false; ///< ZIL: ,MIRROR-MUNG (1actions.zil:968)
 
   // Parser state
-  bool pCont = false;
+  int pCont = 0;           ///< ZIL: ,P-CONT (P-LEXV entry index to continue from; 0 = none)
   bool quoteFlag = false;
   bool pOflag = false;     ///< ZIL: ,P-OFLAG (Orphan flag)
   bool pMerged = false;    ///< ZIL: ,P-MERGED (Merged sentence flag)

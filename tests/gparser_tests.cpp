@@ -321,6 +321,145 @@ void testSearchAndLit() {
   std::println("✓ search");
 }
 
+// ---------------------------------------------------------------------------
+// B2: PARSER lexical stage and CLAUSE
+// ---------------------------------------------------------------------------
+
+// Runs PARSER on one line with output captured; returns P-WON and the text.
+std::pair<bool, std::string> runParser(const std::string &line) {
+  GParser::setNextInput(line);
+  OutputCapture cap;
+  bool won = GParser::parser();
+  return {won, cap.str()};
+}
+
+void testParserDirections() {
+  std::println("Testing PARSER direction short-cuts...");
+  setupWorld();
+  auto &g = Globals::instance();
+  auto &s = GParser::state();
+  auto [won, out] = runParser("n");
+  assert(won);
+  assert(out == "\n>");
+  assert(g.prsa == V_WALK && g.pWalkDir == Direction::NORTH);
+  assert(s.againDir == Direction::NORTH);
+  assert(!g.pOflag);
+
+  auto r2 = runParser("go northeast");
+  assert(r2.first && g.pWalkDir == Direction::NE);
+
+  // "walk to the north" is not a direction command (LEN > 2)
+  g.pWalkDir.reset();
+  auto r3 = runParser("walk north now");
+  (void)r3;
+  assert(!g.pWalkDir); // fails later (unknown word "now")
+
+  // "n then s": the first parse walks north and leaves P-CONT at "s"
+  auto r4 = runParser("n then s");
+  assert(r4.first && g.pWalkDir == Direction::NORTH);
+  assert(g.pCont == 2);
+  assert(s.lexv.count == 1);
+  // The THEN with no verb became a quote and the ITBL verb TELL (gparser.zil:261-266)
+  assert(g.quoteFlag);
+  auto r5 = runParser("");
+  assert(r5.first && g.pWalkDir == Direction::SOUTH);
+  assert(g.pCont == 0);
+  assert(r5.second == "\n"); // P-CONT continuation: a CRLF but no prompt
+  std::println("✓ directions");
+}
+
+void testParserClauses() {
+  std::println("Testing PARSER noun clauses...");
+  setupWorld();
+  auto &g = Globals::instance();
+  auto &s = GParser::state();
+  // SYNTAX-CHECK is not ported yet, so the parse stops after the tables
+  // are filled; inspect P-ITBL.
+  runParser("open the small mailbox");
+  assert(s.itbl.verb == "open");
+  assert(s.itbl.verbn && s.vtbl.word == GParser::lookupWord("open") && s.vtbl.text == "open");
+  assert(s.ncn == 1);
+  assert(s.itbl.nc1 == GParser::Ptr::lex(2)); // THE skipped
+  assert(s.itbl.nc1l == GParser::Ptr::lex(4));
+  assert(s.itbl.prep1 == 0 && s.itbl.nc2.isNull());
+
+  runParser("put leaflet in mailbox");
+  assert(s.itbl.verb == "put" && s.ncn == 2);
+  assert(s.itbl.nc1 == GParser::Ptr::lex(1) && s.itbl.nc1l == GParser::Ptr::lex(2));
+  assert(s.itbl.prep2 == GParser::lookupWord("in")->prep);
+  assert(s.itbl.prep2n == GParser::lookupWord("in"));
+  assert(s.itbl.nc2 == GParser::Ptr::lex(3) && s.itbl.nc2l == GParser::Ptr::lex(4));
+
+  // Trailing preposition: P-END-ON-PREP and PREP1
+  runParser("look up");
+  assert(s.itbl.verb == "look" && s.ncn == 0);
+  assert(s.endOnPrep && s.itbl.prep1 == GParser::lookupWord("up")->prep);
+
+  runParser("take all except mailbox");
+  assert(s.ncn == 1);
+  assert(s.itbl.nc1 == GParser::Ptr::lex(1) && s.itbl.nc1l == GParser::Ptr::lex(4));
+
+  runParser("take lamp and sword");
+  assert(s.ncn == 1);
+  assert(s.itbl.nc1 == GParser::Ptr::lex(1) && s.itbl.nc1l == GParser::Ptr::lex(4));
+
+  // "take lamp and go north": AND before a verb becomes THEN
+  runParser("take lamp and go north");
+  assert(s.ncn == 1);
+  assert(s.lexv.e[2].w == GParser::W("then"));
+  assert(g.pCont == 3);
+  g.pCont = 0;
+
+  // TO after TELL is a quote
+  runParser("tell troll to go north");
+  assert(s.itbl.verb == "tell" && s.ncn == 1);
+  assert(g.quoteFlag);
+  assert(g.pCont == 3);
+  g.pCont = 0;
+  g.quoteFlag = false;
+
+  // Period ends the sentence
+  runParser("open mailbox. read leaflet");
+  assert(s.itbl.verb == "open" && s.ncn == 1);
+  assert(s.itbl.nc1l == GParser::Ptr::lex(2));
+  assert(g.pCont == 3);
+  g.pCont = 0;
+
+  // Adjective-only clauses are accepted here (GET-OBJECT decides later)
+  runParser("take small");
+  assert(s.ncn == 1);
+  std::println("✓ clauses");
+}
+
+void testParserMessages() {
+  std::println("Testing PARSER messages...");
+  setupWorld();
+  auto &g = Globals::instance();
+  auto r = runParser("");
+  assert(!r.first && r.second == "\n>I beg your pardon?\n");
+  r = runParser("frobnicate the mailbox");
+  assert(!r.first && r.second == "\n>I don't know the word \"frobnicate\".\n");
+  r = runParser("x mailbox");
+  assert(!r.first && r.second == "\n>I don't know the word \"x\".\n");
+  r = runParser("open mailbox.");
+  assert(g.pCont == 0);
+  r = runParser("take of");
+  assert(!r.first && r.second == "\n>You used the word \"of\" in a way that I don't understand.\n");
+  r = runParser("put lamp in mailbox on table");
+  assert(!r.first && r.second == "\n>There were too many nouns in that sentence.\n");
+  r = runParser("tell troll attack");
+  assert(!r.first && r.second.contains("Please consult your manual for the correct way to talk to other people or creatures."));
+  // An unknown word records OOPS-TABLE O-PTR
+  runParser("open frob");
+  assert(GParser::state().oops.ptr == 1);
+  // SUPER-BRIEF suppresses the blank line before the prompt
+  g.superbriefMode = true;
+  r = runParser("");
+  assert(r.second == ">I beg your pardon?\n");
+  g.superbriefMode = false;
+  std::println("✓ messages");
+}
+
 } // namespace
 
 int main() {
@@ -333,6 +472,9 @@ int main() {
   testUnknownAndCantUse();
   testBufferPrint();
   testSearchAndLit();
+  testParserDirections();
+  testParserClauses();
+  testParserMessages();
   std::println("All gparser tests passed.");
   return 0;
 }

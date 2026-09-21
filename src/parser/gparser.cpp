@@ -99,19 +99,34 @@ std::string zkey(std::string_view word) {
   return key;
 }
 
-void invalidateDictionary() { dict().built = false; }
+void invalidateDictionary() {
+  dict().built = false;
+  dict().objectCount = 0;
+}
 
 void buildDictionary() {
   auto &g = Globals::instance();
   auto &d = dict();
   if (d.built && d.objectCount == g.getAllObjects().size()) return;
-  d.words.clear();
-  d.verbs.clear();
-  d.prepositions.clear();
-  d.prepNumbers.clear();
-  d.prepositions.push_back(nullptr); // prep numbers start at 1
+  // Dictionary words are never removed (pointers into the map stay valid
+  // across rebuilds); a rebuild only adds the words of new objects.
+  if (!d.built) {
+    d.words.clear();
+    d.verbs.clear();
+    d.prepositions.clear();
+    d.prepNumbers.clear();
+    d.prepositions.push_back(nullptr); // prep numbers start at 1
+  }
 
   const auto &syntaxes = GSyntax::getAllSyntaxes();
+  if (d.built) {
+    for (const auto &[id, obj] : g.getAllObjects()) {
+      for (const auto &syn : obj->getSynonyms()) addWord(syn, PS_OBJECT);
+      for (const auto &adj : obj->getAdjectives()) addWord(adj, PS_ADJECTIVE);
+    }
+    d.objectCount = g.getAllObjects().size();
+    return;
+  }
 
   // Prepositions: numbered in order of first appearance (PREPOSITIONS table).
   for (const auto &s : syntaxes) {
@@ -578,7 +593,6 @@ bool isLit(ZObject *rm, bool rmbit) {
 // Routines ported in later items (B2-B10)
 // ============================================================================
 
-std::optional<int> clause(int, int, const DictWord *) { return std::nullopt; }
 const DictWord *numberQ(int) { return nullptr; }
 bool orphanMerge() { return false; }
 bool aclauseWin(const DictWord *) { return true; }
@@ -619,6 +633,321 @@ void globalCheck(std::vector<ZObject *> &) {}
 bool takeCheck() { return true; }
 bool itakeCheck(std::vector<ZObject *> &, int) { return true; }
 bool manyCheck() { return true; }
-bool parser() { return false; }
+
+
+// ============================================================================
+// PARSER and CLAUSE (gparser.zil:109-380, 440-510)
+// ============================================================================
+
+namespace {
+
+bool isThenPeriod(const DictWord *w) { return w && (w == W("then") || w == W(".")); }
+bool isCommaAnd(const DictWord *w) { return w && (w == W(",") || w == W("and")); }
+
+void setPrepSlot(ITbl &t, int num, int val, const DictWord *wrd) {
+  if (num == P_PREP1) {
+    t.prep1 = val;
+    t.prep1n = wrd;
+  } else {
+    t.prep2 = val;
+    t.prep2n = wrd;
+  }
+}
+
+} // namespace
+
+// ZIL: <ROUTINE CLAUSE (PTR VAL WRD ...> (gparser.zil:440-510)
+// PTR is a P-LEXV entry index. Returns the entry index of the clause's
+// last word, -1 when the input is exhausted, nullopt on RFALSE.
+std::optional<int> clause(int ptr, int val, const DictWord *wrd) {
+  auto &g = Globals::instance();
+  auto &s = state();
+  int off = (s.ncn - 1) * 2;
+  int num;
+  bool andflg = false;
+  bool first = true;
+  const DictWord *nw = nullptr;
+  const DictWord *lw = nullptr;
+  if (val != 0) {
+    num = P_PREP1 + off;
+    setPrepSlot(s.itbl, num, val, wrd);
+    ptr += 1;
+  } else {
+    s.len += 1;
+  }
+  if (s.len == 0) {
+    s.ncn -= 1;
+    return -1;
+  }
+  num = P_NC1 + off;
+  s.itbl.slot(num) = Ptr::lex(ptr);
+  {
+    const DictWord *w = s.lexv.e[ptr].w;
+    if (w && (w == W("the") || w == W("a") || w == W("an"))) {
+      s.itbl.slot(num) = Ptr::lex(ptr + 1);
+    }
+  }
+  while (true) {
+    if (--s.len < 0) {
+      s.itbl.slot(num + 1) = Ptr::lex(ptr);
+      return -1;
+    }
+    wrd = s.lexv.e[ptr].w;
+    if (!wrd) wrd = numberQ(ptr);
+    if (wrd) {
+      nw = (s.len == 0) ? nullptr : s.lexv.e[ptr + 1].w;
+      if (isCommaAnd(wrd)) {
+        andflg = true;
+      } else if (wrd == W("all") || wrd == W("one")) {
+        if (nw && nw == W("of")) {
+          s.len -= 1;
+          ptr += 1;
+        }
+      } else if (isThenPeriod(wrd) ||
+                 (wt(wrd, PS_PREPOSITION) && !s.itbl.verb.empty() && !first)) {
+        // "ADDED 4/27 FOR TURTLE,UP"
+        s.len += 1;
+        s.itbl.slot(num + 1) = Ptr::lex(ptr);
+        return ptr - 1;
+      } else if (wt(wrd, PS_OBJECT)) {
+        if (s.len > 0 && nw && nw == W("of") && !(wrd == W("all") || wrd == W("one"))) {
+          // adjective-like noun followed by OF: keep scanning
+        } else if (wt(wrd, PS_ADJECTIVE) && nw != nullptr && wt(nw, PS_OBJECT)) {
+          // adjective use of an object word
+        } else if (!andflg && !(nw && (nw == W("but") || nw == W("except"))) && !isCommaAnd(nw)) {
+          s.itbl.slot(num + 1) = Ptr::lex(ptr + 1);
+          return ptr;
+        } else {
+          andflg = false;
+        }
+      } else if ((g.pMerged || g.pOflag || !s.itbl.verb.empty()) &&
+                 (wt(wrd, PS_ADJECTIVE) || wt(wrd, PS_BUZZ_WORD))) {
+        // adjectives and buzzwords inside the clause
+      } else if (andflg && (wt(wrd, PS_DIRECTION) || wt(wrd, PS_VERB))) {
+        // "take lamp and go north": the AND becomes THEN
+        ptr -= 2;
+        s.lexv.e[ptr + 1].w = W("then");
+        s.len += 2;
+      } else if (wt(wrd, PS_PREPOSITION)) {
+        // a preposition as the first word of the clause
+      } else {
+        cantUse(ptr);
+        return std::nullopt;
+      }
+    } else {
+      unknownWord(ptr);
+      return std::nullopt;
+    }
+    lw = wrd;
+    (void)lw;
+    first = false;
+    ptr += 1;
+  }
+}
+
+// ZIL: <ROUTINE PARSER ("AUX" ...) ...> (gparser.zil:109-380)
+bool parser() {
+  auto &g = Globals::instance();
+  auto &s = state();
+  buildDictionary();
+  int ptr = 0;               // P-LEXSTART as an entry index
+  const DictWord *wrd = nullptr;
+  int val = 0;
+  std::string verb;          // VERB (an ACT? value; empty = <>)
+  bool ofFlag = false;
+  ZObject *owinner = nullptr;
+  bool omerged = false;
+  int len = 0;
+  std::optional<Direction> dir;
+  const DictWord *nw = nullptr;
+  const DictWord *lw = nullptr;
+
+  // <REPEAT ... <COND (<NOT ,P-OFLAG> <PUT ,P-OTBL .CNT <GET ,P-ITBL .CNT>>)>
+  //             <PUT ,P-ITBL .CNT 0>>
+  if (!g.pOflag) s.otbl = s.itbl;
+  s.itbl.clear();
+  owinner = g.winner;
+  omerged = g.pMerged;
+  // P-ADVERB is dead in Zork I
+  g.pMerged = false;
+  s.endOnPrep = false;
+  s.prso.clear();
+  s.prsi.clear();
+  s.buts.clear();
+  if (!g.quoteFlag && g.winner != g.player) {
+    g.winner = g.player;
+    g.here = metaLoc(g.player);
+    g.lit = isLit(g.here);
+  }
+  if (s.reservePtr >= 0) {
+    ptr = s.reservePtr;
+    stuff(s.reserveLexv, s.lexv);
+    if (!g.superbriefMode && g.player == g.winner) crlf();
+    s.reservePtr = -1;
+    g.pCont = 0;
+  } else if (g.pCont) {
+    ptr = g.pCont;
+    if (!g.superbriefMode && g.player == g.winner && g.prsa != V_SAY) crlf();
+    g.pCont = 0;
+  } else {
+    g.winner = g.player;
+    g.quoteFlag = false;
+    if (g.winner && !(g.winner->getLocation() && g.winner->getLocation()->hasFlag(ObjectFlag::VEHBIT))) {
+      g.here = g.winner->getLocation();
+    }
+    g.lit = isLit(g.here);
+    if (!g.superbriefMode) crlf();
+    print(">");
+    if (g_nextInput) {
+      std::string line = std::move(*g_nextInput);
+      g_nextInput.reset();
+      read(line);
+    } else {
+      read(readLine());
+    }
+  }
+  s.len = s.lexv.count;
+  if (s.len == 0) {
+    printLine("I beg your pardon?");
+    return false;
+  }
+  wrd = s.lexv.e[ptr].w;
+  if (wrd && wrd == W("oops")) {
+    // Ported in B3 (OOPS)
+    if (!(s.len > 1)) {
+      printLine("I can't help your clumsiness.");
+      return false;
+    }
+    s.oops.end = false;
+    printLine("There was no word to replace!");
+    return false;
+  } else {
+    if (!(wrd && (wrd == W("again") || wrd == W("g")))) g.pNumber = 0;
+    s.oops.end = false;
+  }
+  if (wrd && (wrd == W("again") || wrd == W("g"))) {
+    // Ported in B4 (AGAIN)
+    printLine("Beg pardon?");
+    return false;
+  } else {
+    stuff(s.lexv, s.againLexv);
+    inbufStuff(s.inbuf, s.oopsInbuf);
+    s.oops.start = ptr;
+    s.oops.length = 4 * s.len;
+    s.oops.end = true; // O-END: the byte after the last typed word
+    s.reservePtr = -1;
+    len = s.len;
+    // P-DIR is never read
+    s.ncn = 0;
+    g.pGetFlags = 0;
+    while (true) {
+      if (--s.len < 0) {
+        g.quoteFlag = false;
+        break;
+      }
+      wrd = s.lexv.e[ptr].w;
+      if (!wrd) wrd = numberQ(ptr);
+      if (wrd) {
+        nw = (s.len == 0) ? nullptr : s.lexv.e[ptr + 1].w;
+        if (wrd == W("to") && verb == "tell") {
+          wrd = W("\"");
+        } else if (wrd == W("then") && s.len > 0 && verb.empty() && !g.quoteFlag) {
+          // "Last NOT added 7/3"
+          if (lw == nullptr || lw == W(".")) {
+            wrd = W("the");
+          } else {
+            s.itbl.verb = "tell";
+            s.itbl.verbn = false;
+            wrd = W("\"");
+          }
+        }
+        if (wrd == W("then") || wrd == W(".") || wrd == W("\"")) {
+          if (wrd == W("\"")) g.quoteFlag = !g.quoteFlag;
+          if (s.len != 0) g.pCont = ptr + 1;
+          s.lexv.count = s.len;
+          break;
+        } else if (wt(wrd, PS_DIRECTION) && (verb.empty() || verb == "walk") &&
+                   (len == 1 || (len == 2 && verb == "walk") ||
+                    ((isThenPeriod(nw) || (nw && nw == W("\""))) && !(len < 2)) ||
+                    (g.quoteFlag && len == 2 && nw && nw == W("\"")) ||
+                    (len > 2 && isCommaAnd(nw)))) {
+          dir = wrd->dir;
+          if (isCommaAnd(nw)) s.lexv.e[ptr + 1].w = W("then");
+          if (!(len > 2)) {
+            g.quoteFlag = false;
+            break;
+          }
+        } else if (wt(wrd, PS_VERB) && verb.empty()) {
+          verb = wrd->verb;
+          s.itbl.verb = verb;
+          s.itbl.verbn = true;
+          s.vtbl.word = wrd;
+          s.vtbl.text = s.lexv.e[ptr].text;
+          s.vtbl.haveText = true;
+        } else if ((val = wt(wrd, PS_PREPOSITION) ? wrd->prep : 0, val != 0) ||
+                   wrd == W("all") || wrd == W("one") ||
+                   wt(wrd, PS_ADJECTIVE) || wt(wrd, PS_OBJECT)) {
+          if (s.len > 1 && nw && nw == W("of") && val == 0 &&
+              !(wrd == W("all") || wrd == W("one") || wrd == W("a"))) {
+            ofFlag = true;
+          } else if (val != 0 && (s.len == 0 || isThenPeriod(nw))) {
+            s.endOnPrep = true;
+            if (s.ncn < 2) {
+              s.itbl.prep1 = val;
+              s.itbl.prep1n = wrd;
+            }
+          } else if (s.ncn == 2) {
+            printLine("There were too many nouns in that sentence.");
+            return false;
+          } else {
+            s.ncn += 1;
+            s.act = verb;
+            auto r = clause(ptr, val, wrd);
+            if (!r) return false;
+            ptr = *r;
+            if (ptr < 0) {
+              g.quoteFlag = false;
+              break;
+            }
+          }
+        } else if (wrd == W("of")) {
+          if (!ofFlag || isThenPeriod(nw)) {
+            cantUse(ptr);
+            return false;
+          }
+          ofFlag = false;
+        } else if (wt(wrd, PS_BUZZ_WORD)) {
+          // buzzwords are skipped
+        } else if (verb == "tell" && wt(wrd, PS_VERB) && g.winner == g.player) {
+          printLine("Please consult your manual for the correct way to talk to other people or creatures.");
+          return false;
+        } else {
+          cantUse(ptr);
+          return false;
+        }
+      } else {
+        unknownWord(ptr);
+        return false;
+      }
+      lw = wrd;
+      ptr += 1;
+    }
+  }
+  s.oops.ptr = -1;
+  if (dir) {
+    g.prsa = V_WALK;
+    g.prso = nullptr; // PRSO holds the direction property in ZIL
+    g.pOflag = false;
+    g.pWalkDir = dir;
+    s.againDir = dir;
+    return true;
+  }
+  if (g.pOflag) orphanMerge();
+  g.pWalkDir.reset();
+  s.againDir.reset();
+  (void)owinner;
+  (void)omerged;
+  return syntaxCheck() && snarfObjects() && manyCheck() && takeCheck();
+}
 
 } // namespace GParser

@@ -183,7 +183,7 @@ struct Vtbl {
 
 // P-ITBL / P-OTBL (gparser.zil:82-99)
 struct ITbl {
-  const DictWord *verb = nullptr; // P-VERB (0 = none)
+  std::string verb;               // P-VERB: the ACT? value (canonical verb word; empty = 0)
   bool verbn = false;             // P-VERBN (0 or ,P-VTBL)
   int prep1 = 0;                  // P-PREP1
   const DictWord *prep1n = nullptr;
