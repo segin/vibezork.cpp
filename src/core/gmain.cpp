@@ -226,6 +226,9 @@ void initializeAllVerbHandlers() {
   registerVerbHandler(V_COMMAND_FILE, Verbs::vCommandFile);
 
   // Preactions (gverbs.zil)
+  registerVerbHandler(V_STAY, Verbs::vStay);
+  registerVerbHandler(V_TREASURE, Verbs::vTreasure);
+  registerVerbHandler(V_WIN, Verbs::vWin);
   registerVerbHandler(V_BLAST, Verbs::vBlast);
   registerVerbHandler(V_BRUSH, Verbs::vBrush);
   registerVerbHandler(V_BUG, Verbs::vBug);

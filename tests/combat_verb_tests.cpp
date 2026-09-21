@@ -278,12 +278,12 @@ TEST(ThrowVerbBasic) {
     g.prsi = trollPtr;
     g.prsa = V_THROW;
     
-    // Test THROW verb
+    // ZIL V-THROW drops the object with IDROP, which puts it in
+    // <LOC ,WINNER> (gverbs.zil:1445-1460, 1966-1977), then reports the
+    // actor ducking; the object never travels to the target.
     bool result = Verbs::vThrow();
     ASSERT_TRUE(result);
-    
-    // Verify rock is now at troll's location
-    ASSERT_EQ(rockPtr->getLocation(), trollPtr->getLocation());
+    ASSERT_EQ(rockPtr->getLocation(), g.winner->getLocation());
     
     // Cleanup
     g.reset();

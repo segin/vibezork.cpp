@@ -68,12 +68,14 @@ void testGVerbsPreactions() {
   assert(Verbs::preTurn()); // No TURNBIT
 
   bolt->setFlag(ObjectFlag::TURNBIT);
+  // ZIL PRE-TURN has no TOOLBIT test: it only refuses when there is no
+  // indirect object at all, the BOOK excepted (gverbs.zil:1488-1503).
   auto wrench = std::make_unique<ZObject>(7002, "wrench");
   g.prsi = wrench.get();
-  assert(Verbs::preTurn()); // Wrench lacks TOOLBIT
+  assert(!Verbs::preTurn()); // Valid turn: a TURNBIT object and something to turn it with
 
-  wrench->setFlag(ObjectFlag::TOOLBIT);
-  assert(!Verbs::preTurn()); // Valid turn
+  g.prsi = nullptr;
+  assert(Verbs::preTurn()); // Bare hands
 
   std::println("✓ Preaction routines verified against gverbs.zil");
 }

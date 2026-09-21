@@ -1,6 +1,7 @@
 #pragma once
 #include "core/types.h"
 #include "world/rooms.h"
+#include <optional>
 
 /**
  * @brief Verb ID Constants (from gsyntax.zil)
@@ -497,6 +498,9 @@ namespace Verbs {
     void mungRoom(ZObject *room, std::string_view desc);
     /// ZIL NO-GO-TELL (gverbs.zil:2038-2043)
     void noGoTell(ZObject *av, ZObject *wloc);
+    /// ZIL OTHER-SIDE (gverbs.zil:2173-2181): the direction of the DEXIT
+    /// whose door is this object
+    std::optional<Direction> otherSideDir(const ZObject *door);
     ZObject *otherSide(const ZObject *door);
     /// ZIL PRINT-CONT (gverbs.zil:1750-1816)
     bool printCont(const ZObject *obj, bool v = false, int level = 0);

@@ -10,7 +10,7 @@ test, build, commit, push; then mark `[x]` and update the counters. Every routin
 ported carries `// ZIL:` and `// Source: <file>:<lines>` comments. Never simplify
 away a ZIL behaviour.
 
-Progress: 36/74 (49%)
+Progress: 37/74 (50%)
 
 ## Phase A: engine foundations (src/core, src/systems/timer)
 
@@ -56,7 +56,7 @@ Progress: 36/74 (49%)
 - [x] C10 Light verbs: V-LAMP-ON (CRLF + V-LOOK when dark), V-LAMP-OFF ("It is now pitch black."), V-BURN, PRE-BURN ("With a X??!?"), V-STRIKE, REMOVE-CAREFULLY (P-IT-OBJECT clear, LIT recompute, "You are left in the dark..."), TELL-NO-PRSI ("You didn't say with what!") (gverbs.zil:240-270, 610-628, 792-826, 1329-1350)
 - [x] C11 V-ATTACK (HERO-BLOW dispatch, HANDS case), V-SWING, V-STAB with FIND-WEAPON, V-MUNG, PRE-MUNG, V-KICK, V-KISS, V-RAPE, V-ALARM with AWAKEN (gverbs.zil:176-199, 923-964, 1288-1327, 1360-1362)
 - [x] C12 Remaining generic verbs A-L verbatim: V-ADVENT, V-BACK, V-BLAST, V-BOARD, PRE-BOARD, V-BREATHE, V-BRUSH, V-BUG, V-CHOMP, V-CLIMB-UP/DOWN/FOO/ON, V-COUNT, V-CROSS, V-CUT, V-DEFLATE, V-DIG, V-DISEMBARK, V-DISENCHANT, V-DRINK, V-DRINK-FROM, V-EAT, V-ECHO, V-ENCHANT, V-ENTER, V-EXIT, V-EXORCISE, V-FILL, PRE-FILL, V-FIND, V-FOLLOW, V-FROBOZZ, V-HATCH, V-INCANT, V-INFLATE, V-KNOCK, V-LAUNCH, V-LEAN-ON, V-LEAP with JUMPLOSS/WHEEEEE, V-LEAVE, V-LISTEN, V-LOCK, V-LOOK-BEHIND, V-LOOK-UNDER, V-LOWER
-- [ ] C13 Remaining generic verbs M-Z verbatim: V-MAKE, V-MELT, V-MOVE, PRE-MOVE, V-ODYSSEUS hook, V-OIL, V-OVERBOARD, V-PICK, V-PLAY, V-PLUG, V-POUR-ON, V-PUMP, V-PUSH, V-PUSH-TO, V-RAISE, V-READ, PRE-READ, V-READ-PAGE, V-RING, V-RUB, V-SEND, V-SHAKE with SHAKE-LOOP, V-SKIP, V-SMELL, V-SPIN, V-SPRAY, V-SSPRAY, V-SQUEEZE, V-STAND, V-STAY, V-SWIM with SWIMYUKS, V-THROUGH, V-THROW, V-THROW-OFF, V-TIE, V-TIE-UP, V-TREASURE, V-TURN, PRE-TURN, V-UNLOCK, V-UNTIE, V-WAVE, V-WEAR, V-WIN, V-WIND, V-WISH, V-ZORK
+- [x] C13 Remaining generic verbs M-Z verbatim: V-MAKE, V-MELT, V-MOVE, PRE-MOVE, V-ODYSSEUS hook, V-OIL, V-OVERBOARD, V-PICK, V-PLAY, V-PLUG, V-POUR-ON, V-PUMP, V-PUSH, V-PUSH-TO, V-RAISE, V-READ, PRE-READ, V-READ-PAGE, V-RING, V-RUB, V-SEND, V-SHAKE with SHAKE-LOOP, V-SKIP, V-SMELL, V-SPIN, V-SPRAY, V-SSPRAY, V-SQUEEZE, V-STAND, V-STAY, V-SWIM with SWIMYUKS, V-THROUGH, V-THROW, V-THROW-OFF, V-TIE, V-TIE-UP, V-TREASURE, V-TURN, PRE-TURN, V-UNLOCK, V-UNTIE, V-WAVE, V-WEAR, V-WIN, V-WIND, V-WISH, V-ZORK
 - [ ] C14 Random tables as PICK-ONE tables: JUMPLOSS, WHEEEEE, HO-HUM, HELLOS, YUKS, DUMMY, SWIMYUKS; HACK-HACK, HIT-SPOT (gverbs.zil:518-532, 2024-2036, 2194-2216)
 
 ## Phase D: world data (src/world, 1dungeon.zil)

@@ -291,6 +291,8 @@ public:
     void setExit(Direction dir, const RoomExit& exit);
     
     /// Get exit for direction (returns nullptr if no exit)
+    /// All exits, in direction order (ZIL walks HERE's direction properties)
+    const std::map<Direction, RoomExit>& getExits() const { return exits_; }
     RoomExit* getExit(Direction dir);
     const RoomExit* getExit(Direction dir) const;
     
