@@ -104,7 +104,7 @@ bool serializeState(std::ofstream& out) {
     
     // Requirement 60.2: Save score and moves
     out << "SCORE=" << score.getScore() << "\n";
-    out << "MOVES=" << score.getMoves() << "\n";
+    out << "MOVES=" << g.moves << "\n";  // ZIL: ,MOVES (gverbs.zil:1843)
     
     // Save display mode settings
     out << "VERBOSE_MODE=" << (g.verboseMode ? 1 : 0) << "\n";
@@ -166,10 +166,7 @@ bool deserializeState(std::ifstream& in) {
             score.addScore(std::stoi(value));
         }
         else if (key == "MOVES") {
-            // Set moves directly (need to add setter to ScoreSystem)
-            for (int i = 0; i < std::stoi(value); i++) {
-                score.incrementMoves();
-            }
+            g.moves = std::stoi(value);
         }
         else if (key == "VERBOSE_MODE") {
             g.verboseMode = (std::stoi(value) != 0);

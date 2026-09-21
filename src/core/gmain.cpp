@@ -434,8 +434,8 @@ void mainLoop1() {
   g.lPrso = cmd.directObj;
   g.lPrsi = cmd.indirectObj;
 
-  g.moves++;
-
+  // ZIL: MOVES is incremented only inside CLOCKER (gclock.zil:50), so
+  // meta verbs and CLOCK-WAIT turns do not count.
   // Process timers if not meta-verb (ZIL: lines 170-172)
   if (g.pWon && !isMetaVerb(cmd.verb)) {
     TimerSystem::tick();

@@ -60,9 +60,7 @@ void testBasicRestore() {
     
     // Set up initial state
     score.addScore(100);
-    for (int i = 0; i < 50; i++) {
-        score.incrementMoves();
-    }
+    g.moves = 50;
     g.verboseMode = false;
     g.briefMode = true;
     
@@ -75,7 +73,7 @@ void testBasicRestore() {
     g.reset();
     score.reset();
     TEST_ASSERT(score.getScore() == 0, "Score should be reset to 0");
-    TEST_ASSERT(score.getMoves() == 0, "Moves should be reset to 0");
+    TEST_ASSERT(g.moves == 0, "Moves should be reset to 0");
     
     // Restore
     auto restoreResult = SaveSystem::restore(TEST_SAVE_FILE);
@@ -84,7 +82,7 @@ void testBasicRestore() {
     
     // Verify state was restored
     TEST_ASSERT(score.getScore() == 100, "Score should be restored to 100");
-    TEST_ASSERT(score.getMoves() == 50, "Moves should be restored to 50");
+    TEST_ASSERT(g.moves == 50, "Moves should be restored to 50");
     TEST_ASSERT(!g.verboseMode, "Verbose mode should be restored to false");
     TEST_ASSERT(g.briefMode, "Brief mode should be restored to true");
     

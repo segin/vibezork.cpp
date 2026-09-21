@@ -1,6 +1,7 @@
 #include "test_framework.h"
 #include "systems/score.h"
 #include "core/globals.h"
+#include "systems/timer.h"
 #include <iostream>
 #include <stdexcept>
 
@@ -32,23 +33,22 @@ void testScoreTracking() {
     std::cout << "✓ Score tracking test passed" << std::endl;
 }
 
-// Test move counting (Requirement 53)
+// ZIL: MOVES is a single global incremented by CLOCKER (gclock.zil:50)
 void testMoveCounting() {
-    auto& score = ScoreSystem::instance();
-    score.reset();
+    auto& g = Globals::instance();
+    g.reset();
+    TimerSystem::clear();
+    g.pWon = true;
     
-    // Initial moves should be 0
-    TEST_ASSERT(score.getMoves() == 0, "Initial moves should be 0");
+    TEST_ASSERT(g.moves == 0, "Initial moves should be 0");
     
-    // Increment moves
-    score.incrementMoves();
-    TEST_ASSERT(score.getMoves() == 1, "Moves should be 1 after incrementing once");
+    TimerSystem::clocker();
+    TEST_ASSERT(g.moves == 1, "Moves should be 1 after one CLOCKER pass");
     
-    // Increment multiple times
     for (int i = 0; i < 10; i++) {
-        score.incrementMoves();
+        TimerSystem::clocker();
     }
-    TEST_ASSERT(score.getMoves() == 11, "Moves should be 11 after incrementing 10 more times");
+    TEST_ASSERT(g.moves == 11, "Moves should be 11 after 10 more passes");
     
     std::cout << "✓ Move counting test passed" << std::endl;
 }
@@ -173,12 +173,9 @@ void testScoreReset() {
     
     // Set up some state
     score.addScore(100);
-    score.incrementMoves();
-    score.incrementMoves();
     score.markTreasureScored(100);
     
     TEST_ASSERT(score.getScore() == 100, "Score should be 100 before reset");
-    TEST_ASSERT(score.getMoves() == 2, "Moves should be 2 before reset");
     TEST_ASSERT(score.isTreasureScored(100), "Treasure 100 should be scored before reset");
     
     // Reset
@@ -186,7 +183,6 @@ void testScoreReset() {
     
     // Everything should be back to initial state
     TEST_ASSERT(score.getScore() == 0, "Score should be 0 after reset");
-    TEST_ASSERT(score.getMoves() == 0, "Moves should be 0 after reset");
     TEST_ASSERT(!score.isTreasureScored(100), "Treasure 100 should not be scored after reset");
     
     std::cout << "✓ Score reset test passed" << std::endl;

@@ -21,11 +21,6 @@ void ScoreSystem::addScore(int points) {
     }
 }
 
-// Requirement 53: Increment move counter
-void ScoreSystem::incrementMoves() {
-    moves_++;
-}
-
 // Requirement 54: Get player's rank based on score
 std::string_view ScoreSystem::getRank() const {
     return calculateRank();
@@ -57,6 +52,5 @@ bool ScoreSystem::isTreasureScored(ObjectId treasureId) const {
 // Reset score system for new game
 void ScoreSystem::reset() {
     score_ = 0;
-    moves_ = 0;
     scoredTreasures_.clear();
 }

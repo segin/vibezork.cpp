@@ -162,6 +162,9 @@ bool TimerManager::clocker() {
     }
   }
 
+  // ZIL: <SETG MOVES <+ ,MOVES 1>> when the scan reaches the end of C-TABLE
+  // (gclock.zil:49-51): one move per completed CLOCKER pass
+  g.moves++;
   return flg;
 }
 

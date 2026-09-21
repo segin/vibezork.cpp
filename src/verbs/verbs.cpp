@@ -2170,7 +2170,7 @@ bool vScore() {
   auto &scoreSystem = ScoreSystem::instance();
 
   int currentScore = (g.score > 0) ? g.score : scoreSystem.getScore();
-  int currentMoves = (g.moves > 0) ? g.moves : scoreSystem.getMoves();
+  int currentMoves = g.moves;  // ZIL: ,MOVES, the only move counter
 
   // Display current score
   printLine(std::format("Your score is {} (total of 350 points), in {} {}.",

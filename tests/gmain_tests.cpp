@@ -1,4 +1,5 @@
 #include "core/globals.h"
+#include "systems/timer.h"
 #include "core/gmacros.h"
 #include "core/gmain.h"
 #include "core/object.h"
@@ -466,6 +467,36 @@ void testMetaVerbs() {
   std::println("✓ Meta-verbs verified against gmain.zil:170-171");
 }
 
+// ZIL: MOVES is incremented only inside CLOCKER (gclock.zil:49-51), and
+// CLOCKER is skipped for the meta verbs (gmain.zil:169-172) and for one
+// call after CLOCK-WAIT (gclock.zil:45)
+void testMovesCountedOnlyByClocker() {
+  std::println("Testing MOVES counting...");
+  auto &g = Globals::instance();
+  g.reset();
+  TimerSystem::clear();
+  g.pWon = true;
+  g.moves = 0;
+
+  // A normal command's CLOCKER pass counts one move
+  TimerSystem::clocker();
+  assert(g.moves == 1);
+
+  // CLOCK-WAIT skips the pass and the move
+  g.clockWait = true;
+  TimerSystem::clocker();
+  assert(g.moves == 1);
+  TimerSystem::clocker();
+  assert(g.moves == 2);
+
+  // Meta verbs never reach CLOCKER
+  assert(isMetaVerb(V_SCORE));
+  assert(isMetaVerb(V_VERSION));
+  assert(!isMetaVerb(V_INVENTORY));
+
+  std::println("✓ MOVES counting verified against gclock.zil:50");
+}
+
 int main() {
   std::println("========================================");
   std::println("Running GMAIN Tests (gmain.zil)");
@@ -479,6 +510,7 @@ int main() {
   testRfatalAbortsLoopAndSkipsMEnd();
   testDirectionThroughPerform();
   testMetaVerbs();
+  testMovesCountedOnlyByClocker();
 
   std::println("========================================");
   std::println("All GMAIN Tests Passed successfully!");

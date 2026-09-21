@@ -14,10 +14,6 @@ public:
     int getScore() const { return score_; }
     static constexpr int MAX_SCORE = 350;
     
-    // Move counting (Requirement 53)
-    void incrementMoves();
-    int getMoves() const { return moves_; }
-    
     // Rank calculation (Requirement 54)
     std::string_view getRank() const;
     
@@ -32,7 +28,6 @@ private:
     ScoreSystem() = default;
     
     int score_ = 0;
-    int moves_ = 0;
     std::unordered_set<ObjectId> scoredTreasures_;
     
     std::string_view calculateRank() const;
