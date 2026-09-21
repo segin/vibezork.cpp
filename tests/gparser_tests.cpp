@@ -661,6 +661,114 @@ void testSyntaxCheckAndOrphan() {
   std::println("✓ SYNTAX-CHECK");
 }
 
+// ---------------------------------------------------------------------------
+// B6: SNARF-OBJECTS, SNARFEM, BUT-MERGE, GET-OBJECT
+// ---------------------------------------------------------------------------
+
+void testGetObject() {
+  std::println("Testing SNARFEM / GET-OBJECT / BUT-MERGE...");
+  setupWorld();
+  auto &g = Globals::instance();
+  auto &s = GParser::state();
+  ZObject *mailbox = g.getObject(ObjectIds::MAILBOX);
+  ZObject *leaflet = g.getObject(ObjectIds::ADVERTISEMENT);
+  ZObject *notHere = g.getObject(ObjectIds::NOT_HERE_OBJECT);
+  assert(mailbox && leaflet && notHere);
+
+  auto r = runParser("open mailbox");
+  assert(r.first && g.prsa == V_OPEN);
+  assert(s.prso.size() == 1 && s.prso[0] == mailbox && s.prsi.empty());
+  assert(g.pGetFlags == 0);
+
+  // Not visible (inside the closed mailbox): NOT-HERE-OBJECT stands in
+  r = runParser("take leaflet");
+  assert(r.first);
+  assert(s.prso.size() == 1 && s.prso[0] == notHere);
+  assert(g.pXnam == "leafle" && g.pXadjn.empty());
+
+  // Adjective + noun through an open container
+  mailbox->setFlag(ObjectFlag::OPENBIT);
+  r = runParser("take the leaflet");
+  assert(r.first && s.prso.size() == 1 && s.prso[0] == leaflet);
+  r = runParser("examine small mailbox");
+  assert(r.first && s.prso.size() == 1 && s.prso[0] == mailbox);
+  r = runParser("examine small");
+  // adjective-only clause: the adjective word is not an object word
+  assert(r.first && s.prso.size() == 1 && s.prso[0] == mailbox);
+
+  // ALL and EXCEPT
+  r = runParser("take all");
+  assert(r.first && g.pGetFlags == GParser::P_ALL);
+  assert(GParser::zmemq(mailbox, s.prso) && GParser::zmemq(leaflet, s.prso));
+  r = runParser("take all except leaflet");
+  assert(r.first);
+  assert(GParser::zmemq(mailbox, s.prso) && !GParser::zmemq(leaflet, s.prso));
+  assert(s.buts.size() == 1 && s.buts[0] == leaflet);
+  r = runParser("take all except mailbox and leaflet");
+  assert(r.first && s.prso.empty());
+  assert(s.buts.size() == 2);
+
+  // AND lists and unfound nouns
+  r = runParser("take lamp and sword");
+  assert(r.first && s.prso.size() == 2 && s.prso[0] == notHere && s.prso[1] == notHere);
+  assert(s.pAnd);
+  r = runParser("take leaflet, mailbox");
+  assert(r.first && s.prso.size() == 2 && s.prso[0] == leaflet && s.prso[1] == mailbox);
+
+  // "take the": the buzzword is skipped and GWIM finds the leaflet
+  r = runParser("take the");
+  assert(r.first && r.second == "\n>(leaflet)\n" && s.prso.size() == 1 && s.prso[0] == leaflet);
+  // A missing noun
+  r = runParser("put leaflet in the");
+  assert(!r.first && r.second == "\n>There seems to be a noun missing in that sentence!\n");
+
+  // Darkness
+  g.lit = false;
+  ZObject *here = g.here;
+  here->clearFlag(ObjectFlag::ONBIT);
+  r = runParser("take leaflet");
+  // PARSER recomputes LIT from the room; West of House is ONBIT, so force it
+  g.lit = false;
+  s.nam = GParser::lookupWord("leaflet");
+  s.adj = nullptr;
+  g.pGetFlags = 0;
+  g.pSlocbits = 0;
+  std::vector<ZObject *> tbl;
+  {
+    OutputCapture cap;
+    bool ok = GParser::getObject(tbl);
+    assert(!ok && cap.str() == "It's too dark to see!\n");
+  }
+  here->setFlag(ObjectFlag::ONBIT);
+  g.lit = true;
+
+  // Two candidates: the second pass narrows by the syntax's scope bits,
+  // then WHICH-PRINT (B7) and an orphan
+  auto other = std::make_unique<ZObject>(9999, "other leaflet");
+  other->addSynonym("leaflet");
+  other->setFlag(ObjectFlag::TAKEBIT);
+  ZObject *otherPtr = other.get();
+  g.registerObject(9999, std::move(other));
+  otherPtr->moveTo(here);
+  r = runParser("take leaflet");
+  assert(!r.first && g.pOflag);
+  assert(s.aclause == GParser::P_NC1 && s.anam == GParser::lookupWord("leaflet"));
+  g.pOflag = false;
+  // "take one leaflet" picks one at random and says so ("a" is a buzzword
+  // the PARSER loop skips before the clause starts, so only ONE sets P-ONE)
+  r = runParser("take one leaflet");
+  assert(r.first && s.prso.size() == 1);
+  assert(r.second.starts_with("\n>(How about the "));
+  // The held one is preferred once the leaflet is carried and the syntax
+  // searches only the room
+  leaflet->moveTo(g.player);
+  r = runParser("take leaflet");
+  assert(r.first && s.prso.size() == 1 && s.prso[0] == otherPtr);
+  r = runParser("drop leaflet");
+  assert(r.first && s.prso.size() == 1 && s.prso[0] == leaflet);
+  std::println("✓ GET-OBJECT");
+}
+
 } // namespace
 
 int main() {
@@ -679,6 +787,7 @@ int main() {
   testOops();
   testAgain();
   testSyntaxCheckAndOrphan();
+  testGetObject();
   std::println("All gparser tests passed.");
   return 0;
 }

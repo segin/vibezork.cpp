@@ -7,6 +7,7 @@
 #include "world/rooms.h"
 #include <algorithm>
 #include <cctype>
+#include <cstdlib>
 #include <iostream>
 #include <map>
 #include <unordered_map>
@@ -617,10 +618,6 @@ void syntaxFound(const Syntax *syn) {
   state().syntax = syn;
   Globals::instance().prsa = syn ? syn->action : 0;
 }
-bool snarfObjects() { return true; }
-void butMerge(std::vector<ZObject *> &) {}
-bool snarfem(Ptr, Ptr, std::vector<ZObject *> &) { return false; }
-bool getObject(std::vector<ZObject *> &, bool) { return false; }
 void whichPrint(int, int, const std::vector<ZObject *> &) {}
 void globalCheck(std::vector<ZObject *> &) {}
 bool takeCheck() { return true; }
@@ -1281,6 +1278,208 @@ bool syntaxCheck() {
   prepPrint(drive1 ? drive1->prep1 : drive2->prep2);
   printLine("?");
   return false;
+}
+
+
+// ============================================================================
+// Noun-clause resolution (gparser.zil:928-1140)
+// ============================================================================
+
+// ZIL: <ROUTINE SNARF-OBJECTS () ...> (gparser.zil:928-943)
+bool snarfObjects() {
+  auto &g = Globals::instance();
+  auto &s = state();
+  s.buts.clear();
+  Ptr iptr = s.itbl.nc2;
+  Ptr optr = s.itbl.nc1;
+  if (!iptr.isNull()) {
+    g.pSlocbits = s.syntax ? s.syntax->loc2 : 0;
+    if (!snarfem(iptr, s.itbl.nc2l, s.prsi)) return false;
+  }
+  if (!optr.isNull()) {
+    g.pSlocbits = s.syntax ? s.syntax->loc1 : 0;
+    if (!snarfem(optr, s.itbl.nc1l, s.prso)) return false;
+  }
+  if (!s.buts.empty()) {
+    int l = static_cast<int>(s.prso.size());
+    if (!optr.isNull()) butMerge(s.prso);
+    if (!iptr.isNull() && (optr.isNull() || l == static_cast<int>(s.prso.size()))) {
+      butMerge(s.prsi);
+    }
+  }
+  return true;
+}
+
+// ZIL: <ROUTINE BUT-MERGE (TBL ...> (gparser.zil:945-958)
+// Leaves the merged list in TBL and the previous contents in P-MERGE (the
+// ZIL swaps the two tables).
+void butMerge(std::vector<ZObject *> &tbl) {
+  auto &s = state();
+  s.merge.clear();
+  for (auto *obj : tbl) {
+    if (!zmemq(obj, s.buts)) s.merge.push_back(obj);
+  }
+  std::swap(tbl, s.merge);
+}
+
+// ZIL: <ROUTINE SNARFEM (PTR EPTR TBL ...> (gparser.zil:978-1030)
+bool snarfem(Ptr ptr, Ptr eptr, std::vector<ZObject *> &tbl) {
+  auto &g = Globals::instance();
+  auto &s = state();
+  std::vector<ZObject *> *but = nullptr;
+  bool wasAll = false;
+  s.pAnd = false;
+  if (g.pGetFlags == P_ALL) wasAll = true;
+  g.pGetFlags = 0;
+  tbl.clear();
+  const DictWord *wrd = wordAt(ptr);
+  const DictWord *nw = nullptr;
+  while (true) {
+    if (ptr == eptr) {
+      bool wv = getObject(but ? *but : tbl);
+      if (wasAll) g.pGetFlags = P_ALL;
+      return wv;
+    }
+    Ptr next{ptr.kind, ptr.idx + 1};
+    nw = (next == eptr) ? nullptr : wordAt(next);
+    if (wrd && wrd == W("all")) {
+      g.pGetFlags = P_ALL;
+      if (nw && nw == W("of")) ptr.idx += 1;
+    } else if (wrd && (wrd == W("but") || wrd == W("except"))) {
+      if (!getObject(but ? *but : tbl)) return false;
+      but = &s.buts;
+      s.buts.clear();
+    } else if (wrd && (wrd == W("a") || wrd == W("one"))) {
+      if (!s.adj) {
+        g.pGetFlags = P_ONE;
+        if (nw && nw == W("of")) ptr.idx += 1;
+      } else {
+        s.nam = s.oneobj;
+        if (!getObject(but ? *but : tbl)) return false;
+        if (!nw) return true;
+      }
+    } else if (isCommaAnd(wrd) && !isCommaAnd(nw)) {
+      s.pAnd = true;
+      if (!getObject(but ? *but : tbl)) return false;
+    } else if (wt(wrd, PS_BUZZ_WORD)) {
+      // buzzwords (including a doubled AND / comma) are skipped
+    } else if (isCommaAnd(wrd)) {
+      // unreachable: AND and comma are buzzwords
+    } else if (wrd && wrd == W("of")) {
+      if (g.pGetFlags == 0) g.pGetFlags = P_INHIBIT;
+    } else if (wt(wrd, PS_ADJECTIVE) && !s.adj) {
+      s.adj = wrd;
+      s.adjn = wrd;
+    } else if (wt(wrd, PS_OBJECT)) {
+      s.nam = wrd;
+      s.oneobj = wrd;
+    }
+    if (!(ptr == eptr)) {
+      ptr.idx += 1;
+      wrd = nw;
+    }
+  }
+}
+
+// ZIL: <ROUTINE GET-OBJECT (TBL "OPTIONAL" (VRB T) ...> (gparser.zil:1040-1140)
+bool getObject(std::vector<ZObject *> &tbl, bool vrb) {
+  auto &g = Globals::instance();
+  auto &s = state();
+  int xbits = g.pSlocbits;
+  int tlen = static_cast<int>(tbl.size());
+  bool gcheck = false;
+  int olen = 0;
+  int len = 0;
+  if (g.pGetFlags & P_INHIBIT) return true;
+  if (!s.nam && s.adj) {
+    if (wt(s.adjn, PS_OBJECT)) {
+      s.nam = s.adjn;
+      s.adj = nullptr;
+    }
+    // (Zork III's direction-as-object case is compiled out: <NULL-F>)
+  }
+  if (!s.nam && !s.adj && g.pGetFlags != P_ALL && g.pGwimbit == 0) {
+    if (vrb) printLine("There seems to be a noun missing in that sentence!");
+    return false;
+  }
+  if (g.pGetFlags != P_ALL || g.pSlocbits == 0) g.pSlocbits = -1;
+  s.table = &tbl;
+  while (true) {
+    if (gcheck) {
+      globalCheck(tbl);
+    } else {
+      if (g.lit) {
+        if (g.player) g.player->clearFlag(ObjectFlag::TRANSBIT);
+        doSl(g.here, SOG, SIR);
+        if (g.player) g.player->setFlag(ObjectFlag::TRANSBIT);
+      }
+      doSl(g.player, SH, SC);
+    }
+    len = static_cast<int>(tbl.size()) - tlen;
+    if (g.pGetFlags & P_ALL) {
+      // every match is kept
+    } else if ((g.pGetFlags & P_ONE) && len != 0) {
+      if (len != 1) {
+        int pick = (std::rand() % len) + 1; // <RANDOM .LEN>
+        tbl[0] = tbl[pick - 1];              // <PUT .TBL 1 <GET .TBL <RANDOM .LEN>>>
+        print("(How about the ");
+        printDesc(tbl[0]);
+        printLine("?)");
+      }
+      tbl.resize(1); // <PUT .TBL ,P-MATCHLEN 1>
+    } else if (len > 1 || (len == 0 && g.pSlocbits != -1)) {
+      if (g.pSlocbits == -1) {
+        g.pSlocbits = xbits;
+        olen = len;
+        tbl.resize(tbl.size() - len);
+        continue; // <AGAIN>
+      }
+      if (len == 0) len = olen;
+      if (g.winner != g.player) {
+        cantOrphan();
+        return false;
+      } else if (vrb && s.nam) {
+        whichPrint(tlen, len, tbl);
+        s.aclause = (&tbl == &s.prso) ? P_NC1 : P_NC2;
+        s.aadj = s.adj;
+        s.anam = s.nam;
+        orphan(nullptr, nullptr);
+        g.pOflag = true;
+      } else if (vrb) {
+        printLine("There seems to be a noun missing in that sentence!");
+      }
+      s.nam = nullptr;
+      s.adj = nullptr;
+      return false;
+    }
+    if (len == 0 && gcheck) {
+      if (vrb) {
+        // "next added 1/2/85 by JW"
+        g.pSlocbits = xbits;
+        if (g.lit || g.prsa == V_TELL) {
+          // "Changed 6/10/83 - MARC"
+          objFound(g.getObject(ObjectIds::NOT_HERE_OBJECT), tbl);
+          g.pXnam = s.nam ? s.nam->key : std::string();
+          g.pXadjn = (s.adj && s.adjn) ? s.adjn->key : std::string();
+          s.nam = nullptr;
+          s.adj = nullptr;
+          s.adjn = nullptr;
+          return true;
+        }
+        printLine("It's too dark to see!");
+      }
+      s.nam = nullptr;
+      s.adj = nullptr;
+      return false;
+    } else if (len == 0) {
+      gcheck = true;
+      continue; // <AGAIN>
+    }
+    g.pSlocbits = xbits;
+    s.nam = nullptr;
+    s.adj = nullptr;
+    return true;
+  }
 }
 
 } // namespace GParser
