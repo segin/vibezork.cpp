@@ -226,7 +226,7 @@ struct State {
   int aclause = 0;       // P-ACLAUSE (0, P_NC1 or P_NC2)
   const DictWord *anam = nullptr; // P-ANAM
   const DictWord *aadj = nullptr; // P-AADJ
-  std::array<Ptr, 4> cctbl{};     // P-CCTBL
+  std::array<int, 4> cctbl{};     // P-CCTBL (P-ITBL slot numbers)
 
   // Object matching
   const DictWord *nam = nullptr;  // P-NAM

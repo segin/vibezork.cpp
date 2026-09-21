@@ -594,15 +594,10 @@ bool isLit(ZObject *rm, bool rmbit) {
 // ============================================================================
 
 const DictWord *numberQ(int) { return nullptr; }
-bool orphanMerge() { return false; }
-bool aclauseWin(const DictWord *) { return true; }
-bool nclauseWin() { return true; }
-bool syntaxCheck() { return false; }
 bool cantOrphan() {
   printLine("\"I don't understand! What are you referring to?\"");
   return false;
 }
-void orphan(const Syntax *, const Syntax *) {}
 void thingPrint(bool prso, bool the) {
   auto &s = state();
   if (prso) {
@@ -617,13 +612,11 @@ void prepPrint(int prep) {
     if (auto *w = prepFind(prep)) print(w->key);
   }
 }
-void clauseCopy(ITbl &, ITbl &, const DictWord *) {}
 void clauseAdd(const DictWord *wrd) { state().oclause.push_back(wrd); }
 void syntaxFound(const Syntax *syn) {
   state().syntax = syn;
   Globals::instance().prsa = syn ? syn->action : 0;
 }
-ZObject *gwim(uint64_t, int, int) { return nullptr; }
 bool snarfObjects() { return true; }
 void butMerge(std::vector<ZObject *> &) {}
 bool snarfem(Ptr, Ptr, std::vector<ZObject *> &) { return false; }
@@ -1005,6 +998,289 @@ bool parser() {
   (void)owinner;
   (void)omerged;
   return syntaxCheck() && snarfObjects() && manyCheck() && takeCheck();
+}
+
+
+// ============================================================================
+// Syntax matching and orphaning (gparser.zil:543-655, 707-926)
+// ============================================================================
+
+// ZIL: <ROUTINE CLAUSE-COPY (SRC DEST "OPTIONAL" (INSRT <>) ...> (gparser.zil:860-879)
+void clauseCopy(ITbl &src, ITbl &dest, const DictWord *insrt) {
+  auto &s = state();
+  Ptr beg = src.slot(s.cctbl[CC_SBPTR]);
+  Ptr end = src.slot(s.cctbl[CC_SEPTR]);
+  dest.slot(s.cctbl[CC_DBPTR]) = Ptr::ocl(static_cast<int>(s.oclause.size()));
+  while (true) {
+    if (beg == end) {
+      dest.slot(s.cctbl[CC_DEPTR]) = Ptr::ocl(static_cast<int>(s.oclause.size()));
+      return;
+    }
+    const DictWord *w = wordAt(beg);
+    if (insrt && s.anam && s.anam == w) clauseAdd(insrt);
+    clauseAdd(w);
+    beg.idx += 1;
+  }
+}
+
+// ZIL: <ROUTINE ORPHAN (D1 D2 ...> (gparser.zil:782-808)
+void orphan(const Syntax *d1, const Syntax *d2) {
+  auto &g = Globals::instance();
+  auto &s = state();
+  if (!g.pMerged) s.oclause.clear();
+  s.ovtbl = s.vtbl;
+  s.otbl = s.itbl;
+  if (s.ncn == 2) {
+    s.cctbl = {P_NC2, P_NC2L, P_NC2, P_NC2L};
+    clauseCopy(s.itbl, s.otbl);
+  }
+  if (s.ncn >= 1) {
+    s.cctbl = {P_NC1, P_NC1L, P_NC1, P_NC1L};
+    clauseCopy(s.itbl, s.otbl);
+  }
+  if (d1) {
+    s.otbl.prep1 = d1->prep1;
+    s.otbl.nc1 = Ptr::one();
+  } else if (d2) {
+    s.otbl.prep2 = d2->prep2;
+    s.otbl.nc2 = Ptr::one();
+  }
+}
+
+// ZIL: <ROUTINE ACLAUSE-WIN (ADJ) ...> (gparser.zil:634-643)
+bool aclauseWin(const DictWord *adj) {
+  auto &s = state();
+  s.itbl.verb = s.otbl.verb;
+  s.cctbl = {s.aclause, s.aclause + 1, s.aclause, s.aclause + 1};
+  clauseCopy(s.otbl, s.otbl, adj);
+  if (!s.otbl.nc2.isNull()) s.ncn = 2;
+  s.aclause = 0;
+  return true;
+}
+
+// ZIL: <ROUTINE NCLAUSE-WIN () ...> (gparser.zil:645-653)
+bool nclauseWin() {
+  auto &s = state();
+  s.cctbl = {P_NC1, P_NC1L, s.aclause, s.aclause + 1};
+  clauseCopy(s.itbl, s.otbl);
+  if (!s.otbl.nc2.isNull()) s.ncn = 2;
+  s.aclause = 0;
+  return true;
+}
+
+// ZIL: <ROUTINE ORPHAN-MERGE ...> (gparser.zil:543-630)
+// "New ORPHAN-MERGE for TRAP Retrofix 6/21/84"
+bool orphanMerge() {
+  auto &g = Globals::instance();
+  auto &s = state();
+  bool adjFlag = false;         // ADJ set to T
+  const DictWord *adj = nullptr; // ADJ set to a word in the P-ACLAUSE loop
+  g.pOflag = false;
+  // <SET WRD <GET <GET ,P-ITBL ,P-VERBN> 0>>: with no verb this reads the
+  // story header in ZIL, whose bits make both tests fail.
+  const DictWord *wrd = s.itbl.verbn ? s.vtbl.word : nullptr;
+  std::string wrdVerb = (wrd && wt(wrd, PS_VERB)) ? wrd->verb : std::string();
+  if (wrdVerb == s.otbl.verb || (wrd && wt(wrd, PS_ADJECTIVE))) {
+    adjFlag = true;
+  } else if (wrd && wt(wrd, PS_OBJECT) && s.ncn == 0) {
+    s.itbl.verb.clear();
+    s.itbl.verbn = false;
+    s.itbl.nc1 = Ptr::lex(0);
+    s.itbl.nc1l = Ptr::lex(1);
+    s.ncn = 1;
+  }
+  std::string verb = s.itbl.verb;
+  if (!verb.empty() && !adjFlag && verb != s.otbl.verb) {
+    return false;
+  } else if (s.ncn == 2) {
+    return false;
+  } else if (s.otbl.nc1 == Ptr::one()) {
+    int temp = s.itbl.prep1;
+    if (temp == s.otbl.prep1 || temp == 0) {
+      if (adjFlag) {
+        s.otbl.nc1 = Ptr::lex(0);
+        if (s.itbl.nc1l.isNull()) s.itbl.nc1l = Ptr::lex(1);
+        if (s.ncn == 0) s.ncn = 1;
+      } else {
+        s.otbl.nc1 = s.itbl.nc1;
+      }
+      s.otbl.nc1l = s.itbl.nc1l;
+    } else {
+      return false;
+    }
+  } else if (s.otbl.nc2 == Ptr::one()) {
+    int temp = s.itbl.prep1;
+    if (temp == s.otbl.prep2 || temp == 0) {
+      if (adjFlag) {
+        s.itbl.nc1 = Ptr::lex(0);
+        if (s.itbl.nc1l.isNull()) s.itbl.nc1l = Ptr::lex(1);
+      }
+      s.otbl.nc2 = s.itbl.nc1;
+      s.otbl.nc2l = s.itbl.nc1l;
+      s.ncn = 2;
+    } else {
+      return false;
+    }
+  } else if (s.aclause != 0) {
+    if (s.ncn != 1 && !adjFlag) {
+      s.aclause = 0;
+      return false;
+    }
+    Ptr beg = s.itbl.nc1;
+    if (adjFlag) {
+      beg = Ptr::lex(0);
+      adjFlag = false;
+    }
+    Ptr end = s.itbl.nc1l;
+    while (true) {
+      wrd = wordAt(beg);
+      if (beg == end) {
+        if (adj) {
+          aclauseWin(adj);
+          break;
+        }
+        s.aclause = 0;
+        return false;
+      } else if (!adj && wrd && (wt(wrd, PS_ADJECTIVE) || wrd == W("all") || wrd == W("one"))) {
+        adj = wrd;
+      } else if (wrd && wrd == W("one")) {
+        aclauseWin(adj);
+        break;
+      } else if (wrd && wt(wrd, PS_OBJECT)) {
+        if (wrd == s.anam) {
+          aclauseWin(adj);
+        } else {
+          nclauseWin();
+        }
+        break;
+      }
+      beg.idx += 1;
+      if (end.isNull()) {
+        end = beg;
+        s.ncn = 1;
+        s.itbl.nc1 = Ptr{beg.kind, beg.idx - 1};
+        s.itbl.nc1l = beg;
+      }
+    }
+  }
+  // <PUT ,P-VTBL 0 <GET ,P-OVTBL 0>> <PUTB ,P-VTBL 2 ...> <PUTB ,P-VTBL 3 ...>
+  s.vtbl = s.ovtbl;
+  s.otbl.verbn = true; // <PUT ,P-OTBL ,P-VERBN ,P-VTBL>
+  s.vtbl.haveText = false; // <PUTB ,P-VTBL 2 0>
+  s.itbl = s.otbl;
+  g.pMerged = true;
+  return true;
+}
+
+// ZIL: <ROUTINE GWIM (GBIT LBIT PREP ...> (gparser.zil:901-926)
+ZObject *gwim(uint64_t gbit, int lbit, int prep) {
+  auto &g = Globals::instance();
+  auto &s = state();
+  if (gbit == static_cast<uint64_t>(ObjectFlag::RMUNGBIT)) {
+    return g.getObject(ObjectIds::ROOMS);
+  }
+  g.pGwimbit = gbit;
+  g.pSlocbits = lbit;
+  s.merge.clear();
+  if (getObject(s.merge, false)) {
+    g.pGwimbit = 0;
+    if (s.merge.size() == 1) {
+      ZObject *obj = s.merge[0];
+      print("(");
+      if (prep != 0 && !s.endOnPrep) {
+        const DictWord *pw = prepFind(prep);
+        if (pw) print(pw->key);
+        if (pw && pw == W("out")) print(" of");
+        print(" ");
+        if (obj->getId() == ObjectIds::HANDS) {
+          print("your hands");
+        } else {
+          print("the ");
+          printDesc(obj);
+        }
+        printLine(")");
+      } else {
+        printDesc(obj);
+        printLine(")");
+      }
+      return obj;
+    }
+    return nullptr;
+  }
+  g.pGwimbit = 0;
+  return nullptr;
+}
+
+// ZIL: <ROUTINE SYNTAX-CHECK () ...> (gparser.zil:707-775)
+bool syntaxCheck() {
+  auto &g = Globals::instance();
+  auto &s = state();
+  const std::string verb = s.itbl.verb;
+  if (verb.empty()) {
+    printLine("There was no verb in that sentence!");
+    return false;
+  }
+  auto syns = verbSyntaxes(verb);
+  int len = static_cast<int>(syns.size());
+  const Syntax *drive1 = nullptr;
+  const Syntax *drive2 = nullptr;
+  size_t i = 0;
+  while (true) {
+    const Syntax &syn = syns[i];
+    int num = syn.nobj;
+    if (s.ncn > num) {
+      // this syntax takes fewer objects than were typed
+    } else if (num >= 1 && s.ncn == 0 &&
+               (s.itbl.prep1 == 0 || s.itbl.prep1 == syn.prep1)) {
+      drive1 = &syn;
+    } else if (syn.prep1 == s.itbl.prep1) {
+      if (num == 2 && s.ncn == 1) {
+        drive2 = &syn;
+      } else if (syn.prep2 == s.itbl.prep2) {
+        syntaxFound(&syn);
+        return true;
+      }
+    }
+    if (--len < 1) {
+      if (drive1 || drive2) break;
+      printLine("That sentence isn't one I recognize.");
+      return false;
+    }
+    ++i;
+  }
+  ZObject *obj = nullptr;
+  if (drive1 && (obj = gwim(drive1->fwim1, drive1->loc1, drive1->prep1))) {
+    s.prso.assign(1, obj);
+    syntaxFound(drive1);
+    return true;
+  } else if (drive2 && (obj = gwim(drive2->fwim2, drive2->loc2, drive2->prep2))) {
+    s.prsi.assign(1, obj);
+    syntaxFound(drive2);
+    return true;
+  } else if (verb == "find") {
+    printLine("That question can't be answered.");
+    return false;
+  } else if (g.winner != g.player) {
+    return cantOrphan();
+  }
+  orphan(drive1, drive2);
+  print("What do you want to ");
+  if (!s.otbl.verbn) {
+    print("tell");
+  } else if (!s.vtbl.haveText) {
+    if (s.vtbl.word) print(s.vtbl.word->key);
+  } else {
+    wordPrint(s.vtbl.text);
+    s.vtbl.haveText = false;
+  }
+  if (drive2) {
+    print(" ");
+    thingPrint(true, true);
+  }
+  g.pOflag = true;
+  prepPrint(drive1 ? drive1->prep1 : drive2->prep2);
+  printLine("?");
+  return false;
 }
 
 } // namespace GParser

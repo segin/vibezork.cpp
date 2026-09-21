@@ -568,6 +568,99 @@ void testAgain() {
   std::println("✓ AGAIN");
 }
 
+// ---------------------------------------------------------------------------
+// B5: SYNTAX-CHECK, GWIM, ORPHAN, ORPHAN-MERGE
+// ---------------------------------------------------------------------------
+
+void testSyntaxCheckAndOrphan() {
+  std::println("Testing SYNTAX-CHECK / ORPHAN / ORPHAN-MERGE...");
+  setupWorld();
+  auto &g = Globals::instance();
+  auto &s = GParser::state();
+  // GET-OBJECT is not ported yet, so GWIM finds nothing and every missing
+  // object orphans.
+  auto r = runParser("take");
+  assert(!r.first && r.second == "\n>What do you want to take?\n");
+  assert(g.pOflag && s.otbl.nc1 == GParser::Ptr::one() && s.otbl.prep1 == 0);
+  // The answer is merged into the orphaned sentence
+  r = runParser("mailbox");
+  assert(!g.pOflag && g.pMerged);
+  assert(s.itbl.verb == "take" && s.ncn == 1);
+  assert(s.itbl.nc1 == GParser::Ptr::lex(0) && s.itbl.nc1l == GParser::Ptr::lex(1));
+  assert(g.prsa == V_TAKE);
+  assert(s.syntax && s.syntax->nobj == 1);
+
+  // Missing indirect object: the direct clause is echoed with "the"
+  r = runParser("put leaflet");
+  assert(!r.first && r.second == "\n>What do you want to put the leaflet in?\n");
+  assert(s.otbl.nc2 == GParser::Ptr::one());
+  assert(GParser::prepFind(s.otbl.prep2)->key == "in");
+  r = runParser("mailbox");
+  assert(g.pMerged && s.ncn == 2 && g.prsa == V_PUT);
+  assert(s.itbl.nc2 == GParser::Ptr::lex(0));
+  // The direct clause now lives in P-OCLAUSE
+  assert(s.itbl.nc1.kind == GParser::Ptr::Ocl);
+  assert(GParser::wordAt(s.itbl.nc1) == GParser::lookupWord("leaflet"));
+
+  // A new verb abandons the orphan
+  r = runParser("take");
+  r = runParser("open mailbox");
+  assert(!g.pOflag && g.prsa == V_OPEN);
+
+  // FIND RMUNGBIT: GWIM yields ROOMS without asking
+  r = runParser("look up");
+  assert(r.first && g.prsa == V_LOOK);
+  assert(s.prso.size() == 1 && s.prso[0] == g.getObject(ObjectIds::ROOMS));
+  r = runParser("climb up");
+  assert(r.first && g.prsa == V_CLIMB_UP && s.prso[0] == g.getObject(ObjectIds::ROOMS));
+  r = runParser("stand up");
+  assert(r.first && g.prsa == V_STAND);
+
+  // No FIND flag: an ordinary orphan
+  r = runParser("walk around");
+  assert(!r.first && r.second == "\n>What do you want to walk around?\n");
+  r = runParser("find");
+  assert(!r.first && r.second == "\n>That question can't be answered.\n");
+  r = runParser("kick mailbox to");
+  assert(!r.first && r.second == "\n>That sentence isn't one I recognize.\n");
+  r = runParser("put leaflet in");
+  assert(!r.first && r.second == "\n>That sentence isn't one I recognize.\n");
+  r = runParser("look");
+  assert(r.first && g.prsa == V_LOOK && s.syntax->nobj == 0);
+  r = runParser("look at mailbox");
+  assert(r.first && g.prsa == V_EXAMINE);
+  r = runParser("look at leaflet with lamp");
+  assert(r.first && g.prsa == V_READ);
+  r = runParser("shut door");
+  assert(g.prsa == V_TURN || !r.first); // SHUT is a TURN synonym: TURN OBJECT (FIND TURNBIT) WITH ...
+  r = runParser("pour water in bottle");
+  assert(r.first && g.prsa == V_DROP);
+
+  // The typed verb word is echoed; a synonym stays as typed
+  r = runParser("get");
+  assert(r.second == "\n>What do you want to get?\n");
+  r = runParser("mailbox");
+  assert(g.prsa == V_TAKE);
+
+  // Orphaning is refused for a non-player WINNER
+  // (only reachable on a P-CONT continuation, since a fresh READ resets
+  // WINNER to the player)
+  ZObject *troll = g.getObject(ObjectIds::TROLL);
+  GParser::read("tell troll \"take");
+  g.pCont = 3;
+  s.lexv.count = 1; // the first parse stored the remaining word count
+  g.winner = troll;
+  g.quoteFlag = true;
+  {
+    OutputCapture cap;
+    bool won = GParser::parser();
+    assert(!won && cap.str() == "\"I don't understand! What are you referring to?\"\n");
+  }
+  g.winner = g.player;
+  g.quoteFlag = false;
+  std::println("✓ SYNTAX-CHECK");
+}
+
 } // namespace
 
 int main() {
@@ -585,6 +678,7 @@ int main() {
   testParserMessages();
   testOops();
   testAgain();
+  testSyntaxCheckAndOrphan();
   std::println("All gparser tests passed.");
   return 0;
 }
