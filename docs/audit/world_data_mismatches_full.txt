@@ -1,0 +1,651 @@
+[HIGH] ADVENTURER (C++ 800 ADVENTURER) :: IN :: ZIL None vs C++ WEST-OF-HOUSE
+[HIGH] ADVENTURER (C++ 800 ADVENTURER) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] ADVENTURER (C++ 800 ADVENTURER) :: STRENGTH :: ZIL 0 vs C++ 10
+[HIGH] ALTAR (C++ 310 ALTAR) :: IN :: ZIL SOUTH-TEMPLE vs C++ None
+[HIGH] ALTAR (C++ 310 ALTAR) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] ARAGAIN-FALLS (C++ 1140 ARAGAIN_FALLS) :: FLAGS :: missing in C++: ['ONBIT']
+[HIGH] ATTIC-TABLE :: missing :: OBJECT ATTIC-TABLE not registered in C++ world
+[HIGH] AXE (C++ 700 AXE) :: ACTION :: ZIL ACTION AXE-F but C++ has no action
+[HIGH] AXE (C++ 700 AXE) :: FLAGS :: missing in C++: ['NDESCBIT', 'TAKEBIT', 'TRYTAKEBIT']
+[HIGH] AXE (C++ 700 AXE) :: IN :: ZIL TROLL vs C++ TROLL-ROOM
+[HIGH] AXE (C++ 700 AXE) :: SIZE :: ZIL 25 vs C++ 15
+[HIGH] AXE (C++ 700 AXE) :: STRENGTH :: ZIL 0 vs C++ 7
+[HIGH] BAG-OF-COINS (C++ 743 BAG_OF_COINS) :: IN :: ZIL MAZE-5 vs C++ None
+[HIGH] BAG-OF-COINS (C++ 743 BAG_OF_COINS) :: TVALUE :: ZIL 5 vs C++ 0
+[HIGH] BARROW (C++ 524 BARROW) :: ACTION :: ZIL ACTION BARROW-FCN but C++ has no action
+[HIGH] BARROW (C++ 524 BARROW) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] BARROW-DOOR (C++ 507 BARROW_DOOR) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] BAT :: missing :: OBJECT BAT not registered in C++ world
+[HIGH] BAUBLE (C++ 121 BAUBLE) :: SIZE :: ZIL default 5 vs C++ 2
+[HIGH] BELL (C++ 780 BELL) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] BLESSINGS (C++ 744 BLESSINGS) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] BLUE-BUTTON (C++ 613 BLUE_BUTTON) :: FLAGS :: missing in C++: ['NDESCBIT']
+[HIGH] BLUE-BUTTON (C++ 613 BLUE_BUTTON) :: IN :: ZIL MAINTENANCE-ROOM vs C++ MACHINE-ROOM
+[HIGH] BLUE-BUTTON (C++ 613 BLUE_BUTTON) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] BOARD (C++ 501 BOARD) :: IN :: ZIL LOCAL-GLOBALS vs C++ None
+[HIGH] BOARD (C++ 501 BOARD) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] BOARDED-WINDOW (C++ 503 BOARDED_WINDOW) :: IN :: ZIL LOCAL-GLOBALS vs C++ None
+[HIGH] BOARDED-WINDOW (C++ 503 BOARDED_WINDOW) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] BOAT-LABEL (C++ 765 BOAT_LABEL) :: FLAGS :: missing in C++: ['BURNBIT', 'TAKEBIT']
+[HIGH] BOAT-LABEL (C++ 765 BOAT_LABEL) :: IN :: ZIL INFLATED-BOAT vs C++ None
+[HIGH] BOAT-LABEL (C++ 765 BOAT_LABEL) :: SIZE :: ZIL 2 vs C++ 1
+[HIGH] BODIES (C++ 531 BODIES) :: ACTION :: ZIL ACTION BODY-FUNCTION but C++ has no action
+[HIGH] BODIES (C++ 531 BODIES) :: IN :: ZIL LOCAL-GLOBALS vs C++ None
+[HIGH] BODIES (C++ 531 BODIES) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] BOLT (C++ 606 BOLT) :: FLAGS :: missing in C++: ['NDESCBIT']
+[HIGH] BOLT (C++ 606 BOLT) :: IN :: ZIL DAM-ROOM vs C++ MAINTENANCE-ROOM
+[HIGH] BOLT (C++ 606 BOLT) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] BONES (C++ 532 BONES) :: ACTION :: ZIL ACTION SKELETON but C++ has no action
+[HIGH] BONES (C++ 532 BONES) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] BOOK (C++ 761 BOOK) :: ACTION :: ZIL ACTION BLACK-BOOK but C++ has no action
+[HIGH] BOOK (C++ 761 BOOK) :: FLAGS :: missing in C++: ['CONTBIT', 'TURNBIT']
+[HIGH] BOOK (C++ 761 BOOK) :: IN :: ZIL ALTAR vs C++ None
+[HIGH] BOOK (C++ 761 BOOK) :: SIZE :: ZIL 10 vs C++ 5
+[HIGH] BOTTLE (C++ 306 BOTTLE) :: IN :: ZIL KITCHEN-TABLE vs C++ KITCHEN
+[HIGH] BOTTLE (C++ 306 BOTTLE) :: SIZE :: ZIL default 5 vs C++ 8
+[HIGH] BROKEN-CANARY (C++ 120 BROKEN_CANARY) :: SIZE :: ZIL default 5 vs C++ 3
+[HIGH] BROKEN-LAMP (C++ 720 BROKEN_LAMP) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] BROWN-BUTTON (C++ 611 BROWN_BUTTON) :: FLAGS :: missing in C++: ['NDESCBIT']
+[HIGH] BROWN-BUTTON (C++ 611 BROWN_BUTTON) :: IN :: ZIL MAINTENANCE-ROOM vs C++ MACHINE-ROOM
+[HIGH] BROWN-BUTTON (C++ 611 BROWN_BUTTON) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] BUBBLE (C++ 607 BUBBLE) :: FLAGS :: missing in C++: ['NDESCBIT']
+[HIGH] BUBBLE (C++ 607 BUBBLE) :: IN :: ZIL DAM-ROOM vs C++ None
+[HIGH] BUBBLE (C++ 607 BUBBLE) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] CANARY (C++ 119 CANARY) :: SIZE :: ZIL default 5 vs C++ 3
+[HIGH] CANDLES (C++ 211 CANDLES) :: STRENGTH :: ZIL 0 vs C++ 50
+[HIGH] CANYON-VIEW (C++ 1008 CANYON_VIEW) :: EXIT EAST :: ZIL TO CLIFF-MIDDLE vs C++ NORMAL -> None msg='The canyon is too wide to cross.'
+[HIGH] CANYON-VIEW (C++ 1008 CANYON_VIEW) :: EXIT NORTH :: C++ has exit NORMAL -> None msg='The canyon is too wide to cross.' with no ZIL basis
+[HIGH] CELLAR (C++ 1023 CELLAR) :: VALUE :: ZIL 25 vs C++ 0
+[HIGH] CHALICE (C++ 103 CHALICE) :: ACTION :: ZIL ACTION CHALICE-FCN but C++ has no action
+[HIGH] CHALICE (C++ 103 CHALICE) :: FLAGS :: missing in C++: ['TRYTAKEBIT']
+[HIGH] CHIMNEY (C++ 512 CHIMNEY) :: IN :: ZIL LOCAL-GLOBALS vs C++ None
+[HIGH] CHIMNEY (C++ 512 CHIMNEY) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] CLIMBABLE-CLIFF (C++ 538 CLIMBABLE_CLIFF) :: ACTION :: ZIL ACTION CLIFF-OBJECT but C++ has no action
+[HIGH] CLIMBABLE-CLIFF (C++ 538 CLIMBABLE_CLIFF) :: IN :: ZIL LOCAL-GLOBALS vs C++ None
+[HIGH] CLIMBABLE-CLIFF (C++ 538 CLIMBABLE_CLIFF) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] CONTROL-PANEL :: missing :: OBJECT CONTROL-PANEL not registered in C++ world
+[HIGH] CRACK (C++ 522 CRACK) :: IN :: ZIL LOCAL-GLOBALS vs C++ None
+[HIGH] CRACK (C++ 522 CRACK) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] CYCLOPS (C++ 402 CYCLOPS) :: FLAGS :: missing in C++: ['NDESCBIT', 'TRYTAKEBIT']
+[HIGH] CYCLOPS (C++ 402 CYCLOPS) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] CYCLOPS (C++ 402 CYCLOPS) :: STRENGTH :: ZIL 10000 vs C++ 10
+[HIGH] CYCLOPS-ROOM (C++ 1100 CYCLOPS_ROOM) :: EXIT NORTH :: C++ has exit NORMAL -> None msg="The cyclops doesn't look like he'll let you past." with no ZIL basis
+[HIGH] CYCLOPS-ROOM (C++ 1100 CYCLOPS_ROOM) :: EXIT WEST :: C++ has exit NORMAL -> MAZE-15 msg='' with no ZIL basis
+[HIGH] DAM (C++ 605 DAM) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] DEAD-END-1 (C++ 1086 DEAD_END_1) :: FLAGS :: missing in C++: ['MAZEBIT']
+[HIGH] DEAD-END-2 (C++ 1087 DEAD_END_2) :: FLAGS :: missing in C++: ['MAZEBIT']
+[HIGH] DEAD-END-3 (C++ 1088 DEAD_END_3) :: FLAGS :: missing in C++: ['MAZEBIT']
+[HIGH] DEAD-END-4 (C++ 1089 DEAD_END_4) :: FLAGS :: missing in C++: ['MAZEBIT']
+[HIGH] EAST-OF-HOUSE (C++ 1003 BEHIND_HOUSE) :: EXIT NE :: C++ has exit NORMAL -> CLEARING msg='' with no ZIL basis
+[HIGH] EAST-OF-HOUSE (C++ 1003 BEHIND_HOUSE) :: EXIT SE :: C++ has exit NORMAL -> CLEARING msg='' with no ZIL basis
+[HIGH] EGG (C++ 101 EGG) :: IN :: ZIL NEST vs C++ UP-A-TREE
+[HIGH] EMERALD (C++ 111 EMERALD) :: SIZE :: ZIL default 5 vs C++ 2
+[HIGH] END-OF-RAINBOW (C++ 1142 END_OF_RAINBOW) :: FLAGS :: missing in C++: ['ONBIT']
+[HIGH] ENGRAVINGS (C++ 536 ENGRAVINGS) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] EW-PASSAGE (C++ 1042 EW_PASSAGE) :: VALUE :: ZIL 5 vs C++ 0
+[HIGH] FOREST (C++ 510 FOREST) :: IN :: ZIL LOCAL-GLOBALS vs C++ None
+[HIGH] FOREST (C++ 510 FOREST) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] FRONT-DOOR (C++ 505 FRONT_DOOR) :: IN :: ZIL WEST-OF-HOUSE vs C++ None
+[HIGH] FRONT-DOOR (C++ 505 FRONT_DOOR) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] GARLIC (C++ 741 GARLIC) :: ACTION :: ZIL ACTION GARLIC-F but C++ has no action
+[HIGH] GARLIC (C++ 741 GARLIC) :: SIZE :: ZIL 4 vs C++ 2
+[HIGH] GHOSTS (C++ 405 GHOSTS) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] GLOBAL-OBJECTS (C++ 806 GLOBAL_OBJECTS) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] GLOBAL-WATER (C++ 529 GLOBAL_WATER) :: IN :: ZIL LOCAL-GLOBALS vs C++ None
+[HIGH] GLOBAL-WATER (C++ 529 GLOBAL_WATER) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] GRANITE-WALL (C++ 521 GRANITE_WALL) :: IN :: ZIL GLOBAL-OBJECTS vs C++ None
+[HIGH] GRANITE-WALL (C++ 521 GRANITE_WALL) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] GRATE (C++ 523 GRATE) :: IN :: ZIL LOCAL-GLOBALS vs C++ None
+[HIGH] GRATE (C++ 523 GRATE) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] GRATING-CLEARING (C++ 1007 GRATING_CLEARING) :: EXIT EAST :: ZIL TO FOREST-2 vs C++ NORMAL -> CANYON-VIEW msg=''
+[HIGH] GRATING-CLEARING (C++ 1007 GRATING_CLEARING) :: EXIT SW :: C++ has exit NORMAL -> FOREST-2 msg='' with no ZIL basis
+[HIGH] GROUND (C++ 541 GROUND) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] GRUE (C++ 403 GRUE) :: IN :: ZIL GLOBAL-OBJECTS vs C++ None
+[HIGH] GRUE (C++ 403 GRUE) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] GUIDE (C++ 762 GUIDE) :: IN :: ZIL DAM-LOBBY vs C++ None
+[HIGH] GUIDE (C++ 762 GUIDE) :: SIZE :: ZIL default 5 vs C++ 3
+[HIGH] GUNK (C++ 614 GUNK) :: FLAGS :: missing in C++: ['TAKEBIT']
+[HIGH] GUNK (C++ 614 GUNK) :: IN :: ZIL None vs C++ MACHINE-ROOM
+[HIGH] GUNK (C++ 614 GUNK) :: SIZE :: ZIL 10 vs C++ unset->0
+[HIGH] HANDS (C++ 542 HANDS) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] HOT-BELL (C++ 781 HOT_BELL) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] IN-STREAM (C++ 1124 IN_STREAM) :: EXIT LAND :: ZIL {'dir': 'LAND', 'raw': ['TO', 'STREAM-VIEW'], 'target': 'STREAM-VIEW', 'type': 'UEXIT'} missing in C++
+[HIGH] IN-STREAM (C++ 1124 IN_STREAM) :: FLAGS :: missing in C++: ['NONLANDBIT']
+[HIGH] INFLATABLE-BOAT (C++ 602 BOAT_INFLATABLE) :: SIZE :: ZIL 20 vs C++ unset->0
+[HIGH] INFLATED-BOAT (C++ 746 INFLATED_BOAT) :: FLAGS :: missing in C++: ['BURNBIT', 'SEARCHBIT', 'TAKEBIT']
+[HIGH] INFLATED-BOAT (C++ 746 INFLATED_BOAT) :: SIZE :: ZIL 20 vs C++ 50
+[HIGH] INTNUM (C++ 808 INTNUM) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] IT (C++ 801 IT) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] KITCHEN (C++ 1021 KITCHEN) :: EXIT NORTH :: C++ has exit NORMAL -> GALLERY msg='' with no ZIL basis
+[HIGH] KITCHEN (C++ 1021 KITCHEN) :: VALUE :: ZIL 10 vs C++ 0
+[HIGH] KITCHEN-TABLE :: missing :: OBJECT KITCHEN-TABLE not registered in C++ world
+[HIGH] KITCHEN-WINDOW (C++ 504 KITCHEN_WINDOW) :: IN :: ZIL LOCAL-GLOBALS vs C++ EAST-OF-HOUSE
+[HIGH] KITCHEN-WINDOW (C++ 504 KITCHEN_WINDOW) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] KNIFE (C++ 203 KNIFE) :: ACTION :: ZIL ACTION KNIFE-F but C++ has no action
+[HIGH] KNIFE (C++ 203 KNIFE) :: FLAGS :: missing in C++: ['TRYTAKEBIT']
+[HIGH] KNIFE (C++ 203 KNIFE) :: IN :: ZIL ATTIC-TABLE vs C++ None
+[HIGH] KNIFE (C++ 203 KNIFE) :: SIZE :: ZIL default 5 vs C++ 10
+[HIGH] KNIFE (C++ 203 KNIFE) :: STRENGTH :: ZIL 0 vs C++ 5
+[HIGH] LADDER (C++ 514 LADDER) :: IN :: ZIL LOCAL-GLOBALS vs C++ None
+[HIGH] LADDER (C++ 514 LADDER) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] LAMP (C++ 201 LAMP) :: CAPACITY :: ZIL 0 vs C++ 330
+[HIGH] LAMP (C++ 201 LAMP) :: STRENGTH :: ZIL 0 vs C++ 100
+[HIGH] LARGE-BAG (C++ 305 BAG) :: ACTION :: ZIL ACTION LARGE-BAG-F but C++ has no action
+[HIGH] LARGE-BAG (C++ 305 BAG) :: CAPACITY :: ZIL 0 vs C++ 100
+[HIGH] LARGE-BAG (C++ 305 BAG) :: FLAGS :: missing in C++: ['NDESCBIT', 'TRYTAKEBIT']
+[HIGH] LARGE-BAG (C++ 305 BAG) :: IN :: ZIL THIEF vs C++ None
+[HIGH] LARGE-BAG (C++ 305 BAG) :: SIZE :: ZIL default 5 vs C++ 20
+[HIGH] LEAK :: missing :: OBJECT LEAK not registered in C++ world
+[HIGH] LEAVES (C++ 533 LEAVES) :: ACTION :: ZIL ACTION LEAF-PILE but C++ has no action
+[HIGH] LOWERED-BASKET (C++ 302 BASKET) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] LUNCH (C++ 740 LUNCH) :: SIZE :: ZIL default 5 vs C++ 4
+[HIGH] LUNGS (C++ 750 LUNGS) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] MACHINE (C++ 311 MACHINE) :: CAPACITY :: ZIL 50 vs C++ 20
+[HIGH] MACHINE (C++ 311 MACHINE) :: FLAGS :: missing in C++: ['NDESCBIT']
+[HIGH] MACHINE (C++ 311 MACHINE) :: SIZE :: ZIL default 5 vs C++ 100
+[HIGH] MACHINE-SWITCH :: missing :: OBJECT MACHINE-SWITCH not registered in C++ world
+[HIGH] MAILBOX (C++ 300 MAILBOX) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] MAP (C++ 764 MAP) :: FLAGS :: missing in C++: ['INVISIBLE']
+[HIGH] MAP (C++ 764 MAP) :: IN :: ZIL TROPHY-CASE vs C++ None
+[HIGH] MATCH (C++ 210 MATCH) :: STRENGTH :: ZIL 0 vs C++ 5
+[HIGH] ME (C++ 802 ME) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] MIRROR-1 (C++ 603 MIRROR_1) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] MIRROR-2 (C++ 604 MIRROR_2) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] MOUNTAIN-RANGE (C++ 511 MOUNTAIN_RANGE) :: IN :: ZIL MOUNTAINS vs C++ None
+[HIGH] MOUNTAIN-RANGE (C++ 511 MOUNTAIN_RANGE) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] NOT-HERE-OBJECT (C++ 810 NOT_HERE_OBJECT) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] OWNERS-MANUAL (C++ 763 OWNERS_MANUAL) :: IN :: ZIL STUDIO vs C++ None
+[HIGH] OWNERS-MANUAL (C++ 763 OWNERS_MANUAL) :: SIZE :: ZIL default 5 vs C++ 3
+[HIGH] PATHOBJ (C++ 811 PATHOBJ) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] PEDESTAL (C++ 312 PEDESTAL) :: ACTION :: ZIL ACTION DUMB-CONTAINER but C++ has no action
+[HIGH] PEDESTAL (C++ 312 PEDESTAL) :: IN :: ZIL TORCH-ROOM vs C++ None
+[HIGH] PEDESTAL (C++ 312 PEDESTAL) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] PRAYER (C++ 537 PRAYER) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] PSEUDO-OBJECT (C++ 809 PSEUDO_OBJECT) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] PUMP (C++ 208 PUMP) :: SIZE :: ZIL default 5 vs C++ 8
+[HIGH] PUNCTURED-BOAT (C++ 601 BOAT_PUNCTURED) :: FLAGS :: missing in C++: ['BURNBIT', 'TAKEBIT']
+[HIGH] PUNCTURED-BOAT (C++ 601 BOAT_PUNCTURED) :: SIZE :: ZIL 20 vs C++ 30
+[HIGH] PUTTY (C++ 212 PUTTY) :: ACTION :: ZIL ACTION PUTTY-FCN but C++ has no action
+[HIGH] RAILING (C++ 519 RAILING) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] RAINBOW (C++ 527 RAINBOW) :: ACTION :: ZIL ACTION RAINBOW-FCN but C++ has no action
+[HIGH] RAINBOW (C++ 527 RAINBOW) :: IN :: ZIL LOCAL-GLOBALS vs C++ CANYON-VIEW
+[HIGH] RAINBOW (C++ 527 RAINBOW) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] RAISED-BASKET (C++ 303 RAISED_BASKET) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] RED-BUTTON (C++ 612 RED_BUTTON) :: FLAGS :: missing in C++: ['NDESCBIT']
+[HIGH] RED-BUTTON (C++ 612 RED_BUTTON) :: IN :: ZIL MAINTENANCE-ROOM vs C++ MACHINE-ROOM
+[HIGH] RED-BUTTON (C++ 612 RED_BUTTON) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] RESERVOIR (C++ 1121 RESERVOIR) :: FLAGS :: missing in C++: ['NONLANDBIT']
+[HIGH] RESERVOIR-SOUTH (C++ 1120 RESERVOIR_SOUTH) :: EXIT EAST :: ZIL {'dir': 'EAST', 'raw': ['TO', 'DAM-ROOM'], 'target': 'DAM-ROOM', 'type': 'UEXIT'} missing in C++
+[HIGH] RESERVOIR-SOUTH (C++ 1120 RESERVOIR_SOUTH) :: EXIT SE :: ZIL TO DEEP-CANYON vs C++ NORMAL -> DAM-LOBBY msg=''
+[HIGH] RESERVOIR-SOUTH (C++ 1120 RESERVOIR_SOUTH) :: EXIT SOUTH :: C++ has exit NORMAL -> DEEP-CANYON msg='' with no ZIL basis
+[HIGH] RIVER (C++ 528 RIVER) :: ACTION :: ZIL ACTION RIVER-FUNCTION but C++ has no action
+[HIGH] RIVER (C++ 528 RIVER) :: IN :: ZIL LOCAL-GLOBALS vs C++ None
+[HIGH] RIVER (C++ 528 RIVER) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] RIVER-3 (C++ 1132 RIVER_3) :: EXIT EAST :: C++ has exit NORMAL -> None msg='The White Cliffs prevent landing here.' with no ZIL basis
+[HIGH] RIVER-5 (C++ 1134 RIVER_5) :: EXIT DOWN :: C++ has exit NORMAL -> None msg='The river rushes over the falls to your doom!' with no ZIL basis
+[HIGH] ROOMS (C++ 805 ROOMS) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] ROPE (C++ 202 ROPE) :: FLAGS :: missing in C++: ['TRYTAKEBIT']
+[HIGH] RUG (C++ 516 RUG) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] RUSTY-KNIFE (C++ 204 RUSTY_KNIFE) :: ACTION :: ZIL ACTION RUSTY-KNIFE-FCN but C++ has no action
+[HIGH] SAILOR (C++ 803 SAILOR) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] SAND (C++ 530 SAND) :: ACTION :: ZIL ACTION SAND-FUNCTION but C++ has no action
+[HIGH] SAND (C++ 530 SAND) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] SANDWICH-BAG (C++ 304 SACK) :: IN :: ZIL KITCHEN-TABLE vs C++ KITCHEN
+[HIGH] SANDY-BEACH (C++ 1137 SANDY_BEACH) :: EXIT LAUNCH :: C++ has exit NORMAL -> RIVER-4 msg='' with no ZIL basis
+[HIGH] SCEPTRE (C++ 118 SCEPTRE) :: ACTION :: ZIL ACTION SCEPTRE-FUNCTION but C++ has no action
+[HIGH] SCREWDRIVER (C++ 206 SCREWDRIVER) :: SIZE :: ZIL default 5 vs C++ 8
+[HIGH] SHORE (C++ 1139 SHORE) :: EXIT LAUNCH :: C++ has exit NORMAL -> RIVER-5 msg='' with no ZIL basis
+[HIGH] SKULL (C++ 117 SKULL) :: SIZE :: ZIL default 5 vs C++ 15
+[HIGH] SLIDE (C++ 513 SLIDE) :: IN :: ZIL LOCAL-GLOBALS vs C++ None
+[HIGH] SLIDE (C++ 513 SLIDE) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] SONGBIRD (C++ 525 SONGBIRD) :: IN :: ZIL LOCAL-GLOBALS vs C++ None
+[HIGH] SONGBIRD (C++ 525 SONGBIRD) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] STAIRS (C++ 515 STAIRS) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] STILETTO (C++ 701 STILETTO) :: ACTION :: ZIL ACTION STILETTO-FUNCTION but C++ has no action
+[HIGH] STILETTO (C++ 701 STILETTO) :: FLAGS :: missing in C++: ['NDESCBIT', 'TRYTAKEBIT']
+[HIGH] STILETTO (C++ 701 STILETTO) :: SIZE :: ZIL 10 vs C++ 5
+[HIGH] STILETTO (C++ 701 STILETTO) :: STRENGTH :: ZIL 0 vs C++ 4
+[HIGH] STRANGE-PASSAGE (C++ 1101 STRANGE_PASSAGE) :: EXIT NORTH :: C++ has exit NORMAL -> LIVING-ROOM msg='' with no ZIL basis
+[HIGH] STRANGE-PASSAGE (C++ 1101 STRANGE_PASSAGE) :: EXIT OUT :: C++ has exit NORMAL -> LIVING-ROOM msg='' with no ZIL basis
+[HIGH] STRANGE-PASSAGE (C++ 1101 STRANGE_PASSAGE) :: EXIT SOUTH :: C++ has exit NORMAL -> CYCLOPS-ROOM msg='' with no ZIL basis
+[HIGH] SWORD (C++ 200 SWORD) :: FLAGS :: missing in C++: ['TRYTAKEBIT']
+[HIGH] SWORD (C++ 200 SWORD) :: STRENGTH :: ZIL 0 vs C++ 10
+[HIGH] TEETH (C++ 526 TEETH) :: IN :: ZIL GLOBAL-OBJECTS vs C++ None
+[HIGH] TEETH (C++ 526 TEETH) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] THIEF (C++ 400 THIEF) :: FLAGS :: missing in C++: ['CONTBIT', 'INVISIBLE', 'OPENBIT', 'TRYTAKEBIT']
+[HIGH] THIEF (C++ 400 THIEF) :: IN :: ZIL ROUND-ROOM vs C++ MAZE-1
+[HIGH] THIEF (C++ 400 THIEF) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] TOOL-CHEST (C++ 309 TOOL_CHEST) :: ACTION :: ZIL ACTION TOOL-CHEST-FCN but C++ has no action
+[HIGH] TOOL-CHEST (C++ 309 TOOL_CHEST) :: CAPACITY :: ZIL 0 vs C++ 40
+[HIGH] TOOL-CHEST (C++ 309 TOOL_CHEST) :: IN :: ZIL MAINTENANCE-ROOM vs C++ None
+[HIGH] TOOL-CHEST (C++ 309 TOOL_CHEST) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] TORCH (C++ 116 TORCH) :: STRENGTH :: ZIL 0 vs C++ 30
+[HIGH] TRAP-DOOR (C++ 508 TRAP_DOOR) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] TREE (C++ 509 TREE) :: IN :: ZIL LOCAL-GLOBALS vs C++ None
+[HIGH] TREE (C++ 509 TREE) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] TROLL (C++ 401 TROLL) :: FLAGS :: missing in C++: ['OPENBIT', 'TRYTAKEBIT']
+[HIGH] TROLL (C++ 401 TROLL) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] TROLL (C++ 401 TROLL) :: STRENGTH :: ZIL 2 vs C++ 8
+[HIGH] TROPHY-CASE (C++ 301 TROPHY_CASE) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] TRUNK (C++ 107 JEWELS) :: ACTION :: ZIL ACTION TRUNK-F but C++ has no action
+[HIGH] TUBE (C++ 213 TUBE) :: ACTION :: ZIL ACTION TUBE-FUNCTION but C++ has no action
+[HIGH] WALL (C++ 520 WALL) :: IN :: ZIL GLOBAL-OBJECTS vs C++ None
+[HIGH] WALL (C++ 520 WALL) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] WATER (C++ 742 WATER) :: ACTION :: ZIL ACTION WATER-F but C++ has no action
+[HIGH] WATER (C++ 742 WATER) :: FLAGS :: missing in C++: ['DRINKBIT', 'TRYTAKEBIT']
+[HIGH] WHITE-CLIFF (C++ 539 WHITE_CLIFF) :: ACTION :: ZIL ACTION WCLIF-OBJECT but C++ has no action
+[HIGH] WHITE-CLIFF (C++ 539 WHITE_CLIFF) :: IN :: ZIL LOCAL-GLOBALS vs C++ None
+[HIGH] WHITE-CLIFF (C++ 539 WHITE_CLIFF) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] WHITE-CLIFFS-NORTH (C++ 1135 WHITE_CLIFFS_NORTH) :: ACTION :: ZIL room ACTION WHITE-CLIFFS-FUNCTION but C++ room has no action
+[HIGH] WHITE-CLIFFS-NORTH (C++ 1135 WHITE_CLIFFS_NORTH) :: EXIT LAUNCH :: C++ has exit NORMAL -> RIVER-3 msg='' with no ZIL basis
+[HIGH] WHITE-CLIFFS-SOUTH (C++ 1136 WHITE_CLIFFS_SOUTH) :: ACTION :: ZIL room ACTION WHITE-CLIFFS-FUNCTION but C++ room has no action
+[HIGH] WHITE-CLIFFS-SOUTH (C++ 1136 WHITE_CLIFFS_SOUTH) :: EXIT LAUNCH :: C++ has exit NORMAL -> RIVER-4 msg='' with no ZIL basis
+[HIGH] WHITE-CLIFFS-SOUTH (C++ 1136 WHITE_CLIFFS_SOUTH) :: EXIT UP :: C++ has exit NORMAL -> None msg='The cliffs are too steep to climb.' with no ZIL basis
+[HIGH] WHITE-HOUSE (C++ 500 WHITE_HOUSE) :: IN :: ZIL LOCAL-GLOBALS vs C++ None
+[HIGH] WHITE-HOUSE (C++ 500 WHITE_HOUSE) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] WOODEN-DOOR (C++ 506 WOODEN_DOOR) :: ACTION :: ZIL ACTION FRONT-DOOR-FCN but C++ has no action
+[HIGH] WOODEN-DOOR (C++ 506 WOODEN_DOOR) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] YELLOW-BUTTON (C++ 610 YELLOW_BUTTON) :: FLAGS :: missing in C++: ['NDESCBIT']
+[HIGH] YELLOW-BUTTON (C++ 610 YELLOW_BUTTON) :: IN :: ZIL MAINTENANCE-ROOM vs C++ MACHINE-ROOM
+[HIGH] YELLOW-BUTTON (C++ 610 YELLOW_BUTTON) :: SIZE :: ZIL default 5 vs C++ unset->0
+[HIGH] ZORKMID (C++ 804 ZORKMID) :: SIZE :: ZIL default 5 vs C++ unset->0
+[MED] ADVENTURER (C++ 800 ADVENTURER) :: DESC :: ZIL 'cretin' vs C++ 'adventurer'
+[MED] ADVENTURER (C++ 800 ADVENTURER) :: SYNONYM :: ZIL ['ADVENTURER'] vs C++ ['ADVENTURER', 'ME', 'MYSELF', 'SELF', 'ADVENTURER']
+[MED] ADVERTISEMENT (C++ 760 ADVERTISEMENT) :: ADJECTIVE :: ZIL ['SMALL'] vs C++ []
+[MED] ADVERTISEMENT (C++ 760 ADVERTISEMENT) :: SYNONYM :: ZIL ['ADVERTISEMENT', 'LEAFLET', 'BOOKLET', 'MAIL'] vs C++ ['LEAFLET', 'ADVERTISEMENT', 'MAIL', 'BOOKLET', 'PAMPHLET']
+[MED] ADVERTISEMENT (C++ 760 ADVERTISEMENT) :: TEXT :: ZIL '"WELCOME TO ZORK!\n \n ZORK is a game of adventure, danger, and low cunning. In it you will explore some of the most amazing territory ever seen by mortals. No computer should be without one!"'
+      C++ '"WELCOME TO ZORK!\n\nZORK is a game of adventure, danger, and low cunning. In it you\nwill explore some of the most amazing territory ever seen by\nmortals. No computer should be without one!"'
+[MED] ARAGAIN-FALLS (C++ 1140 ARAGAIN_FALLS) :: LDESC :: ZIL ''
+      C++ 'You are at the top of Aragain Falls, an enormous cataract with a drop of several hundred feet. The roar of the water is deafening.'
+[MED] ATLANTIS-ROOM (C++ 1125 ATLANTIS_ROOM) :: GLOBAL :: ZIL ['STAIRS'] vs C++ []
+[MED] ATTIC (C++ 1022 ATTIC) :: FLAGS :: extra in C++: ['ONBIT']
+[MED] AXE (C++ 700 AXE) :: ADJECTIVE :: ZIL ['BLOODY'] vs C++ ['BLOODY', "TROLL'S"]
+[MED] AXE (C++ 700 AXE) :: FLAGS :: extra in C++: ['TOOLBIT']
+[MED] AXE (C++ 700 AXE) :: SYNONYM :: ZIL ['AXE', 'AX'] vs C++ ['AXE']
+[MED] BAG-OF-COINS (C++ 743 BAG_OF_COINS) :: DESC :: ZIL 'leather bag of coins' vs C++ 'bag of coins'
+[MED] BAG-OF-COINS (C++ 743 BAG_OF_COINS) :: FLAGS :: extra in C++: ['CONTBIT']
+[MED] BAG-OF-COINS (C++ 743 BAG_OF_COINS) :: LDESC :: ZIL 'An old leather bag, bulging with coins, is here.'
+      C++ ''
+[MED] BAG-OF-COINS (C++ 743 BAG_OF_COINS) :: SYNONYM :: ZIL ['BAG', 'COINS', 'TREASURE'] vs C++ ['BAG', 'COINS']
+[MED] BAR (C++ 113 BAR) :: ADJECTIVE :: ZIL ['PLATINUM', 'LARGE'] vs C++ ['PLATINUM', 'LARGE', 'HEAVY']
+[MED] BAT-ROOM (C++ 1054 BAT_ROOM) :: LDESC :: ZIL ''
+      C++ 'You are in a small room which has doors only to the east and south.'
+[MED] BAUBLE (C++ 121 BAUBLE) :: ADJECTIVE :: ZIL ['BRASS', 'BEAUTI'] vs C++ ['BRASS', 'BEAUTIFUL']
+[MED] BLUE-BUTTON (C++ 613 BLUE_BUTTON) :: FLAGS :: extra in C++: ['TRYTAKEBIT']
+[MED] BLUE-BUTTON (C++ 613 BLUE_BUTTON) :: SYNONYM :: ZIL ['BUTTON', 'SWITCH'] vs C++ ['BUTTON']
+[MED] BOAT-LABEL (C++ 765 BOAT_LABEL) :: ADJECTIVE :: ZIL ['TAN', 'FINE'] vs C++ []
+[MED] BOAT-LABEL (C++ 765 BOAT_LABEL) :: DESC :: ZIL 'tan label' vs C++ 'label'
+[MED] BOAT-LABEL (C++ 765 BOAT_LABEL) :: FLAGS :: extra in C++: ['TRYTAKEBIT']
+[MED] BOAT-LABEL (C++ 765 BOAT_LABEL) :: SYNONYM :: ZIL ['LABEL', 'FINEPRINT', 'PRINT'] vs C++ ['LABEL', 'TAG']
+[MED] BOAT-LABEL (C++ 765 BOAT_LABEL) :: TEXT :: ZIL '  !!!!FROBOZZ MAGIC BOAT COMPANY!!!!\n \n Hello, Sailor!\n \n Instructions for use:\n \n    To get into a body of water, say "Launch".\n    To get to shore, say "Land" or the direction in which you want to maneuver the boat.\n \n Warranty:\n \n   This boat is guaranteed against all defects for a period of 76 milliseconds from date of purchase or until first used, whichever comes first.\n \n Warning:\n    This boat is made of thin plastic.\n    Good Luck!'
+      C++ 'FROBOZZ MAGIC BOAT COMPANY\n  Inflatable Boat\n  Capacity: 2\n  Model: FMB-1\n  Serial Number: 123456789'
+[MED] BOOK (C++ 761 BOOK) :: ADJECTIVE :: ZIL ['LARGE', 'BLACK'] vs C++ ['BLACK']
+[MED] BOOK (C++ 761 BOOK) :: FDESC :: ZIL 'On the altar is a large black book, open to page 569.'
+      C++ ''
+[MED] BOOK (C++ 761 BOOK) :: SYNONYM :: ZIL ['BOOK', 'PRAYER', 'PAGE', 'BOOKS'] vs C++ ['BOOK', 'TOME']
+[MED] BOOK (C++ 761 BOOK) :: TEXT :: ZIL 'Commandment #12592\n \n Oh ye who go about saying unto each:  "Hello sailor":\n Dost thou know the magnitude of thy sin before the gods?\n Yea, verily, thou shalt be ground between two stones.\n Shall the angry gods cast thy body into the whirlpool?\n Surely, thy eye shall be put out with a sharp stick!\n Even unto the ends of the earth shalt thou wander and\n Unto the land of the dead shalt thou be sent at last.\n Surely thou shalt repent of thy cunning.'
+      C++ "Commandment #12592\n\nOh ye who go about saying unto each: 'Hello sailor':\nDost thou know the magnitude of thy sin before the gods?\nYea, verily, thou shalt be ground between two stones.\nShall the angry gods cast thy body into the whirlpool?\nSurely, thy eye shall be put out with a sharp stick!\nEven unto the ends of the earth shalt thou wander and\nUnto the land of the dead shalt thou be sent at last.\nSurely thou shalt repent of thy cunning."
+[MED] BRACELET (C++ 112 BRACELET) :: ADJECTIVE :: ZIL ['SAPPHIRE'] vs C++ ['SAPPHIRE', 'ENCRUSTED', 'BEAUTIFUL']
+[MED] BRACELET (C++ 112 BRACELET) :: SYNONYM :: ZIL ['BRACELET', 'JEWEL', 'SAPPHIRE', 'TREASURE'] vs C++ ['BRACELET', 'SAPPHIRE', 'TREASURE']
+[MED] BROKEN-CANARY (C++ 120 BROKEN_CANARY) :: FDESC :: ZIL 'There is a golden clockwork canary nestled in the egg. It seems to have recently had a bad experience. The mountings for its jewel-like eyes are empty, and its silver beak is crumpled. Through a cracked crystal window below its left wing you can see the remains of intricate machinery. It is not clear what result winding it would have, as the mainspring seems sprung.'
+      C++ ''
+[MED] BROWN-BUTTON (C++ 611 BROWN_BUTTON) :: FLAGS :: extra in C++: ['TRYTAKEBIT']
+[MED] BROWN-BUTTON (C++ 611 BROWN_BUTTON) :: SYNONYM :: ZIL ['BUTTON', 'SWITCH'] vs C++ ['BUTTON']
+[MED] BUBBLE (C++ 607 BUBBLE) :: ADJECTIVE :: ZIL ['SMALL', 'GREEN', 'PLASTIC'] vs C++ ['GREEN', 'LARGE']
+[MED] BUBBLE (C++ 607 BUBBLE) :: DESC :: ZIL 'green bubble' vs C++ 'bubble'
+[MED] BUOY (C++ 307 BUOY) :: FDESC :: ZIL 'There is a red buoy here (probably a warning).'
+      C++ ''
+[MED] BUOY (C++ 307 BUOY) :: FLAGS :: extra in C++: ['SEARCHBIT']
+[MED] BURNED-OUT-LANTERN (C++ 721 BURNED_OUT_LANTERN) :: FDESC :: ZIL "The deceased adventurer's useless lantern is here."
+      C++ ''
+[MED] C++ 100 ['TROPHY'] :: extra :: no ZIL basis: desc='trophy' loc=1102 syn=['trophy', 'cup'] flags=['TAKEBIT']
+[MED] C++ 108 ['COINS'] :: extra :: no ZIL basis: desc='bag of coins' loc=1074 syn=['coins', 'bag', 'coin', 'zorkmids', 'treasure'] flags=['TAKEBIT']
+[MED] C++ 502 ['WINDOW'] :: extra :: no ZIL basis: desc='window' loc=0 syn=['window', 'windows'] flags=['TRYTAKEBIT', 'NDESCBIT']
+[MED] CANARY (C++ 119 CANARY) :: FDESC :: ZIL 'There is a golden clockwork canary nestled in the egg. It has ruby eyes and a silver beak. Through a crystal window below its left wing you can see intricate machinery inside. It appears to have wound down.'
+      C++ ''
+[MED] CANDLES (C++ 211 CANDLES) :: ADJECTIVE :: ZIL ['BURNING'] vs C++ ['BURNING', 'WAX']
+[MED] CANDLES (C++ 211 CANDLES) :: FDESC :: ZIL 'On the two ends of the altar are burning candles.'
+      C++ ''
+[MED] CANDLES (C++ 211 CANDLES) :: SYNONYM :: ZIL ['CANDLES', 'PAIR'] vs C++ ['CANDLES', 'CANDLE', 'PAIR']
+[MED] CANYON-BOTTOM (C++ 1143 CANYON_BOTTOM) :: GLOBAL :: ZIL ['CLIMBABLE-CLIFF', 'GLOBAL-WATER', 'RIVER'] vs C++ []
+[MED] CANYON-VIEW (C++ 1008 CANYON_VIEW) :: LDESC :: ZIL 'You are at the top of the Great Canyon on its west wall. From here there is a marvelous view of the canyon and parts of the Frigid River upstream. Across the canyon, the walls of the White Cliffs join the mighty ramparts of the Flathead Mountains to the east. Following the Canyon upstream to the north, Aragain Falls may be seen, complete with rainbow. The mighty Frigid River flows out from a great dark cavern. To the west and south can be seen an immense forest, stretching for miles around. A path leads northwest. It is possible to climb down into the canyon from here.'
+      C++ 'You are at the top of the Great Canyon on its west wall. From here there is a marvelous view of the canyon and parts of the Frigid River upstream. Across the canyon, the walls of the White Cliffs join the mighty ramparts of the Flathead Mountains to the east. Following the Canyon upstream to the north, Aragain Falls may be seen, complete with rainbow. The mighty Frigid River flows out from a great dark cavern. To the west and south can be seen an immense forest, stretching for miles around. A path leads northwest.'
+[MED] CELLAR (C++ 1023 CELLAR) :: EXIT UP :: ZIL door TRAP-DOOR vs C++ CONDITIONAL door=None cond=True
+[MED] CELLAR (C++ 1023 CELLAR) :: EXIT WEST :: ZIL NEXIT 'You try to ascend the ramp, but it is impossible, and you slide back down.' vs C++ NORMAL -> None msg='The ramp is too steep to climb.'
+[MED] CELLAR (C++ 1023 CELLAR) :: FLAGS :: extra in C++: ['SACREDBIT']
+[MED] CELLAR (C++ 1023 CELLAR) :: GLOBAL :: ZIL ['SLIDE', 'STAIRS', 'TRAP-DOOR'] vs C++ ['TRAP-DOOR']
+[MED] CELLAR (C++ 1023 CELLAR) :: LDESC :: ZIL ''
+      C++ 'You are in a dark and damp cellar with a narrow passageway leading north, and a crawlway to the south. On the west is the bottom of a steep metal ramp which is unclimbable.'
+[MED] CHALICE (C++ 103 CHALICE) :: ADJECTIVE :: ZIL ['SILVER', 'ENGRAVINGS'] vs C++ ['SILVER']
+[MED] CHALICE (C++ 103 CHALICE) :: DESC :: ZIL 'chalice' vs C++ 'silver chalice'
+[MED] CHALICE (C++ 103 CHALICE) :: SYNONYM :: ZIL ['CHALICE', 'CUP', 'SILVER', 'TREASURE'] vs C++ ['CHALICE', 'GOBLET', 'GRAIL', 'CUP', 'TREASURE']
+[MED] CHASM-ROOM (C++ 1046 CHASM_ROOM) :: GLOBAL :: ZIL ['CRACK', 'STAIRS'] vs C++ []
+[MED] CLEARING (C++ 1005 CLEARING) :: GLOBAL :: ZIL ['FOREST', 'SONGBIRD', 'TREE', 'WHITE-HOUSE'] vs C++ []
+[MED] CLIFF-MIDDLE (C++ 1144 CLIFF_MIDDLE) :: GLOBAL :: ZIL ['CLIMBABLE-CLIFF', 'RIVER'] vs C++ []
+[MED] COFFIN (C++ 106 COFFIN) :: ADJECTIVE :: ZIL ['SOLID', 'GOLD'] vs C++ ['SOLID', 'GOLD', 'GOLDEN', 'EGYPTIAN']
+[MED] CYCLOPS (C++ 402 CYCLOPS) :: ADJECTIVE :: ZIL ['HUNGRY', 'GIANT'] vs C++ []
+[MED] CYCLOPS (C++ 402 CYCLOPS) :: FLAGS :: extra in C++: ['FIGHTBIT']
+[MED] CYCLOPS (C++ 402 CYCLOPS) :: SYNONYM :: ZIL ['CYCLOPS', 'MONSTER', 'EYE'] vs C++ ['CYCLOPS', 'GIANT', 'MONSTER', 'CREATURE']
+[MED] CYCLOPS-ROOM (C++ 1100 CYCLOPS_ROOM) :: GLOBAL :: ZIL ['STAIRS'] vs C++ ['CYCLOPS']
+[MED] CYCLOPS-ROOM (C++ 1100 CYCLOPS_ROOM) :: LDESC :: ZIL ''
+      C++ 'This is a large room with a ceiling which cannot be detected from the ground. There is a narrow passage from east to west and a stone stairway leading upward. The room is eerie in its quietness.'
+[MED] DAM (C++ 605 DAM) :: ADJECTIVE :: ZIL [] vs C++ ['CONCRETE', 'MASSIVE']
+[MED] DAM (C++ 605 DAM) :: SYNONYM :: ZIL ['DAM', 'GATE', 'GATES', 'FCD#3'] vs C++ ['DAM', 'STRUCTURE']
+[MED] DAM-BASE (C++ 1129 DAM_BASE) :: GLOBAL :: ZIL ['GLOBAL-WATER', 'RIVER'] vs C++ []
+[MED] DAM-ROOM (C++ 1126 DAM_ROOM) :: GLOBAL :: ZIL ['GLOBAL-WATER'] vs C++ []
+[MED] DAM-ROOM (C++ 1126 DAM_ROOM) :: LDESC :: ZIL ''
+      C++ 'You are standing on the top of the Flood Control Dam #3, which was quite a tourist attraction in times far distant. There are paths to the north, south, and west, and a scramble down.'
+[MED] DAMP-CAVE (C++ 1048 DAMP_CAVE) :: GLOBAL :: ZIL ['CRACK'] vs C++ []
+[MED] DEEP-CANYON (C++ 1047 DEEP_CANYON) :: GLOBAL :: ZIL ['STAIRS'] vs C++ []
+[MED] DEEP-CANYON (C++ 1047 DEEP_CANYON) :: LDESC :: ZIL ''
+      C++ 'You are on the south edge of a deep canyon. Passages lead off to the east, northwest and southwest. You can hear the sound of flowing water from below.'
+[MED] DIAMOND (C++ 109 DIAMOND) :: SYNONYM :: ZIL ['DIAMOND', 'TREASURE'] vs C++ ['DIAMOND', 'GEM', 'TREASURE']
+[MED] DOME-ROOM (C++ 1106 DOME_ROOM) :: GLOBAL :: ZIL [] vs C++ ['RAILING']
+[MED] DOME-ROOM (C++ 1106 DOME_ROOM) :: LDESC :: ZIL ''
+      C++ 'You are at the periphery of a large dome, which forms the ceiling of another room below. Protecting you from a precipitous drop is a wooden railing which circles the dome.'
+[MED] EAST-OF-HOUSE (C++ 1003 BEHIND_HOUSE) :: LDESC :: ZIL ''
+      C++ 'You are behind the white house. A path leads into the forest to the east. In one corner of the house there is a small window which is slightly ajar.'
+[MED] EGG (C++ 101 EGG) :: ADJECTIVE :: ZIL ['BIRDS', 'ENCRUSTED', 'JEWELED'] vs C++ ['JEWEL', 'JEWELED', 'ENCRUSTED', 'BIRDS']
+[MED] EGG (C++ 101 EGG) :: FDESC :: ZIL "In the bird's nest is a large egg encrusted with precious jewels, apparently scavenged by a childless songbird. The egg is covered with fine gold inlay, and ornamented in lapis lazuli and mother-of-pearl. Unlike most eggs, this one is hinged and closed with a delicate looking clasp. The egg appears extremely fragile."
+      C++ ''
+[MED] EGYPT-ROOM (C++ 1110 EGYPT_ROOM) :: GLOBAL :: ZIL ['STAIRS'] vs C++ []
+[MED] EMERALD (C++ 111 EMERALD) :: SYNONYM :: ZIL ['EMERALD', 'TREASURE'] vs C++ ['EMERALD', 'GEM', 'TREASURE']
+[MED] END-OF-RAINBOW (C++ 1142 END_OF_RAINBOW) :: FLAGS :: extra in C++: ['SACREDBIT']
+[MED] END-OF-RAINBOW (C++ 1142 END_OF_RAINBOW) :: GLOBAL :: ZIL ['GLOBAL-WATER', 'RAINBOW', 'RIVER'] vs C++ ['RAINBOW']
+[MED] ENTRANCE-TO-HADES (C++ 1103 ENTRANCE_TO_HADES) :: LDESC :: ZIL ''
+      C++ 'You are outside a large gateway, on which is inscribed:\n\n Abandon every hope all ye who enter here\n\nThe gate is open; through it you can see a desolation, with a pile of mangled bodies in one corner. Thousands of voices, lamenting some hideous fate, can be heard.'
+[MED] EW-PASSAGE (C++ 1042 EW_PASSAGE) :: GLOBAL :: ZIL ['STAIRS'] vs C++ []
+[MED] FOREST-1 (C++ 1010 FOREST_1) :: GLOBAL :: ZIL ['FOREST', 'SONGBIRD', 'TREE', 'WHITE-HOUSE'] vs C++ []
+[MED] FOREST-2 (C++ 1011 FOREST_2) :: GLOBAL :: ZIL ['FOREST', 'SONGBIRD', 'TREE', 'WHITE-HOUSE'] vs C++ []
+[MED] FOREST-3 (C++ 1012 FOREST_3) :: GLOBAL :: ZIL ['FOREST', 'SONGBIRD', 'TREE', 'WHITE-HOUSE'] vs C++ []
+[MED] FRONT-DOOR (C++ 505 FRONT_DOOR) :: ADJECTIVE :: ZIL ['FRONT', 'BOARDED'] vs C++ ['FRONT']
+[MED] FRONT-DOOR (C++ 505 FRONT_DOOR) :: DESC :: ZIL 'door' vs C++ 'front door'
+[MED] GALLERY (C++ 1024 GALLERY) :: FLAGS :: extra in C++: ['SACREDBIT']
+[MED] GALLERY (C++ 1024 GALLERY) :: LDESC :: ZIL 'This is an art gallery. Most of the paintings have been stolen by vandals with exceptional taste. The vandals left through either the north or west exits.'
+      C++ 'This is an art gallery. Most of the paintings which were here have been stolen by vandals with exceptional taste. The vandals left through either the north or west exits.'
+[MED] GAS-ROOM (C++ 1057 GAS_ROOM) :: GLOBAL :: ZIL ['STAIRS'] vs C++ []
+[MED] GRANITE-WALL (C++ 521 GRANITE_WALL) :: FLAGS :: extra in C++: ['NDESCBIT']
+[MED] GRATING-CLEARING (C++ 1007 GRATING_CLEARING) :: LDESC :: ZIL ''
+      C++ 'You are in a clearing, with a forest surrounding you on all sides. A path leads south.'
+[MED] GRATING-ROOM (C++ 1085 GRATING_ROOM) :: EXIT UP :: ZIL door GRATE vs C++ CONDITIONAL door=None cond=True
+[MED] GRATING-ROOM (C++ 1085 GRATING_ROOM) :: LDESC :: ZIL ''
+      C++ 'You are in a small room near the maze. There are twisty passages in the immediate vicinity.'
+[MED] GROUND (C++ 541 GROUND) :: FLAGS :: extra in C++: ['INVISIBLE', 'NDESCBIT']
+[MED] GRUE (C++ 403 GRUE) :: DESC :: ZIL 'lurking grue' vs C++ 'grue'
+[MED] GRUE (C++ 403 GRUE) :: FLAGS :: extra in C++: ['INVISIBLE']
+[MED] GUIDE (C++ 762 GUIDE) :: ADJECTIVE :: ZIL ['TOUR', 'GUIDE'] vs C++ ['TOUR']
+[MED] GUIDE (C++ 762 GUIDE) :: FDESC :: ZIL 'Some guidebooks entitled "Flood Control Dam #3" are on the reception desk.'
+      C++ ''
+[MED] GUIDE (C++ 762 GUIDE) :: SYNONYM :: ZIL ['GUIDE', 'BOOK', 'BOOKS', 'GUIDEBOOKS'] vs C++ ['GUIDE', 'GUIDEBOOK', 'BOOK']
+[MED] GUIDE (C++ 762 GUIDE) :: TEXT :: ZIL '"\tFlood Control Dam #3\n \n FCD#3 was constructed in year 783 of the Great Underground Empire to harness the mighty Frigid River. This work was supported by a grant of 37 million zorkmids from your omnipotent local tyrant Lord Dimwit Flathead the Excessive. This impressive structure is composed of 370,000 cubic feet of concrete, is 256 feet tall at the center, and 193 feet wide at the top. The lake created behind the dam has a volume of 1.7 billion cubic feet, an area of 12 million square feet, and a shore line of 36 thousand feet.\n \n The construction of FCD#3 took 112 days from ground breaking to the dedication. It required a work force of 384 slaves, 34 slave drivers, 12 engineers, 2 turtle doves, and a partridge in a pear tree. The work was managed by a command team composed of 2345 bureaucrats, 2347 secretaries (at least two of whom could type), 12,256 paper shufflers, 52,469 rubber stampers, 245,193 red tape processors, and nearly one million dead trees.\n \n We will now point out some of the more interesting features of FCD#3 as we conduct you on a guided tour of the facilities:\n \n         1) You start your tour here in the Dam Lobby. You will notice on your right that....'
+      C++ 'Flood Control Dam #3\n\nFCD#3 was constructed in year 783 of the Great Underground Empire to harness the mighty Frigid River. This work was supported by a grant of 37 million zorkmids from your omnipotent local tyrant Lord Dimwit Flathead the Excessive. This impressive structure is composed of 370,000 cubic feet of concrete, is 256 feet tall at the center, and 193 feet wide at the top. The reservoir created behind the dam has a volume of 1.7 billion cubic feet, an area of 12 million square feet, and a shore line of 36 thousand feet.\n\nThe construction of FCD#3 took 112 days from ground breaking to the dedication. It required a work force of 384 slaves, 34 slave drivers, 12 engineers, 2 turtle doves, and a partridge in a pear tree. The work was managed by a command team composed of 2345 bureaucrats, 2347 secretaries (at least two of whom could type), 12,256 paper shufflers, 52,469 rubber stampers, 245,193 red tape processors, and nearly one million dead trees.\n\nWe will now point out some of the more interesting features of FCD#3 as we conduct you on a guided tour of the facilities...'
+[MED] GUNK (C++ 614 GUNK) :: ADJECTIVE :: ZIL ['SMALL', 'VITREOUS'] vs C++ ['VITREOUS', 'GLASSY']
+[MED] GUNK (C++ 614 GUNK) :: DESC :: ZIL 'small piece of vitreous slag' vs C++ 'vitreous slag'
+[MED] GUNK (C++ 614 GUNK) :: SYNONYM :: ZIL ['GUNK', 'PIECE', 'SLAG'] vs C++ ['GUNK', 'SLAG', 'PILE']
+[MED] IN-STREAM (C++ 1124 IN_STREAM) :: GLOBAL :: ZIL ['GLOBAL-WATER'] vs C++ []
+[MED] INFLATABLE-BOAT (C++ 602 BOAT_INFLATABLE) :: ADJECTIVE :: ZIL ['PLASTIC', 'INFLAT'] vs C++ ['PLASTIC', 'INFLATABLE']
+[MED] INFLATABLE-BOAT (C++ 602 BOAT_INFLATABLE) :: LDESC :: ZIL 'There is a folded pile of plastic here which has a small valve attached.'
+      C++ ''
+[MED] INFLATED-BOAT (C++ 746 INFLATED_BOAT) :: ADJECTIVE :: ZIL ['INFLAT', 'MAGIC', 'PLASTIC', 'SEAWORTHY'] vs C++ ['RUBBER', 'INFLATED', 'SMALL']
+[MED] INFLATED-BOAT (C++ 746 INFLATED_BOAT) :: FLAGS :: extra in C++: ['CONTBIT']
+[MED] INTNUM (C++ 808 INTNUM) :: SYNONYM :: ZIL ['INTNUM'] vs C++ ['INTNUM', 'NUMBER']
+[MED] JADE (C++ 110 JADE) :: ADJECTIVE :: ZIL ['EXQUISITE', 'JADE'] vs C++ ['JADE', 'SMALL']
+[MED] JADE (C++ 110 JADE) :: SYNONYM :: ZIL ['FIGURINE', 'TREASURE'] vs C++ ['FIGURINE', 'JADE', 'STATUE', 'TREASURE']
+[MED] KITCHEN (C++ 1021 KITCHEN) :: LDESC :: ZIL ''
+      C++ 'You are in the kitchen of the white house. A table seems to have been used recently for the preparation of food. A passage leads to the west and a dark staircase can be seen leading upward. A dark chimney leads down and to the east is a small window which is open.'
+[MED] KNIFE (C++ 203 KNIFE) :: ADJECTIVE :: ZIL ['NASTY', 'UNRUSTY'] vs C++ ['NASTY', 'SHARP']
+[MED] KNIFE (C++ 203 KNIFE) :: FDESC :: ZIL 'On a table is a nasty-looking knife.'
+      C++ ''
+[MED] LADDER-BOTTOM (C++ 1059 LADDER_BOTTOM) :: GLOBAL :: ZIL ['LADDER'] vs C++ []
+[MED] LADDER-TOP (C++ 1058 LADDER_TOP) :: GLOBAL :: ZIL ['LADDER', 'STAIRS'] vs C++ []
+[MED] LAMP (C++ 201 LAMP) :: ADJECTIVE :: ZIL ['BRASS'] vs C++ ['BRASS', 'BATTERY']
+[MED] LAND-OF-LIVING-DEAD (C++ 1104 LAND_OF_LIVING_DEAD) :: GLOBAL :: ZIL ['BODIES'] vs C++ []
+[MED] LARGE-BAG (C++ 305 BAG) :: ADJECTIVE :: ZIL ['LARGE', 'THIEFS'] vs C++ ['LARGE']
+[MED] LARGE-BAG (C++ 305 BAG) :: FLAGS :: extra in C++: ['CONTBIT', 'OPENBIT', 'TAKEBIT']
+[MED] LARGE-BAG (C++ 305 BAG) :: SYNONYM :: ZIL ['BAG'] vs C++ ['BAG', 'SACK']
+[MED] LIVING-ROOM (C++ 1020 LIVING_ROOM) :: LDESC :: ZIL ''
+      C++ 'You are in the living room. There is a doorway to the east, a wooden door with strange gothic lettering to the west, which appears to be nailed shut, a trophy case, and a large oriental rug in the center of the room.'
+[MED] LOCAL-GLOBALS (C++ 807 LOCAL_GLOBALS) :: LDESC/FDESC :: ZIL LDESC 'F' FDESC 'F'
+      C++ ''
+[MED] LOUD-ROOM (C++ 1044 LOUD_ROOM) :: GLOBAL :: ZIL ['STAIRS'] vs C++ []
+[MED] LOUD-ROOM (C++ 1044 LOUD_ROOM) :: LDESC :: ZIL ''
+      C++ 'This is a large room with a ceiling which cannot be detected from the ground. There is a narrow passage from east to west and a stone stairway leading upward. The room is extremely noisy. In fact, it is difficult to hear yourself think.'
+[MED] LOWERED-BASKET (C++ 302 BASKET) :: LDESC :: ZIL 'From the chain is suspended a basket.'
+      C++ ''
+[MED] LUNCH (C++ 740 LUNCH) :: SYNONYM :: ZIL ['FOOD', 'SANDWICH', 'LUNCH', 'DINNER'] vs C++ ['LUNCH', 'SANDWICH', 'PEPPER']
+[MED] MACHINE (C++ 311 MACHINE) :: ADJECTIVE :: ZIL [] vs C++ ['CONTROL', 'METAL', 'LARGE']
+[MED] MACHINE (C++ 311 MACHINE) :: SYNONYM :: ZIL ['MACHINE', 'PDP10', 'DRYER', 'LID'] vs C++ ['MACHINE', 'PANEL', 'CONTROLS', 'CONTRAPTION']
+[MED] MACHINE-ROOM (C++ 1062 MACHINE_ROOM) :: LDESC :: ZIL ''
+      C++ 'This is a large room full of assorted heavy machinery, whirring noisily. The room smells of burned resistors. Along one wall of the room are three buttons which are, respectively, round, triangular, and square. Naturally, above these buttons are instructions written in EBCDIC. A large sign above the buttons says "DANGER: DEADLY RADIATION BEYOND THIS POINT!" There are exits to the north and east.'
+[MED] MAP (C++ 764 MAP) :: ADJECTIVE :: ZIL ['ANTIQUE', 'OLD', 'ANCIENT'] vs C++ []
+[MED] MAP (C++ 764 MAP) :: DESC :: ZIL 'ancient map' vs C++ 'map'
+[MED] MAP (C++ 764 MAP) :: FDESC :: ZIL 'In the trophy case is an ancient parchment which appears to be a map.'
+      C++ ''
+[MED] MAP (C++ 764 MAP) :: FLAGS :: extra in C++: ['BURNBIT']
+[MED] MAP (C++ 764 MAP) :: SYNONYM :: ZIL ['PARCHMENT', 'MAP'] vs C++ ['MAP', 'CHART']
+[MED] MAP (C++ 764 MAP) :: TEXT :: ZIL 'The map shows a forest with three clearings. The largest clearing contains a house. Three paths leave the large clearing. One of these paths, leading southwest, is marked "To Stone Barrow".'
+      C++ 'The map shows a complex maze of twisty passages, all alike.'
+[MED] MATCH (C++ 210 MATCH) :: FLAGS :: missing in C++: ['READBIT']
+[MED] MATCH (C++ 210 MATCH) :: TEXT :: ZIL '\n (Close cover before striking)\n \n YOU too can make BIG MONEY in the exciting field of PAPER SHUFFLING!\n \n Mr. Anderson of Muddle, Mass. says: "Before I took this course I was a lowly bit twiddler. Now with what I learned at GUE Tech I feel really important and can obfuscate and confuse with the best."\n \n Dr. Blank had this to say: "Ten short days ago all I could look forward to was a dead-end job as a doctor. Now I have a promising future and make really big Zorkmids."\n \n GUE Tech can\'t promise these fantastic results to everyone. But when you earn your degree from GUE Tech, your future will be brighter.'
+      C++ ''
+[MED] MAZE-11 (C++ 1080 MAZE_11) :: GLOBAL :: ZIL [] vs C++ ['GRATE']
+[MED] MAZE-5 (C++ 1074 MAZE_5) :: LDESC :: ZIL 'This is part of a maze of twisty little passages, all alike. A skeleton, probably the remains of a luckless adventurer, lies here.'
+      C++ 'This is part of a maze of twisty little passages, all alike.'
+[MED] MIRROR-1 (C++ 603 MIRROR_1) :: ADJECTIVE :: ZIL [] vs C++ ['LARGE']
+[MED] MIRROR-1 (C++ 603 MIRROR_1) :: SYNONYM :: ZIL ['REFLECTION', 'MIRROR', 'ENORMOUS'] vs C++ ['MIRROR', 'GLASS']
+[MED] MIRROR-2 (C++ 604 MIRROR_2) :: ADJECTIVE :: ZIL [] vs C++ ['LARGE']
+[MED] MIRROR-2 (C++ 604 MIRROR_2) :: SYNONYM :: ZIL ['REFLECTION', 'MIRROR', 'ENORMOUS'] vs C++ ['MIRROR', 'GLASS']
+[MED] MIRROR-ROOM-1 (C++ 1111 MIRROR_ROOM_1) :: LDESC :: ZIL ''
+      C++ 'You are in a large square room with tall ceilings. On the south wall is an enormous mirror which fills the entire wall. There are exits on the other three sides of the room.'
+[MED] MIRROR-ROOM-2 (C++ 1112 MIRROR_ROOM_2) :: LDESC :: ZIL ''
+      C++ 'You are in a large square room with tall ceilings. On the south wall is an enormous mirror which fills the entire wall. There are exits on the other three sides of the room.'
+[MED] MOUNTAINS (C++ 1013 MOUNTAINS) :: GLOBAL :: ZIL ['TREE', 'WHITE-HOUSE'] vs C++ []
+[MED] NEST (C++ 308 NEST) :: FDESC :: ZIL "Beside you on the branch is a small bird's nest."
+      C++ ''
+[MED] NORTH-OF-HOUSE (C++ 1001 NORTH_OF_HOUSE) :: GLOBAL :: ZIL ['BOARD', 'BOARDED-WINDOW', 'FOREST', 'WHITE-HOUSE'] vs C++ ['BOARD', 'FOREST', 'WHITE-HOUSE']
+[MED] NORTH-TEMPLE (C++ 1108 NORTH_TEMPLE) :: GLOBAL :: ZIL ['STAIRS'] vs C++ []
+[MED] ON-RAINBOW (C++ 1141 ON_RAINBOW) :: GLOBAL :: ZIL ['RAINBOW'] vs C++ []
+[MED] OWNERS-MANUAL (C++ 763 OWNERS_MANUAL) :: ADJECTIVE :: ZIL ['ZORK', 'OWNERS', 'SMALL'] vs C++ ['OWNERS', "OWNER'S"]
+[MED] OWNERS-MANUAL (C++ 763 OWNERS_MANUAL) :: DESC :: ZIL "ZORK owner's manual" vs C++ "owner's manual"
+[MED] OWNERS-MANUAL (C++ 763 OWNERS_MANUAL) :: FDESC :: ZIL 'Loosely attached to a wall is a small piece of paper.'
+      C++ ''
+[MED] OWNERS-MANUAL (C++ 763 OWNERS_MANUAL) :: FLAGS :: extra in C++: ['BURNBIT']
+[MED] OWNERS-MANUAL (C++ 763 OWNERS_MANUAL) :: SYNONYM :: ZIL ['MANUAL', 'PIECE', 'PAPER'] vs C++ ['MANUAL', 'BOOK']
+[MED] OWNERS-MANUAL (C++ 763 OWNERS_MANUAL) :: TEXT :: ZIL 'Congratulations!\n \n You are the privileged owner of ZORK I: The Great Underground Empire, a self-contained and self-maintaining universe. If used and maintained in accordance with normal operating practices for small universes, ZORK will provide many months of trouble-free operation.'
+      C++ 'Congratulations! You are the proud owner of a FROBOZZ MAGIC BOAT, the finest boat in the world. Your boat is guaranteed against all defects for a period of 76 years. If you have any questions about the operation of your boat, please consult your local dealer.'
+[MED] PAINTING (C++ 105 PAINTING) :: ADJECTIVE :: ZIL ['BEAUTI'] vs C++ ['BEAUTIFUL']
+[MED] PAINTING (C++ 105 PAINTING) :: SYNONYM :: ZIL ['PAINTING', 'ART', 'CANVAS', 'TREASURE'] vs C++ ['PAINTING', 'PICTURE', 'ART', 'CANVAS', 'TREASURE']
+[MED] POT-OF-GOLD (C++ 114 POT_OF_GOLD) :: ADJECTIVE :: ZIL ['GOLD'] vs C++ ['GOLD', 'GOLDEN', 'LARGE']
+[MED] POT-OF-GOLD (C++ 114 POT_OF_GOLD) :: FDESC :: ZIL 'At the end of the rainbow is a pot of gold.'
+      C++ ''
+[MED] PUMP (C++ 208 PUMP) :: SYNONYM :: ZIL ['PUMP', 'AIR-PUMP', 'TOOL', 'TOOLS'] vs C++ ['PUMP', 'AIR-PUMP', 'TOOL']
+[MED] PUNCTURED-BOAT (C++ 601 BOAT_PUNCTURED) :: ADJECTIVE :: ZIL ['PLASTIC', 'PUNCTURE', 'LARGE'] vs C++ ['RUBBER', 'PUNCTURED', 'DAMAGED']
+[MED] PUNCTURED-BOAT (C++ 601 BOAT_PUNCTURED) :: FLAGS :: extra in C++: ['TRYTAKEBIT']
+[MED] PUNCTURED-BOAT (C++ 601 BOAT_PUNCTURED) :: SYNONYM :: ZIL ['BOAT', 'PILE', 'PLASTIC'] vs C++ ['BOAT', 'RAFT']
+[MED] RAINBOW (C++ 527 RAINBOW) :: ADJECTIVE :: ZIL [] vs C++ ['BEAUTIFUL']
+[MED] RAINBOW (C++ 527 RAINBOW) :: FLAGS :: missing in C++: ['CLIMBBIT']
+[MED] RAINBOW (C++ 527 RAINBOW) :: FLAGS :: extra in C++: ['TRYTAKEBIT']
+[MED] RAISED-BASKET (C++ 303 RAISED_BASKET) :: LDESC :: ZIL 'At the end of the chain is a basket.'
+      C++ ''
+[MED] RED-BUTTON (C++ 612 RED_BUTTON) :: FLAGS :: extra in C++: ['TRYTAKEBIT']
+[MED] RED-BUTTON (C++ 612 RED_BUTTON) :: SYNONYM :: ZIL ['BUTTON', 'SWITCH'] vs C++ ['BUTTON']
+[MED] RESERVOIR (C++ 1121 RESERVOIR) :: LDESC :: ZIL ''
+      C++ 'You are on the lake. The water is cold and the current is strong. It is difficult to stay afloat.'
+[MED] RESERVOIR-NORTH (C++ 1122 RESERVOIR_NORTH) :: GLOBAL :: ZIL ['GLOBAL-WATER', 'STAIRS'] vs C++ ['GLOBAL-WATER']
+[MED] RESERVOIR-NORTH (C++ 1122 RESERVOIR_NORTH) :: LDESC :: ZIL ''
+      C++ 'You are in a long room on the north shore of a large lake, far too deep and wide for crossing.'
+[MED] RESERVOIR-SOUTH (C++ 1120 RESERVOIR_SOUTH) :: LDESC :: ZIL ''
+      C++ 'You are in a long room on the south shore of a large lake, far too deep and wide for crossing. There is a path along the stream to the east or west, and a steep pathway climbing southwest along the edge of a chasm.'
+[MED] RIVER (C++ 528 RIVER) :: SYNONYM :: ZIL ['RIVER'] vs C++ ['RIVER', 'FRIGID']
+[MED] RIVER-1 (C++ 1130 RIVER_1) :: GLOBAL :: ZIL ['GLOBAL-WATER', 'RIVER'] vs C++ []
+[MED] RIVER-2 (C++ 1131 RIVER_2) :: FLAGS :: extra in C++: ['ONBIT']
+[MED] RIVER-2 (C++ 1131 RIVER_2) :: GLOBAL :: ZIL ['GLOBAL-WATER', 'RIVER'] vs C++ []
+[MED] RIVER-3 (C++ 1132 RIVER_3) :: FLAGS :: extra in C++: ['ONBIT']
+[MED] RIVER-3 (C++ 1132 RIVER_3) :: GLOBAL :: ZIL ['GLOBAL-WATER', 'RIVER'] vs C++ []
+[MED] RIVER-4 (C++ 1133 RIVER_4) :: FLAGS :: extra in C++: ['ONBIT']
+[MED] RIVER-4 (C++ 1133 RIVER_4) :: GLOBAL :: ZIL ['GLOBAL-WATER', 'RIVER'] vs C++ []
+[MED] RIVER-5 (C++ 1134 RIVER_5) :: GLOBAL :: ZIL ['GLOBAL-WATER', 'RIVER'] vs C++ []
+[MED] ROPE (C++ 202 ROPE) :: ADJECTIVE :: ZIL ['LARGE'] vs C++ ['LARGE', 'THICK']
+[MED] ROPE (C++ 202 ROPE) :: FDESC :: ZIL 'A large coil of rope is lying in the corner.'
+      C++ ''
+[MED] RUG (C++ 516 RUG) :: DESC :: ZIL 'carpet' vs C++ 'rug'
+[MED] RUSTY-KNIFE (C++ 204 RUSTY_KNIFE) :: FDESC :: ZIL 'Beside the skeleton is a rusty knife.'
+      C++ ''
+[MED] SANDWICH-BAG (C++ 304 SACK) :: FLAGS :: extra in C++: ['OPENBIT']
+[MED] SANDY-BEACH (C++ 1137 SANDY_BEACH) :: FLAGS :: extra in C++: ['ONBIT']
+[MED] SANDY-BEACH (C++ 1137 SANDY_BEACH) :: GLOBAL :: ZIL ['GLOBAL-WATER', 'RIVER'] vs C++ []
+[MED] SCARAB (C++ 115 SCARAB) :: ADJECTIVE :: ZIL ['BEAUTI', 'CARVED', 'JEWELED'] vs C++ ['JEWEL', 'JEWELED', 'ENCRUSTED', 'BEAUTIFUL', 'ANCIENT']
+[MED] SCARAB (C++ 115 SCARAB) :: DESC :: ZIL 'beautiful jeweled scarab' vs C++ 'jewel-encrusted scarab'
+[MED] SCARAB (C++ 115 SCARAB) :: SYNONYM :: ZIL ['SCARAB', 'BUG', 'BEETLE', 'TREASURE'] vs C++ ['SCARAB', 'BEETLE', 'TREASURE']
+[MED] SCEPTRE (C++ 118 SCEPTRE) :: ADJECTIVE :: ZIL ['SHARP', 'EGYPTIAN', 'ANCIENT', 'ENAMELED'] vs C++ ['EGYPTIAN', 'GOLD']
+[MED] SCREWDRIVER (C++ 206 SCREWDRIVER) :: SYNONYM :: ZIL ['SCREWDRIVER', 'TOOL', 'TOOLS', 'DRIVER'] vs C++ ['SCREWDRIVER', 'DRIVER', 'TOOL']
+[MED] SHORE (C++ 1139 SHORE) :: GLOBAL :: ZIL ['GLOBAL-WATER', 'RIVER'] vs C++ []
+[MED] SHOVEL (C++ 207 SHOVEL) :: SYNONYM :: ZIL ['SHOVEL', 'TOOL', 'TOOLS'] vs C++ ['SHOVEL', 'SPADE', 'TOOL']
+[MED] SLIDE-ROOM (C++ 1051 SLIDE_ROOM) :: GLOBAL :: ZIL ['SLIDE'] vs C++ []
+[MED] SMALL-CAVE (C++ 1113 SMALL_CAVE) :: GLOBAL :: ZIL ['STAIRS'] vs C++ []
+[MED] SMELLY-ROOM (C++ 1056 SMELLY_ROOM) :: GLOBAL :: ZIL ['STAIRS'] vs C++ []
+[MED] SOUTH-OF-HOUSE (C++ 1002 SOUTH_OF_HOUSE) :: GLOBAL :: ZIL ['BOARD', 'BOARDED-WINDOW', 'FOREST', 'WHITE-HOUSE'] vs C++ ['BOARD', 'FOREST', 'WHITE-HOUSE']
+[MED] STILETTO (C++ 701 STILETTO) :: ADJECTIVE :: ZIL ['VICIOUS'] vs C++ ['NASTY']
+[MED] STILETTO (C++ 701 STILETTO) :: SYNONYM :: ZIL ['STILETTO'] vs C++ ['STILETTO', 'KNIFE']
+[MED] STRANGE-PASSAGE (C++ 1101 STRANGE_PASSAGE) :: LDESC :: ZIL 'This is a long passage. To the west is one entrance. On the east there is an old wooden door, with a large opening in it (about cyclops sized).'
+      C++ 'This is a long passage. To the west is one entrance. On the east there is an old wooden door, with a large hole in it (about cyclops sized).'
+[MED] STREAM-VIEW (C++ 1123 STREAM_VIEW) :: GLOBAL :: ZIL ['GLOBAL-WATER'] vs C++ []
+[MED] STUDIO (C++ 1025 STUDIO) :: FLAGS :: extra in C++: ['ONBIT', 'SACREDBIT']
+[MED] SWORD (C++ 200 SWORD) :: ADJECTIVE :: ZIL ['ELVISH', 'OLD', 'ANTIQUE'] vs C++ ['ELVISH', 'ELVEN', 'OLD', 'ANTIQUE']
+[MED] SWORD (C++ 200 SWORD) :: FDESC :: ZIL 'Above the trophy case hangs an elvish sword of great antiquity.'
+      C++ ''
+[MED] THIEF (C++ 400 THIEF) :: ADJECTIVE :: ZIL ['SHADY', 'SUSPICIOUS', 'SEEDY'] vs C++ ['SEEDY', 'SINISTER']
+[MED] THIEF (C++ 400 THIEF) :: FLAGS :: extra in C++: ['FIGHTBIT']
+[MED] THIEF (C++ 400 THIEF) :: SYNONYM :: ZIL ['THIEF', 'ROBBER', 'MAN', 'PERSON'] vs C++ ['THIEF', 'ROBBER', 'BURGLAR']
+[MED] TINY-CAVE (C++ 1114 TINY_CAVE) :: GLOBAL :: ZIL ['STAIRS'] vs C++ []
+[MED] TORCH (C++ 116 TORCH) :: ADJECTIVE :: ZIL ['FLAMING', 'IVORY'] vs C++ ['IVORY']
+[MED] TORCH (C++ 116 TORCH) :: DESC :: ZIL 'torch' vs C++ 'ivory torch'
+[MED] TORCH (C++ 116 TORCH) :: FDESC :: ZIL 'Sitting on the pedestal is a flaming torch, made of ivory.'
+      C++ ''
+[MED] TORCH (C++ 116 TORCH) :: SYNONYM :: ZIL ['TORCH', 'IVORY', 'TREASURE'] vs C++ ['TORCH', 'TREASURE']
+[MED] TORCH-ROOM (C++ 1107 TORCH_ROOM) :: GLOBAL :: ZIL ['STAIRS'] vs C++ ['PEDESTAL', 'RAILING']
+[MED] TORCH-ROOM (C++ 1107 TORCH_ROOM) :: LDESC :: ZIL ''
+      C++ 'This is a large room with a prominent doorway leading to a down staircase. To the west is a narrow twisting tunnel, through which is coming a horrible stench. Above you is a large dome painted with scenes depicting elvish hacking rites. Up around the edge of the dome (20 feet up) is a wooden railing. In the center of the room there is a white marble pedestal.'
+[MED] TREASURE-ROOM (C++ 1102 TREASURE_ROOM) :: GLOBAL :: ZIL ['STAIRS'] vs C++ ['CHALICE']
+[MED] TRIDENT (C++ 104 TRIDENT) :: ADJECTIVE :: ZIL ['POSEIDON', 'OWN', 'CRYSTAL'] vs C++ ['CRYSTAL', 'POSEIDON']
+[MED] TRIDENT (C++ 104 TRIDENT) :: FDESC :: ZIL "On the shore lies Poseidon's own crystal trident."
+      C++ ''
+[MED] TRIDENT (C++ 104 TRIDENT) :: FLAGS :: extra in C++: ['WEAPONBIT']
+[MED] TROLL (C++ 401 TROLL) :: ADJECTIVE :: ZIL ['NASTY'] vs C++ []
+[MED] TROLL (C++ 401 TROLL) :: FLAGS :: extra in C++: ['FIGHTBIT']
+[MED] TROLL-ROOM (C++ 1040 TROLL_ROOM) :: DESC :: ZIL 'The Troll Room' vs C++ 'Troll Room'
+[MED] TROLL-ROOM (C++ 1040 TROLL_ROOM) :: GLOBAL :: ZIL [] vs C++ ['TROLL']
+[MED] TROPHY-CASE (C++ 301 TROPHY_CASE) :: FLAGS :: extra in C++: ['OPENBIT']
+[MED] TRUNK (C++ 107 JEWELS) :: ADJECTIVE :: ZIL ['OLD'] vs C++ ['PRECIOUS', 'OLD']
+[MED] TRUNK (C++ 107 JEWELS) :: SYNONYM :: ZIL ['TRUNK', 'CHEST', 'JEWELS', 'TREASURE'] vs C++ ['JEWELS', 'TRUNK', 'JEWELRY', 'GEMS', 'TREASURE']
+[MED] UP-A-TREE (C++ 1014 UP_A_TREE) :: LDESC :: ZIL ''
+      C++ 'You are about 10 feet above the ground nestled among some large branches. The nearest branch above you is above your reach.'
+[MED] WALL (C++ 520 WALL) :: FLAGS :: extra in C++: ['NDESCBIT']
+[MED] WATER (C++ 742 WATER) :: ADJECTIVE :: ZIL [] vs C++ ['CLEAR']
+[MED] WATER (C++ 742 WATER) :: SYNONYM :: ZIL ['WATER', 'QUANTITY', 'LIQUID', 'H2O'] vs C++ ['WATER', 'QUANTITY']
+[MED] WEST-OF-HOUSE (C++ 1000 WEST_OF_HOUSE) :: LDESC :: ZIL ''
+      C++ 'You are standing in an open field west of a white house, with a boarded front door.'
+[MED] WHITE-HOUSE (C++ 500 WHITE_HOUSE) :: ADJECTIVE :: ZIL ['WHITE', 'BEAUTI', 'COLONI'] vs C++ ['WHITE', 'BEAUTIFUL', 'COLONIAL', 'BEAUTI', 'COLONI']
+[MED] WRENCH (C++ 205 WRENCH) :: ADJECTIVE :: ZIL [] vs C++ ['METAL']
+[MED] WRENCH (C++ 205 WRENCH) :: SYNONYM :: ZIL ['WRENCH', 'TOOL', 'TOOLS'] vs C++ ['WRENCH', 'TOOL']
+[MED] YELLOW-BUTTON (C++ 610 YELLOW_BUTTON) :: FLAGS :: extra in C++: ['TRYTAKEBIT']
+[MED] YELLOW-BUTTON (C++ 610 YELLOW_BUTTON) :: SYNONYM :: ZIL ['BUTTON', 'SWITCH'] vs C++ ['BUTTON']
+[LOW] ARAGAIN-FALLS (C++ 1140 ARAGAIN_FALLS) :: EXIT UP :: ZIL IF RAINBOW-FLAG (no ELSE, default "You can't go that way.") vs C++ msg="You can't go that way."
+[LOW] ARAGAIN-FALLS (C++ 1140 ARAGAIN_FALLS) :: EXIT WEST :: ZIL IF RAINBOW-FLAG (no ELSE, default "You can't go that way.") vs C++ msg="You can't go that way."
+[LOW] ATLANTIS-ROOM (C++ 1125 ATLANTIS_ROOM) :: ACTION :: C++ room has action but ZIL has none
+[LOW] ATTIC (C++ 1022 ATTIC) :: ACTION :: C++ room has action but ZIL has none
+[LOW] BROKEN-CANARY (C++ 120 BROKEN_CANARY) :: TEXT :: C++ has TEXT 'There is a golden clockwork canary nestled in the egg. It seems to have recently had a bad experience. The mountings for its jewel-like eyes are empty, and its silver beak is crumpled. Through a cracked crystal window below its left wing you can see the remains of intricate machinery. It is not clear what result winding it would have, as the mainspring seems sprung.' but ZIL has none
+[LOW] BROKEN-EGG (C++ 102 BROKEN_EGG) :: TEXT :: C++ has TEXT 'There is a somewhat ruined egg here.' but ZIL has none
+[LOW] BUOY (C++ 307 BUOY) :: TEXT :: C++ has TEXT 'There is a red buoy here (probably a warning).' but ZIL has none
+[LOW] BURNED-OUT-LANTERN (C++ 721 BURNED_OUT_LANTERN) :: TEXT :: C++ has TEXT "The deceased adventurer's useless lantern is here." but ZIL has none
+[LOW] CANARY (C++ 119 CANARY) :: TEXT :: C++ has TEXT 'There is a golden clockwork canary nestled in the egg. It has ruby eyes and a silver beak. Through a crystal window below its left wing you can see intricate machinery inside. It appears to have wound down.' but ZIL has none
+[LOW] CHASM-ROOM (C++ 1046 CHASM_ROOM) :: ACTION :: C++ room has action but ZIL has none
+[LOW] COFFIN (C++ 106 COFFIN) :: ACTION :: C++ has action but ZIL has none
+[LOW] COLD-PASSAGE (C++ 1049 COLD_PASSAGE) :: ACTION :: C++ room has action but ZIL has none
+[LOW] DAM-BASE (C++ 1129 DAM_BASE) :: ACTION :: C++ room has action but ZIL has none
+[LOW] DAM-LOBBY (C++ 1127 DAM_LOBBY) :: ACTION :: C++ room has action but ZIL has none
+[LOW] DAMP-CAVE (C++ 1048 DAMP_CAVE) :: ACTION :: C++ room has action but ZIL has none
+[LOW] DEAD-END-1 (C++ 1086 DEAD_END_1) :: ACTION :: C++ room has action but ZIL has none
+[LOW] DEAD-END-2 (C++ 1087 DEAD_END_2) :: ACTION :: C++ room has action but ZIL has none
+[LOW] DEAD-END-3 (C++ 1088 DEAD_END_3) :: ACTION :: C++ room has action but ZIL has none
+[LOW] DEAD-END-4 (C++ 1089 DEAD_END_4) :: ACTION :: C++ room has action but ZIL has none
+[LOW] DEAD-END-5 (C++ 1063 DEAD_END_5) :: ACTION :: C++ room has action but ZIL has none
+[LOW] EAST-OF-CHASM (C++ 1041 EAST_OF_CHASM) :: ACTION :: C++ room has action but ZIL has none
+[LOW] EGG (C++ 101 EGG) :: TEXT :: C++ has TEXT "In the bird's nest is a large egg encrusted with precious jewels, apparently scavenged by a childless songbird. The egg is covered with fine gold inlay, and ornamented in lapis lazuli and mother-of-pearl. Unlike most eggs, this one is hinged and closed with a delicate looking clasp. The egg appears extremely fragile." but ZIL has none
+[LOW] EGYPT-ROOM (C++ 1110 EGYPT_ROOM) :: ACTION :: C++ room has action but ZIL has none
+[LOW] END-OF-RAINBOW (C++ 1142 END_OF_RAINBOW) :: EXIT EAST :: ZIL IF RAINBOW-FLAG (no ELSE, default "You can't go that way.") vs C++ msg="You can't go that way."
+[LOW] END-OF-RAINBOW (C++ 1142 END_OF_RAINBOW) :: EXIT NE :: ZIL IF RAINBOW-FLAG (no ELSE, default "You can't go that way.") vs C++ msg="You can't go that way."
+[LOW] END-OF-RAINBOW (C++ 1142 END_OF_RAINBOW) :: EXIT UP :: ZIL IF RAINBOW-FLAG (no ELSE, default "You can't go that way.") vs C++ msg="You can't go that way."
+[LOW] ENGRAVINGS-CAVE (C++ 1105 ENGRAVINGS_CAVE) :: ACTION :: C++ room has action but ZIL has none
+[LOW] EW-PASSAGE (C++ 1042 EW_PASSAGE) :: ACTION :: C++ room has action but ZIL has none
+[LOW] GALLERY (C++ 1024 GALLERY) :: ACTION :: C++ room has action but ZIL has none
+[LOW] IN-STREAM (C++ 1124 IN_STREAM) :: ACTION :: C++ room has action but ZIL has none
+[LOW] LADDER-BOTTOM (C++ 1059 LADDER_BOTTOM) :: ACTION :: C++ room has action but ZIL has none
+[LOW] LADDER-TOP (C++ 1058 LADDER_TOP) :: ACTION :: C++ room has action but ZIL has none
+[LOW] LAMP (C++ 201 LAMP) :: FDESC :: ZIL has both FDESC and LDESC; C++ longDesc holds LDESC only (FDESC 'A battery-powered brass lantern is on the trophy case.' dropped)
+[LOW] LAND-OF-LIVING-DEAD (C++ 1104 LAND_OF_LIVING_DEAD) :: ACTION :: C++ room has action but ZIL has none
+[LOW] LOCAL-GLOBALS (C++ 807 LOCAL_GLOBALS) :: ACTION :: C++ has action but ZIL has none
+[LOW] MAINTENANCE-ROOM (C++ 1128 MAINTENANCE_ROOM) :: ACTION :: C++ room has action but ZIL has none
+[LOW] MAZE-1 (C++ 1070 MAZE_1) :: ACTION :: C++ room has action but ZIL has none
+[LOW] MAZE-10 (C++ 1079 MAZE_10) :: ACTION :: C++ room has action but ZIL has none
+[LOW] MAZE-11 (C++ 1080 MAZE_11) :: ACTION :: C++ room has action but ZIL has none
+[LOW] MAZE-12 (C++ 1081 MAZE_12) :: ACTION :: C++ room has action but ZIL has none
+[LOW] MAZE-13 (C++ 1082 MAZE_13) :: ACTION :: C++ room has action but ZIL has none
+[LOW] MAZE-14 (C++ 1083 MAZE_14) :: ACTION :: C++ room has action but ZIL has none
+[LOW] MAZE-15 (C++ 1084 MAZE_15) :: ACTION :: C++ room has action but ZIL has none
+[LOW] MAZE-2 (C++ 1071 MAZE_2) :: ACTION :: C++ room has action but ZIL has none
+[LOW] MAZE-3 (C++ 1072 MAZE_3) :: ACTION :: C++ room has action but ZIL has none
+[LOW] MAZE-4 (C++ 1073 MAZE_4) :: ACTION :: C++ room has action but ZIL has none
+[LOW] MAZE-5 (C++ 1074 MAZE_5) :: ACTION :: C++ room has action but ZIL has none
+[LOW] MAZE-6 (C++ 1075 MAZE_6) :: ACTION :: C++ room has action but ZIL has none
+[LOW] MAZE-7 (C++ 1076 MAZE_7) :: ACTION :: C++ room has action but ZIL has none
+[LOW] MAZE-8 (C++ 1077 MAZE_8) :: ACTION :: C++ room has action but ZIL has none
+[LOW] MAZE-9 (C++ 1078 MAZE_9) :: ACTION :: C++ room has action but ZIL has none
+[LOW] MINE-1 (C++ 1064 MINE_1) :: ACTION :: C++ room has action but ZIL has none
+[LOW] MINE-2 (C++ 1065 MINE_2) :: ACTION :: C++ room has action but ZIL has none
+[LOW] MINE-3 (C++ 1066 MINE_3) :: ACTION :: C++ room has action but ZIL has none
+[LOW] MINE-4 (C++ 1067 MINE_4) :: ACTION :: C++ room has action but ZIL has none
+[LOW] MINE-ENTRANCE (C++ 1052 MINE_ENTRANCE) :: ACTION :: C++ room has action but ZIL has none
+[LOW] MOUNTAINS (C++ 1013 MOUNTAINS) :: ACTION :: C++ room has action but ZIL has none
+[LOW] NARROW-PASSAGE (C++ 1050 NARROW_PASSAGE) :: ACTION :: C++ room has action but ZIL has none
+[LOW] NORTH-OF-HOUSE (C++ 1001 NORTH_OF_HOUSE) :: ACTION :: C++ room has action but ZIL has none
+[LOW] NORTH-TEMPLE (C++ 1108 NORTH_TEMPLE) :: ACTION :: C++ room has action but ZIL has none
+[LOW] NS-PASSAGE (C++ 1045 NS_PASSAGE) :: ACTION :: C++ room has action but ZIL has none
+[LOW] PAINTING (C++ 105 PAINTING) :: FDESC :: ZIL has both FDESC and LDESC; C++ longDesc holds LDESC only (FDESC 'Fortunately, there is still one chance for you to be a vandal, for on the far wall is a painting of unparalleled beauty.' dropped)
+[LOW] PAINTING (C++ 105 PAINTING) :: TEXT :: C++ has TEXT 'Fortunately, there is still one chance for you to be a vandal, for on the far wall is a painting of unparalleled beauty.' but ZIL has none
+[LOW] PUMP (C++ 208 PUMP) :: ACTION :: C++ has action but ZIL has none
+[LOW] ROUND-ROOM (C++ 1043 ROUND_ROOM) :: ACTION :: C++ room has action but ZIL has none
+[LOW] RUSTY-KNIFE (C++ 204 RUSTY_KNIFE) :: TEXT :: C++ has TEXT 'Beside the skeleton is a rusty knife.' but ZIL has none
+[LOW] SCEPTRE (C++ 118 SCEPTRE) :: FDESC :: ZIL has both FDESC and LDESC; C++ longDesc holds LDESC only (FDESC 'A sceptre, possibly that of ancient Egypt itself, is in the coffin. The sceptre is ornamented with colored enamel, and tapers to a sharp point.' dropped)
+[LOW] SCREWDRIVER (C++ 206 SCREWDRIVER) :: ACTION :: C++ has action but ZIL has none
+[LOW] SHAFT-ROOM (C++ 1055 SHAFT_ROOM) :: ACTION :: C++ room has action but ZIL has none
+[LOW] SHOVEL (C++ 207 SHOVEL) :: ACTION :: C++ has action but ZIL has none
+[LOW] SLIDE-ROOM (C++ 1051 SLIDE_ROOM) :: ACTION :: C++ room has action but ZIL has none
+[LOW] SMALL-CAVE (C++ 1113 SMALL_CAVE) :: ACTION :: C++ room has action but ZIL has none
+[LOW] SMELLY-ROOM (C++ 1056 SMELLY_ROOM) :: ACTION :: C++ room has action but ZIL has none
+[LOW] SOUTH-OF-HOUSE (C++ 1002 SOUTH_OF_HOUSE) :: ACTION :: C++ room has action but ZIL has none
+[LOW] SQUEEKY-ROOM (C++ 1053 SQUEEKY_ROOM) :: ACTION :: C++ room has action but ZIL has none
+[LOW] STRANGE-PASSAGE (C++ 1101 STRANGE_PASSAGE) :: ACTION :: C++ room has action but ZIL has none
+[LOW] STREAM-VIEW (C++ 1123 STREAM_VIEW) :: ACTION :: C++ room has action but ZIL has none
+[LOW] STUDIO (C++ 1025 STUDIO) :: ACTION :: C++ room has action but ZIL has none
+[LOW] TRUNK (C++ 107 JEWELS) :: FDESC :: ZIL has both FDESC and LDESC; C++ longDesc holds LDESC only (FDESC 'Lying half buried in the mud is an old trunk, bulging with jewels.' dropped)
+[LOW] TUBE (C++ 213 TUBE) :: TEXT :: whitespace-only difference
+[LOW] TWISTING-PASSAGE (C++ 1115 TWISTING_PASSAGE) :: ACTION :: C++ room has action but ZIL has none
+[LOW] WINDING-PASSAGE (C++ 1116 WINDING_PASSAGE) :: ACTION :: C++ room has action but ZIL has none
+[LOW] WRENCH (C++ 205 WRENCH) :: ACTION :: C++ has action but ZIL has none
+[INFO] CHASM-ROOM (C++ 1046 CHASM_ROOM) :: PSEUDO :: ZIL PSEUDO ['CHASM', 'CHASM-PSEUDO'] (verify pseudo-object handling separately)
+[INFO] DOME-ROOM (C++ 1106 DOME_ROOM) :: PSEUDO :: ZIL PSEUDO ['DOME', 'DOME-PSEUDO'] (verify pseudo-object handling separately)
+[INFO] EAST-OF-CHASM (C++ 1041 EAST_OF_CHASM) :: PSEUDO :: ZIL PSEUDO ['CHASM', 'CHASM-PSEUDO'] (verify pseudo-object handling separately)
+[INFO] ENTRANCE-TO-HADES (C++ 1103 ENTRANCE_TO_HADES) :: PSEUDO :: ZIL PSEUDO ['GATE', 'GATE-PSEUDO', 'GATES', 'GATE-PSEUDO'] (verify pseudo-object handling separately)
+[INFO] GAS-ROOM (C++ 1057 GAS_ROOM) :: PSEUDO :: ZIL PSEUDO ['GAS', 'GAS-PSEUDO', 'ODOR', 'GAS-PSEUDO'] (verify pseudo-object handling separately)
+[INFO] IN-STREAM (C++ 1124 IN_STREAM) :: PSEUDO :: ZIL PSEUDO ['STREAM', 'STREAM-PSEUDO'] (verify pseudo-object handling separately)
+[INFO] LIVING-ROOM (C++ 1020 LIVING_ROOM) :: PSEUDO :: ZIL PSEUDO ['NAILS', 'NAILS-PSEUDO', 'NAIL', 'NAILS-PSEUDO'] (verify pseudo-object handling separately)
+[INFO] LOWER-SHAFT (C++ 1061 LOWER_SHAFT) :: PSEUDO :: ZIL PSEUDO ['CHAIN', 'CHAIN-PSEUDO'] (verify pseudo-object handling separately)
+[INFO] RESERVOIR (C++ 1121 RESERVOIR) :: PSEUDO :: ZIL PSEUDO ['STREAM', 'STREAM-PSEUDO'] (verify pseudo-object handling separately)
+[INFO] RESERVOIR-NORTH (C++ 1122 RESERVOIR_NORTH) :: PSEUDO :: ZIL PSEUDO ['LAKE', 'LAKE-PSEUDO'] (verify pseudo-object handling separately)
+[INFO] RESERVOIR-SOUTH (C++ 1120 RESERVOIR_SOUTH) :: PSEUDO :: ZIL PSEUDO ['LAKE', 'LAKE-PSEUDO', 'CHASM', 'CHASM-PSEUDO'] (verify pseudo-object handling separately)
+[INFO] SHAFT-ROOM (C++ 1055 SHAFT_ROOM) :: PSEUDO :: ZIL PSEUDO ['CHAIN', 'CHAIN-PSEUDO'] (verify pseudo-object handling separately)
+[INFO] SMELLY-ROOM (C++ 1056 SMELLY_ROOM) :: PSEUDO :: ZIL PSEUDO ['ODOR', 'GAS-PSEUDO', 'GAS', 'GAS-PSEUDO'] (verify pseudo-object handling separately)
+[INFO] STREAM-VIEW (C++ 1123 STREAM_VIEW) :: PSEUDO :: ZIL PSEUDO ['STREAM', 'STREAM-PSEUDO'] (verify pseudo-object handling separately)
+[INFO] STUDIO (C++ 1025 STUDIO) :: PSEUDO :: ZIL PSEUDO ['DOOR', 'DOOR-PSEUDO', 'PAINT', 'PAINT-PSEUDO'] (verify pseudo-object handling separately)
+[INFO] TORCH-ROOM (C++ 1107 TORCH_ROOM) :: PSEUDO :: ZIL PSEUDO ['DOME', 'DOME-PSEUDO'] (verify pseudo-object handling separately)
