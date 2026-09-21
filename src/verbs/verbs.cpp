@@ -245,7 +245,11 @@ bool vLook() {
   for (const auto *obj : contents) {
     if (!obj->hasFlag(ObjectFlag::NDESCBIT) &&
         !obj->hasFlag(ObjectFlag::INVISIBLE)) {
-      if (obj->hasLongDesc()) {
+      // ZIL: untouched objects print FDESC, touched ones LDESC
+      // (DESCRIBE-OBJECT, gverbs.zil:1696-1704)
+      if (!obj->hasFlag(ObjectFlag::TOUCHBIT) && obj->hasFirstDesc()) {
+        printLine(obj->getFirstDesc());
+      } else if (obj->hasLongDesc()) {
         // Use custom long description
         printLine(obj->getLongDesc());
       } else {
@@ -590,12 +594,6 @@ bool vOpen() {
     return RTRUE;
   }
 
-  // Check if locked
-  if (g.prso->hasFlag(ObjectFlag::LOCKEDBIT)) {
-    printLine("The " + g.prso->getDesc() + " is locked.");
-    return RTRUE;
-  }
-
   // Default OPEN behavior - authentic ZIL V-OPEN
   g.prso->setFlag(ObjectFlag::OPENBIT);
   g.prso->setFlag(ObjectFlag::TOUCHBIT);
@@ -713,12 +711,6 @@ bool vLock() {
     return RTRUE;
   }
 
-  // Check if already locked
-  if (g.prso->hasFlag(ObjectFlag::LOCKEDBIT)) {
-    printLine("It's already locked.");
-    return RTRUE;
-  }
-
   // Verify player has the key (must be in inventory or accessible)
   if (!isObjectAccessible(g.prsi)) {
     printLine("You don't have that.");
@@ -760,12 +752,6 @@ bool vUnlock() {
   if (!g.prsi) {
     printLine("What do you want to unlock it with?");
     getGlobalParser().setOrphanIndirect(V_UNLOCK, g.prso, "with");
-    return RTRUE;
-  }
-
-  // Verify object is locked
-  if (!g.prso->hasFlag(ObjectFlag::LOCKEDBIT)) {
-    printLine("It's not locked.");
     return RTRUE;
   }
 
@@ -836,12 +822,6 @@ int vWalkDir(Direction dir) {
     ZObject *door = g.getObject(exit->doorObject);
     if (!door) {
       printLine("You can't go that way.");
-      return M_FATAL;
-    }
-
-    // Check if door is locked
-    if (door->hasFlag(ObjectFlag::LOCKEDBIT)) {
-      printLine("The door is locked.");
       return M_FATAL;
     }
 
@@ -952,10 +932,6 @@ bool trySpecialMovement(int verbId, Direction dir) {
   if (exit->doorObject != 0) {
     ZObject *door = g.getObject(exit->doorObject);
     if (door) {
-      if (door->hasFlag(ObjectFlag::LOCKEDBIT)) {
-        printLine("The door is locked.");
-        return true;
-      }
       if (!door->hasFlag(ObjectFlag::OPENBIT)) {
         printLine("The door is closed.");
         return true;
@@ -1327,12 +1303,6 @@ bool vSearchOld() {
   auto &g = Globals::instance();
 
   if (g.prso->hasFlag(ObjectFlag::CONTBIT)) {
-    if (g.prso->hasFlag(ObjectFlag::LOCKEDBIT)) {
-      print("The ");
-      print(g.prso->getDesc());
-      printLine(" is locked.");
-      return RTRUE;
-    }
 
     const auto &contents = g.prso->getContents();
     if (contents.empty()) {

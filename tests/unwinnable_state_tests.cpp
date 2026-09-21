@@ -10,6 +10,7 @@
 #include "../src/verbs/verbs.h"
 #include "../src/systems/combat.h"
 #include "../src/systems/light.h"
+#include "../src/systems/death.h"
 #include <memory>
 #include <iostream>
 
@@ -30,8 +31,8 @@ public:
     bool isGameWinnable() {
         auto& g = Globals::instance();
         
-        // Check if player is alive
-        if (g.winner->hasFlag(ObjectFlag::DEADBIT)) {
+        // Check if player is alive (ZIL: the DEAD global, gverbs.zil:1882)
+        if (DeathSystem::isDead()) {
             return false;
         }
         
@@ -88,7 +89,7 @@ TEST(NoUnwinnableNPCKilling) {
     // Test killing thief
     auto* thief = g.getObject(ObjectIds::THIEF);
     if (thief) {
-        thief->setFlag(ObjectFlag::DEADBIT);
+        thief->moveTo(nullptr);  // ZIL REMOVEs a dead villain
         
         // Verify game is still winnable
         ASSERT_TRUE(helper.isGameWinnable());
@@ -99,7 +100,7 @@ TEST(NoUnwinnableNPCKilling) {
     // Test killing troll
     auto* troll = g.getObject(ObjectIds::TROLL);
     if (troll) {
-        troll->setFlag(ObjectFlag::DEADBIT);
+        troll->moveTo(nullptr);  // ZIL REMOVEs a dead villain
         
         // Verify game is still winnable
         ASSERT_TRUE(helper.isGameWinnable());
@@ -300,11 +301,11 @@ TEST(NoUnwinnableMultipleDeaths) {
     
     for (int i = 0; i < 3; i++) {
         // Simulate death (set player as dead temporarily)
-        g.winner->setFlag(ObjectFlag::DEADBIT);
+        DeathSystem::setDead(true);
         deathCount++;
         
         // Clear death flag (simulate resurrection)
-        g.winner->clearFlag(ObjectFlag::DEADBIT);
+        DeathSystem::setDead(false);
         
         // Verify resurrection is still possible (up to limit)
         if (deathCount < 3) {

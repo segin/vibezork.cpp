@@ -40,7 +40,6 @@ TEST(UnlockSuccessWithHandler) {
     
     // Locked Box
     auto box = std::make_unique<ZObject>(200, "box");
-    box->setFlag(ObjectFlag::LOCKEDBIT);
     box->moveTo(g.here);
     // Mock handler: Says "Click!" and returns true
     box->setAction([]() {
@@ -87,7 +86,6 @@ TEST(UnlockFailureDefault) {
     g.registerObject(1, std::move(player));
     
     auto box = std::make_unique<ZObject>(200, "box");
-    box->setFlag(ObjectFlag::LOCKEDBIT);
     box->moveTo(g.here);
     ZObject* boxPtr = box.get();
     g.registerObject(200, std::move(box));
@@ -123,7 +121,7 @@ TEST(UnlockNotLockedFailure) {
     g.registerObject(1, std::move(player));
     
     auto box = std::make_unique<ZObject>(200, "box");
-    // Missing LOCKEDBIT
+    // ZIL V-UNLOCK is V-LOCK: "It doesn't seem to work." (gverbs.zil:855-856, 1508-1509)
     box->moveTo(g.here);
     ZObject* boxPtr = box.get();
     g.registerObject(200, std::move(box));
@@ -141,7 +139,7 @@ TEST(UnlockNotLockedFailure) {
     Verbs::vUnlock();
     std::string output = stopCapture();
     
-    ASSERT_CONTAINS(output, "not locked");
+    ASSERT_CONTAINS(output, "doesn't seem to work");
 }
 
 TEST(UnlockNotToolFailure) {
@@ -159,7 +157,6 @@ TEST(UnlockNotToolFailure) {
     g.registerObject(1, std::move(player));
     
     auto box = std::make_unique<ZObject>(200, "box");
-    box->setFlag(ObjectFlag::LOCKEDBIT);
     box->moveTo(g.here);
     ZObject* boxPtr = box.get();
     g.registerObject(200, std::move(box));
@@ -195,7 +192,6 @@ TEST(UnlockNotHeldFailure) {
     g.registerObject(1, std::move(player));
     
     auto box = std::make_unique<ZObject>(200, "box");
-    box->setFlag(ObjectFlag::LOCKEDBIT);
     box->moveTo(g.here);
     ZObject* boxPtr = box.get();
     g.registerObject(200, std::move(box));

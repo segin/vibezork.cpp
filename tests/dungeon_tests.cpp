@@ -344,7 +344,7 @@ TEST(DungeonExits_ConditionalExitsVerification) {
   ASSERT_TRUE(trollRoom->hasGlobal(ObjectIds::TROLL));
   g.trollFlag = false;
   auto* troll = g.getObject(ObjectIds::TROLL);
-  if (troll) troll->clearFlag(ObjectFlag::DEADBIT);
+  (void)troll;
   ASSERT_TRUE(trollRoom->getExit(Direction::EAST)->condition != nullptr);
   ASSERT_FALSE(trollRoom->getExit(Direction::EAST)->condition());
   g.trollFlag = true;

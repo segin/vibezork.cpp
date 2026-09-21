@@ -51,7 +51,6 @@ TEST(AttackVerbBasic) {
     
     // Combat is probabilistic - just verify attack was initiated
     // (Combat system handles actual damage/death over multiple rounds)
-    // Not checking DEADBIT since that requires multiple rounds
     
     // Cleanup
     g.reset();
@@ -90,7 +89,7 @@ TEST(AttackVerbNoWeapon) {
     ASSERT_TRUE(result);
     
     // Verify troll is NOT dead (no weapon)
-    ASSERT_FALSE(trollPtr->hasFlag(ObjectFlag::DEADBIT));
+    ASSERT_FALSE(trollPtr->hasFlag(ObjectFlag::INVISIBLE));
     
     // Cleanup
     g.reset();
@@ -137,7 +136,7 @@ TEST(AttackVerbNotAttackable) {
     ASSERT_TRUE(result);
     
     // Verify lamp is not affected
-    ASSERT_FALSE(lampPtr->hasFlag(ObjectFlag::DEADBIT));
+    ASSERT_FALSE(lampPtr->hasFlag(ObjectFlag::INVISIBLE));
     
     // Cleanup
     g.reset();
@@ -186,7 +185,7 @@ TEST(AttackVerbInSacredRoom) {
     ASSERT_TRUE(result);
     
     // Verify troll is NOT dead (sacred room prevents fighting)
-    ASSERT_FALSE(trollPtr->hasFlag(ObjectFlag::DEADBIT));
+    ASSERT_FALSE(trollPtr->hasFlag(ObjectFlag::INVISIBLE));
     
     // Cleanup
     g.reset();
@@ -468,7 +467,7 @@ TEST(SwingVerbNotWeapon) {
     ASSERT_TRUE(result);
     
     // Verify troll is NOT dead
-    ASSERT_FALSE(trollPtr->hasFlag(ObjectFlag::DEADBIT));
+    ASSERT_FALSE(trollPtr->hasFlag(ObjectFlag::INVISIBLE));
     
     // Cleanup
     g.reset();
@@ -554,7 +553,7 @@ TEST(AttackVerbWeakerWeapon) {
     ASSERT_TRUE(result);
     
     // Verify troll is NOT dead (weapon too weak)
-    ASSERT_FALSE(trollPtr->hasFlag(ObjectFlag::DEADBIT));
+    ASSERT_FALSE(trollPtr->hasFlag(ObjectFlag::INVISIBLE));
     
     // Cleanup
     g.reset();

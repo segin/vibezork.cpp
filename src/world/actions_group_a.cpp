@@ -884,12 +884,7 @@ bool grateAction() {
     if (room == RoomIds::GRATING_ROOM) {
       g.grunlock = false;
       printLine("The grate is locked.");
-      // ZIL also calls <FSET ,GRATE ,LOCKEDBIT> if tracking object bits
-      // We use global grunlock.
-      // Also need to set object open/locked status?
-      // Engine checks LOCKEDBIT often.
-      // If we use grunlock, we might need to sync.
-      // For now, fidelity of output is key.
+      // ZIL: <SETG GRUNLOCK <>> (1actions.zil:876); no lock flag exists.
       return true;
     }
     if (room == RoomIds::CLEARING) { // ZIL: GRATING-CLEARING

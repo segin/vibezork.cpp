@@ -838,11 +838,19 @@ TEST(OpenVerbLockedContainer) {
     g.winner = player.get();
     g.registerObject(999, std::move(player));
     
-    // Create locked container (safe) in room
+    // Create a container whose action refuses OPEN (ZIL has no lock flag;
+    // "locked" things intercept V-OPEN in their ACTION routine)
     auto safe = std::make_unique<ZObject>(1, "safe");
     safe->addSynonym("safe");
     safe->setFlag(ObjectFlag::CONTBIT);
-    safe->setFlag(ObjectFlag::LOCKEDBIT);  // Locked
+    safe->setAction([]() {
+        auto& g = Globals::instance();
+        if (g.prsa == V_OPEN) {
+            std::cout << "The safe is locked." << std::endl;
+            return true;
+        }
+        return false;
+    });
     safe->moveTo(g.here);
     ZObject* safePtr = safe.get();
     g.registerObject(1, std::move(safe));
@@ -1140,11 +1148,13 @@ TEST(LockVerbBasic) {
     auto chest = std::make_unique<ZObject>(1, "chest");
     chest->addSynonym("chest");
     chest->setFlag(ObjectFlag::CONTBIT);
-    // Note: LOCKEDBIT is NOT set (unlocked)
+    // The chest's own action handles LOCK (ZIL: object ACTION intercepts)
+    static bool chestLocked = false;
+    chestLocked = false;
     chest->setAction([]() {
         auto& g = Globals::instance();
         if (g.prsa == V_LOCK) {
-            g.prso->setFlag(ObjectFlag::LOCKEDBIT);
+            chestLocked = true;
             return true;
         }
         return false;
@@ -1170,8 +1180,8 @@ TEST(LockVerbBasic) {
     bool result = Verbs::vLock();
     ASSERT_TRUE(result);
     
-    // Verify chest is now locked
-    ASSERT_TRUE(chestPtr->hasFlag(ObjectFlag::LOCKEDBIT));
+    // Verify the chest's action ran
+    ASSERT_TRUE(chestLocked);
     
     // Cleanup
     g.reset();
@@ -1191,11 +1201,10 @@ TEST(LockVerbAlreadyLocked) {
     g.winner = player.get();
     g.registerObject(999, std::move(player));
     
-    // Create locked container (safe) in room
+    // Create container with no LOCK action in room
     auto safe = std::make_unique<ZObject>(1, "safe");
     safe->addSynonym("safe");
     safe->setFlag(ObjectFlag::CONTBIT);
-    safe->setFlag(ObjectFlag::LOCKEDBIT);  // Already locked
     safe->moveTo(g.here);
     ZObject* safePtr = safe.get();
     g.registerObject(1, std::move(safe));
@@ -1213,14 +1222,10 @@ TEST(LockVerbAlreadyLocked) {
     g.prsi = keyPtr;
     g.prsa = V_LOCK;
     
-    // Test LOCK verb on already locked container
+    // Test default LOCK verb (ZIL: "It doesn't seem to work.", gverbs.zil:855-856)
     bool result = Verbs::vLock();
     ASSERT_TRUE(result);
-    
-    // Verify safe is still locked
-    ASSERT_TRUE(safePtr->hasFlag(ObjectFlag::LOCKEDBIT));
-    
-    // Should display "It's already locked." message
+    (void)safePtr;
     
     // Cleanup
     g.reset();
@@ -1257,10 +1262,7 @@ TEST(LockVerbWithoutKey) {
     bool result = Verbs::vLock();
     ASSERT_TRUE(result);
     
-    // Verify chest is still unlocked
-    ASSERT_FALSE(chestPtr->hasFlag(ObjectFlag::LOCKEDBIT));
-    
-    // Should display "Lock it with what?" message
+    (void)chestPtr;
     
     // Cleanup
     g.reset();
@@ -1329,11 +1331,12 @@ TEST(UnlockVerbBasic) {
     auto chest = std::make_unique<ZObject>(1, "chest");
     chest->addSynonym("chest");
     chest->setFlag(ObjectFlag::CONTBIT);
-    chest->setFlag(ObjectFlag::LOCKEDBIT);  // Locked
+    static bool chestUnlocked = false;
+    chestUnlocked = false;
     chest->setAction([]() {
         auto& g = Globals::instance();
         if (g.prsa == V_UNLOCK) {
-            g.prso->clearFlag(ObjectFlag::LOCKEDBIT);
+            chestUnlocked = true;
             return true;
         }
         return false;
@@ -1359,8 +1362,8 @@ TEST(UnlockVerbBasic) {
     bool result = Verbs::vUnlock();
     ASSERT_TRUE(result);
     
-    // Verify chest is now unlocked
-    ASSERT_FALSE(chestPtr->hasFlag(ObjectFlag::LOCKEDBIT));
+    // Verify the chest's action ran
+    ASSERT_TRUE(chestUnlocked);
     
     // Cleanup
     g.reset();
@@ -1384,7 +1387,6 @@ TEST(UnlockVerbNotLocked) {
     auto box = std::make_unique<ZObject>(1, "box");
     box->addSynonym("box");
     box->setFlag(ObjectFlag::CONTBIT);
-    // Note: LOCKEDBIT is NOT set (unlocked)
     box->moveTo(g.here);
     ZObject* boxPtr = box.get();
     g.registerObject(1, std::move(box));
@@ -1406,10 +1408,7 @@ TEST(UnlockVerbNotLocked) {
     bool result = Verbs::vUnlock();
     ASSERT_TRUE(result);
     
-    // Verify box is still unlocked
-    ASSERT_FALSE(boxPtr->hasFlag(ObjectFlag::LOCKEDBIT));
-    
-    // Should display "It's not locked." message
+    (void)boxPtr;
     
     // Cleanup
     g.reset();
@@ -1433,7 +1432,6 @@ TEST(UnlockVerbWithoutKey) {
     auto chest = std::make_unique<ZObject>(1, "chest");
     chest->addSynonym("chest");
     chest->setFlag(ObjectFlag::CONTBIT);
-    chest->setFlag(ObjectFlag::LOCKEDBIT);
     chest->moveTo(g.here);
     ZObject* chestPtr = chest.get();
     g.registerObject(1, std::move(chest));
@@ -1447,10 +1445,7 @@ TEST(UnlockVerbWithoutKey) {
     bool result = Verbs::vUnlock();
     ASSERT_TRUE(result);
     
-    // Verify chest is still locked
-    ASSERT_TRUE(chestPtr->hasFlag(ObjectFlag::LOCKEDBIT));
-    
-    // Should display "Unlock it with what?" message
+    (void)chestPtr;
     
     // Cleanup
     g.reset();
@@ -1474,14 +1469,17 @@ TEST(LockUnlockSequence) {
     auto safe = std::make_unique<ZObject>(1, "safe");
     safe->addSynonym("safe");
     safe->setFlag(ObjectFlag::CONTBIT);
+    // ZIL has no lock flag; the object's ACTION keeps its own state
+    static bool safeLocked = false;
+    safeLocked = false;
     safe->setAction([]() {
         auto& g = Globals::instance();
         if (g.prsa == V_LOCK) {
-            g.prso->setFlag(ObjectFlag::LOCKEDBIT);
+            safeLocked = true;
             return true;
         }
         if (g.prsa == V_UNLOCK) {
-            g.prso->clearFlag(ObjectFlag::LOCKEDBIT);
+            safeLocked = false;
             return true;
         }
         return false;
@@ -1499,7 +1497,7 @@ TEST(LockUnlockSequence) {
     g.registerObject(2, std::move(key));
     
     // Verify initially unlocked
-    ASSERT_FALSE(safePtr->hasFlag(ObjectFlag::LOCKEDBIT));
+    ASSERT_FALSE(safeLocked);
     
     // Lock the safe
     g.prso = safePtr;
@@ -1507,7 +1505,7 @@ TEST(LockUnlockSequence) {
     g.prsa = V_LOCK;
     bool result1 = Verbs::vLock();
     ASSERT_TRUE(result1);
-    ASSERT_TRUE(safePtr->hasFlag(ObjectFlag::LOCKEDBIT));
+    ASSERT_TRUE(safeLocked);
     
     // Unlock the safe
     g.prso = safePtr;
@@ -1515,7 +1513,7 @@ TEST(LockUnlockSequence) {
     g.prsa = V_UNLOCK;
     bool result2 = Verbs::vUnlock();
     ASSERT_TRUE(result2);
-    ASSERT_FALSE(safePtr->hasFlag(ObjectFlag::LOCKEDBIT));
+    ASSERT_FALSE(safeLocked);
     
     // Lock again
     g.prso = safePtr;
@@ -1523,7 +1521,7 @@ TEST(LockUnlockSequence) {
     g.prsa = V_LOCK;
     bool result3 = Verbs::vLock();
     ASSERT_TRUE(result3);
-    ASSERT_TRUE(safePtr->hasFlag(ObjectFlag::LOCKEDBIT));
+    ASSERT_TRUE(safeLocked);
     
     // Cleanup
     g.reset();

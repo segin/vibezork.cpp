@@ -247,3 +247,4 @@ constexpr PropertyId P_CAPACITY = 2;
 constexpr PropertyId P_VALUE = 3;
 constexpr PropertyId P_TVALUE = 4;
 constexpr PropertyId P_STRENGTH = 5;
+constexpr PropertyId P_VTYPE = 6; // ZIL: P?VTYPE (vehicle's allowed room flag)

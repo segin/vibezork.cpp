@@ -56,7 +56,6 @@ void testEnemyProximityCurrentRoom() {
     if (troll) {
         troll->moveTo(testRoom);
         troll->setFlag(ObjectFlag::FIGHTBIT);
-        troll->clearFlag(ObjectFlag::DEADBIT);
         
         // Now there should be an enemy nearby
         TEST_ASSERT(SwordSystem::areEnemiesNearby(), 
@@ -104,12 +103,12 @@ void testDeadEnemyNoGlow() {
     g.winner = g.getObject(ObjectIds::ADVENTURER);
     sword->moveTo(g.winner);
     
-    // Create a dead enemy in the room
+    // A dead villain is REMOVEd from the game in ZIL (VILLAIN-RESULT);
+    // nothing with FIGHTBIT remains in the room
     ZObject* troll = g.getObject(ObjectIds::TROLL);
     if (troll) {
-        troll->moveTo(testRoom);
         troll->setFlag(ObjectFlag::FIGHTBIT);
-        troll->setFlag(ObjectFlag::DEADBIT);  // Dead
+        troll->moveTo(nullptr);  // Dead: removed
         
         // Dead enemy should not trigger glow
         TEST_ASSERT(!SwordSystem::areEnemiesNearby(), 
@@ -146,7 +145,6 @@ void testSwordGlowTimerCallback() {
     if (thief) {
         thief->moveTo(testRoom);
         thief->setFlag(ObjectFlag::FIGHTBIT);
-        thief->clearFlag(ObjectFlag::DEADBIT);
         
         // Call the timer callback directly
         SwordSystem::swordTimerCallback();

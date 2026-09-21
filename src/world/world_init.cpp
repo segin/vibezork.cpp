@@ -602,7 +602,7 @@ void initializeWorld() {
     auto trollExitCond = []() {
         auto& g = Globals::instance();
         ZObject* troll = g.getObject(ObjectIds::TROLL);
-        return g.trollFlag || !troll || troll->hasFlag(ObjectFlag::DEADBIT) || !NPCSystem::isTrollActive();
+        return g.trollFlag || !troll || !NPCSystem::isTrollActive();
     };
     const std::string trollExitMsg = "The troll fends you off with a menacing gesture.";
     trollRoom->setExit(Direction::EAST, RoomExit::createConditional(RoomIds::EW_PASSAGE, trollExitCond, trollExitMsg));
@@ -2783,7 +2783,7 @@ void initializeWorld() {
     buoy->setFlag(ObjectFlag::SEARCHBIT);
     buoy->setProperty(P_CAPACITY, 20);
     buoy->setProperty(P_SIZE, 10);
-    buoy->setText("There is a red buoy here (probably a warning).");
+    buoy->setFirstDesc("There is a red buoy here (probably a warning).");
     buoy->setAction(Dungeon::treasureInsideAction);
     buoy->moveTo(g.getObject(RoomIds::RIVER_4));
     
@@ -2964,7 +2964,7 @@ void initializeWorld() {
     egg->setProperty(P_SIZE, 5);
     egg->setProperty(P_CAPACITY, 6);
     egg->setAction(eggAction);
-    egg->setText("In the bird's nest is a large egg encrusted with precious jewels, apparently scavenged by a childless songbird. The egg is covered with fine gold inlay, and ornamented in lapis lazuli and mother-of-pearl. Unlike most eggs, this one is hinged and closed with a delicate looking clasp. The egg appears extremely fragile.");
+    egg->setFirstDesc("In the bird's nest is a large egg encrusted with precious jewels, apparently scavenged by a childless songbird. The egg is covered with fine gold inlay, and ornamented in lapis lazuli and mother-of-pearl. Unlike most eggs, this one is hinged and closed with a delicate looking clasp. The egg appears extremely fragile.");
     // Egg will be placed in nest after nest is created
     g.registerObject(ObjectIds::EGG, std::move(egg));
     
@@ -3000,7 +3000,7 @@ void initializeWorld() {
     canary->setProperty(P_TVALUE, 4);
     canary->setProperty(P_SIZE, 3);
     canary->setAction(canaryAction);
-    canary->setText("There is a golden clockwork canary nestled in the egg. It has ruby eyes and a silver beak. Through a crystal window below its left wing you can see intricate machinery inside. It appears to have wound down.");
+    canary->setFirstDesc("There is a golden clockwork canary nestled in the egg. It has ruby eyes and a silver beak. Through a crystal window below its left wing you can see intricate machinery inside. It appears to have wound down.");
     // Canary will be placed in egg after egg is registered
     g.registerObject(ObjectIds::CANARY, std::move(canary));
     
@@ -3028,7 +3028,7 @@ void initializeWorld() {
     brokenCanary->setProperty(P_TVALUE, 1);  // Worth much less than intact canary
     brokenCanary->setProperty(P_SIZE, 3);
     brokenCanary->setAction(canaryAction);
-    brokenCanary->setText("There is a golden clockwork canary nestled in the egg. It seems to have recently had a bad experience. The mountings for its jewel-like eyes are empty, and its silver beak is crumpled. Through a cracked crystal window below its left wing you can see the remains of intricate machinery. It is not clear what result winding it would have, as the mainspring seems sprung.");
+    brokenCanary->setFirstDesc("There is a golden clockwork canary nestled in the egg. It seems to have recently had a bad experience. The mountings for its jewel-like eyes are empty, and its silver beak is crumpled. Through a cracked crystal window below its left wing you can see the remains of intricate machinery. It is not clear what result winding it would have, as the mainspring seems sprung.");
     // Broken canary starts in broken egg (but broken egg starts nowhere)
     brokenCanary->moveTo(g.getObject(ObjectIds::BROKEN_EGG));
     g.registerObject(ObjectIds::BROKEN_CANARY, std::move(brokenCanary));
@@ -3156,7 +3156,7 @@ void initializeWorld() {
     painting->setProperty(P_TVALUE, 6);
     painting->setProperty(P_SIZE, 15);
     painting->setAction(paintingAction);
-    painting->setText("Fortunately, there is still one chance for you to be a vandal, for on the far wall is a painting of unparalleled beauty.");
+    painting->setFirstDesc("Fortunately, there is still one chance for you to be a vandal, for on the far wall is a painting of unparalleled beauty.");
     painting->setLongDesc("A painting by a neglected genius is here.");
     painting->moveTo(g.getObject(RoomIds::GALLERY));
     g.registerObject(ObjectIds::PAINTING, std::move(painting));

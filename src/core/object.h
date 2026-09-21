@@ -42,10 +42,22 @@ public:
   std::optional<std::string_view> getTextOpt() const;
   bool hasText() const;
 
-  // Long description (for room display)
+  // Long description (ZIL: P?LDESC, printed once the object is TOUCHBIT)
   void setLongDesc(std::string_view ldesc) { longDesc_ = ldesc; }
   const std::string &getLongDesc() const { return longDesc_; }
   bool hasLongDesc() const { return !longDesc_.empty(); }
+
+  // First description (ZIL: P?FDESC, printed while the object lacks TOUCHBIT;
+  // distinct from LDESC and from the READ text). Source: gverbs.zil:1693-1728
+  void setFirstDesc(std::string_view fdesc) { firstDesc_ = fdesc; }
+  const std::string &getFirstDesc() const { return firstDesc_; }
+  bool hasFirstDesc() const { return !firstDesc_.empty(); }
+
+  // Vehicle type (ZIL: P?VTYPE holds a room flag that the vehicle may enter;
+  // GOTO tests <FSET? .RM <GETP .V ,P?VTYPE>>, gverbs.zil:2050-2062).
+  // Stored in the P?VTYPE property as the flag's bit index.
+  void setVehicleType(ObjectFlag flag);
+  std::optional<ObjectFlag> getVehicleType() const;
 
   // Flag operations with C++23 fold expression helpers
   void setFlag(ObjectFlag flag);
@@ -109,7 +121,8 @@ private:
   uint64_t flags_ = 0;
   std::map<PropertyId, int> properties_;
   std::string text_;     // For readable objects
-  std::string longDesc_; // Long description for room display
+  std::string longDesc_; // Long description for room display (P?LDESC)
+  std::string firstDesc_; // First description (P?FDESC)
   ZObject *location_ = nullptr;
   std::vector<ZObject *> contents_;
   ActionFunc action_;

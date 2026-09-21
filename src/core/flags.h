@@ -37,8 +37,8 @@ enum class ObjectFlag : uint64_t {
   READBIT = 1ULL << 27,   // Object has readable text
   TURNBIT = 1ULL << 28,   // Object can be turned
   SACREDBIT = 1ULL << 29, // Sacred location (no combat)
-  LOCKEDBIT = 1ULL << 30, // Container/door is locked
-  DEADBIT = 1ULL << 31,   // NPC is dead
+  // Bits 30-31 unused: ZIL has no LOCKEDBIT/DEADBIT (dead villains are
+  // REMOVEd; "locked" is expressed by object actions), gglobals.zil:7-10.
 
   // Additional ZIL flags (bits 32-47)
   MAZEBIT = 1ULL << 32,    // Room is in a maze

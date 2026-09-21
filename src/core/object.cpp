@@ -1,5 +1,14 @@
 #include "object.h"
+#include "world/objects.h"
 #include <algorithm>
+#include <bit>
+
+// ZIL: <PROPDEF SIZE 5> <PROPDEF CAPACITY 0> <PROPDEF VALUE 0> <PROPDEF TVALUE 0>
+// Source: zil/zork1.zil:24-27. An object without an explicit SIZE weighs 5;
+// every other property defaults to 0.
+static int propertyDefault(PropertyId prop) {
+    return prop == P_SIZE ? 5 : 0;
+}
 
 ZObject::ZObject(ObjectId id, std::string_view desc)
     : id_(id), desc_(desc) {}
@@ -10,7 +19,18 @@ void ZObject::setProperty(PropertyId prop, int value) {
 
 int ZObject::getProperty(PropertyId prop) const {
     auto it = properties_.find(prop);
-    return it != properties_.end() ? it->second : 0;
+    return it != properties_.end() ? it->second : propertyDefault(prop);
+}
+
+void ZObject::setVehicleType(ObjectFlag flag) {
+    properties_[P_VTYPE] = std::countr_zero(static_cast<uint64_t>(flag));
+}
+
+std::optional<ObjectFlag> ZObject::getVehicleType() const {
+    if (auto it = properties_.find(P_VTYPE); it != properties_.end()) {
+        return static_cast<ObjectFlag>(1ULL << it->second);
+    }
+    return std::nullopt;
 }
 
 std::optional<int> ZObject::getPropertyOpt(PropertyId prop) const {

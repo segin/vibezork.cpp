@@ -79,11 +79,8 @@ TEST(ObjectFlagsAllTypes) {
     obj.setFlag(ObjectFlag::LIGHTBIT);
     ASSERT_TRUE(obj.hasFlag(ObjectFlag::LIGHTBIT));
     
-    obj.setFlag(ObjectFlag::LOCKEDBIT);
-    ASSERT_TRUE(obj.hasFlag(ObjectFlag::LOCKEDBIT));
-    
-    obj.setFlag(ObjectFlag::DEADBIT);
-    ASSERT_TRUE(obj.hasFlag(ObjectFlag::DEADBIT));
+    obj.setFlag(ObjectFlag::SACREDBIT);
+    ASSERT_TRUE(obj.hasFlag(ObjectFlag::SACREDBIT));
     
     obj.setFlag(ObjectFlag::FIGHTBIT);
     ASSERT_TRUE(obj.hasFlag(ObjectFlag::FIGHTBIT));
@@ -142,7 +139,7 @@ TEST(ObjectPropertiesDefaultValue) {
     ZObject obj(1, "test");
     
     // Test getting unset property returns 0
-    ASSERT_EQ(obj.getProperty(P_SIZE), 0);
+    ASSERT_EQ(obj.getProperty(P_SIZE), 5);  // ZIL: <PROPDEF SIZE 5> (zork1.zil:24)
     ASSERT_EQ(obj.getProperty(P_CAPACITY), 0);
     ASSERT_EQ(obj.getProperty(P_VALUE), 0);
 }
@@ -158,7 +155,7 @@ TEST(ObjectPropertiesOverwrite) {
     ASSERT_EQ(obj.getProperty(P_SIZE), 20);
     
     obj.setProperty(P_SIZE, 0);
-    ASSERT_EQ(obj.getProperty(P_SIZE), 0);
+    ASSERT_EQ(obj.getProperty(P_SIZE), 0);  // explicit 0 overrides the PROPDEF default
 }
 
 TEST(ObjectPropertiesNegativeValues) {
@@ -383,7 +380,7 @@ TEST(ObjectCreationInitialState) {
     ASSERT_EQ(obj.getLocation(), nullptr);
     ASSERT_EQ(obj.getContents().size(), 0);
     ASSERT_FALSE(obj.hasFlag(ObjectFlag::TAKEBIT));
-    ASSERT_EQ(obj.getProperty(P_SIZE), 0);
+    ASSERT_EQ(obj.getProperty(P_SIZE), 5);  // ZIL: <PROPDEF SIZE 5> (zork1.zil:24)
     ASSERT_FALSE(obj.hasText());
     ASSERT_EQ(obj.getSynonyms().size(), 0);
     ASSERT_EQ(obj.getAdjectives().size(), 0);

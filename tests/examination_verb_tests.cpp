@@ -179,11 +179,10 @@ TEST(ExamineVerbLockedContainer) {
     g.winner = player.get();
     g.registerObject(999, std::move(player));
     
-    // Create locked container
+    // Create closed container
     auto safe = std::make_unique<ZObject>(1, "safe");
     safe->addSynonym("safe");
     safe->setFlag(ObjectFlag::CONTBIT);
-    safe->setFlag(ObjectFlag::LOCKEDBIT);
     safe->moveTo(&testRoom);
     ZObject* safePtr = safe.get();
     g.registerObject(1, std::move(safe));
@@ -192,7 +191,7 @@ TEST(ExamineVerbLockedContainer) {
     g.prso = safePtr;
     g.prsa = V_EXAMINE;
     
-    // Test EXAMINE verb on locked container
+    // Test EXAMINE verb on closed container
     bool result = Verbs::vExamine();
     ASSERT_TRUE(result);
     
@@ -507,11 +506,10 @@ TEST(SearchVerbLockedContainer) {
     g.winner = player.get();
     g.registerObject(999, std::move(player));
     
-    // Create locked container
+    // Create closed container
     auto safe = std::make_unique<ZObject>(1, "safe");
     safe->addSynonym("safe");
     safe->setFlag(ObjectFlag::CONTBIT);
-    safe->setFlag(ObjectFlag::LOCKEDBIT);
     safe->moveTo(&testRoom);
     ZObject* safePtr = safe.get();
     g.registerObject(1, std::move(safe));
@@ -520,7 +518,7 @@ TEST(SearchVerbLockedContainer) {
     g.prso = safePtr;
     g.prsa = V_SEARCH;
     
-    // Test SEARCH verb on locked container
+    // Test SEARCH verb on closed container
     bool result = Verbs::vSearch();
     ASSERT_TRUE(result);
     

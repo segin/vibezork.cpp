@@ -278,9 +278,6 @@ void CombatManager::handleDeath(Combatant& combatant) {
     
     auto& g = Globals::instance();
     
-    // Mark as dead
-    combatant.object->setFlag(ObjectFlag::DEADBIT);
-    
     // Remove FIGHTBIT so it can't be attacked again
     combatant.object->clearFlag(ObjectFlag::FIGHTBIT);
     

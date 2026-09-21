@@ -27,7 +27,7 @@ void initializeUndergroundRooms() {
                 .target = EW_PASSAGE,
                 .condition = []() {
                     auto* troll = Globals::instance().getObject(ObjectIds::TROLL);
-                    return !troll || troll->hasFlag(DEADBIT) || !NPCSystem::isTrollActive();
+                    return Globals::instance().trollFlag || !troll || !NPCSystem::isTrollActive();
                 },
                 .blockedMsg = "The troll blocks your way."
             },
@@ -36,7 +36,7 @@ void initializeUndergroundRooms() {
                 .target = MAZE_1,
                 .condition = []() {
                     auto* troll = Globals::instance().getObject(ObjectIds::TROLL);
-                    return !troll || troll->hasFlag(DEADBIT) || !NPCSystem::isTrollActive();
+                    return Globals::instance().trollFlag || !troll || !NPCSystem::isTrollActive();
                 },
                 .blockedMsg = "The troll blocks your way."
             }

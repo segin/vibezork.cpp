@@ -169,7 +169,7 @@ void testEnemyDeath() {
     TEST_ASSERT(!isInCombat(), "Combat should have ended");
     
     // Enemy should be dead
-    TEST_ASSERT(enemy->hasFlag(ObjectFlag::DEADBIT), "Enemy should be marked as dead");
+    TEST_ASSERT(enemy->hasFlag(ObjectFlag::INVISIBLE), "Enemy should be gone");
     TEST_ASSERT(!enemy->hasFlag(ObjectFlag::FIGHTBIT), "Enemy should not be fightable");
     
     std::cout << "✓ Enemy death test passed" << std::endl;

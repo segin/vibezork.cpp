@@ -90,7 +90,7 @@ TEST(PuzzleTrollBridge) {
     }
     
     // Verify troll is defeated (dead or fled)
-    ASSERT_TRUE(troll->hasFlag(ObjectFlag::DEADBIT) || troll->getLocation() != g.here);
+    ASSERT_TRUE(troll->hasFlag(ObjectFlag::INVISIBLE) || troll->getLocation() != g.here);
     
     std::cout << "✓ Troll bridge puzzle is solvable\n";
 }

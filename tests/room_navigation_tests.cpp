@@ -124,10 +124,9 @@ TEST(LockedDoorExits) {
     auto room1 = std::make_unique<ZRoom>(1, "Room 1", "You are in room 1.");
     auto room2 = std::make_unique<ZRoom>(2, "Room 2", "You are in room 2.");
     
-    // Create locked door
+    // Create closed door (ZIL has no lock flag; a closed DOORBIT exit blocks)
     auto door = std::make_unique<ZObject>(50, "door");
     door->setFlag(ObjectFlag::DOORBIT);
-    door->setFlag(ObjectFlag::LOCKEDBIT);  // Door is locked
     
     g.registerObject(50, std::move(door));
     
@@ -146,7 +145,7 @@ TEST(LockedDoorExits) {
     g.here = r1;
     g.winner->moveTo(r1);
     
-    // Try to move through locked door - should fail
+    // Try to move through closed door - should fail
     Verbs::vWalkDir(Direction::NORTH);
     ASSERT_EQ(g.here, r1);
 }

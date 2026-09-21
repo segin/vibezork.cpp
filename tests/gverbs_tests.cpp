@@ -112,7 +112,9 @@ void testGVerbsSystemRoutines() {
   assert(Verbs::seeInside(chest.get())); // Open container
 
   // Test WEIGHT
-  assert(Verbs::weight(chest.get()) == 13); // 10 + 3
+  // 10 + 3 + 5: the scenery detail has no SIZE, so it weighs the
+  // <PROPDEF SIZE 5> default (zork1.zil:24)
+  assert(Verbs::weight(chest.get()) == 18);
 
   // Test HELD?
   assert(!Verbs::isHeld(ruby.get()));

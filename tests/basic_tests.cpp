@@ -52,7 +52,7 @@ TEST(ObjectFlags) {
 TEST(ObjectProperties) {
     ZObject obj(1, "test");
     constexpr PropertyId P_SIZE = 1;
-    ASSERT_EQ(obj.getProperty(P_SIZE), 0);
+    ASSERT_EQ(obj.getProperty(P_SIZE), 5);  // ZIL: <PROPDEF SIZE 5> (zork1.zil:24)
     
     obj.setProperty(P_SIZE, 10);
     ASSERT_EQ(obj.getProperty(P_SIZE), 10);

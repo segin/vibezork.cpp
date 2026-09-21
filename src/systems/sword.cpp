@@ -53,8 +53,7 @@ bool areEnemiesNearby() {
     // An enemy is an object with FIGHTBIT flag that is not dead
     const auto& contents = g.here->getContents();
     for (const auto* obj : contents) {
-        if (obj && obj->hasFlag(ObjectFlag::FIGHTBIT) && 
-            !obj->hasFlag(ObjectFlag::DEADBIT)) {
+        if (obj && obj->hasFlag(ObjectFlag::FIGHTBIT)) {
             return true;  // Enemy in current room
         }
     }
@@ -84,8 +83,7 @@ bool areEnemiesNearby() {
             // Check adjacent room for enemies
             const auto& adjacentContents = adjacentRoom->getContents();
             for (const auto* obj : adjacentContents) {
-                if (obj && obj->hasFlag(ObjectFlag::FIGHTBIT) && 
-                    !obj->hasFlag(ObjectFlag::DEADBIT)) {
+                if (obj && obj->hasFlag(ObjectFlag::FIGHTBIT)) {
                     return true;  // Enemy in adjacent room
                 }
             }

@@ -483,8 +483,6 @@ void thiefDeath() {
     thiefState.isAlive = false;
     thiefState.isEngaged = false;
     
-    // Mark thief as dead
-    thief->setFlag(ObjectFlag::DEADBIT);
     thief->clearFlag(ObjectFlag::FIGHTBIT);
     
     // Drop all items from bag to current room
@@ -624,8 +622,7 @@ bool isTrollActive() {
     ZObject* troll = getTroll();
     if (!troll) return false;
     
-    return trollState.isAlive && !trollState.isUnconscious && 
-           !troll->hasFlag(ObjectFlag::DEADBIT);
+    return trollState.isAlive && !trollState.isUnconscious;
 }
 
 bool trollBlocks(Direction dir) {
@@ -742,8 +739,6 @@ void trollDeath() {
     
     trollState.isAlive = false;
     
-    // Mark troll as dead
-    troll->setFlag(ObjectFlag::DEADBIT);
     troll->clearFlag(ObjectFlag::FIGHTBIT);
     
     // Troll vanishes (move to nowhere)
@@ -808,7 +803,7 @@ bool trollAction() {
     
     // Handle EXAMINE
     if (g.prsa == V_EXAMINE) {
-        if (!trollState.isAlive || troll->hasFlag(ObjectFlag::DEADBIT)) {
+        if (!trollState.isAlive) {
             printLine("The troll is dead.");
         } else if (trollState.isUnconscious) {
             printLine("The troll is unconscious on the ground.");

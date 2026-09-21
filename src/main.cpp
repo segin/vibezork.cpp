@@ -29,9 +29,9 @@ void initializeGame() {
 void go() {
   auto &g = Globals::instance();
 
-  // ZIL: <PUTP ,INFLATED-BOAT ,P?VTYPE ,NONLANDBIT>
+  // ZIL: <PUTP ,INFLATED-BOAT ,P?VTYPE ,NONLANDBIT> (1dungeon.zil:2643)
   if (auto *boat = g.getObject(ObjectIds::BOAT_INFLATED)) {
-    boat->setFlag(ObjectFlag::NONLANDBIT);
+    boat->setVehicleType(ObjectFlag::NONLANDBIT);
   }
 
   // ZIL: <SETG HERE ,WEST-OF-HOUSE>
