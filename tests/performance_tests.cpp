@@ -3,6 +3,7 @@
 // Requirements: 86 - Command response time <10ms
 
 #include "test_framework.h"
+#include "core/go.h"
 #include "core/globals.h"
 #include "core/io.h"
 #include "parser/parser.h"
@@ -97,7 +98,8 @@ public:
 void initializeForPerformanceTest() {
     auto& g = Globals::instance();
     g.reset();
-    initializeWorld();
+    initializeGame();
+    goSetup();
     NPCSystem::initializeThief();
     NPCSystem::initializeTroll();
     NPCSystem::initializeCyclops();

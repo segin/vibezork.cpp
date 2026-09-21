@@ -215,36 +215,3 @@ bool chainPseudo() {
     return RFALSE;
 }
 
-// ZIL: the (PSEUDO "WORD" ROUTINE ...) clauses of 1dungeon.zil
-// Source: 1dungeon.zil:1460 (LIVING-ROOM), 1505 (EAST-OF-CHASM), 1532
-// (STUDIO), 1781 (RESERVOIR-SOUTH), 1793 (RESERVOIR), 1805
-// (RESERVOIR-NORTH), 1817 (STREAM-VIEW), 1833 (IN-STREAM), 2021
-// (CHASM-ROOM), 2038 (ENTRANCE-TO-HADES), 2085 (DOME-ROOM), 2096
-// (TORCH-ROOM), 2461 (SHAFT-ROOM), 2474 (SMELLY-ROOM), 2487 (GAS-ROOM),
-// 2552 (LOWER-SHAFT)
-void registerRoomPseudos() {
-  auto &g = Globals::instance();
-  auto add = [&](ObjectId roomId, std::initializer_list<std::pair<const char *, bool (*)()>> entries) {
-    auto *room = dynamic_cast<ZRoom *>(g.getObject(roomId));
-    if (!room) return;
-    for (const auto &[word, fn] : entries) {
-      room->addPseudo(word, fn);
-    }
-  };
-  add(RoomIds::LIVING_ROOM, {{"NAILS", nailsPseudo}, {"NAIL", nailsPseudo}});
-  add(RoomIds::EAST_OF_CHASM, {{"CHASM", chasmPseudo}});
-  add(RoomIds::STUDIO, {{"DOOR", doorPseudo}, {"PAINT", paintPseudo}});
-  add(RoomIds::RESERVOIR_SOUTH, {{"LAKE", lakePseudo}, {"CHASM", chasmPseudo}});
-  add(RoomIds::RESERVOIR, {{"STREAM", streamPseudo}});
-  add(RoomIds::RESERVOIR_NORTH, {{"LAKE", lakePseudo}});
-  add(RoomIds::STREAM_VIEW, {{"STREAM", streamPseudo}});
-  add(RoomIds::IN_STREAM, {{"STREAM", streamPseudo}});
-  add(RoomIds::CHASM_ROOM, {{"CHASM", chasmPseudo}});
-  add(RoomIds::ENTRANCE_TO_HADES, {{"GATE", gatePseudo}, {"GATES", gatePseudo}});
-  add(RoomIds::DOME_ROOM, {{"DOME", domePseudo}});
-  add(RoomIds::TORCH_ROOM, {{"DOME", domePseudo}});
-  add(RoomIds::SHAFT_ROOM, {{"CHAIN", chainPseudo}});
-  add(RoomIds::SMELLY_ROOM, {{"ODOR", gasPseudo}, {"GAS", gasPseudo}});
-  add(RoomIds::GAS_ROOM, {{"GAS", gasPseudo}, {"ODOR", gasPseudo}});
-  add(RoomIds::LOWER_SHAFT, {{"CHAIN", chainPseudo}});
-}

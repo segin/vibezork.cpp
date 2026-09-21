@@ -341,7 +341,9 @@ TEST(DungeonExits_ConditionalExitsVerification) {
   // 1. Troll room east/west conditional on trollFlag
   auto* trollRoom = dynamic_cast<ZRoom*>(g.getObject(RoomIds::TROLL_ROOM));
   ASSERT_TRUE(trollRoom != nullptr);
-  ASSERT_TRUE(trollRoom->hasGlobal(ObjectIds::TROLL));
+  // ZIL: TROLL-ROOM has no (GLOBAL ...) clause at all; the troll is an
+  // ordinary object (IN TROLL-ROOM).  Source: zil/1dungeon.zil:1036-1037, 1479-1492
+  ASSERT_TRUE(trollRoom->getGlobals().empty());
   g.trollFlag = false;
   auto* troll = g.getObject(ObjectIds::TROLL);
   (void)troll;
@@ -353,9 +355,14 @@ TEST(DungeonExits_ConditionalExitsVerification) {
   // 2. Cyclops room UP and EAST conditional
   auto* cyclopsRoom = dynamic_cast<ZRoom*>(g.getObject(RoomIds::CYCLOPS_ROOM));
   ASSERT_TRUE(cyclopsRoom != nullptr);
-  ASSERT_TRUE(cyclopsRoom->hasGlobal(ObjectIds::CYCLOPS));
-  ASSERT_EQ(cyclopsRoom->getExit(Direction::WEST)->targetRoom, RoomIds::MAZE_15);
+  // ZIL: (GLOBAL STAIRS) is CYCLOPS-ROOM's only global; the cyclops itself is
+  // an object (IN CYCLOPS-ROOM).  Source: zil/1dungeon.zil:1728-1738
+  ASSERT_TRUE(cyclopsRoom->hasGlobal(ObjectIds::STAIRS));
+  ASSERT_TRUE(!cyclopsRoom->hasGlobal(ObjectIds::CYCLOPS));
+  // ZIL: (NW TO MAZE-15) is the only way back into the maze; there is no WEST
+  // exit.  Source: zil/1dungeon.zil:1731
   ASSERT_EQ(cyclopsRoom->getExit(Direction::NW)->targetRoom, RoomIds::MAZE_15);
+  ASSERT_TRUE(cyclopsRoom->getExit(Direction::WEST) == nullptr);
   g.magicFlag = false;
   ASSERT_FALSE(cyclopsRoom->getExit(Direction::EAST)->condition());
   g.magicFlag = true;

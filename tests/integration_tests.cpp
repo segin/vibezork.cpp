@@ -1,5 +1,6 @@
 // Integration Tests - Task 67
 #include "test_framework.h"
+#include "core/go.h"
 #include "../src/core/object.h"
 #include "../src/core/globals.h"
 #include "../src/world/world.h"
@@ -24,7 +25,8 @@ public:
         g.reset();
         DeathSystem::setTestMode(true);  // Disable interactive prompts
         LightSystem::reset();  // Reset darkness counter
-        initializeWorld();
+        initializeGame();
+        goSetup();
     }
     
     ~IntegrationHelper() {

@@ -10,7 +10,7 @@ test, build, commit, push; then mark `[x]` and update the counters. Every routin
 ported carries `// ZIL:` and `// Source: <file>:<lines>` comments. Never simplify
 away a ZIL behaviour.
 
-Progress: 24/74 (32%)
+Progress: 25/74 (34%)
 
 ## Phase A: engine foundations (src/core, src/systems/timer)
 
@@ -61,7 +61,7 @@ Progress: 24/74 (32%)
 
 ## Phase D: world data (src/world, 1dungeon.zil)
 
-- [ ] D1 All 110 rooms regenerated from 1dungeon.zil: DESC, LDESC, every exit form (UEXIT/NEXIT string/CEXIT flag/DEXIT door/FEXIT PER), FLAGS, VALUE, ACTION, GLOBAL lists, PSEUDO clauses (docs/audit/world_data_audit.md)
+- [x] D1 All 110 rooms regenerated from 1dungeon.zil: DESC, LDESC, every exit form (UEXIT/NEXIT string/CEXIT flag/DEXIT door/FEXIT PER), FLAGS, VALUE, ACTION, GLOBAL lists, PSEUDO clauses (docs/audit/world_data_audit.md)
 - [ ] D2 All 140 objects regenerated from 1dungeon.zil and gglobals.zil: IN, SYNONYM/ADJECTIVE with truncations, DESC, FDESC, LDESC, TEXT, FLAGS, SIZE, CAPACITY, VALUE, TVALUE, STRENGTH, ACTION, DESCFCN; add BAT, KITCHEN-TABLE, ATTIC-TABLE, LEAK, MACHINE-SWITCH, CONTROL-PANEL; remove "trophy", duplicate bag of coins, "window"
 - [ ] D3 Delete the dead builder-style world files (rooms_*.cpp, treasures.cpp, containers.cpp, scenery.cpp, npcs.cpp, tools.cpp, readables.cpp, special_objects.cpp data parts) and the invented state globals (lampBattery, rugMoved, gateFlag, gatesOpen, grunlock, waterLevel, grateRevealed, buoyFlag, matchCount 5)
 - [ ] D4 Walk-around tables, DIRECTIONS incl. LAND, conditional-exit flag globals, SCORE-MAX, and a data-level test that diffs the live world against a parse of 1dungeon.zil

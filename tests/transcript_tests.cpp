@@ -5,6 +5,7 @@
 // Commands are extracted and expected outputs verified
 
 #include "test_framework.h"
+#include "core/go.h"
 #include "transcript_data.h"
 #include "../src/core/globals.h"
 #include "../src/core/io.h"
@@ -202,7 +203,8 @@ void runTranscript(const std::vector<TranscriptStep>& steps, const std::string& 
 
 // Initialize game state for testing
 void initializeTestGame() {
-    initializeWorld();
+    initializeGame();
+    goSetup();
     NPCSystem::initializeThief();
     NPCSystem::initializeTroll();
     NPCSystem::initializeCyclops();

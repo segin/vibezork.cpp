@@ -1,4 +1,5 @@
 #include "test_framework.h"
+#include "core/go.h"
 #include "../src/core/object.h"
 #include "../src/core/globals.h"
 #include "../src/world/rooms.h"
@@ -10,7 +11,8 @@
 TEST(WorldInitializationAllRoomsExist) {
     auto& g = Globals::instance();
     g.reset();
-    initializeWorld();
+    initializeGame();
+    goSetup();
     
     // Test that key rooms exist
     ASSERT_TRUE(g.getObject(ROOM_WEST_OF_HOUSE) != nullptr);
@@ -28,7 +30,8 @@ TEST(WorldInitializationAllRoomsExist) {
 TEST(WorldInitializationAllObjectsExist) {
     auto& g = Globals::instance();
     g.reset();
-    initializeWorld();
+    initializeGame();
+    goSetup();
     
     // Test that key objects exist
     ASSERT_TRUE(g.getObject(ObjectIds::MAILBOX) != nullptr);
@@ -43,7 +46,8 @@ TEST(WorldInitializationAllObjectsExist) {
 TEST(WorldInitializationPlayerState) {
     auto& g = Globals::instance();
     g.reset();
-    initializeWorld();
+    initializeGame();
+    goSetup();
     
     // Test player object exists
     ASSERT_TRUE(g.player != nullptr);
@@ -66,7 +70,8 @@ TEST(WorldInitializationPlayerState) {
 TEST(WorldInitializationCurrentRoom) {
     auto& g = Globals::instance();
     g.reset();
-    initializeWorld();
+    initializeGame();
+    goSetup();
     
     // Test current room is set to West of House
     ASSERT_TRUE(g.here != nullptr);
@@ -78,7 +83,8 @@ TEST(WorldInitializationCurrentRoom) {
 TEST(WorldInitializationInitialFlags) {
     auto& g = Globals::instance();
     g.reset();
-    initializeWorld();
+    initializeGame();
+    goSetup();
     
     // Test West of House has correct flags
     ZObject* westOfHouse = g.getObject(ROOM_WEST_OF_HOUSE);
@@ -106,7 +112,8 @@ TEST(WorldInitializationInitialFlags) {
 TEST(WorldInitializationObjectPlacements) {
     auto& g = Globals::instance();
     g.reset();
-    initializeWorld();
+    initializeGame();
+    goSetup();
     
     // Test lamp is in Living Room
     ZObject* lamp = g.getObject(ObjectIds::LAMP);
@@ -132,7 +139,8 @@ TEST(WorldInitializationObjectPlacements) {
 TEST(WorldInitializationContainmentRelationships) {
     auto& g = Globals::instance();
     g.reset();
-    initializeWorld();
+    initializeGame();
+    goSetup();
     
     // Test mailbox contains leaflet (if leaflet is created)
     ZObject* mailbox = g.getObject(ObjectIds::MAILBOX);
@@ -149,7 +157,8 @@ TEST(WorldInitializationContainmentRelationships) {
 TEST(WorldInitializationNoOrphanedObjects) {
     auto& g = Globals::instance();
     g.reset();
-    initializeWorld();
+    initializeGame();
+    goSetup();
     
     // Check that important objects have locations
     // Some objects like GRUE, global scenery, etc. don't need locations
@@ -180,7 +189,8 @@ TEST(WorldInitializationNoOrphanedObjects) {
 TEST(WorldInitializationGameStateVariables) {
     auto& g = Globals::instance();
     g.reset();
-    initializeWorld();
+    initializeGame();
+    goSetup();
     
     // Test initial game state
     ASSERT_TRUE(g.lit);  // West of House is lit
@@ -193,7 +203,8 @@ TEST(WorldInitializationGameStateVariables) {
 TEST(WorldInitializationRoomExits) {
     auto& g = Globals::instance();
     g.reset();
-    initializeWorld();
+    initializeGame();
+    goSetup();
     
     // Test West of House has correct exits
     ZRoom* westOfHouse = dynamic_cast<ZRoom*>(g.getObject(ROOM_WEST_OF_HOUSE));
@@ -215,7 +226,8 @@ TEST(WorldInitializationRoomExits) {
 TEST(WorldInitializationTreasureValues) {
     auto& g = Globals::instance();
     g.reset();
-    initializeWorld();
+    initializeGame();
+    goSetup();
     
     // Test treasures have value properties set
     ZObject* trophy = g.getObject(ObjectIds::TROPHY);
@@ -236,7 +248,8 @@ TEST(WorldInitializationTreasureValues) {
 TEST(WorldInitializationNPCStrength) {
     auto& g = Globals::instance();
     g.reset();
-    initializeWorld();
+    initializeGame();
+    goSetup();
     
     // Test NPCs have strength properties
     ZObject* thief = g.getObject(ObjectIds::THIEF);

@@ -6,6 +6,7 @@
 #include "../src/verbs/verbs.h"
 #include "../src/world/objects.h"
 #include "../src/world/rooms.h"
+#include "../src/core/go.h"
 #include "../src/world/world.h"
 #include "test_framework.h"
 #include <sstream>
@@ -34,7 +35,14 @@ extern bool knifeAction();
 extern bool teethAction();
 
 // Initialize world for testing
-static void setupTestWorld() { initializeWorld(); }
+// Rebuild the world from scratch.  Without the reset a second initializeWorld()
+// replaces every registered object while the previous instances are still
+// pointed at by location_/contents_ and by HERE, which corrupts the heap.
+static void setupTestWorld() {
+  Globals::instance().reset();
+  initializeGame();
+  goSetup();
+}
 
 // =============================================================================
 // AXE-F Tests (1actions.zil lines 622-638)
