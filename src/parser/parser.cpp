@@ -1,6 +1,7 @@
 #include "parser.h"
 #include "core/globals.h"
 #include "core/io.h"
+#include "parser/gparser.h"
 #include "verb_registry.h"
 #include "verbs/verbs.h"
 #include "world/objects.h"
@@ -351,6 +352,16 @@ Parser::findObjects(const std::vector<std::string> &words, size_t startIdx) {
     return matches;
   }
 
+  // ZIL: the pronoun words are synonyms of the IT object in GLOBAL-OBJECTS
+  // (gglobals.zil:42-46); it is always found and resolved later by
+  // MAIN-LOOP-1 / PERFORM (gmain.zil:45-64, 194-203).
+  if (nouns.size() == 1 && isPronoun(nouns[0])) {
+    if (auto *itObj = g.getObject(ObjectIds::IT)) {
+      matches.push_back(itObj);
+    }
+    return matches;
+  }
+
   // Search through all objects
   for (const auto &[id, objPtr] : g.getAllObjects()) {
     ZObject *obj = objPtr.get();
@@ -561,18 +572,6 @@ void Parser::setLastCommand(const std::string &cmd) { lastCommand_ = cmd; }
 
 std::string_view Parser::getLastCommand() const { return lastCommand_; }
 
-void Parser::setLastObject(ZObject *obj) { lastObject_ = obj; }
-
-ZObject *Parser::getLastObject() const { return lastObject_; }
-
-void Parser::setLastObjects(const std::vector<ZObject *> &objs) {
-  lastObjects_ = objs;
-}
-
-const std::vector<ZObject *> &Parser::getLastObjects() const {
-  return lastObjects_;
-}
-
 void Parser::setLastUnknownWord(const std::string &word) {
   lastUnknownWord_ = word;
   hadUnknownWordLastTurn_ = true;
@@ -601,9 +600,11 @@ bool Parser::isOopsCommand(const std::vector<std::string> &tokens) const {
   return !tokens.empty() && tokens[0] == "oops";
 }
 
+// ZIL: <OBJECT IT ... (SYNONYM IT THEM HER HIM)> (gglobals.zil:42-46)
 bool Parser::isPronoun(const std::string &word) const {
-  return word == "it" || word == "them";
+  return word == "it" || word == "them" || word == "her" || word == "him";
 }
+
 
 std::vector<ZObject *> Parser::findAllApplicableObjects(VerbId verb) const {
   std::vector<ZObject *> applicable;
@@ -815,6 +816,11 @@ std::string getVerbName(VerbId verb) {
 bool Parser::isKnownObjectWord(const std::string &word) const {
   auto &g = Globals::instance();
 
+  // ZIL: IT THEM HER HIM are dictionary words (synonyms of the IT object)
+  if (isPronoun(word)) {
+    return true;
+  }
+
   // Check all objects for this word as a synonym or adjective
   for (const auto &[id, objPtr] : g.getAllObjects()) {
     if (objPtr->hasSynonym(word) || objPtr->hasAdjective(word)) {
@@ -889,9 +895,6 @@ ParsedCommand Parser::parse(const std::string &input) {
           cmd.directObj = matches.size() == 1
                               ? matches[0]
                               : disambiguate(matches, cmd.words.back());
-          if (cmd.directObj) {
-            setLastObject(cmd.directObj);
-          }
         } else if (orphanNeedsIndirect_) {
           cmd.directObj = orphanDirectObj_;
           cmd.indirectObj = matches.size() == 1
@@ -902,6 +905,7 @@ ParsedCommand Parser::parse(const std::string &input) {
         orphanFlag_ = false;
         // Save the completed command for AGAIN
         lastCommand_ = input; // This isn't quite right but works for now
+        finishTables(cmd);
         return cmd;
       } else {
         // Couldn't find an object - check for unknown word
@@ -1009,43 +1013,8 @@ ParsedCommand Parser::parse(const std::string &input) {
                            cmd.allObjects.end());
     }
 
-    // Update pronoun tracking
-    if (!cmd.allObjects.empty()) {
-      setLastObjects(cmd.allObjects);
-      if (cmd.allObjects.size() == 1) {
-        setLastObject(cmd.allObjects[0]);
-      }
-    }
-
+    finishTables(cmd);
     return cmd;
-  }
-
-  // Handle pronoun substitution
-  if (cmd.words.size() > 1) {
-    if (isPronoun(cmd.words[1])) {
-      if (cmd.words[1] == "it") {
-        if (lastObject_) {
-          cmd.directObj = lastObject_;
-        } else {
-          printLine("I don't know what \"it\" refers to.");
-          return cmd;
-        }
-      } else if (cmd.words[1] == "them") {
-        if (!lastObjects_.empty()) {
-          // For "them", treat as "all" with the last objects
-          cmd.isAll = true;
-          cmd.allObjects = lastObjects_;
-        } else {
-          printLine("I don't know what \"them\" refers to.");
-          return cmd;
-        }
-      }
-
-      // If we substituted a pronoun, we're done with object parsing
-      if (cmd.directObj || cmd.isAll) {
-        return cmd;
-      }
-    }
   }
 
   // Find preposition and extract indirect object (PRSI)
@@ -1087,11 +1056,6 @@ ParsedCommand Parser::parse(const std::string &input) {
               directMatches.size() == 1
                   ? directMatches[0]
                   : disambiguate(directMatches, directObjWords.back());
-
-          // Update pronoun tracking
-          if (cmd.directObj) {
-            setLastObject(cmd.directObj);
-          }
         }
 
         if (!indirectObjWords.empty()) {
@@ -1113,10 +1077,6 @@ ParsedCommand Parser::parse(const std::string &input) {
                 matches.size() == 1
                     ? matches[0]
                     : disambiguate(matches, indirectObjWords.back());
-
-            if (cmd.directObj) {
-              setLastObject(cmd.directObj);
-            }
           }
         }
       }
@@ -1130,11 +1090,6 @@ ParsedCommand Parser::parse(const std::string &input) {
           cmd.directObj = matches.size() == 1
                               ? matches[0]
                               : disambiguate(matches, objWords.back());
-
-          // Update pronoun tracking
-          if (cmd.directObj) {
-            setLastObject(cmd.directObj);
-          }
         } else if (!objWords.empty()) {
           // No visible object found - check if word is known or unknown
           bool foundUnknown = false;
@@ -1174,7 +1129,25 @@ ParsedCommand Parser::parse(const std::string &input) {
     }
   }
 
+  finishTables(cmd);
   return cmd;
+}
+
+// Fill the ZIL match tables (P-PRSO / P-PRSI) from the single-object
+// results of the interim parser, and keep the legacy mirrors coherent.
+void Parser::finishTables(ParsedCommand &cmd) {
+  if (cmd.isAll) {
+    cmd.prsoTable = cmd.allObjects;
+    cmd.getFlags = GParser::P_ALL;
+    cmd.nc1IsAll = true;
+  } else if (cmd.directObj && cmd.prsoTable.empty()) {
+    cmd.prsoTable.push_back(cmd.directObj);
+  }
+  if (cmd.indirectObj && cmd.prsiTable.empty()) {
+    cmd.prsiTable.push_back(cmd.indirectObj);
+  }
+  cmd.directObj = cmd.prsoTable.empty() ? nullptr : cmd.prsoTable.front();
+  cmd.indirectObj = cmd.prsiTable.empty() ? nullptr : cmd.prsiTable.front();
 }
 
 ParseExpected Parser::tryParse(std::string_view input) {

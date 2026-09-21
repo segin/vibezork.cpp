@@ -1,7 +1,10 @@
 #include "gmain.h"
+#include "gglobals.h"
 #include "globals.h"
 #include "io.h"
+#include "parser/gparser.h"
 #include "parser/parser.h"
+#include "world/objects.h"
 #include "systems/npc.h"
 #include "systems/score.h"
 #include "systems/timer.h"
@@ -292,19 +295,33 @@ int perform(VerbId a, ZObject *o, ZObject *i) {
   ZObject *oo = g.prso;
   ZObject *oi = g.prsi;
 
-  // ZIL: <COND (<AND <EQUAL? ,IT .I .O> <NOT <ACCESSIBLE? ,P-IT-OBJECT>>> <TELL "I don't see what you are referring to." CR> <RFATAL>)>
-  if (o == nullptr && i == nullptr && g.it == nullptr &&
-      (a == V_EXAMINE || a == V_TAKE || a == V_READ)) {
+  // ZIL: <COND (<AND <EQUAL? ,IT .I .O> <NOT <ACCESSIBLE? ,P-IT-OBJECT>>>
+  //             <TELL "I don't see what you are referring to." CR>
+  //             <RFATAL>)> (gmain.zil:194-197)
+  ZObject *itObj = g.getObject(ObjectIds::IT);
+  if (itObj && (i == itObj || o == itObj) && !GParser::isAccessible(g.it)) {
     printLine("I don't see what you are referring to.");
     return M_FATAL;
+  }
+
+  // ZIL: <COND (<==? .O ,IT> <SET O ,P-IT-OBJECT>)>
+  //      <COND (<==? .I ,IT> <SET I ,P-IT-OBJECT>)> (gmain.zil:198-199)
+  if (itObj && o == itObj) {
+    o = g.it;
+  }
+  if (itObj && i == itObj) {
+    i = g.it;
   }
 
   // ZIL: <SETG PRSA .A> <SETG PRSO .O>
   g.prsa = a;
   g.prso = o;
 
-  // ZIL: <COND (<AND ,PRSO <NOT <VERB? WALK>>> <SETG P-IT-OBJECT ,PRSO>)>
-  if (g.prso && a != V_WALK) {
+  // ZIL: <COND (<AND ,PRSO <NOT <EQUAL? ,PRSI ,IT>> <NOT <VERB? WALK>>>
+  //             <SETG P-IT-OBJECT ,PRSO>)> (gmain.zil:202-203)
+  // Note: ,PRSI here is still the previous command's value; the new PRSI is
+  // stored on the next line, exactly as in the shipped PERFORM.
+  if (g.prso && !(itObj && g.prsi == itObj) && a != V_WALK) {
     g.it = g.prso;
   }
 
@@ -313,9 +330,18 @@ int perform(VerbId a, ZObject *o, ZObject *i) {
 
   int v = M_NOT_HANDLED;
 
+  // ZIL: <COND (<AND <EQUAL? ,NOT-HERE-OBJECT ,PRSO ,PRSI>
+  //                  <SET V <NOT-HERE-OBJECT-F>>> .V) (gmain.zil:205-206)
+  ZObject *notHere = g.getObject(ObjectIds::NOT_HERE_OBJECT);
+  bool notHereHandled = false;
+  if (notHere && (g.prso == notHere || g.prsi == notHere)) {
+    v = GGlobals::notHereObjectF() ? M_HANDLED : M_NOT_HANDLED;
+    notHereHandled = v != M_NOT_HANDLED;
+  }
+
   // ZIL Execution Hierarchy:
   // 1. Actor (WINNER) action: <DD-APPLY "Actor" ,WINNER <GETP ,WINNER ,P?ACTION>>
-  if (g.winner && g.winner->hasAction()) {
+  if (!notHereHandled && g.winner && g.winner->hasAction()) {
     v = ddApply("Actor", g.winner, [&]() -> int {
       return g.winner->performAction();
     });
@@ -448,9 +474,35 @@ void mainLoop1() {
 }
 
 // ZIL: MAIN-LOOP-1 after <SETG P-WON <PARSER>> succeeded (gmain.zil:42-161)
-int executeCommand(const ParsedCommand &cmd) {
+int executeCommand(const ParsedCommand &cmdIn) {
   auto &g = Globals::instance();
   int v = M_NOT_HANDLED;
+  // The match tables are edited in place by the IT substitution below.
+  ParsedCommand cmd = cmdIn;
+
+  // ZIL: <COND (<AND ,P-IT-OBJECT <ACCESSIBLE? ,P-IT-OBJECT>>
+  //        ... replace ,IT in P-PRSI, else in P-PRSO ...)> (gmain.zil:45-64)
+  ZObject *itObj = g.getObject(ObjectIds::IT);
+  if (itObj && g.it && GParser::isAccessible(g.it)) {
+    bool tmp = false;
+    for (auto &entry : cmd.prsiTable) {
+      if (entry == itObj) {
+        entry = g.it;
+        tmp = true;
+        break;
+      }
+    }
+    if (!tmp) {
+      for (auto &entry : cmd.prsoTable) {
+        if (entry == itObj) {
+          entry = g.it;
+          break;
+        }
+      }
+    }
+  }
+  cmd.directObj = cmd.prsoTable.empty() ? nullptr : cmd.prsoTable.front();
+  cmd.indirectObj = cmd.prsiTable.empty() ? nullptr : cmd.prsiTable.front();
 
   // ZIL: the parser leaves PRSA/PRSO/PRSI set (SYNTAX-FOUND, SNARF-OBJECTS,
   // gparser.zil:370-372 for directions); PERFORM saves and restores them, so
@@ -467,12 +519,12 @@ int executeCommand(const ParsedCommand &cmd) {
     g.pMult = true;
     g.pNotHere = 0;
 
-    if (cmd.allObjects.empty()) {
+    if (cmd.prsoTable.empty()) {
       printLine(std::format("There's nothing here to {}.", cmd.words[0]));
       return v;
     }
 
-    for (auto *obj : cmd.allObjects) {
+    for (auto *obj : cmd.prsoTable) {
       print(std::format("{}: ", obj->getDesc()));
       v = perform(cmd.verb, obj, cmd.indirectObj);
       // ZIL: <COND (<==? .V ,M-FATAL> <RETURN>)> (gmain.zil:150)

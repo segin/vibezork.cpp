@@ -17,14 +17,33 @@ Parser& getGlobalParser();
 
 struct ParsedCommand {
     VerbId verb = 0;
-    ZObject* directObj = nullptr;
-    ZObject* indirectObj = nullptr;
+    ZObject* directObj = nullptr;    // first entry of prsoTable, if any
+    ZObject* indirectObj = nullptr;  // first entry of prsiTable, if any
     std::vector<std::string> words;
     Direction direction = Direction::NORTH;
     bool isDirection = false;
-    bool isAll = false;  // "all" keyword used
-    std::vector<ZObject*> allObjects;  // Objects for "all" command
-    ZObject* exceptObject = nullptr;  // Object to exclude in "all except"
+
+    // ZIL: P-PRSO / P-PRSI match tables (gparser.zil:964-965); the size is
+    // P-MATCHLEN. The IT object (gglobals.zil:42-46) may appear in either
+    // table and is substituted by MAIN-LOOP-1 / PERFORM (gmain.zil:45-64,
+    // 194-203).
+    std::vector<ZObject*> prsoTable;
+    std::vector<ZObject*> prsiTable;
+    // ZIL: ,P-GETFLAGS after SNARFEM: 0, P-ALL, P-ONE or P-INHIBIT
+    // (gparser.zil:970-973).
+    int getFlags = 0;
+    // ZIL: <EQUAL? <GET <GET ,P-ITBL ,P-NC1> 0> ,W?ALL> -- the first noun
+    // clause began with the word ALL (gmain.zil:122, 129).
+    bool nc1IsAll = false;
+    // ZIL: <BAND <GETB ,P-SYNTAX ,P-SBITS> ,P-SONUMS> -- number of objects
+    // the matched syntax expects (gmain.zil:83); -1 when unknown.
+    int objectsExpected = -1;
+
+    // Legacy mirrors kept for existing tests: true / the P-PRSO table when
+    // the first noun clause was ALL.
+    bool isAll = false;
+    std::vector<ZObject*> allObjects;
+    ZObject* exceptObject = nullptr;
 };
 
 // C++23 std::expected error types
@@ -57,10 +76,6 @@ public:
     // Special command support
     void setLastCommand(const std::string& cmd);
     std::string_view getLastCommand() const;
-    void setLastObject(ZObject* obj);
-    ZObject* getLastObject() const;
-    void setLastObjects(const std::vector<ZObject*>& objs);
-    const std::vector<ZObject*>& getLastObjects() const;
     void setLastUnknownWord(const std::string& word);
     std::string_view getLastUnknownWord() const;
     void clearLastUnknownWord();
@@ -79,6 +94,7 @@ public:
     
 private:
     void initializeVerbsAndDirections();
+    void finishTables(ParsedCommand& cmd);
     void tokenize(const std::string& input, std::vector<std::string>& tokens);
     VerbId findVerb(const std::string& word) const;
     ZObject* findObject(const std::string& word);
@@ -103,6 +119,8 @@ private:
     bool isExceptKeyword(const std::string& word) const;
     bool isAgainCommand(const std::vector<std::string>& tokens) const;
     bool isOopsCommand(const std::vector<std::string>& tokens) const;
+    // ZIL: IT / THEM / HER / HIM are synonyms of the IT object
+    // (gglobals.zil:42-46); findObjects yields that object for them.
     bool isPronoun(const std::string& word) const;
     bool isKnownObjectWord(const std::string& word) const;
     std::vector<ZObject*> findAllApplicableObjects(VerbId verb) const;
@@ -116,8 +134,6 @@ private:
     
     // Special command state
     std::string lastCommand_;
-    ZObject* lastObject_ = nullptr;
-    std::vector<ZObject*> lastObjects_;
     std::string lastUnknownWord_;
     bool hadUnknownWordLastTurn_ = false;
     

@@ -1,16 +1,19 @@
 #include "core/globals.h"
 #include "systems/timer.h"
+#include "core/gglobals.h"
 #include "core/gmacros.h"
 #include "core/gmain.h"
 #include "core/object.h"
 #include "core/types.h"
 #include "parser/parser.h"
 #include "verbs/verbs.h"
+#include "world/objects.h"
 #include "world/rooms.h"
 #include <cassert>
 #include <iostream>
 #include <memory>
 #include <print>
+#include <sstream>
 
 // ZIL: Test suite for gmain.zil routines and constants
 // Source: zil/gmain.zil
@@ -322,6 +325,7 @@ void testRfatalAbortsLoopAndSkipsMEnd() {
   cmd.words = {"pray"};
   cmd.isAll = true;
   cmd.allObjects = {objA.get(), objB.get()};
+  cmd.prsoTable = cmd.allObjects;
 
   // Fatal on the first object: loop aborts, M-END skipped, P-CONT cleared.
   g.pCont = true;
@@ -443,6 +447,140 @@ void testDirectionThroughPerform() {
   std::println("✓ Direction dispatch verified against gmain.zil:79-81");
 }
 
+// ZIL: IT handling in MAIN-LOOP-1 (gmain.zil:45-64) and PERFORM (194-206)
+void testItSubstitution() {
+  std::println("Testing IT substitution and P-IT-OBJECT rules...");
+  auto &g = Globals::instance();
+  g.reset();
+  initializeAllVerbHandlers();
+
+  auto playerObj = std::make_unique<ZObject>(5401, "adventurer");
+  auto roomObj = std::make_unique<ZRoom>(5402, "Attic", "Attic desc");
+  auto elsewhere = std::make_unique<ZRoom>(5403, "Cellar", "Cellar desc");
+  auto objA = std::make_unique<ZObject>(5404, "rope");
+  auto objB = std::make_unique<ZObject>(5405, "knife");
+  auto itUnique = std::make_unique<ZObject>(ObjectIds::IT, "random object");
+  auto notHereUnique =
+      std::make_unique<ZObject>(ObjectIds::NOT_HERE_OBJECT, "such thing");
+  ZObject *itObj = itUnique.get();
+  ZObject *notHere = notHereUnique.get();
+  notHere->setAction(GGlobals::notHereObjectF);
+  g.registerObject(ObjectIds::IT, std::move(itUnique));
+  g.registerObject(ObjectIds::NOT_HERE_OBJECT, std::move(notHereUnique));
+  g.player = playerObj.get();
+  g.winner = playerObj.get();
+  g.here = roomObj.get();
+  playerObj->moveTo(roomObj.get());
+  objA->moveTo(roomObj.get());
+  objB->moveTo(roomObj.get());
+  roomObj->setFlag(ObjectFlag::ONBIT);
+  g.lit = true;
+
+  ZObject *seenPrso = nullptr;
+  ZObject *seenPrsi = nullptr;
+  int defaultCalls = 0;
+  registerVerbHandler(V_PRAY, [&]() -> int {
+    ++defaultCalls;
+    seenPrso = g.prso;
+    seenPrsi = g.prsi;
+    return M_HANDLED;
+  });
+
+  // 1. IT in P-PRSO is replaced by an accessible P-IT-OBJECT before PERFORM.
+  g.it = objA.get();
+  ParsedCommand cmd;
+  cmd.verb = V_PRAY;
+  cmd.words = {"pray", "it"};
+  cmd.prsoTable = {itObj};
+  int v = executeCommand(cmd);
+  assert(v != M_FATAL);
+  assert(seenPrso == objA.get());
+  assert(g.it == objA.get());
+
+  // 2. IT in P-PRSI is replaced first; P-PRSO's IT is then left alone and
+  //    resolved by PERFORM itself.
+  g.it = objA.get();
+  cmd.prsoTable = {objB.get()};
+  cmd.prsiTable = {itObj};
+  executeCommand(cmd);
+  assert(seenPrso == objB.get());
+  assert(seenPrsi == objA.get());
+
+  // 3. Inaccessible P-IT-OBJECT: "I don't see what you are referring to."
+  //    and RFATAL, so M-END is skipped and P-CONT cleared.
+  int endCalls = 0;
+  roomObj->setRoomAction([&](int rarg) -> int {
+    if (rarg == M_END) {
+      ++endCalls;
+    }
+    return M_NOT_HANDLED;
+  });
+  objA->moveTo(elsewhere.get());
+  g.it = objA.get();
+  g.pCont = true;
+  defaultCalls = 0;
+  cmd.prsoTable = {itObj};
+  cmd.prsiTable.clear();
+  {
+    std::stringstream buf;
+    auto *old = std::cout.rdbuf(buf.rdbuf());
+    v = executeCommand(cmd);
+    std::cout.rdbuf(old);
+    assert(buf.str().find("I don't see what you are referring to.") !=
+           std::string::npos);
+  }
+  assert(v == M_FATAL);
+  assert(defaultCalls == 0);
+  assert(endCalls == 0);
+  assert(!g.pCont);
+
+  // 4. No P-IT-OBJECT at all behaves the same way.
+  g.it = nullptr;
+  {
+    std::stringstream buf;
+    auto *old = std::cout.rdbuf(buf.rdbuf());
+    v = executeCommand(cmd);
+    std::cout.rdbuf(old);
+    assert(buf.str().find("I don't see what you are referring to.") !=
+           std::string::npos);
+  }
+  assert(v == M_FATAL);
+
+  // 5. P-IT-OBJECT is set to PRSO, except for WALK and when the previous
+  //    PRSI was IT (gmain.zil:202-203).
+  g.it = nullptr;
+  g.prsi = nullptr;
+  perform(V_PRAY, objB.get(), nullptr);
+  assert(g.it == objB.get());
+  g.it = nullptr;
+  registerVerbHandler(V_WALK, []() -> int { return M_HANDLED; });
+  perform(V_WALK, objB.get(), nullptr);
+  registerVerbHandler(V_WALK, Verbs::vWalk);
+  assert(g.it == nullptr);
+  g.it = nullptr;
+  g.prsi = itObj;
+  perform(V_PRAY, objB.get(), nullptr);
+  assert(g.it == nullptr);
+
+  // 6. NOT-HERE-OBJECT as PRSO runs NOT-HERE-OBJECT-F instead of the verb.
+  defaultCalls = 0;
+  g.pNc1 = {"lamp"};
+  cmd.prsoTable = {notHere};
+  {
+    std::stringstream buf;
+    auto *old = std::cout.rdbuf(buf.rdbuf());
+    v = executeCommand(cmd);
+    std::cout.rdbuf(old);
+    assert(buf.str().find("You can't see any lamp here!") !=
+           std::string::npos);
+  }
+  assert(defaultCalls == 0);
+  assert(v != M_FATAL); // V is the room's M-END value afterwards (gmain.zil:154)
+
+  registerVerbHandler(V_PRAY, nullptr);
+  std::println("✓ IT handling verified against gmain.zil:45-64, 194-206");
+}
+
 void testMetaVerbs() {
   std::println("Testing meta-verb recognition...");
 
@@ -509,6 +647,7 @@ int main() {
   testRoomMBegStopsDispatch();
   testRfatalAbortsLoopAndSkipsMEnd();
   testDirectionThroughPerform();
+  testItSubstitution();
   testMetaVerbs();
   testMovesCountedOnlyByClocker();
 

@@ -1372,16 +1372,27 @@ TEST(SpecialFeaturesOopsWithoutError) {
 
 TEST(SpecialFeaturesPronounIt) {
     auto& g = Globals::instance();
-    
+
     // Create test room
     ZRoom testRoom(100, "Test Room", "A test room.");
     g.here = &testRoom;
-    
+
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
     g.registerObject(999, std::move(player));
-    
+
+    // ZIL: the IT object lives in GLOBAL-OBJECTS with synonyms IT THEM HER
+    // HIM (gglobals.zil:42-46); the parser finds it like any other object and
+    // MAIN-LOOP-1 / PERFORM substitute P-IT-OBJECT (gmain.zil:45-64, 194-203).
+    auto itUnique = std::make_unique<ZObject>(ObjectIds::IT, "random object");
+    itUnique->addSynonym("it");
+    itUnique->addSynonym("them");
+    itUnique->addSynonym("her");
+    itUnique->addSynonym("him");
+    ZObject* itPtr = itUnique.get();
+    g.registerObject(ObjectIds::IT, std::move(itUnique));
+
     // Create lamp object
     auto lamp = std::make_unique<ZObject>(1, "lamp");
     lamp->addSynonym("lamp");
@@ -1389,98 +1400,113 @@ TEST(SpecialFeaturesPronounIt) {
     lamp->moveTo(&testRoom);
     ZObject* lampPtr = lamp.get();
     g.registerObject(1, std::move(lamp));
-    
+
     // Create parser
     Parser parser;
-    
+
     // Parse command that mentions lamp
     ParsedCommand cmd1 = parser.parse("examine lamp");
     ASSERT_EQ(cmd1.verb, V_EXAMINE);
     ASSERT_EQ(cmd1.directObj, lampPtr);
-    
-    // Test "IT" pronoun
+
+    // "IT" parses to the IT object; the substitution is MAIN-LOOP-1's job.
     ParsedCommand cmd2 = parser.parse("take it");
     ASSERT_EQ(cmd2.verb, V_TAKE);
-    ASSERT_EQ(cmd2.directObj, lampPtr);  // "it" should refer to lamp
-    
+    ASSERT_EQ(cmd2.directObj, itPtr);
+    ASSERT_EQ(cmd2.prsoTable.size(), 1u);
+    ASSERT_EQ(cmd2.prsoTable[0], itPtr);
+
+    // HER / HIM are synonyms of the same object.
+    ParsedCommand cmd3 = parser.parse("examine her");
+    ASSERT_EQ(cmd3.directObj, itPtr);
+    ParsedCommand cmd4 = parser.parse("examine him");
+    ASSERT_EQ(cmd4.directObj, itPtr);
+
     // Cleanup
     g.reset();
 }
 
 TEST(SpecialFeaturesPronounThem) {
     auto& g = Globals::instance();
-    
+
     // Create test room
     ZRoom testRoom(100, "Test Room", "A test room.");
     g.here = &testRoom;
-    
+
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
     g.registerObject(999, std::move(player));
-    
+
+    auto itUnique = std::make_unique<ZObject>(ObjectIds::IT, "random object");
+    itUnique->addSynonym("it");
+    itUnique->addSynonym("them");
+    ZObject* itPtr = itUnique.get();
+    g.registerObject(ObjectIds::IT, std::move(itUnique));
+
     // Create multiple objects
     auto lamp = std::make_unique<ZObject>(1, "lamp");
     lamp->addSynonym("lamp");
     lamp->setFlag(ObjectFlag::TAKEBIT);
     lamp->moveTo(&testRoom);
-    ZObject* lampPtr = lamp.get();
     g.registerObject(1, std::move(lamp));
-    
+
     auto knife = std::make_unique<ZObject>(2, "knife");
     knife->addSynonym("knife");
     knife->setFlag(ObjectFlag::TAKEBIT);
     knife->moveTo(&testRoom);
-    ZObject* knifePtr = knife.get();
     g.registerObject(2, std::move(knife));
-    
+
     // Create parser
     Parser parser;
-    
-    // Parse "TAKE ALL" to establish multiple objects
+
     ParsedCommand cmd1 = parser.parse("take all");
     ASSERT_TRUE(cmd1.isAll);
     ASSERT_TRUE(cmd1.allObjects.size() >= 2);
-    
-    // Move objects to inventory for DROP test
-    lampPtr->moveTo(g.winner);
-    knifePtr->moveTo(g.winner);
-    
-    // Test "THEM" pronoun
+
+    // ZIL: THEM is a synonym of the single IT object, not a list
+    // (gglobals.zil:44).
     ParsedCommand cmd2 = parser.parse("drop them");
     ASSERT_EQ(cmd2.verb, V_DROP);
-    ASSERT_TRUE(cmd2.isAll);
-    ASSERT_TRUE(cmd2.allObjects.size() >= 2);
-    
+    ASSERT_FALSE(cmd2.isAll);
+    ASSERT_EQ(cmd2.directObj, itPtr);
+
     // Cleanup
     g.reset();
 }
 
 TEST(SpecialFeaturesPronounWithoutReference) {
     auto& g = Globals::instance();
-    
+
     // Create test room
     ZRoom testRoom(100, "Test Room", "A test room.");
     g.here = &testRoom;
-    
+
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
     g.registerObject(999, std::move(player));
-    
+
+    auto itUnique = std::make_unique<ZObject>(ObjectIds::IT, "random object");
+    itUnique->addSynonym("it");
+    itUnique->addSynonym("them");
+    ZObject* itPtr = itUnique.get();
+    g.registerObject(ObjectIds::IT, std::move(itUnique));
+
     // Create parser
     Parser parser;
-    
-    // Test "IT" without previous object reference
+
+    // ZIL: the parser always yields the IT object; PERFORM then prints
+    // "I don't see what you are referring to." when P-IT-OBJECT is not
+    // accessible (gmain.zil:194-197), which gmain_tests covers.
     ParsedCommand cmd1 = parser.parse("take it");
     ASSERT_EQ(cmd1.verb, V_TAKE);
-    ASSERT_EQ(cmd1.directObj, nullptr);  // No object to refer to
-    
-    // Test "THEM" without previous objects reference
+    ASSERT_EQ(cmd1.directObj, itPtr);
+
     ParsedCommand cmd2 = parser.parse("drop them");
     ASSERT_EQ(cmd2.verb, V_DROP);
-    // Should either have no objects or handle gracefully
-    
+    ASSERT_EQ(cmd2.directObj, itPtr);
+
     // Cleanup
     g.reset();
 }
