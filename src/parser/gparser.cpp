@@ -813,14 +813,38 @@ bool parser() {
   }
   wrd = s.lexv.e[ptr].w;
   if (wrd && wrd == W("oops")) {
-    // Ported in B3 (OOPS)
+    // <COND (<EQUAL? <GET ,P-LEXV <+ .PTR ,P-LEXELEN>> ,W?PERIOD ,W?COMMA> ...>
+    {
+      const DictWord *next = s.lexv.e[ptr + 1].w;
+      if (next && (next == W(".") || next == W(","))) {
+        ptr += 1;
+        s.len -= 1;
+      }
+    }
     if (!(s.len > 1)) {
       printLine("I can't help your clumsiness.");
       return false;
+    } else if (s.oops.ptr >= 0) {
+      const DictWord *next = s.lexv.e[ptr + 1].w;
+      if (s.len > 2 && next && next == W("\"")) {
+        printLine("Sorry, you can't correct mistakes in quoted text.");
+        return false;
+      } else if (s.len > 2) {
+        printLine("Warning: only the first word after OOPS is used.");
+      }
+      // <PUT ,AGAIN-LEXV <GET ,OOPS-TABLE ,O-PTR> <GET ,P-LEXV <+ .PTR ,P-LEXELEN>>>
+      s.againLexv.e[s.oops.ptr].w = next;
+      g.winner = owinner; // "maybe fix oops vs. chars.?"
+      inbufAdd(s.lexv.e[ptr + 1].text, s.oops.ptr);
+      stuff(s.againLexv, s.lexv);
+      s.len = s.lexv.count;
+      ptr = s.oops.start;
+      inbufStuff(s.oopsInbuf, s.inbuf);
+    } else {
+      s.oops.end = false;
+      printLine("There was no word to replace!");
+      return false;
     }
-    s.oops.end = false;
-    printLine("There was no word to replace!");
-    return false;
   } else {
     if (!(wrd && (wrd == W("again") || wrd == W("g")))) g.pNumber = 0;
     s.oops.end = false;

@@ -460,6 +460,55 @@ void testParserMessages() {
   std::println("✓ messages");
 }
 
+// ---------------------------------------------------------------------------
+// B3: OOPS
+// ---------------------------------------------------------------------------
+
+void testOops() {
+  std::println("Testing OOPS...");
+  setupWorld();
+  auto &g = Globals::instance();
+  auto &s = GParser::state();
+  // Nothing to correct yet
+  auto r = runParser("oops open");
+  assert(!r.first && r.second == "\n>There was no word to replace!\n");
+  // An unknown word, then a correction that re-parses the sentence
+  r = runParser("frobnicate the mailbox");
+  assert(!r.first && s.oops.ptr == 0);
+  r = runParser("oops open");
+  assert(r.second == "\n>"); // no complaint; the corrected sentence parsed
+  assert(s.itbl.verb == "open" && s.ncn == 1);
+  assert(s.lexv.e[0].text == "open" && s.lexv.e[0].w == GParser::lookupWord("open"));
+  assert(s.itbl.nc1 == GParser::Ptr::lex(2)); // "the" skipped
+  assert(s.inbuf.starts_with("frobnicate the mailboxopen"));
+  assert(s.oops.ptr == -1);
+  // A bare OOPS
+  r = runParser("frobnicate mailbox");
+  r = runParser("oops");
+  assert(!r.first && r.second == "\n>I can't help your clumsiness.\n");
+  // A comma after OOPS is skipped; extra words only warn
+  r = runParser("frobnicate mailbox");
+  r = runParser("oops, open the box");
+  assert(r.second == "\n>Warning: only the first word after OOPS is used.\n");
+  assert(s.itbl.verb == "open");
+  // Unknown word in the middle of the sentence
+  r = runParser("open frob");
+  assert(s.oops.ptr == 1);
+  r = runParser("oops mailbox");
+  assert(s.itbl.verb == "open" && s.itbl.nc1 == GParser::Ptr::lex(1));
+  assert(s.lexv.e[1].text == "mailbox" && s.lexv.e[1].w == GParser::lookupWord("mailbox"));
+  // Corrections inside quotes are refused
+  r = runParser("open frob");
+  r = runParser("oops \"mailbox\"");
+  assert(!r.first && r.second == "\n>Sorry, you can't correct mistakes in quoted text.\n");
+  // Correcting to another unknown word complains about the new word
+  r = runParser("open frob");
+  r = runParser("oops blorp");
+  assert(!r.first && r.second == "\n>I don't know the word \"blorp\".\n");
+  (void)g;
+  std::println("✓ OOPS");
+}
+
 } // namespace
 
 int main() {
@@ -475,6 +524,7 @@ int main() {
   testParserDirections();
   testParserClauses();
   testParserMessages();
+  testOops();
   std::println("All gparser tests passed.");
   return 0;
 }

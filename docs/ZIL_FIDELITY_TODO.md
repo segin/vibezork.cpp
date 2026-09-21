@@ -10,7 +10,7 @@ test, build, commit, push; then mark `[x]` and update the counters. Every routin
 ported carries `// ZIL:` and `// Source: <file>:<lines>` comments. Never simplify
 away a ZIL behaviour.
 
-Progress: 14/74 (19%)
+Progress: 15/74 (20%)
 
 ## Phase A: engine foundations (src/core, src/systems/timer)
 
@@ -31,7 +31,7 @@ Progress: 14/74 (19%)
 
 - [x] B1 Lexer per PARSER/READ: P-INBUF 120 bytes, P-LEXV 59 entries, dictionary built from GSyntax tables plus object SYNONYM/ADJECTIVE words with 6-character truncation, WORD-PRINT echoing the typed word (gparser.zil:109-380, 658-663)
 - [x] B2 CLAUSE, punctuation, THEN/AND/"."/"," splitting, P-CONT continuation, "dir then"/"dir, ..." rewrites, TO-after-TELL quote, leading-THEN rules, "There were too many nouns in that sentence.", "Please consult your manual..." (gparser.zil:139-146, 217-368, 440-510)
-- [ ] B3 OOPS: all messages, INBUF-STUFF/INBUF-ADD splice, first-word-only warning (gparser.zil:177-206, 402-428)
+- [x] B3 OOPS: all messages, INBUF-STUFF/INBUF-ADD splice, first-word-only warning (gparser.zil:177-206, 402-428)
 - [ ] B4 AGAIN/G: "Beg pardon?", "It's difficult to repeat fragments.", "That would just repeat a mistake.", "AGAIN, x" via RESERVE-LEXV, P-OTBL restore, STUFF 29-entry limit (gparser.zil:132-138, 211-250, 387-400)
 - [ ] B5 SYNTAX-CHECK, GWIM (incl. the FIND RMUNGBIT no-object idiom and "(the X)"/"(with your hands)" echoes), ORPHAN, ORPHAN-MERGE, ACLAUSE-WIN/NCLAUSE-WIN, CANT-ORPHAN (gparser.zil:543-655, 707-926)
 - [ ] B6 SNARF-OBJECTS, SNARFEM, BUT-MERGE, GET-OBJECT two-pass search with the TRANSBIT trick, DO-SL/SEARCH-LIST with syntax scope bits, OBJ-FOUND, "(How about the X?)", "There seems to be a noun missing in that sentence!", "It's too dark to see!" (gparser.zil:928-1140, 1202-1243). Oracle check: at West of House "take all except mailbox" prints "There's nothing here you can take." (dfrotz, R119), which the source reading of BUT-MERGE (empty P-PRSO -> zero-object branch) does not predict; reproduce whatever the verbatim port yields and compare
