@@ -839,6 +839,75 @@ void testGlobalCheckAndWhichPrint() {
   std::println("✓ GLOBAL-CHECK");
 }
 
+// ---------------------------------------------------------------------------
+// B8: MANY-CHECK, TAKE-CHECK, ITAKE-CHECK
+// ---------------------------------------------------------------------------
+
+void testManyAndTakeCheck() {
+  std::println("Testing MANY-CHECK / TAKE-CHECK / ITAKE-CHECK...");
+  setupWorld();
+  auto &g = Globals::instance();
+  auto &s = GParser::state();
+  ZObject *mailbox = g.getObject(ObjectIds::MAILBOX);
+  ZObject *leaflet = g.getObject(ObjectIds::ADVERTISEMENT);
+  ZObject *itObj = g.getObject(ObjectIds::IT);
+  mailbox->setFlag(ObjectFlag::OPENBIT);
+
+  // MANY is allowed for TAKE and EXAMINE, not for OPEN
+  auto r = runParser("take leaflet and mailbox");
+  assert(r.first && s.prso.size() == 2);
+  r = runParser("open leaflet and mailbox");
+  assert(!r.first && r.second == "\n>You can't use multiple direct objects with \"open\".\n");
+  r = runParser("put leaflet in mailbox and mailbox");
+  assert(!r.first && r.second == "\n>You can't use multiple indirect objects with \"put\".\n");
+
+  // TAKE bit: READ takes the leaflet first and says so
+  assert(leaflet->getLocation() == mailbox);
+  r = runParser("read leaflet");
+  assert(r.first && r.second == "\n>(Taken)\n");
+  assert(leaflet->getLocation() == g.player);
+  // Already held: nothing to do
+  r = runParser("read leaflet");
+  assert(r.first && r.second == "\n>");
+
+  // HAVE bit without TAKE: DROP demands possession
+  leaflet->moveTo(mailbox);
+  r = runParser("drop leaflet");
+  assert(!r.first && r.second == "\n>You don't have the leaflet.\n");
+  r = runParser("drop lamp");
+  assert(!r.first && r.second == "\n>You don't have that!\n");
+  // TRYTAKEBIT objects are never taken implicitly
+  r = runParser("drop mailbox");
+  assert(!r.first && r.second == "\n>You don't have the small mailbox.\n");
+
+  // IT: inaccessible P-IT-OBJECT
+  g.it = nullptr;
+  r = runParser("drop it");
+  assert(!r.first && r.second == "\n>I don't see what you're referring to.\n");
+  leaflet->moveTo(g.player);
+  g.it = leaflet;
+  r = runParser("drop it");
+  assert(r.first && s.prso.size() == 1 && s.prso[0] == itObj);
+
+  // A non-player WINNER never takes and never complains
+  ZObject *troll = g.getObject(ObjectIds::TROLL);
+  leaflet->moveTo(mailbox);
+  GParser::read("tell troll \"read leaflet");
+  g.pCont = 3;
+  s.lexv.count = 2;
+  g.winner = troll;
+  g.quoteFlag = true;
+  {
+    OutputCapture cap;
+    bool won = GParser::parser();
+    assert(won && cap.str().empty());
+    assert(leaflet->getLocation() == mailbox);
+  }
+  g.winner = g.player;
+  g.quoteFlag = false;
+  std::println("✓ TAKE-CHECK");
+}
+
 } // namespace
 
 int main() {
@@ -859,6 +928,7 @@ int main() {
   testSyntaxCheckAndOrphan();
   testGetObject();
   testGlobalCheckAndWhichPrint();
+  testManyAndTakeCheck();
   std::println("All gparser tests passed.");
   return 0;
 }

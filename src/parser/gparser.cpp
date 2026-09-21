@@ -625,9 +625,6 @@ void syntaxFound(const Syntax *syn) {
   state().syntax = syn;
   Globals::instance().prsa = syn ? syn->action : 0;
 }
-bool takeCheck() { return true; }
-bool itakeCheck(std::vector<ZObject *> &, int) { return true; }
-bool manyCheck() { return true; }
 
 
 // ============================================================================
@@ -1561,6 +1558,97 @@ void globalCheck(std::vector<ZObject *> &tbl) {
       doSl(g.getObject(ObjectIds::ROOMS), 1, 1);
     }
   }
+}
+
+
+// ============================================================================
+// TAKE-CHECK, ITAKE-CHECK, MANY-CHECK (gparser.zil:1244-1313)
+// ============================================================================
+
+// ZIL: <ROUTINE TAKE-CHECK () ...> (gparser.zil:1244-1246)
+bool takeCheck() {
+  auto &s = state();
+  int loc1 = s.syntax ? s.syntax->loc1 : 0;
+  int loc2 = s.syntax ? s.syntax->loc2 : 0;
+  return itakeCheck(s.prso, loc1) && itakeCheck(s.prsi, loc2);
+}
+
+// ZIL: <ROUTINE ITAKE-CHECK (TBL IBITS ...> (gparser.zil:1248-1292)
+bool itakeCheck(std::vector<ZObject *> &tbl, int ibits) {
+  auto &g = Globals::instance();
+  int ptr = static_cast<int>(tbl.size());
+  if (ptr != 0 && ((ibits & SHAVE) || (ibits & STAKE))) {
+    ZObject *itObj = g.getObject(ObjectIds::IT);
+    ZObject *adventurer = g.getObject(ObjectIds::ADVENTURER);
+    while (true) {
+      if (--ptr < 0) return true;
+      ZObject *obj = tbl[ptr];
+      if (obj && obj == itObj) {
+        if (!isAccessible(g.it)) {
+          printLine("I don't see what you're referring to.");
+          return false;
+        }
+        obj = g.it;
+      }
+      if (obj && !Verbs::isHeld(obj) &&
+          !(obj->getId() == ObjectIds::HANDS || obj->getId() == ObjectIds::ME)) {
+        g.prso = obj;
+        bool taken;
+        if (obj->hasFlag(ObjectFlag::TRYTAKEBIT)) {
+          taken = true;
+        } else if (g.winner != adventurer) {
+          taken = false;
+        } else if ((ibits & STAKE) && static_cast<int>(Verbs::iTake(false)) == 1) {
+          // <EQUAL? <ITAKE <>> T>: only a plain true counts as taken
+          taken = false;
+        } else {
+          taken = true;
+        }
+        if (taken && (ibits & SHAVE) && g.winner == adventurer) {
+          if (obj->getId() == ObjectIds::NOT_HERE_OBJECT) {
+            printLine("You don't have that!");
+            return false;
+          }
+          print("You don't have the ");
+          printDesc(obj);
+          printLine(".");
+          return false;
+        } else if (!taken && g.winner == adventurer) {
+          printLine("(Taken)");
+        }
+      }
+    }
+  }
+  return true;
+}
+
+// ZIL: <ROUTINE MANY-CHECK () ...> (gparser.zil:1294-1313)
+bool manyCheck() {
+  auto &g = Globals::instance();
+  auto &s = state();
+  int loss = 0;
+  int loc1 = s.syntax ? s.syntax->loc1 : 0;
+  int loc2 = s.syntax ? s.syntax->loc2 : 0;
+  if (s.prso.size() > 1 && !(loc1 & SMANY)) {
+    loss = 1;
+  } else if (s.prsi.size() > 1 && !(loc2 & SMANY)) {
+    loss = 2;
+  }
+  if (loss) {
+    print("You can't use multiple ");
+    if (loss == 2) print("in");
+    print("direct objects with \"");
+    if (!s.itbl.verbn) {
+      print("tell");
+    } else if (g.pOflag || g.pMerged) {
+      if (s.vtbl.word) print(s.vtbl.word->key);
+    } else {
+      wordPrint(s.vtbl.text);
+    }
+    printLine("\".");
+    return false;
+  }
+  return true;
 }
 
 } // namespace GParser

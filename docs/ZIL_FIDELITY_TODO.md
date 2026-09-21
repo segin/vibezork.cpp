@@ -10,7 +10,7 @@ test, build, commit, push; then mark `[x]` and update the counters. Every routin
 ported carries `// ZIL:` and `// Source: <file>:<lines>` comments. Never simplify
 away a ZIL behaviour.
 
-Progress: 19/74 (26%)
+Progress: 20/74 (27%)
 
 ## Phase A: engine foundations (src/core, src/systems/timer)
 
@@ -36,7 +36,7 @@ Progress: 19/74 (26%)
 - [x] B5 SYNTAX-CHECK, GWIM (incl. the FIND RMUNGBIT no-object idiom and "(the X)"/"(with your hands)" echoes), ORPHAN, ORPHAN-MERGE, ACLAUSE-WIN/NCLAUSE-WIN, CANT-ORPHAN (gparser.zil:543-655, 707-926)
 - [x] B6 SNARF-OBJECTS, SNARFEM, BUT-MERGE, GET-OBJECT two-pass search with the TRANSBIT trick, DO-SL/SEARCH-LIST with syntax scope bits, OBJ-FOUND, "(How about the X?)", "There seems to be a noun missing in that sentence!", "It's too dark to see!" (gparser.zil:928-1140, 1202-1243). (Oracle note resolved: "take all except mailbox" at West of House leaves the NDESCBIT front door in P-PRSO, which the TAKE-ALL rule skips, hence "There's nothing here you can take."; with nothing left, e.g. "drop all except leaflet", the game prints "It's not clear what you're referring to." as the source predicts)
 - [x] B7 GLOBAL-CHECK with pseudo objects (PSEUDO-OBJECT action rewrite) and the ROOMS-only-for-LOOK-INSIDE/SEARCH/EXAMINE rule; WHICH-PRINT single-line question answered by orphaning (gparser.zil:1146-1200)
-- [ ] B8 MANY-CHECK, TAKE-CHECK, ITAKE-CHECK with "(Taken)", "You don't have the X.", "You don't have that!", HANDS/ME exemptions (gparser.zil:1244-1313)
+- [x] B8 MANY-CHECK, TAKE-CHECK, ITAKE-CHECK with "(Taken)", "You don't have the X.", "You don't have that!", HANDS/ME exemptions (gparser.zil:1244-1313)
 - [ ] B9 NUMBER? with all rejection rules and W?INTNUM substitution; INTNUM object (gparser.zil:512-534)
 - [ ] B10 LIT? via the object search with P-GWIMBIT=ONBIT, THIS-IT? byte adjective matching, ACCESSIBLE?/META-LOC, ALWAYS-LIT (gparser.zil:1315-1407)
 - [ ] B11 Wire GParser/GSyntax as the runtime parser; delete the hand-typed Parser vocabulary, VerbRegistry duplicates, numbered disambiguation menu, INHIBIT flag, "everything", GWIMBIT auto-select, extra prepositions, and every invented parser message (parser.cpp, verb_registry.cpp)
