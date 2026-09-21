@@ -1,5 +1,6 @@
 #include "core/gglobals.h"
 #include "core/globals.h"
+#include "world/dungeon.h"
 #include "core/gmacros.h"
 #include "core/io.h"
 #include "parser/gparser.h"
@@ -779,32 +780,6 @@ bool bottleAction() {
   return false;
 }
 
-// ZIL: RANDOM TABLES FOR WALK-AROUND (1dungeon.zil:2620-2633)
-namespace WalkAroundTables {
-    inline constexpr ObjectId HOUSE_AROUND[] = {
-        RoomIds::WEST_OF_HOUSE, RoomIds::NORTH_OF_HOUSE,
-        RoomIds::EAST_OF_HOUSE, RoomIds::SOUTH_OF_HOUSE,
-        RoomIds::WEST_OF_HOUSE
-    };
-
-    inline constexpr ObjectId FOREST_AROUND[] = {
-        RoomIds::FOREST_1, RoomIds::FOREST_2, RoomIds::FOREST_3,
-        RoomIds::FOREST_PATH, RoomIds::CLEARING, RoomIds::FOREST_1
-    };
-
-    inline constexpr ObjectId IN_HOUSE_AROUND[] = {
-        RoomIds::LIVING_ROOM, RoomIds::KITCHEN, RoomIds::ATTIC, RoomIds::KITCHEN
-    };
-
-    inline constexpr ObjectId ABOVE_GROUND[] = {
-        RoomIds::WEST_OF_HOUSE, RoomIds::NORTH_OF_HOUSE,
-        RoomIds::EAST_OF_HOUSE, RoomIds::SOUTH_OF_HOUSE,
-        RoomIds::FOREST_1, RoomIds::FOREST_2, RoomIds::FOREST_3,
-        RoomIds::FOREST_PATH, RoomIds::CLEARING, RoomIds::GRATING_CLEARING,
-        RoomIds::CANYON_VIEW
-    };
-}
-
 // ZIL: <ROUTINE GO-NEXT (TBL) ...> (1actions.zil:131-134)
 inline bool goNext(std::span<const ObjectId> tbl) {
     auto& g = Globals::instance();
@@ -840,7 +815,7 @@ bool whiteHouseAction() {
       return RTRUE;
     }
     if (g.prsa == V_WALK_AROUND) {
-      goNext(WalkAroundTables::IN_HOUSE_AROUND);
+      goNext(Dungeon::inHouseAround());
       return RTRUE;
     }
   } else if (hereId != RoomIds::EAST_OF_HOUSE && hereId != RoomIds::WEST_OF_HOUSE &&
@@ -864,7 +839,7 @@ bool whiteHouseAction() {
   }
 
   if (g.prsa == V_WALK_AROUND) {
-    goNext(WalkAroundTables::HOUSE_AROUND);
+    goNext(Dungeon::houseAround());
     return RTRUE;
   }
 
@@ -931,7 +906,7 @@ bool forestAction() {
       return RTRUE;
     }
 
-    if (!goNext(WalkAroundTables::FOREST_AROUND)) {
+    if (!goNext(Dungeon::forestAround())) {
       printLine("You aren't even in the forest.");
     }
     return RTRUE;

@@ -36,29 +36,29 @@ TEST(DungeonConstants_ScoreMaxAndFalseFlag) {
 
 TEST(DungeonTables_WalkAroundTables) {
   // HOUSE_AROUND: WEST, NORTH, EAST, SOUTH, WEST (1dungeon.zil:2620)
-  ASSERT_EQ(Dungeon::HOUSE_AROUND[0], ROOM_WEST_OF_HOUSE);
-  ASSERT_EQ(Dungeon::HOUSE_AROUND[1], ROOM_NORTH_OF_HOUSE);
-  ASSERT_EQ(Dungeon::HOUSE_AROUND[2], ROOM_EAST_OF_HOUSE);
-  ASSERT_EQ(Dungeon::HOUSE_AROUND[3], ROOM_SOUTH_OF_HOUSE);
-  ASSERT_EQ(Dungeon::HOUSE_AROUND[4], ROOM_WEST_OF_HOUSE);
+  ASSERT_EQ(Dungeon::houseAround()[0], ROOM_WEST_OF_HOUSE);
+  ASSERT_EQ(Dungeon::houseAround()[1], ROOM_NORTH_OF_HOUSE);
+  ASSERT_EQ(Dungeon::houseAround()[2], ROOM_EAST_OF_HOUSE);
+  ASSERT_EQ(Dungeon::houseAround()[3], ROOM_SOUTH_OF_HOUSE);
+  ASSERT_EQ(Dungeon::houseAround()[4], ROOM_WEST_OF_HOUSE);
 
   // FOREST_AROUND: FOREST_1, FOREST_2, FOREST_3, FOREST_PATH, CLEARING, FOREST_1 (1dungeon.zil:2625)
-  ASSERT_EQ(Dungeon::FOREST_AROUND[0], RoomIds::FOREST_1);
-  ASSERT_EQ(Dungeon::FOREST_AROUND[1], RoomIds::FOREST_2);
-  ASSERT_EQ(Dungeon::FOREST_AROUND[2], RoomIds::FOREST_3);
-  ASSERT_EQ(Dungeon::FOREST_AROUND[3], RoomIds::FOREST_PATH);
-  ASSERT_EQ(Dungeon::FOREST_AROUND[4], RoomIds::CLEARING);
-  ASSERT_EQ(Dungeon::FOREST_AROUND[5], RoomIds::FOREST_1);
+  ASSERT_EQ(Dungeon::forestAround()[0], RoomIds::FOREST_1);
+  ASSERT_EQ(Dungeon::forestAround()[1], RoomIds::FOREST_2);
+  ASSERT_EQ(Dungeon::forestAround()[2], RoomIds::FOREST_3);
+  ASSERT_EQ(Dungeon::forestAround()[3], RoomIds::FOREST_PATH);
+  ASSERT_EQ(Dungeon::forestAround()[4], RoomIds::CLEARING);
+  ASSERT_EQ(Dungeon::forestAround()[5], RoomIds::FOREST_1);
 
   // IN_HOUSE_AROUND: LIVING_ROOM, KITCHEN, ATTIC, KITCHEN (1dungeon.zil:2629)
-  ASSERT_EQ(Dungeon::IN_HOUSE_AROUND[0], RoomIds::LIVING_ROOM);
-  ASSERT_EQ(Dungeon::IN_HOUSE_AROUND[1], RoomIds::KITCHEN);
-  ASSERT_EQ(Dungeon::IN_HOUSE_AROUND[2], RoomIds::ATTIC);
-  ASSERT_EQ(Dungeon::IN_HOUSE_AROUND[3], RoomIds::KITCHEN);
+  ASSERT_EQ(Dungeon::inHouseAround()[0], RoomIds::LIVING_ROOM);
+  ASSERT_EQ(Dungeon::inHouseAround()[1], RoomIds::KITCHEN);
+  ASSERT_EQ(Dungeon::inHouseAround()[2], RoomIds::ATTIC);
+  ASSERT_EQ(Dungeon::inHouseAround()[3], RoomIds::KITCHEN);
 
   // ABOVE_GROUND: 11 rooms (1dungeon.zil:2631)
-  ASSERT_EQ(Dungeon::ABOVE_GROUND[0], ROOM_WEST_OF_HOUSE);
-  ASSERT_EQ(Dungeon::ABOVE_GROUND[10], RoomIds::CANYON_VIEW);
+  ASSERT_EQ(Dungeon::aboveGround()[0], ROOM_WEST_OF_HOUSE);
+  ASSERT_EQ(Dungeon::aboveGround()[10], RoomIds::CANYON_VIEW);
 }
 
 // =============================================================================

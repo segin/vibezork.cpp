@@ -10,7 +10,7 @@ test, build, commit, push; then mark `[x]` and update the counters. Every routin
 ported carries `// ZIL:` and `// Source: <file>:<lines>` comments. Never simplify
 away a ZIL behaviour.
 
-Progress: 27/74 (36%)
+Progress: 28/74 (38%)
 
 ## Phase A: engine foundations (src/core, src/systems/timer)
 
@@ -64,7 +64,7 @@ Progress: 27/74 (36%)
 - [x] D1 All 110 rooms regenerated from 1dungeon.zil: DESC, LDESC, every exit form (UEXIT/NEXIT string/CEXIT flag/DEXIT door/FEXIT PER), FLAGS, VALUE, ACTION, GLOBAL lists, PSEUDO clauses (docs/audit/world_data_audit.md)
 - [x] D2 All 140 objects regenerated from 1dungeon.zil and gglobals.zil: IN, SYNONYM/ADJECTIVE with truncations, DESC, FDESC, LDESC, TEXT, FLAGS, SIZE, CAPACITY, VALUE, TVALUE, STRENGTH, ACTION, DESCFCN; add BAT, KITCHEN-TABLE, ATTIC-TABLE, LEAK, MACHINE-SWITCH, CONTROL-PANEL; remove "trophy", duplicate bag of coins, "window"
 - [x] D3 Delete the dead builder-style world files (rooms_*.cpp, treasures.cpp, containers.cpp, scenery.cpp, npcs.cpp, tools.cpp, readables.cpp, special_objects.cpp data parts). The invented state globals stay for now: every one is still read by live code that phases F and G own (lampBattery/matchCount by the lamp and match systems, rugMoved/gateFlag/gatesOpen/waterLevel/grunlock/grateRevealed/buoyFlag by the trap door, dam, grate and river handlers)
-- [ ] D4 Walk-around tables, DIRECTIONS incl. LAND, conditional-exit flag globals, SCORE-MAX, and a data-level test that diffs the live world against a parse of 1dungeon.zil
+- [x] D4 Walk-around tables, DIRECTIONS incl. LAND, conditional-exit flag globals, SCORE-MAX, and a data-level test that diffs the live world against a parse of 1dungeon.zil
 
 ## Phase E: melee, NPCs, death (1actions.zil:622-769, 1491-2177, 3236-3990, 4046-4177)
 
