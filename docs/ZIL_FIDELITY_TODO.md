@@ -10,7 +10,7 @@ test, build, commit, push; then mark `[x]` and update the counters. Every routin
 ported carries `// ZIL:` and `// Source: <file>:<lines>` comments. Never simplify
 away a ZIL behaviour.
 
-Progress: 6/74 (8%)
+Progress: 7/74 (9%)
 
 ## Phase A: engine foundations (src/core, src/systems/timer)
 
@@ -20,7 +20,7 @@ Progress: 6/74 (8%)
 - [x] A4 Object model: FDESC property, VTYPE property, PROPDEF defaults SIZE 5 / CAPACITY 0 / VALUE 0 / TVALUE 0 honoured by getProperty; remove LOCKEDBIT/DEADBIT concepts (§2.15, §7.2, §7.7)
 - [x] A5 MOVES incremented only inside CLOCKER; remove ScoreSystem::moves_ duplicate (gclock.zil:50; §2.7)
 - [x] A6 CLOCKER fidelity: C-TABLE of 30 entries allocated downward and scanned from the newest, fires when tick==1 or negative, FLG only when the routine returns true, no auto-repeat, no demon concept (gclock.zil:21-60; §2.9-2.10)
-- [ ] A7 GO startup: queue I-FIGHT -1 enabled, I-SWORD -1 disabled, I-THIEF -1 enabled, I-CANDLES 40, I-LANTERN 200; DEF*-RES patch; INFLATED-BOAT VTYPE=NONLANDBIT; V-VERSION when WEST-OF-HOUSE untouched; V-LOOK (1dungeon.zil:2637-2660; §2.8)
+- [x] A7 GO startup: queue I-FIGHT -1 enabled, I-SWORD -1 disabled, I-THIEF -1 enabled, I-CANDLES 40, I-LANTERN 200; DEF*-RES patch; INFLATED-BOAT VTYPE=NONLANDBIT; V-VERSION when WEST-OF-HOUSE untouched; V-LOOK (1dungeon.zil:2637-2660; §2.8)
 - [ ] A8 Output layer: TELL does not append CRLF, no automatic inter-print spacing, source newlines inside strings become spaces, wrap at screen width like the Z-machine; prompt is ">" (io.cpp; §2.14, §2.16)
 - [ ] A9 IT: substitution in P-PRSI then P-PRSO, PERFORM's ACCESSIBLE? check with "I don't see what you are referring to." + RFATAL, P-IT-OBJECT rule with the PRSI!=IT and WALK guards; THEM/HER/HIM are IT synonyms (gmain.zil:45-64, 194-203; §2.4)
 - [ ] A10 Multi-object loop per MAIN-LOOP-1: NUM>1 without ALL, "name: " prefix, the three "multiple exceptions", P-NOT-HERE and "The [other] object[s] that you mentioned is/aren't here.", any-verb "There's nothing here you can take.", PRSO/PRSI role swap (gmain.zil:65-150; §2.5)

@@ -70,6 +70,12 @@ void candleTimerCallback() {
     }
 }
 
+bool iCandles() {
+    candleTimerCallback();
+    TimerSystem::queue("I-CANDLES", 1);
+    return false;
+}
+
 // Initialize the candle timer
 // Requirement 48: Register candle burning timer
 void initialize() {
@@ -77,13 +83,8 @@ void initialize() {
     // Fires every turn (interval = 1)
     // Repeating timer
     // Register the I-CANDLES routine in C-TABLE; GO queues it
-    // (ZIL: <QUEUE I-CANDLES 40>, 1dungeon.zil:2641). The per-turn wax body
-    // re-queues itself every turn until the CANDLE-TABLE port (TODO F2).
-    TimerSystem::interrupt("I-CANDLES", []() {
-        candleTimerCallback();
-        TimerSystem::queue("I-CANDLES", 1);
-        return false;
-    });
+    // (ZIL: <QUEUE I-CANDLES 40>, 1dungeon.zil:2641).
+    TimerSystem::interrupt("I-CANDLES", iCandles);
     
     // Check if candles exist and are lit
     auto& g = Globals::instance();

@@ -11,9 +11,12 @@
 
 namespace SwordSystem {
 
-// Initialize the sword glow timer
-// This registers the I-SWORD timer with the timer system
+// Register the I-SWORD routine in C-TABLE (GO queues it: <QUEUE I-SWORD -1>)
 void initialize();
+
+// ZIL: I-SWORD interrupt routine (1actions.zil:3851-3889); glow body
+// replaced by the TVALUE model in TODO F4
+bool iSword();
 
 // Sword glow timer callback
 // Called each turn by the timer system

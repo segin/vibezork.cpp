@@ -141,6 +141,11 @@ void updateSwordGlow() {
     }
 }
 
+bool iSword() {
+    swordTimerCallback();
+    return false;
+}
+
 // Initialize the sword timer
 // Requirement 49: Register sword glow timer
 void initialize() {
@@ -149,11 +154,8 @@ void initialize() {
     // Repeating timer
     // Register the I-SWORD routine in C-TABLE; GO queues it disabled
     // (ZIL: <QUEUE I-SWORD -1>, 1dungeon.zil:2639) and SWORD-FCN enables it
-    // on TAKE (1actions.zil:2434). Negative tick = runs every turn.
-    TimerSystem::interrupt("I-SWORD", []() {
-        swordTimerCallback();
-        return false;
-    });
+    // on TAKE (1actions.zil:2434).
+    TimerSystem::interrupt("I-SWORD", iSword);
     TimerSystem::queue("I-SWORD", -1);
 }
 

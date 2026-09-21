@@ -254,5 +254,8 @@ if(BUILD_TESTS)
 
     # Object model tests (PROPDEF defaults, FDESC, VTYPE)
     add_zork_test(ObjectModelTests object_model_tests tests/object_model_tests.cpp)
+
+    # GO tests (1dungeon.zil:2637-2661 start-up sequence, melee tables)
+    add_zork_test(GoTests go_tests tests/go_tests.cpp)
 endif()
 

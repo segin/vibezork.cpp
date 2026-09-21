@@ -135,4 +135,9 @@ inline void processCombatRound() {
     CombatManager::instance().processCombatRound();
 }
 
+// ZIL: I-FIGHT interrupt routine (queued every turn by GO, 1dungeon.zil:2638).
+// Runs a combat round while a fight is in progress; the HP model body is
+// replaced by the melee engine in TODO E2.
+bool iFight();
+
 } // namespace CombatSystem

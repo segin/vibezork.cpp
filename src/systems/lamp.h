@@ -10,9 +10,12 @@
 
 namespace LampSystem {
 
-// Initialize the lamp timer
-// This registers the I-LANTERN timer with the timer system
+// Register the I-LANTERN routine in C-TABLE (GO queues it: <QUEUE I-LANTERN 200>)
 void initialize();
+
+// ZIL: I-LANTERN interrupt routine (1actions.zil:2303-2317); the battery
+// body here re-queues itself every turn until the LAMP-TABLE port (TODO F1)
+bool iLantern();
 
 // Lamp timer callback
 // Called each turn by the timer system

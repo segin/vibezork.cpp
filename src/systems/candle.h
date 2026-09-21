@@ -11,9 +11,12 @@
 
 namespace CandleSystem {
 
-// Initialize the candle timer
-// This registers the I-CANDLES timer with the timer system
+// Register the I-CANDLES routine in C-TABLE (GO queues it: <QUEUE I-CANDLES 40>)
 void initialize();
+
+// ZIL: I-CANDLES interrupt routine (1actions.zil:2319-2324); the wax body
+// here re-queues itself every turn until the CANDLE-TABLE port (TODO F2)
+bool iCandles();
 
 // Candle timer callback
 // Called each turn by the timer system

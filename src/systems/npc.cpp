@@ -158,14 +158,13 @@ void initializeThief() {
         bag->moveTo(thief);
     }
     
-    // Register the I-THIEF routine in C-TABLE; GO queues it enabled
-    // (ZIL: <ENABLE <QUEUE I-THIEF -1>>, 1dungeon.zil:2640): every turn.
-    TimerSystem::interrupt("I-THIEF", []() {
-        thiefTimerCallback();
-        return false;
-    });
-    TimerSystem::queue("I-THIEF", -1);
-    TimerSystem::enable("I-THIEF");
+    // The I-THIEF interrupt is registered, queued and enabled by GO
+    // (ZIL: <ENABLE <QUEUE I-THIEF -1>>, 1dungeon.zil:2640).
+}
+
+bool iThief() {
+    thiefTimerCallback();
+    return false;
 }
 
 void thiefTimerCallback() {

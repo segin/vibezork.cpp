@@ -37,6 +37,10 @@ void initializeThief();
 // Thief timer callback - called by timer system
 void thiefTimerCallback();
 
+// ZIL: I-THIEF interrupt routine (1actions.zil:3890-3939), queued every turn
+// by GO (1dungeon.zil:2640); body replaced in TODO E4
+bool iThief();
+
 // Process thief actions - call each turn from main loop
 // Returns true if thief did something visible to player
 bool processThiefTurn();
