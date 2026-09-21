@@ -509,6 +509,65 @@ void testOops() {
   std::println("✓ OOPS");
 }
 
+// ---------------------------------------------------------------------------
+// B4: AGAIN / G
+// ---------------------------------------------------------------------------
+
+void testAgain() {
+  std::println("Testing AGAIN...");
+  setupWorld();
+  auto &g = Globals::instance();
+  auto &s = GParser::state();
+  // Nothing typed yet
+  auto r = runParser("again");
+  assert(!r.first && r.second == "\n>Beg pardon?\n");
+  // Repeat a direction
+  r = runParser("n");
+  g.pWon = r.first;
+  g.pWalkDir.reset();
+  r = runParser("again");
+  assert(r.first && g.pWalkDir == Direction::NORTH);
+  g.pWon = true;
+  g.pWalkDir.reset();
+  r = runParser("g");
+  assert(r.first && g.pWalkDir == Direction::NORTH);
+  // Repeating a mistake
+  r = runParser("frobnicate");
+  g.pWon = r.first;
+  r = runParser("again");
+  assert(!r.first && r.second == "\n>That would just repeat a mistake.\n");
+  // Repeating a fragment (orphaned sentence)
+  r = runParser("n");
+  g.pWon = true;
+  g.pOflag = true;
+  r = runParser("again");
+  assert(!r.first && r.second == "\n>It's difficult to repeat fragments.\n");
+  g.pOflag = false;
+  // AGAIN followed by something other than a separator
+  r = runParser("again now");
+  assert(!r.first && r.second == "\n>I couldn't understand that sentence.\n");
+  // "again then s": the remainder is parked in RESERVE-LEXV
+  r = runParser("n");
+  g.pWon = true;
+  g.pWalkDir.reset();
+  r = runParser("again then s");
+  assert(r.first && g.pWalkDir == Direction::NORTH);
+  assert(s.reservePtr == 2 && s.reserveLexv.count == 1);
+  r = runParser("");
+  assert(r.first && g.pWalkDir == Direction::SOUTH);
+  assert(r.second == "\n"); // RESERVE path: CRLF, no prompt
+  assert(s.reservePtr == -1);
+  // AGAIN after a sentence restores P-ITBL from P-OTBL and re-runs the
+  // syntax stage on the restored P-LEXV
+  runParser("open mailbox");
+  g.pWon = true;
+  GParser::read("take"); // clobber P-LEXV; AGAIN must restore it
+  r = runParser("again");
+  assert(s.itbl.verb == "open" && s.itbl.nc1 == GParser::Ptr::lex(1));
+  assert(s.lexv.e[1].text == "mailbox");
+  std::println("✓ AGAIN");
+}
+
 } // namespace
 
 int main() {
@@ -525,6 +584,7 @@ int main() {
   testParserClauses();
   testParserMessages();
   testOops();
+  testAgain();
   std::println("All gparser tests passed.");
   return 0;
 }

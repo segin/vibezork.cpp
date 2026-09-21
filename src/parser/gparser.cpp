@@ -849,10 +849,43 @@ bool parser() {
     if (!(wrd && (wrd == W("again") || wrd == W("g")))) g.pNumber = 0;
     s.oops.end = false;
   }
+  wrd = s.lexv.e[ptr].w;
   if (wrd && (wrd == W("again") || wrd == W("g"))) {
-    // Ported in B4 (AGAIN)
-    printLine("Beg pardon?");
-    return false;
+    // <COND (<ZERO? <GETB ,OOPS-INBUF 1>> ...)>: nothing was ever typed
+    if (s.oopsInbuf.empty()) {
+      printLine("Beg pardon?");
+      return false;
+    } else if (g.pOflag) {
+      printLine("It's difficult to repeat fragments.");
+      return false;
+    } else if (!g.pWon) {
+      printLine("That would just repeat a mistake.");
+      return false;
+    } else if (s.len > 1) {
+      const DictWord *next = s.lexv.e[ptr + 1].w;
+      if (next && (next == W(".") || next == W(",") || next == W("then") || next == W("and"))) {
+        ptr += 2;
+        s.lexv.count -= 2;
+      } else {
+        printLine("I couldn't understand that sentence.");
+        return false;
+      }
+    } else {
+      ptr += 1;
+      s.lexv.count -= 1;
+    }
+    if (s.lexv.count > 0) {
+      stuff(s.lexv, s.reserveLexv);
+      s.reservePtr = ptr;
+    } else {
+      s.reservePtr = -1;
+    }
+    g.winner = owinner;
+    g.pMerged = omerged;
+    inbufStuff(s.oopsInbuf, s.inbuf);
+    stuff(s.againLexv, s.lexv);
+    dir = s.againDir;
+    s.itbl = s.otbl;
   } else {
     stuff(s.lexv, s.againLexv);
     inbufStuff(s.inbuf, s.oopsInbuf);
