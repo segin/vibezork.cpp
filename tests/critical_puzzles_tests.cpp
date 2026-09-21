@@ -8,6 +8,7 @@
 #include "../src/world/objects.h"
 #include "../src/world/world.h"
 #include "../src/parser/parser.h"
+#include "../src/core/gmain.h"
 #include "../src/parser/gparser.h"
 #include "../src/systems/score.h"
 #include "../src/verbs/verbs.h"
@@ -40,13 +41,12 @@ void executeCommand(const std::string& command) {
     g.prso = cmd.directObj;
     g.prsi = cmd.indirectObj;
     
-    // Dispatch (Simplified for test)
-    if (cmd.verb == V_OPEN) Verbs::vOpen();
-    else if (cmd.verb == V_WIND) Verbs::vWind();
-    else if (cmd.verb == V_RAISE) Verbs::vRaise();
-    else if (cmd.verb == V_LOWER) Verbs::vLower();
-    else if (cmd.verb == V_TAKE) Verbs::vTake();
-    // Add others if needed
+    // Dispatch through PERFORM so object actions (EGG-OBJECT and friends)
+    // get their turn before the default verb, as they do in play
+    // (gmain.zil:211-224).
+    if (cmd.verb != 0) {
+        perform(cmd.verb, cmd.directObj, cmd.indirectObj);
+    }
 }
 
 // Print helper

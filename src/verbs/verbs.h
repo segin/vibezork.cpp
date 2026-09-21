@@ -489,7 +489,7 @@ namespace Verbs {
     void mungRoom(ZObject *room, std::string_view desc);
     void noGoTell(Direction dir);
     ZObject *otherSide(const ZObject *door);
-    void printCont(const ZObject *obj, bool checkTrans = true);
+    bool printCont(const ZObject *obj, bool checkTrans = true);
     void printContents(const ZObject *obj);
     void removeCarefully(ZObject *obj);
     void scoreObj(ZObject *obj);

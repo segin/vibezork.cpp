@@ -8,6 +8,7 @@
 #include "core/gmacros.h"
 #include "core/gmain.h"
 #include "core/io.h"
+#include "parser/gparser.h"
 #include "parser/parser.h"
 #include "systems/lamp.h"
 #include "systems/light.h"
@@ -412,163 +413,101 @@ bool vDrop() {
   return RFALSE;
 }
 
+// ZIL: <ROUTINE V-EXAMINE () ...>
+// Source: zil/gverbs.zil:623-630
 bool vExamine() {
   auto &g = Globals::instance();
-
-  // Check if object is specified - try implied object first
-  if (!g.prso) {
-    g.prso = tryImpliedObject(V_EXAMINE);
-    if (!g.prso) {
-      printLine("What do you want to examine?");
-      return RTRUE;
-    }
-  }
-
-  // Check if object has an action handler that handles EXAMINE
-  if (g.prso->performAction()) {
+  if (g.prso && g.prso->hasText()) {
+    tell(g.prso->getText(), CR);
     return RTRUE;
   }
-
-  // Authentic ZIL V-EXAMINE logic:
-  // 1. If object has P?TEXT, print it
-  // 2. Else if container or door, do V-LOOK-INSIDE
-  // 3. Else "There's nothing special about the [object]."
-
-  if (g.prso->hasText()) {
-    printLine(g.prso->getText());
-  } else if (g.prso->hasFlag(ObjectFlag::CONTBIT) ||
-             g.prso->hasFlag(ObjectFlag::DOORBIT)) {
-    // Delegate to look-inside behavior
+  if (g.prso && (g.prso->hasFlag(ObjectFlag::CONTBIT) ||
+                 g.prso->hasFlag(ObjectFlag::DOORBIT))) {
     return vLookInside();
-  } else {
-    print("There's nothing special about the ");
-    print(g.prso->getDesc());
-    printLine(".");
   }
-
+  tell("There's nothing special about the ", g.prso, ".", CR);
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-OPEN ("AUX" F STR) ...>
+// Source: zil/gverbs.zil:966-994. A container with <CAPACITY 0> is not
+// openable at all, and a container holding exactly one untouched object with
+// an FDESC prints that description instead of the usual reveal.
 bool vOpen() {
   auto &g = Globals::instance();
-
-  // PRE-OPEN checks (Requirement 23, 34)
-
-  // Check if object is specified - try implied object first
-  if (!g.prso) {
-    g.prso = tryImpliedObject(V_OPEN);
-    if (!g.prso) {
-      printLine("What do you want to open?");
+  if (!g.prso) return RFALSE;
+  if (g.prso->hasFlag(ObjectFlag::CONTBIT) &&
+      g.prso->getProperty(P_CAPACITY) != 0) {
+    if (g.prso->hasFlag(ObjectFlag::OPENBIT)) {
+      tell("It is already open.", CR);
       return RTRUE;
     }
-  }
-
-  // Call object action handler first (Requirement 23)
-  // This allows objects like doors/windows to override default behavior
-  if (g.prso->performAction()) {
-    return RTRUE;
-  }
-
-  // Verify object has CONTBIT or DOORBIT flag (is openable)
-  if (!g.prso->hasFlag(ObjectFlag::CONTBIT) &&
-      !g.prso->hasFlag(ObjectFlag::DOORBIT)) {
-    printLine("You can't open that.");
-    return RTRUE;
-  }
-
-  // Check if already open
-  if (g.prso->hasFlag(ObjectFlag::OPENBIT)) {
-    printLine("It's already open.");
-    return RTRUE;
-  }
-
-  // Default OPEN behavior - authentic ZIL V-OPEN
-  g.prso->setFlag(ObjectFlag::OPENBIT);
-  g.prso->setFlag(ObjectFlag::TOUCHBIT);
-
-  // Display contents if any - authentic formatting
-  const auto &contents = g.prso->getContents();
-  if (contents.empty() || g.prso->hasFlag(ObjectFlag::TRANSBIT)) {
-    // Empty or transparent container
-    printLine("Opened.");
-  } else {
-    // Has contents - "Opening the X reveals Y."
-    print("Opening the ");
-    print(g.prso->getDesc());
-    print(" reveals ");
-    // Print contents inline with proper articles
-    bool first = true;
-    for (const auto *obj : contents) {
-      if (!first)
-        print(", ");
-      // Add proper article
-      std::string desc = obj->getDesc();
-      char firstChar = desc.empty() ? 'a' : desc[0];
-      bool startsWithVowel =
-          (firstChar == 'a' || firstChar == 'e' || firstChar == 'i' ||
-           firstChar == 'o' || firstChar == 'u');
-      if (startsWithVowel) {
-        print("an ");
-      } else {
-        print("a ");
-      }
-      print(desc);
-      first = false;
+    g.prso->setFlag(ObjectFlag::OPENBIT);
+    g.prso->setFlag(ObjectFlag::TOUCHBIT);
+    auto contents = g.prso->getContents();
+    const ZObject *f = contents.empty() ? nullptr : contents.front();
+    if (!f || g.prso->hasFlag(ObjectFlag::TRANSBIT)) {
+      tell("Opened.", CR);
+    } else if (contents.size() == 1 && !f->hasFlag(ObjectFlag::TOUCHBIT) &&
+               !f->getFirstDesc().empty()) {
+      tell("The ", g.prso, " opens.", CR);
+      tell(f->getFirstDesc(), CR);
+    } else {
+      tell("Opening the ", g.prso, " reveals ");
+      printContents(g.prso);
+      tell(".", CR);
     }
-    printLine(".");
+    return RTRUE;
   }
-
+  if (g.prso->hasFlag(ObjectFlag::DOORBIT)) {
+    if (g.prso->hasFlag(ObjectFlag::OPENBIT)) {
+      tell("It is already open.", CR);
+    } else {
+      tell("The ", g.prso, " opens.", CR);
+      g.prso->setFlag(ObjectFlag::OPENBIT);
+    }
+    return RTRUE;
+  }
+  tell("You must tell me how to do that to a ", g.prso, ".", CR);
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-CLOSE () ...>
+// Source: zil/gverbs.zil:336-357
 bool vClose() {
   auto &g = Globals::instance();
-
-  // Check if object is specified - try implied object first
-  if (!g.prso) {
-    g.prso = tryImpliedObject(V_CLOSE);
-    if (!g.prso) {
-      printLine("What do you want to close?");
-      return RTRUE;
-    }
-  }
-
-  // Authentic ZIL V-CLOSE logic
-  // Must have CONTBIT or DOORBIT, and not be a surface with 0 capacity
+  if (!g.prso) return RFALSE;
   if (!g.prso->hasFlag(ObjectFlag::CONTBIT) &&
       !g.prso->hasFlag(ObjectFlag::DOORBIT)) {
-    print("You must tell me how to do that to a ");
-    print(g.prso->getDesc());
-    printLine(".");
+    tell("You must tell me how to do that to a ", g.prso, ".", CR);
     return RTRUE;
   }
-
-  // Check if already closed
-  if (!g.prso->hasFlag(ObjectFlag::OPENBIT)) {
-    printLine("It is already closed.");
+  if (!g.prso->hasFlag(ObjectFlag::SURFACEBIT) &&
+      g.prso->getProperty(P_CAPACITY) != 0) {
+    if (g.prso->hasFlag(ObjectFlag::OPENBIT)) {
+      g.prso->clearFlag(ObjectFlag::OPENBIT);
+      tell("Closed.", CR);
+      if (g.lit) {
+        g.lit = GParser::isLit(g.here);
+        if (!g.lit) {
+          tell("It is now pitch black.", CR);
+        }
+      }
+      return RTRUE;
+    }
+    tell("It is already closed.", CR);
     return RTRUE;
   }
-
-  // Call object action handler first
-  if (g.prso->performAction()) {
-    return RTRUE;
-  }
-
-  // Default CLOSE behavior
-  g.prso->clearFlag(ObjectFlag::OPENBIT);
-
-  // Different message for doors vs containers
   if (g.prso->hasFlag(ObjectFlag::DOORBIT)) {
-    print("The ");
-    print(g.prso->getDesc());
-    printLine(" is now closed.");
-  } else {
-    printLine("Closed.");
+    if (g.prso->hasFlag(ObjectFlag::OPENBIT)) {
+      g.prso->clearFlag(ObjectFlag::OPENBIT);
+      tell("The ", g.prso, " is now closed.", CR);
+    } else {
+      tell("It is already closed.", CR);
+    }
+    return RTRUE;
   }
-
-  // Check if closing this made the room dark
-  // (authentic ZIL checks LIT? after closing)
-
+  tell("You cannot close that.", CR);
   return RTRUE;
 }
 
@@ -1091,88 +1030,41 @@ bool vRead() {
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-LOOK-INSIDE () ...>
+// Source: zil/gverbs.zil:866-890
 bool vLookInside() {
   auto &g = Globals::instance();
-
-  // Check if object is specified
-  if (!g.prso) {
-    printLine("What do you want to look inside?");
-    return RTRUE;
-  }
-
-  // Authentic ZIL V-LOOK-INSIDE logic
+  if (!g.prso) return RFALSE;
   if (g.prso->hasFlag(ObjectFlag::DOORBIT)) {
-    // Door handling
     if (g.prso->hasFlag(ObjectFlag::OPENBIT)) {
-      print("The ");
-      print(g.prso->getDesc());
-      printLine(" is open, but I can't tell what's beyond it.");
+      tell("The ", g.prso, " is open, but I can't tell what's beyond it.");
     } else {
-      print("The ");
-      print(g.prso->getDesc());
-      printLine(" is closed.");
+      tell("The ", g.prso, " is closed.");
     }
+    crlf();
     return RTRUE;
   }
-
   if (g.prso->hasFlag(ObjectFlag::CONTBIT)) {
-    // Actor check - "There is nothing special to be seen."
     if (g.prso->hasFlag(ObjectFlag::ACTORBIT)) {
-      printLine("There is nothing special to be seen.");
-      return RTRUE;
-    }
-
-    // Check if we can see inside (open or transparent)
-    bool canSeeInside = g.prso->hasFlag(ObjectFlag::OPENBIT) ||
-                        g.prso->hasFlag(ObjectFlag::TRANSBIT);
-
-    if (canSeeInside) {
-      const auto &contents = g.prso->getContents();
-      if (contents.empty()) {
-        print("The ");
-        print(g.prso->getDesc());
-        printLine(" is empty.");
-      } else {
-        // Print contents
-        print("The ");
-        print(g.prso->getDesc());
-        printLine(" contains:");
-        for (const auto *obj : contents) {
-          print("  ");
-          printLine(obj->getDesc());
-        }
+      tell("There is nothing special to be seen.", CR);
+    } else if (seeInside(g.prso)) {
+      if (!g.prso->getContents().empty() && printCont(g.prso)) {
+        return RTRUE;
       }
+      tell("The ", g.prso, " is empty.", CR);
     } else {
-      print("The ");
-      print(g.prso->getDesc());
-      printLine(" is closed.");
+      tell("The ", g.prso, " is closed.", CR);
     }
     return RTRUE;
   }
-
-  // Not a container or door
-  print("You can't look inside a ");
-  print(g.prso->getDesc());
-  printLine(".");
+  tell("You can't look inside a ", g.prso, ".", CR);
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-SEARCH () <TELL "You find nothing unusual." CR>>
+// Source: zil/gverbs.zil:1197-1198
 bool vSearch() {
-  auto &g = Globals::instance();
-
-  // Check if object is specified
-  if (!g.prso) {
-    printLine("What do you want to search?");
-    return RTRUE;
-  }
-
-  // Check if object has an action handler that handles SEARCH
-  if (g.prso->performAction()) {
-    return RTRUE;
-  }
-
-  // Authentic ZIL V-SEARCH: "You find nothing unusual."
-  printLine("You find nothing unusual.");
+  tell("You find nothing unusual.", CR);
   return RTRUE;
 }
 
@@ -3121,15 +3013,16 @@ bool vThrowOff() {
   return Verbs::vThrow();
 }
 
-// ZIL: <ROUTINE V-LOOK-ON () ...> (gverbs.zil:892-897)
+// ZIL: <ROUTINE V-LOOK-ON () ...>
+// Source: zil/gverbs.zil:892-897
 bool vLookOn() {
   auto &g = Globals::instance();
-  if (!g.prso) return false;
-  if (g.prso->hasFlag(ObjectFlag::SURFACEBIT)) {
-    return vLookInside();
+  if (g.prso && g.prso->hasFlag(ObjectFlag::SURFACEBIT)) {
+    perform(V_LOOK_INSIDE, g.prso);
+    return RTRUE;
   }
-  printLine(std::format("Look on a {}???", g.prso->getDesc()));
-  return true;
+  tell("Look on a ", g.prso, "???", CR);
+  return RTRUE;
 }
 
 // ZIL: <ROUTINE V-SGIVE () ...> (gverbs.zil:1210-1212)
@@ -3612,19 +3505,50 @@ ZObject *otherSide(const ZObject *door) {
 }
 
 // ZIL: <ROUTINE PRINT-CONT (OBJ "OPTIONAL" (CHECKTRANS? T) ...) ...> (gverbs.zil:1150-1204)
-void printCont(const ZObject *obj, bool checkTrans) {
-  if (!obj) return;
-  if (checkTrans && !seeInside(obj)) return;
+// ZIL: <ROUTINE PRINT-CONT (OBJ "OPTIONAL" (V? <>) (LEVEL 0) ...) ...>
+// Source: zil/gverbs.zil:1750-1816. Returns true when anything was printed,
+// which V-LOOK-INSIDE relies on (gverbs.zil:877-879).
+// TODO(C4): the full two-pass FDESC/LDESC walk with INDENTS.
+bool printCont(const ZObject *obj, bool checkTrans) {
+  if (!obj) return RFALSE;
+  if (checkTrans && !seeInside(obj)) return RFALSE;
+  if (obj->getContents().empty()) return RFALSE;
+  firster(obj);
   printContents(obj);
+  return RTRUE;
 }
 
-// ZIL: <ROUTINE PRINT-CONTENTS (OBJ) ...> (gverbs.zil:1200-1204)
+// ZIL: <ROUTINE PRINT-CONTENTS (OBJ ...) ...>
+// Source: zil/gverbs.zil:1730-1748. "a X, a Y, and a Z" on one line, and
+// THIS-IS-IT when the container held exactly one thing.
 void printContents(const ZObject *obj) {
   if (!obj) return;
-  for (const auto *child : obj->getContents()) {
-    if (child && !child->hasFlag(ObjectFlag::NDESCBIT) && !child->hasFlag(ObjectFlag::INVISIBLE)) {
-      printLine(std::format("  A {}", child->getDesc()));
+  auto contents = obj->getContents();
+  if (contents.empty()) return;
+  const ZObject *it = nullptr;
+  bool two = false;
+  bool first = true;
+  for (size_t idx = 0; idx < contents.size(); ++idx) {
+    const ZObject *f = contents[idx];
+    bool hasNext = idx + 1 < contents.size();
+    if (first) {
+      first = false;
+    } else {
+      tell(", ");
+      if (!hasNext) {
+        tell("and ");
+      }
     }
+    tell("a ", f);
+    if (!it && !two) {
+      it = f;
+    } else {
+      two = true;
+      it = nullptr;
+    }
+  }
+  if (it && !two) {
+    thisIsIt(const_cast<ZObject *>(it));
   }
 }
 
@@ -3654,13 +3578,12 @@ void scoreUpd(int val) {
   }
 }
 
-// ZIL: <ROUTINE SEE-INSIDE? (CONTAINER) ...> (gverbs.zil:1251-1258)
+// ZIL: <ROUTINE SEE-INSIDE? (OBJ) ...>
+// Source: zil/gverbs.zil:1839-1841
 bool seeInside(const ZObject *obj) {
-  if (!obj) return false;
-  if (!obj->hasFlag(ObjectFlag::CONTBIT)) return true;
-  return obj->hasFlag(ObjectFlag::OPENBIT) ||
-         obj->hasFlag(ObjectFlag::TRANSBIT) ||
-         obj->hasFlag(ObjectFlag::SURFACEBIT);
+  return obj && !obj->hasFlag(ObjectFlag::INVISIBLE) &&
+         (obj->hasFlag(ObjectFlag::TRANSBIT) ||
+          obj->hasFlag(ObjectFlag::OPENBIT));
 }
 
 // ZIL: <ROUTINE SHAKE-LOOP (OBJ) ...> (gverbs.zil:1260-1280)

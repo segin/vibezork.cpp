@@ -3,6 +3,7 @@
 #include "../src/core/globals.h"
 #include "../src/world/rooms.h"
 #include "../src/world/objects.h"
+#include "../src/core/gmain.h"
 #include "../src/verbs/verbs.h"
 
 // Test DROP verb - Task 27.3
@@ -264,6 +265,9 @@ TEST(PutVerbBasic) {
     auto box = std::make_unique<ZObject>(1, "box");
     box->addSynonym("box");
     box->setFlag(ObjectFlag::CONTBIT);
+    // <PROPDEF CAPACITY 0> means a container with no CAPACITY cannot be
+    // opened or closed at all (gverbs.zil:967-968, 340-341).
+    box->setProperty(P_CAPACITY, 20);
     box->setFlag(ObjectFlag::OPENBIT);
     box->setProperty(2, 100);  // P_CAPACITY = 2
     box->moveTo(g.here);
@@ -317,6 +321,9 @@ TEST(PutVerbClosedContainer) {
     auto chest = std::make_unique<ZObject>(1, "chest");
     chest->addSynonym("chest");
     chest->setFlag(ObjectFlag::CONTBIT);
+    // <PROPDEF CAPACITY 0> means a container with no CAPACITY cannot be
+    // opened or closed at all (gverbs.zil:967-968, 340-341).
+    chest->setProperty(P_CAPACITY, 20);
     // Note: OPENBIT is NOT set (closed)
     chest->setProperty(2, 100);  // P_CAPACITY
     chest->moveTo(g.here);
@@ -373,6 +380,9 @@ TEST(PutVerbCapacityLimit) {
     auto bag = std::make_unique<ZObject>(1, "bag");
     bag->addSynonym("bag");
     bag->setFlag(ObjectFlag::CONTBIT);
+    // <PROPDEF CAPACITY 0> means a container with no CAPACITY cannot be
+    // opened or closed at all (gverbs.zil:967-968, 340-341).
+    bag->setProperty(P_CAPACITY, 20);
     bag->setFlag(ObjectFlag::OPENBIT);
     bag->setProperty(P_CAPACITY, 10);  // Capacity = 10
     bag->setProperty(P_SIZE, 3);       // Bag itself weighs 3
@@ -442,6 +452,9 @@ TEST(PutVerbCapacityWithNestedContainers) {
     auto sack = std::make_unique<ZObject>(1, "sack");
     sack->addSynonym("sack");
     sack->setFlag(ObjectFlag::CONTBIT);
+    // <PROPDEF CAPACITY 0> means a container with no CAPACITY cannot be
+    // opened or closed at all (gverbs.zil:967-968, 340-341).
+    sack->setProperty(P_CAPACITY, 20);
     sack->setFlag(ObjectFlag::OPENBIT);
     sack->setProperty(P_CAPACITY, 20);
     sack->setProperty(P_SIZE, 5);
@@ -453,6 +466,9 @@ TEST(PutVerbCapacityWithNestedContainers) {
     auto box = std::make_unique<ZObject>(2, "box");
     box->addSynonym("box");
     box->setFlag(ObjectFlag::CONTBIT);
+    // <PROPDEF CAPACITY 0> means a container with no CAPACITY cannot be
+    // opened or closed at all (gverbs.zil:967-968, 340-341).
+    box->setProperty(P_CAPACITY, 20);
     box->setFlag(ObjectFlag::OPENBIT);
     box->setFlag(ObjectFlag::TAKEBIT);
     box->setProperty(P_CAPACITY, 10);
@@ -520,6 +536,9 @@ TEST(PutVerbCapacityExactFit) {
     auto chest = std::make_unique<ZObject>(1, "chest");
     chest->addSynonym("chest");
     chest->setFlag(ObjectFlag::CONTBIT);
+    // <PROPDEF CAPACITY 0> means a container with no CAPACITY cannot be
+    // opened or closed at all (gverbs.zil:967-968, 340-341).
+    chest->setProperty(P_CAPACITY, 20);
     chest->setFlag(ObjectFlag::OPENBIT);
     chest->setProperty(P_CAPACITY, 10);
     chest->setProperty(P_SIZE, 5);
@@ -708,6 +727,9 @@ TEST(PutVerbMultipleObjects) {
     auto sack = std::make_unique<ZObject>(1, "sack");
     sack->addSynonym("sack");
     sack->setFlag(ObjectFlag::CONTBIT);
+    // <PROPDEF CAPACITY 0> means a container with no CAPACITY cannot be
+    // opened or closed at all (gverbs.zil:967-968, 340-341).
+    sack->setProperty(P_CAPACITY, 20);
     sack->setFlag(ObjectFlag::OPENBIT);
     sack->setProperty(2, 100);  // P_CAPACITY
     sack->moveTo(g.here);
@@ -780,6 +802,9 @@ TEST(OpenVerbBasic) {
     auto chest = std::make_unique<ZObject>(1, "chest");
     chest->addSynonym("chest");
     chest->setFlag(ObjectFlag::CONTBIT);
+    // <PROPDEF CAPACITY 0> means a container with no CAPACITY cannot be
+    // opened or closed at all (gverbs.zil:967-968, 340-341).
+    chest->setProperty(P_CAPACITY, 20);
     // Note: OPENBIT is NOT set (closed)
     chest->moveTo(g.here);
     ZObject* chestPtr = chest.get();
@@ -822,6 +847,9 @@ TEST(OpenVerbWithContents) {
     auto box = std::make_unique<ZObject>(1, "box");
     box->addSynonym("box");
     box->setFlag(ObjectFlag::CONTBIT);
+    // <PROPDEF CAPACITY 0> means a container with no CAPACITY cannot be
+    // opened or closed at all (gverbs.zil:967-968, 340-341).
+    box->setProperty(P_CAPACITY, 20);
     box->moveTo(g.here);
     ZObject* boxPtr = box.get();
     g.registerObject(1, std::move(box));
@@ -871,6 +899,9 @@ TEST(OpenVerbAlreadyOpen) {
     auto sack = std::make_unique<ZObject>(1, "sack");
     sack->addSynonym("sack");
     sack->setFlag(ObjectFlag::CONTBIT);
+    // <PROPDEF CAPACITY 0> means a container with no CAPACITY cannot be
+    // opened or closed at all (gverbs.zil:967-968, 340-341).
+    sack->setProperty(P_CAPACITY, 20);
     sack->setFlag(ObjectFlag::OPENBIT);  // Already open
     sack->moveTo(g.here);
     ZObject* sackPtr = sack.get();
@@ -916,6 +947,9 @@ TEST(OpenVerbLockedContainer) {
     auto safe = std::make_unique<ZObject>(1, "safe");
     safe->addSynonym("safe");
     safe->setFlag(ObjectFlag::CONTBIT);
+    // <PROPDEF CAPACITY 0> means a container with no CAPACITY cannot be
+    // opened or closed at all (gverbs.zil:967-968, 340-341).
+    safe->setProperty(P_CAPACITY, 20);
     safe->setAction([]() {
         auto& g = Globals::instance();
         if (g.prsa == V_OPEN) {
@@ -932,8 +966,9 @@ TEST(OpenVerbLockedContainer) {
     g.prso = safePtr;
     g.prsa = V_OPEN;
     
-    // Test OPEN verb on locked container
-    bool result = Verbs::vOpen();
+    // Test OPEN verb on locked container: the refusal is the object's own
+    // ACTION, which PERFORM runs before the default verb (gmain.zil:211-224)
+    bool result = perform(V_OPEN, safePtr) != M_NOT_HANDLED;
     ASSERT_TRUE(result);
     
     // Verify safe is still closed (OPENBIT not set)
@@ -1009,7 +1044,7 @@ TEST(OpenVerbNoObject) {
     
     // Test OPEN verb without object
     bool result = Verbs::vOpen();
-    ASSERT_TRUE(result);
+    // With no PRSO there is nothing to open/close/look into; the parser\n    // asks the orphan question now, so the verb reports nothing.\n    ASSERT_FALSE(result);
     
     // Should display "Open what?" message
     
@@ -1039,6 +1074,9 @@ TEST(CloseVerbBasic) {
     auto chest = std::make_unique<ZObject>(1, "chest");
     chest->addSynonym("chest");
     chest->setFlag(ObjectFlag::CONTBIT);
+    // <PROPDEF CAPACITY 0> means a container with no CAPACITY cannot be
+    // opened or closed at all (gverbs.zil:967-968, 340-341).
+    chest->setProperty(P_CAPACITY, 20);
     chest->setFlag(ObjectFlag::OPENBIT);  // Open
     chest->moveTo(g.here);
     ZObject* chestPtr = chest.get();
@@ -1081,6 +1119,9 @@ TEST(CloseVerbAlreadyClosed) {
     auto box = std::make_unique<ZObject>(1, "box");
     box->addSynonym("box");
     box->setFlag(ObjectFlag::CONTBIT);
+    // <PROPDEF CAPACITY 0> means a container with no CAPACITY cannot be
+    // opened or closed at all (gverbs.zil:967-968, 340-341).
+    box->setProperty(P_CAPACITY, 20);
     // Note: OPENBIT is NOT set (closed)
     box->moveTo(g.here);
     ZObject* boxPtr = box.get();
@@ -1167,7 +1208,7 @@ TEST(CloseVerbNoObject) {
     
     // Test CLOSE verb without object
     bool result = Verbs::vClose();
-    ASSERT_TRUE(result);
+    // With no PRSO there is nothing to open/close/look into; the parser\n    // asks the orphan question now, so the verb reports nothing.\n    ASSERT_FALSE(result);
     
     // Should display "Close what?" message
     
@@ -1197,6 +1238,9 @@ TEST(OpenCloseSequence) {
     auto trunk = std::make_unique<ZObject>(1, "trunk");
     trunk->addSynonym("trunk");
     trunk->setFlag(ObjectFlag::CONTBIT);
+    // <PROPDEF CAPACITY 0> means a container with no CAPACITY cannot be
+    // opened or closed at all (gverbs.zil:967-968, 340-341).
+    trunk->setProperty(P_CAPACITY, 20);
     trunk->moveTo(g.here);
     ZObject* trunkPtr = trunk.get();
     g.registerObject(1, std::move(trunk));
@@ -1253,6 +1297,9 @@ TEST(LockVerbBasic) {
     auto chest = std::make_unique<ZObject>(1, "chest");
     chest->addSynonym("chest");
     chest->setFlag(ObjectFlag::CONTBIT);
+    // <PROPDEF CAPACITY 0> means a container with no CAPACITY cannot be
+    // opened or closed at all (gverbs.zil:967-968, 340-341).
+    chest->setProperty(P_CAPACITY, 20);
     // The chest's own action handles LOCK (ZIL: object ACTION intercepts)
     static bool chestLocked = false;
     chestLocked = false;
@@ -1314,6 +1361,9 @@ TEST(LockVerbAlreadyLocked) {
     auto safe = std::make_unique<ZObject>(1, "safe");
     safe->addSynonym("safe");
     safe->setFlag(ObjectFlag::CONTBIT);
+    // <PROPDEF CAPACITY 0> means a container with no CAPACITY cannot be
+    // opened or closed at all (gverbs.zil:967-968, 340-341).
+    safe->setProperty(P_CAPACITY, 20);
     safe->moveTo(g.here);
     ZObject* safePtr = safe.get();
     g.registerObject(1, std::move(safe));
@@ -1362,6 +1412,9 @@ TEST(LockVerbWithoutKey) {
     auto chest = std::make_unique<ZObject>(1, "chest");
     chest->addSynonym("chest");
     chest->setFlag(ObjectFlag::CONTBIT);
+    // <PROPDEF CAPACITY 0> means a container with no CAPACITY cannot be
+    // opened or closed at all (gverbs.zil:967-968, 340-341).
+    chest->setProperty(P_CAPACITY, 20);
     chest->moveTo(g.here);
     ZObject* chestPtr = chest.get();
     g.registerObject(1, std::move(chest));
@@ -1452,6 +1505,9 @@ TEST(UnlockVerbBasic) {
     auto chest = std::make_unique<ZObject>(1, "chest");
     chest->addSynonym("chest");
     chest->setFlag(ObjectFlag::CONTBIT);
+    // <PROPDEF CAPACITY 0> means a container with no CAPACITY cannot be
+    // opened or closed at all (gverbs.zil:967-968, 340-341).
+    chest->setProperty(P_CAPACITY, 20);
     static bool chestUnlocked = false;
     chestUnlocked = false;
     chest->setAction([]() {
@@ -1512,6 +1568,9 @@ TEST(UnlockVerbNotLocked) {
     auto box = std::make_unique<ZObject>(1, "box");
     box->addSynonym("box");
     box->setFlag(ObjectFlag::CONTBIT);
+    // <PROPDEF CAPACITY 0> means a container with no CAPACITY cannot be
+    // opened or closed at all (gverbs.zil:967-968, 340-341).
+    box->setProperty(P_CAPACITY, 20);
     box->moveTo(g.here);
     ZObject* boxPtr = box.get();
     g.registerObject(1, std::move(box));
@@ -1561,6 +1620,9 @@ TEST(UnlockVerbWithoutKey) {
     auto chest = std::make_unique<ZObject>(1, "chest");
     chest->addSynonym("chest");
     chest->setFlag(ObjectFlag::CONTBIT);
+    // <PROPDEF CAPACITY 0> means a container with no CAPACITY cannot be
+    // opened or closed at all (gverbs.zil:967-968, 340-341).
+    chest->setProperty(P_CAPACITY, 20);
     chest->moveTo(g.here);
     ZObject* chestPtr = chest.get();
     g.registerObject(1, std::move(chest));
@@ -1602,6 +1664,9 @@ TEST(LockUnlockSequence) {
     auto safe = std::make_unique<ZObject>(1, "safe");
     safe->addSynonym("safe");
     safe->setFlag(ObjectFlag::CONTBIT);
+    // <PROPDEF CAPACITY 0> means a container with no CAPACITY cannot be
+    // opened or closed at all (gverbs.zil:967-968, 340-341).
+    safe->setProperty(P_CAPACITY, 20);
     // ZIL has no lock flag; the object's ACTION keeps its own state
     static bool safeLocked = false;
     safeLocked = false;
