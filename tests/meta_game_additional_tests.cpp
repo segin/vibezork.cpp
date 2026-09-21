@@ -34,16 +34,20 @@ TEST(ScriptVerb) {
         bool result = Verbs::vScript();
         ASSERT_TRUE(result);
         ASSERT_TRUE(g.scripting);
-        ASSERT_CONTAINS(capture.getOutput(), "initiated");
+        // ZIL V-SCRIPT prints its header then V-VERSION (gverbs.zil:86-90)
+        ASSERT_CONTAINS(capture.getOutput(),
+                        "Here begins a transcript of interaction with");
     }
     
-    // Test SCRIPT again (idempotent/message check)
+    // ZIL V-SCRIPT has no "already on" case: it sets the header bit and
+    // prints the same two lines every time (gverbs.zil:86-90).
     {
         OutputCapture capture;
         bool result = Verbs::vScript();
         ASSERT_TRUE(result);
         ASSERT_TRUE(g.scripting);
-        ASSERT_CONTAINS(capture.getOutput(), "already on");
+        ASSERT_CONTAINS(capture.getOutput(),
+                        "Here begins a transcript of interaction with");
     }
     
     g.reset();
@@ -60,18 +64,20 @@ TEST(UnscriptVerb) {
         bool result = Verbs::vUnscript();
         ASSERT_TRUE(result);
         ASSERT_FALSE(g.scripting);
-        ASSERT_CONTAINS(capture.getOutput(), "ended");
+        // ZIL V-UNSCRIPT prints its header then V-VERSION (gverbs.zil:92-96)
+        ASSERT_CONTAINS(capture.getOutput(),
+                        "Here ends a transcript of interaction with");
     }
     
-    // Test UNSCRIPT again
+    // ZIL V-UNSCRIPT likewise has no "already off" case (gverbs.zil:92-96).
     {
         OutputCapture capture;
         bool result = Verbs::vUnscript();
         ASSERT_TRUE(result);
         ASSERT_FALSE(g.scripting);
-        ASSERT_CONTAINS(capture.getOutput(), "already off");
+        ASSERT_CONTAINS(capture.getOutput(),
+                        "Here ends a transcript of interaction with");
     }
-    
     g.reset();
 }
 

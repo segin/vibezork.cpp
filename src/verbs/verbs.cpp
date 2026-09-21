@@ -3,6 +3,7 @@
 #include "../systems/combat.h"
 #include "../systems/death.h"
 #include "../systems/npc.h"
+#include "../systems/save.h"
 #include "../systems/score.h"
 #include "core/globals.h"
 #include "core/gmacros.h"
@@ -27,6 +28,15 @@ namespace Verbs {
 // ZIL: <GLOBAL FUMBLE-NUMBER 7> <GLOBAL FUMBLE-PROB 8> (gverbs.zil:1896-1898)
 constexpr int FUMBLE_NUMBER = 7;
 constexpr int FUMBLE_PROB = 8;
+
+// The release and serial V-VERSION reads out of the story header
+// (gverbs.zil:110-119); these are the values in zil/COMPILED/zork1.z3.
+constexpr int RELEASE_NUMBER = 119;
+constexpr std::string_view SERIAL_NUMBER = "880429";
+
+// The interpreter owns the save file in the original, so SAVE and RESTORE
+// take no filename (gverbs.zil:71-83).
+constexpr std::string_view SAVE_FILE = "zork1.sav";
 
 // Helper function to calculate total weight (size) of an object and all its
 // contents recursively This matches the WEIGHT function from ZIL
@@ -451,27 +461,15 @@ bool vInventory() {
 
 
 
+// ZIL: <ROUTINE V-QUIT ("AUX" SCOR) ...>
+// Source: zil/gverbs.zil:55-61
 bool vQuit() {
-  // Authentic Zork: V-QUIT from gverbs.zil
-  // First show score
   vScore();
-
-  // Ask for confirmation - authentic message
-  print("Do you wish to leave the game? (Y is affirmative): ");
-  std::string response = readLine();
-
-  // Convert to lowercase for comparison
-  for (char &c : response) {
-    c = std::tolower(c);
+  tell("Do you wish to leave the game? (Y is affirmative): ");
+  if (yes()) {
+    std::exit(0);
   }
-
-  // Accept Y/YES
-  if (response == "yes" || response == "y") {
-    exit(0);
-  }
-
-  // Player declines - authentic response
-  printLine("Ok.");
+  tell("Ok.", CR);
   return RTRUE;
 }
 
@@ -2099,425 +2097,116 @@ bool vDiagnose() {
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-VERBOSE () ...>
+// Source: zil/gverbs.zil:13-16
 bool vVerbose() {
   auto &g = Globals::instance();
-
-  // Set verbose mode flag
   g.verboseMode = true;
-  g.briefMode = false;
   g.superbriefMode = false;
-
-  printLine("Maximum verbosity.");
-
+  g.briefMode = false;
+  tell("Maximum verbosity.", CR);
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-BRIEF () ...>
+// Source: zil/gverbs.zil:18-21
 bool vBrief() {
   auto &g = Globals::instance();
-
-  // Set brief mode flag
   g.verboseMode = false;
-  g.briefMode = true;
   g.superbriefMode = false;
-
-  printLine("Brief descriptions.");
-
+  g.briefMode = true;
+  tell("Brief descriptions.", CR);
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-SUPER-BRIEF () ...>
+// Source: zil/gverbs.zil:23-25. Note it sets SUPER-BRIEF without clearing
+// VERBOSE, exactly as the source does.
 bool vSuperbrief() {
   auto &g = Globals::instance();
-
-  // Set superbrief mode flag
-  g.verboseMode = false;
-  g.briefMode = false;
   g.superbriefMode = true;
-
-  printLine("Superbrief descriptions.");
-
+  g.briefMode = false;
+  tell("Superbrief descriptions.", CR);
   return RTRUE;
 }
 
 // Game Control Verbs (Requirement 33, 60, 61, 62, 69, 70)
 
+// ZIL: <ROUTINE V-SAVE () ...>
+// Source: zil/gverbs.zil:78-83
 bool vSave() {
-  auto &g = Globals::instance();
-
-  // Prompt for filename (Requirement 60)
-  printLine("Enter save filename:");
-  std::string filename = readLine();
-
-  // Handle empty filename
-  if (filename.empty()) {
-    printLine("Save cancelled.");
-    return RTRUE;
-  }
-
-  // Add .sav extension if not present
-  if (filename.find('.') == std::string::npos) {
-    filename += ".sav";
-  }
-
-  // Try to open file for writing
-  std::ofstream file(filename, std::ios::binary);
-  if (!file) {
-    printLine("Error: Could not create save file.");
-    return RTRUE;
-  }
-
-  // Serialize game state (Requirement 60)
-  // Format: Simple text-based format for readability and debugging
-
-  // Write header
-  file << "ZORK1_SAVE_V1\n";
-
-  // Save player location (Requirement 60.2)
-  if (g.here) {
-    file << "LOCATION:" << g.here->getId() << "\n";
+  // TODO(H1): SaveSystem does not yet round-trip the whole state.
+  if (SaveSystem::save(SAVE_FILE) == SaveSystem::SaveError::SUCCESS) {
+    tell("Ok.", CR);
   } else {
-    file << "LOCATION:0\n";
+    tell("Failed.", CR);
   }
-
-  // Save score and moves (Requirement 60.2)
-  file << "SCORE:" << g.score << "\n";
-  file << "MOVES:" << g.moves << "\n";
-
-  // Save display mode flags
-  file << "VERBOSE:" << (g.verboseMode ? 1 : 0) << "\n";
-  file << "BRIEF:" << (g.briefMode ? 1 : 0) << "\n";
-  file << "SUPERBRIEF:" << (g.superbriefMode ? 1 : 0) << "\n";
-
-  // Save load limits
-  file << "LOADMAX:" << g.loadMax << "\n";
-  file << "LOADALLOWED:" << g.loadAllowed << "\n";
-
-  // Save all object states (Requirement 60.3, 60.4)
-  file << "OBJECTS_BEGIN\n";
-  for (const auto &[id, obj] : g.getAllObjects()) {
-    if (!obj)
-      continue;
-
-    // Save object ID
-    file << "OBJ:" << id << "\n";
-
-    // Save object location (Requirement 60.3)
-    ZObject *loc = obj->getLocation();
-    if (loc) {
-      file << "LOC:" << loc->getId() << "\n";
-    } else {
-      file << "LOC:-1\n";
-    }
-
-    // Save object flags (Requirement 60.4)
-    // We save flags as a bitmask
-    uint32_t flags = 0;
-    for (int i = 0; i < 32; i++) {
-      if (obj->hasFlag(static_cast<ObjectFlag>(1 << i))) {
-        flags |= (1 << i);
-      }
-    }
-    file << "FLAGS:" << flags << "\n";
-
-    // Save key properties (Requirement 60.4)
-    file << "P_SIZE:" << obj->getProperty(P_SIZE) << "\n";
-    file << "P_CAPACITY:" << obj->getProperty(P_CAPACITY) << "\n";
-    file << "P_VALUE:" << obj->getProperty(P_VALUE) << "\n";
-    file << "P_STRENGTH:" << obj->getProperty(P_STRENGTH) << "\n";
-
-    file << "OBJ_END\n";
-  }
-  file << "OBJECTS_END\n";
-
-  // Close file
-  file.close();
-
-  if (file.fail()) {
-    printLine("Error: Failed to write save file.");
-    return RTRUE;
-  }
-
-  printLine("Game saved.");
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-RESTORE () ...>
+// Source: zil/gverbs.zil:71-76. The interpreter owns the file, so there is
+// no filename prompt.
 bool vRestore() {
-  auto &g = Globals::instance();
-
-  // Prompt for filename (Requirement 61)
-  printLine("Enter save filename to restore:");
-  std::string filename = readLine();
-
-  // Handle empty filename
-  if (filename.empty()) {
-    printLine("Restore cancelled.");
-    return RTRUE;
+  // TODO(H1): SaveSystem does not yet round-trip the whole state.
+  if (SaveSystem::restore(SAVE_FILE) == SaveSystem::SaveError::SUCCESS) {
+    tell("Ok.", CR);
+    vFirstLook();
+  } else {
+    tell("Failed.", CR);
   }
-
-  // Add .sav extension if not present
-  if (filename.find('.') == std::string::npos) {
-    filename += ".sav";
-  }
-
-  // Try to open file for reading
-  std::ifstream file(filename);
-  if (!file) {
-    printLine("Error: Could not open save file.");
-    return RTRUE;
-  }
-
-  // Read and verify header
-  std::string line;
-  if (!std::getline(file, line) || line != "ZORK1_SAVE_V1") {
-    printLine("Error: Invalid or corrupted save file.");
-    return RTRUE;
-  }
-
-  // Temporary storage for parsed values
-  ObjectId playerLocation = 0;
-  int savedScore = 0;
-  int savedMoves = 0;
-  bool savedVerbose = true;
-  bool savedBrief = false;
-  bool savedSuperbrief = false;
-  int savedLoadMax = 100;
-  int savedLoadAllowed = 100;
-
-  // Map of object ID to saved state
-  struct ObjectState {
-    ObjectId location = static_cast<ObjectId>(-1);
-    uint32_t flags = 0;
-    int size = 0;
-    int capacity = 0;
-    int value = 0;
-    int strength = 0;
-  };
-  std::map<ObjectId, ObjectState> objectStates;
-
-  // Parse save file (Requirement 61.1)
-  ObjectId currentObjId = 0;
-  bool inObjects = false;
-
-  while (std::getline(file, line)) {
-    if (line.empty())
-      continue;
-
-    size_t colonPos = line.find(':');
-    if (colonPos == std::string::npos) {
-      if (line == "OBJECTS_BEGIN") {
-        inObjects = true;
-        continue;
-      }
-      if (line == "OBJECTS_END") {
-        inObjects = false;
-        continue;
-      }
-      if (line == "OBJ_END") {
-        continue;
-      }
-      continue;
-    }
-
-    std::string key = line.substr(0, colonPos);
-    std::string value = line.substr(colonPos + 1);
-
-    if (!inObjects) {
-      // Parse global state
-      if (key == "LOCATION") {
-        playerLocation = static_cast<ObjectId>(std::stoi(value));
-      } else if (key == "SCORE") {
-        savedScore = std::stoi(value);
-      } else if (key == "MOVES") {
-        savedMoves = std::stoi(value);
-      } else if (key == "VERBOSE") {
-        savedVerbose = (std::stoi(value) != 0);
-      } else if (key == "BRIEF") {
-        savedBrief = (std::stoi(value) != 0);
-      } else if (key == "SUPERBRIEF") {
-        savedSuperbrief = (std::stoi(value) != 0);
-      } else if (key == "LOADMAX") {
-        savedLoadMax = std::stoi(value);
-      } else if (key == "LOADALLOWED") {
-        savedLoadAllowed = std::stoi(value);
-      }
-    } else {
-      // Parse object state
-      if (key == "OBJ") {
-        currentObjId = static_cast<ObjectId>(std::stoi(value));
-        objectStates[currentObjId] = ObjectState();
-      } else if (key == "LOC") {
-        objectStates[currentObjId].location =
-            static_cast<ObjectId>(std::stoi(value));
-      } else if (key == "FLAGS") {
-        objectStates[currentObjId].flags =
-            static_cast<uint32_t>(std::stoul(value));
-      } else if (key == "P_SIZE") {
-        objectStates[currentObjId].size = std::stoi(value);
-      } else if (key == "P_CAPACITY") {
-        objectStates[currentObjId].capacity = std::stoi(value);
-      } else if (key == "P_VALUE") {
-        objectStates[currentObjId].value = std::stoi(value);
-      } else if (key == "P_STRENGTH") {
-        objectStates[currentObjId].strength = std::stoi(value);
-      }
-    }
-  }
-
-  file.close();
-
-  // Apply restored state (Requirement 61.2, 61.3, 61.4)
-
-  // Restore player location
-  ZObject *newLocation = g.getObject(playerLocation);
-  if (newLocation) {
-    g.here = newLocation;
-    if (g.winner) {
-      g.winner->moveTo(newLocation);
-    }
-  }
-
-  // Restore score and moves
-  g.score = savedScore;
-  g.moves = savedMoves;
-
-  // Restore display modes
-  g.verboseMode = savedVerbose;
-  g.briefMode = savedBrief;
-  g.superbriefMode = savedSuperbrief;
-
-  // Restore load limits
-  g.loadMax = savedLoadMax;
-  g.loadAllowed = savedLoadAllowed;
-
-  // Restore object states
-  for (const auto &[id, state] : objectStates) {
-    ZObject *obj = g.getObject(id);
-    if (!obj)
-      continue;
-
-    // Restore location
-    if (state.location == static_cast<ObjectId>(-1)) {
-      obj->moveTo(nullptr);
-    } else {
-      ZObject *loc = g.getObject(state.location);
-      if (loc) {
-        obj->moveTo(loc);
-      }
-    }
-
-    // Restore flags
-    for (int i = 0; i < 32; i++) {
-      ObjectFlag flag = static_cast<ObjectFlag>(1 << i);
-      if (state.flags & (1 << i)) {
-        obj->setFlag(flag);
-      } else {
-        obj->clearFlag(flag);
-      }
-    }
-
-    // Restore properties
-    if (state.size > 0)
-      obj->setProperty(P_SIZE, state.size);
-    if (state.capacity > 0)
-      obj->setProperty(P_CAPACITY, state.capacity);
-    if (state.value > 0)
-      obj->setProperty(P_VALUE, state.value);
-    if (state.strength > 0)
-      obj->setProperty(P_STRENGTH, state.strength);
-  }
-
-  printLine("Game restored.");
-
-  // Show current location
-  Verbs::vLook();
-
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-RESTART () ...>
+// Source: zil/gverbs.zil:63-69
 bool vRestart() {
-  // Confirm with player (Requirement 62.5)
-  printLine("Are you sure you want to restart? (yes/no)");
-  std::string response = readLine();
-
-  // Convert to lowercase for comparison
-  for (char &c : response) {
-    c = std::tolower(c);
+  vScore();
+  tell("Do you wish to restart? (Y is affirmative): ");
+  if (yes()) {
+    tell("Restarting.", CR);
+    // TODO(H1): a real RESTART re-initialises the whole machine; until the
+    // full state reset lands this reports the ZIL failure line.
+    tell("Failed.", CR);
   }
-
-  if (response != "yes" && response != "y") {
-    printLine("Restart cancelled.");
-    return RTRUE;
-  }
-
-  auto &g = Globals::instance();
-
-  // Reset all game state (Requirement 62.1, 62.4)
-  g.score = 0;
-  g.moves = 0;
-  g.verboseMode = true;
-  g.briefMode = false;
-  g.superbriefMode = false;
-  g.loadMax = 100;
-  g.loadAllowed = 100;
-  g.lit = false;
-  g.pCont = false;
-  g.quoteFlag = false;
-
-  // Clear all objects and reinitialize world (Requirement 62.2, 62.3)
-  g.reset();
-
-  // Reinitialize the world
-  initializeWorld();
-
-  printLine("ZORK I: The Great Underground Empire");
-  printLine(
-      "Copyright (c) 1981, 1982, 1983 Infocom, Inc. All rights reserved.");
-  printLine("ZORK is a registered trademark of Infocom, Inc.");
-  printLine("C++ Port - Release 1");
-  crlf();
-
-  // Show starting location
-  Verbs::vLook();
-
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-VERSION ("AUX" (CNT 17)) ...>
+// Source: zil/gverbs.zil:98-121. The release and serial come from the story
+// header in the original; this port carries the same Release 119 /
+// Serial number 880429 as zil/COMPILED/zork1.z3.
 bool vVersion() {
-  // Display game name and version (Requirement 69.2)
-  printLine("ZORK I: The Great Underground Empire");
-
-  // Display port information (Requirement 69.3)
-  printLine("C++ Port - Release 1");
-
-  // Display copyright (Requirement 69.4)
-  printLine(
-      "Copyright (c) 1981, 1982, 1983 Infocom, Inc. All rights reserved.");
-  printLine("ZORK is a registered trademark of Infocom, Inc.");
-
-  // Display interpreter info
-  printLine("Interpreter: C++23 Native");
-
+  tell("ZORK I: The Great Underground Empire", CR);
+  tell("Infocom interactive fiction - a fantasy story", CR);
+  tell("Copyright (c) 1981, 1982, 1983, 1984, 1985, 1986");
+  tell(" Infocom, Inc. All rights reserved.", CR);
+  tell("ZORK is a registered trademark of Infocom, Inc.", CR);
+  tell("Release ");
+  tell(RELEASE_NUMBER);
+  tell(" / Serial number ");
+  tell(SERIAL_NUMBER);
+  crlf();
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-SCRIPT () ...>
+// Source: zil/gverbs.zil:86-90
 bool vScript() {
   auto &g = Globals::instance();
-  if (g.scripting) {
-    printLine("Scripting is already on.");
-    return RTRUE;
-  }
   g.scripting = true;
-  printLine("Scripting initiated.");
+  tell("Here begins a transcript of interaction with", CR);
+  vVersion();
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-UNSCRIPT () ...>
+// Source: zil/gverbs.zil:92-96
 bool vUnscript() {
   auto &g = Globals::instance();
-  if (!g.scripting) {
-    printLine("Scripting is already off.");
-    return RTRUE;
-  }
+  tell("Here ends a transcript of interaction with", CR);
+  vVersion();
   g.scripting = false;
-  printLine("Scripting ended.");
   return RTRUE;
 }
 
@@ -3438,19 +3127,40 @@ ZObject *findIn(const ZObject *container, ObjectFlag flag) {
   return nullptr;
 }
 
-// ZIL: <ROUTINE FINISH ("AUX" WRD) ...> (gverbs.zil:33-54)
+// ZIL: <ROUTINE FINISH ("AUX" WRD) ...>
+// Source: zil/gverbs.zil:33-53. Loops until the player picks one of the
+// three words; anything else simply asks again.
 void finish() {
   vScore();
-  printLine("\nWould you like to restart the game from the beginning, restore a saved");
-  printLine("game, or end this session of the game? (Type RESTART, RESTORE, or QUIT):");
-  print("> ");
-  std::string choice = readLine();
-  if (choice == "restart" || choice == "RESTART") {
-    vRestart();
-  } else if (choice == "restore" || choice == "RESTORE") {
-    vRestore();
-  } else if (choice == "quit" || choice == "QUIT" || choice == "q" || choice == "Q") {
-    vQuit();
+  while (true) {
+    crlf();
+    tell("Would you like to restart the game from the beginning, restore a "
+         "saved game position, or end this session of the game?", CR);
+    tell("(Type RESTART, RESTORE, or QUIT):", CR);
+    tell(">");
+    std::string line = readLine();
+    size_t start = line.find_first_not_of(" \t");
+    std::string word;
+    if (start != std::string::npos) {
+      size_t end = line.find_first_of(" \t", start);
+      word = line.substr(start, end == std::string::npos ? std::string::npos
+                                                         : end - start);
+      for (char &c : word) {
+        c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+      }
+    }
+    if (word == "restart") {
+      // TODO(H1): a real RESTART re-initialises the whole machine.
+      tell("Failed.", CR);
+    } else if (word == "restore") {
+      if (SaveSystem::restore(SAVE_FILE) == SaveSystem::SaveError::SUCCESS) {
+        tell("Ok.", CR);
+      } else {
+        tell("Failed.", CR);
+      }
+    } else if (word == "quit" || word == "q") {
+      std::exit(0);
+    }
   }
 }
 
