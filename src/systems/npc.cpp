@@ -348,7 +348,7 @@ bool thiefCombat() {
     if (!isThiefWithPlayer()) return false;
     
     // Check if player is attacking thief
-    if (g.prsa == V_ATTACK || g.prsa == V_KILL) {
+    if (g.prsa == V_ATTACK) {
         if (g.prso == thief) {
             thiefState.isEngaged = true;
             
@@ -664,7 +664,7 @@ bool trollCombat() {
     if (!isTrollWithPlayer()) return false;
     
     // Check if player is attacking troll
-    if (g.prsa == V_ATTACK || g.prsa == V_KILL) {
+    if (g.prsa == V_ATTACK) {
         if (g.prso == troll) {
             // Check if player has a weapon
             ZObject* weapon = g.prsi;
@@ -816,7 +816,7 @@ bool trollAction() {
     }
     
     // Handle ATTACK/KILL
-    if (g.prsa == V_ATTACK || g.prsa == V_KILL) {
+    if (g.prsa == V_ATTACK) {
         return trollCombat();
     }
     
@@ -1056,7 +1056,7 @@ bool cyclopsCombat() {
     }
     
     // Check if player is attacking cyclops
-    if (g.prsa == V_ATTACK || g.prsa == V_KILL) {
+    if (g.prsa == V_ATTACK) {
         if (g.prso == cyclops) {
             // Check if player has a weapon
             ZObject* weapon = g.prsi;
@@ -1176,7 +1176,7 @@ bool cyclopsAction() {
             printLine("The cyclops is sleeping like a baby, albeit a very ugly one.");
             return RTRUE;
         }
-        if (g.prsa == V_ALARM || g.prsa == V_KICK || g.prsa == V_ATTACK || g.prsa == V_BURN || g.prsa == V_MUNG || g.prsa == V_KILL) {
+        if (g.prsa == V_ALARM || g.prsa == V_KICK || g.prsa == V_ATTACK || g.prsa == V_BURN || g.prsa == V_MUNG) {
             printLine("The cyclops yawns and stares at the thing that woke him up.");
             cyclopsState.isAsleep = false;
             cyclops->setFlag(ObjectFlag::FIGHTBIT);
@@ -1253,7 +1253,7 @@ bool cyclopsAction() {
     }
 
     // Fallback for Attack/Kill
-    if (g.prsa == V_ATTACK || g.prsa == V_KILL) {
+    if (g.prsa == V_ATTACK) {
          return cyclopsCombat();
     }
     

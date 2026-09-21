@@ -728,7 +728,7 @@ bool bottleAction() {
     destroyed = true;
   }
   // MUNG (Attack/Break) - Destroys bottle
-  else if (g.prsa == V_ATTACK || g.prsa == V_KILL || g.prsa == V_MUNG) {
+  else if (g.prsa == V_ATTACK || g.prsa == V_MUNG) {
     printLine("A brilliant maneuver destroys the bottle.");
     destroyed = true;
   }

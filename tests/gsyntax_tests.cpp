@@ -150,10 +150,10 @@ void testVerbSynonyms() {
     assert(GSyntax::lookupVerb("hurt") == V_ATTACK);
     assert(GSyntax::lookupVerb("injure") == V_ATTACK);
     assert(GSyntax::lookupVerb("hit") == V_ATTACK);
-    assert(GSyntax::lookupVerb("kill") == V_KILL);
-    assert(GSyntax::lookupVerb("murder") == V_KILL);
-    assert(GSyntax::lookupVerb("slay") == V_KILL);
-    assert(GSyntax::lookupVerb("dispatch") == V_KILL);
+    assert(GSyntax::lookupVerb("kill") == V_ATTACK);
+    assert(GSyntax::lookupVerb("murder") == V_ATTACK);
+    assert(GSyntax::lookupVerb("slay") == V_ATTACK);
+    assert(GSyntax::lookupVerb("dispatch") == V_ATTACK);
 
     // Look synonyms
     assert(GSyntax::lookupVerb("look") == V_LOOK);

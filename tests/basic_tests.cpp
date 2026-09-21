@@ -2214,16 +2214,16 @@ TEST(NPCCreationGrue) {
     // Verify GRUE object exists
     ZObject* grue = g.getObject(ObjectIds::GRUE);
     ASSERT_TRUE(grue != nullptr);
-    ASSERT_EQ(grue->getDesc(), "grue");
+    ASSERT_EQ(grue->getDesc(), "lurking grue"); // gglobals.zil:188
     
     // Verify GRUE has INVISIBLE flag (never seen, only felt)
-    ASSERT_TRUE(grue->hasFlag(ObjectFlag::INVISIBLE));
+    ASSERT_FALSE(grue->hasFlag(ObjectFlag::INVISIBLE)); // no FLAGS in ZIL
     
     // Verify GRUE has correct synonym
     ASSERT_TRUE(grue->hasSynonym("grue"));
     
     // Verify GRUE has no location (exists in darkness)
-    ASSERT_EQ(grue->getLocation(), nullptr);
+    ASSERT_EQ(grue->getLocation(), g.getObject(ObjectIds::GLOBAL_OBJECTS)); // (IN GLOBAL-OBJECTS)
     
     // Cleanup
     g.reset();

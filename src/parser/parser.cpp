@@ -34,7 +34,7 @@ void Parser::initializeVerbsAndDirections() {
   verbSynonyms_["i"] = V_INVENTORY;
   verbSynonyms_["go"] = V_WALK;
   verbSynonyms_["attack"] = V_ATTACK;
-  verbSynonyms_["kill"] = V_KILL;
+  verbSynonyms_["kill"] = V_ATTACK; // ZIL: KILL ... = V-ATTACK (gsyntax.zil:264)
   verbSynonyms_["quit"] = V_QUIT;
   verbSynonyms_["q"] = V_QUIT;
 
@@ -316,18 +316,23 @@ bool Parser::isObjectVisible(ZObject *obj) const {
 
   auto &g = Globals::instance();
 
-  // Special case: Kitchen window is visible from both Behind House and Kitchen
+  // ZIL: GLOBAL-CHECK (gparser.zil:1169-1200) reaches the room's GLOBAL list
+  // (objects in LOCAL-GLOBALS) and everything in GLOBAL-OBJECTS.
+  if (ZObject *loc = obj->getLocation()) {
+    if (loc->getId() == ObjectIds::GLOBAL_OBJECTS) {
+      return true;
+    }
+    if (loc->getId() == ObjectIds::LOCAL_GLOBALS) {
+      return Verbs::globalIn(obj->getId(), g.here);
+    }
+  }
+  // Interim: objects placed directly in a room by the old data but listed as
+  // that room's globals elsewhere (kitchen window) stay reachable.
   if (obj->getId() == ObjectIds::KITCHEN_WINDOW) {
     if (g.here && (g.here->getId() == RoomIds::BEHIND_HOUSE ||
                    g.here->getId() == RoomIds::KITCHEN)) {
       return true;
     }
-  }
-
-  // Global objects are always visible (GROUND, GRUE, etc.)
-  // These are objects that exist everywhere conceptually
-  if (obj->getId() == ObjectIds::GROUND) {
-    return true;
   }
 
   // Objects with priority > 0 are visible
@@ -988,7 +993,6 @@ bool verbRequiresObject(VerbId verb) {
   case V_LOCK:
   case V_UNLOCK:
   case V_ATTACK:
-  case V_KILL:
   case V_THROW:
   case V_LAMP_ON:
   case V_LAMP_OFF:
@@ -1045,8 +1049,6 @@ std::string getVerbName(VerbId verb) {
     return "unlock";
   case V_ATTACK:
     return "attack";
-  case V_KILL:
-    return "kill";
   case V_THROW:
     return "throw";
   case V_LAMP_ON:

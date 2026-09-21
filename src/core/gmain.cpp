@@ -103,7 +103,6 @@ void initializeAllVerbHandlers() {
 
   // Combat
   registerVerbHandler(V_ATTACK, Verbs::vAttack);
-  registerVerbHandler(V_KILL, Verbs::vKill);
   registerVerbHandler(V_THROW, Verbs::vThrow);
   registerVerbHandler(V_SWING, Verbs::vSwing);
 
@@ -430,21 +429,19 @@ void mainLoop1() {
   print(">");
   std::string input = readLine();
 
-  if (input.empty()) {
-    return;
-  }
-
   size_t start = input.find_first_not_of(" \t\r\n");
   size_t end = input.find_last_not_of(" \t\r\n");
   if (start == std::string::npos) {
+    // ZIL: <COND (<ZERO? <SET LEN <GETB ,P-LEXV ,P-LEXWORDS>>>
+    //             <TELL "I beg your pardon?" CR> <RFALSE>)> (gparser.zil:174-176)
+    if (!std::cin.eof()) {
+      printLine("I beg your pardon?");
+    }
+    g.pWon = false;
+    g.pCont = false;
     return;
   }
   input = input.substr(start, end - start + 1);
-
-  if (input.length() > 1000) {
-    printLine("That command is too long.");
-    return;
-  }
 
   ParsedCommand cmd = getGlobalParser().parse(input);
 
@@ -660,7 +657,6 @@ int executeCommand(const ParsedCommand &cmdIn) {
 void mainLoop() {
   while (true) {
     if (std::cin.eof()) {
-      std::println("\nGoodbye!");
       break;
     }
     mainLoop1();

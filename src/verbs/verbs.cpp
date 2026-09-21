@@ -2081,11 +2081,6 @@ bool vAttack() {
   return RTRUE;
 }
 
-bool vKill() {
-  // KILL is a synonym for ATTACK
-  return vAttack();
-}
-
 bool vThrow() {
   auto &g = Globals::instance();
 

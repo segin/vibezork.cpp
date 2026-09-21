@@ -71,7 +71,6 @@ constexpr VerbId V_DISEMBARK = 57;
 
 // Combat
 constexpr VerbId V_ATTACK = 60;
-constexpr VerbId V_KILL = 61;
 constexpr VerbId V_THROW = 62;
 constexpr VerbId V_SWING = 63;
 
@@ -394,7 +393,6 @@ namespace Verbs {
     
     // Combat verbs
     bool vAttack();
-    bool vKill();
     bool vThrow();
     bool vSwing();
     

@@ -10,6 +10,7 @@
 #include "core/io.h"
 #include "core/globals.h"
 #include "core/object.h"
+#include "parser/parser.h"
 #include "systems/death.h"
 #include "verbs/verbs.h"
 #include "world/objects.h"
@@ -136,7 +137,8 @@ TEST(NotHerePrint_OrphanMode) {
   OutputCapture cap;
   bool res = GGlobals::notHereObjectF();
   assert(res);
-  assert(cap.getOutput().find("You can't see any shiny key here!") != std::string::npos);
+  // R119 prints P-XADJN and P-XNAM back to back (gglobals.zil:77-79)
+  assert(cap.getOutput().find("You can't see any shinykey here!") != std::string::npos);
 }
 
 // ============================================================================
@@ -339,6 +341,44 @@ TEST(GrueFunction_Listen) {
   bool res = GGlobals::grueFunction();
   assert(res);
   assert(cap.getOutput().find("It makes no sound but is always lurking in the darkness nearby.") != std::string::npos);
+}
+
+// ZIL: the grue lives in GLOBAL-OBJECTS with no INVISIBLE flag, so the
+// parser can find it anywhere (gglobals.zil:184-189).
+TEST(GrueFunction_Findable) {
+  auto &g = Globals::instance();
+  g.reset();
+  initializeWorld();
+  ZObject *grue = g.getObject(ObjectIds::GRUE);
+  assert(grue != nullptr);
+  assert(grue->getDesc() == "lurking grue");
+  assert(grue->getLocation() == g.getObject(ObjectIds::GLOBAL_OBJECTS));
+  assert(!grue->hasFlag(ObjectFlag::INVISIBLE));
+  Parser parser;
+  auto matches = parser.findObjects({"grue"}, 0);
+  assert(matches.size() == 1 && matches[0] == grue);
+  g.reset();
+}
+
+// ZIL: GROUND-FUNCTION and CRETIN-FCN go through PERFORM, so the verb's
+// PRE-action and default action both run (gglobals.zil:173, 229).
+TEST(GroundAndCretin_UsePerform) {
+  auto &g = Globals::instance();
+  g.reset();
+  initializeWorld();
+  ZObject *ground = g.getObject(ObjectIds::GROUND);
+  ZObject *sword = g.getObject(ObjectIds::SWORD);
+  sword->moveTo(g.player);
+  g.prsa = V_PUT_ON;
+  g.prso = sword;
+  g.prsi = ground;
+  OutputCapture cap;
+  assert(GGlobals::groundFunction());
+  assert(sword->getLocation() == g.here);
+  // PRSA is restored by PERFORM
+  assert(g.prsa == V_PUT_ON);
+  assert(cap.getOutput().find("Dropped.") != std::string::npos);
+  g.reset();
 }
 
 TEST(GrueFunction_Unhandled) {
@@ -684,13 +724,17 @@ TEST(All18ObjectsInitialization) {
   assert(ground->hasSynonym("floor"));
   assert(ground->hasSynonym("dirt"));
   assert(ground->hasSynonym("sand"));
-  assert(ground->hasFlag(ObjectFlag::NDESCBIT));
-  assert(ground->hasFlag(ObjectFlag::INVISIBLE));
+  // ZIL: GROUND has no FLAGS clause (gglobals.zil:164-168)
+  assert(!ground->hasFlag(ObjectFlag::NDESCBIT));
+  assert(!ground->hasFlag(ObjectFlag::INVISIBLE));
 
   // 12. GRUE
   ZObject *grue = g.getObject(ObjectIds::GRUE);
   assert(grue != nullptr);
-  assert(grue->getLocation() == nullptr);
+  // ZIL: (IN GLOBAL-OBJECTS), DESC "lurking grue", no flags (gglobals.zil:184-189)
+  assert(grue->getLocation() == glob);
+  assert(grue->getDesc() == "lurking grue");
+  assert(!grue->hasFlag(ObjectFlag::INVISIBLE));
   assert(grue->hasSynonym("grue"));
   assert(grue->hasAdjective("lurking"));
   assert(grue->hasAdjective("sinister"));

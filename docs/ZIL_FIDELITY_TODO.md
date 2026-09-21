@@ -10,7 +10,7 @@ test, build, commit, push; then mark `[x]` and update the counters. Every routin
 ported carries `// ZIL:` and `// Source: <file>:<lines>` comments. Never simplify
 away a ZIL behaviour.
 
-Progress: 11/74 (15%)
+Progress: 12/74 (16%)
 
 ## Phase A: engine foundations (src/core, src/systems/timer)
 
@@ -25,7 +25,7 @@ Progress: 11/74 (15%)
 - [x] A9 IT: substitution in P-PRSI then P-PRSO, PERFORM's ACCESSIBLE? check with "I don't see what you are referring to." + RFATAL, P-IT-OBJECT rule with the PRSI!=IT and WALK guards; THEM/HER/HIM are IT synonyms (gmain.zil:45-64, 194-203; §2.4)
 - [x] A10 Multi-object loop per MAIN-LOOP-1: NUM>1 without ALL, "name: " prefix, the three "multiple exceptions", P-NOT-HERE and "The [other] object[s] that you mentioned is/aren't here.", any-verb "There's nothing here you can take.", PRSO/PRSI role swap (gmain.zil:65-150; §2.5)
 - [x] A11 Zero-object branch: "It's too dark to see." / "It's not clear what you're referring to." (gmain.zil:82-90; §2.6)
-- [ ] A12 gglobals fidelity: GROUND-FUNCTION and CRETIN-FCN use PERFORM; GRUE is "lurking grue" in GLOBAL-OBJECTS without INVISIBLE; GROUND without NDESCBIT/INVISIBLE; NOT-HERE-PRINT spacing; "I beg your pardon?" on empty input; remove "That command is too long." and "Goodbye!" (gglobals.zil; §2.11-2.13, §2.16)
+- [x] A12 gglobals fidelity: GROUND-FUNCTION and CRETIN-FCN use PERFORM; GRUE is "lurking grue" in GLOBAL-OBJECTS without INVISIBLE; GROUND without NDESCBIT/INVISIBLE; NOT-HERE-PRINT spacing; "I beg your pardon?" on empty input; remove "That command is too long." and "Goodbye!" (gglobals.zil; §2.11-2.13, §2.16)
 
 ## Phase B: parser (src/parser)
 

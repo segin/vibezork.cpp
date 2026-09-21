@@ -799,6 +799,38 @@ void testZeroObjectBranch() {
   std::println("✓ Zero-object branch verified against gmain.zil:82-90");
 }
 
+// ZIL: empty input -> "I beg your pardon?" and P-WON false (gparser.zil:174-176)
+void testEmptyInput() {
+  std::println("Testing empty input...");
+  auto &g = Globals::instance();
+  g.reset();
+  initializeAllVerbHandlers();
+  auto playerObj = std::make_unique<ZObject>(5701, "adventurer");
+  auto roomObj = std::make_unique<ZRoom>(5702, "Cellar", "Cellar desc");
+  g.player = playerObj.get();
+  g.winner = playerObj.get();
+  g.here = roomObj.get();
+  g.pWon = true;
+  g.pCont = true;
+  g.moves = 0;
+
+  std::stringstream in("   \n");
+  auto *oldIn = std::cin.rdbuf(in.rdbuf());
+  std::stringstream out;
+  auto *oldOut = std::cout.rdbuf(out.rdbuf());
+  mainLoop1();
+  crlf();
+  std::cout.rdbuf(oldOut);
+  std::cin.rdbuf(oldIn);
+  std::cin.clear();
+
+  assert(out.str().find("I beg your pardon?") != std::string::npos);
+  assert(!g.pWon);
+  assert(!g.pCont);
+  assert(g.moves == 0);
+  std::println("✓ Empty input verified against gparser.zil:174-176");
+}
+
 void testMetaVerbs() {
   std::println("Testing meta-verb recognition...");
 
@@ -868,6 +900,7 @@ int main() {
   testItSubstitution();
   testMultiObjectLoop();
   testZeroObjectBranch();
+  testEmptyInput();
   testMetaVerbs();
   testMovesCountedOnlyByClocker();
 

@@ -184,7 +184,7 @@ TEST(RegistrySynonyms) {
     
     // Combat
     check(V_ATTACK, {"attack", "fight", "hurt", "injure", "hit"});
-    check(V_KILL, {"kill", "murder", "slay", "dispatch"});
+    check(V_ATTACK, {"kill", "murder", "slay", "dispatch"});
     check(V_THROW, {"throw", "hurl", "chuck", "toss"});
     check(V_SWING, {"swing", "thrust"});
 

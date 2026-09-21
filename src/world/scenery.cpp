@@ -338,14 +338,7 @@ void initializeScenery() {
         .location = RoomIds::MAZE_5
     });
     
-    // GROUND - Global ground object (for PUT X ON GROUND)
-    createObject({
-        .id = GROUND,
-        .desc = "ground",
-        .synonyms = {"ground", "floor", "dirt", "sand"},
-        .flags = {ObjectFlag::NDESCBIT, ObjectFlag::INVISIBLE},
-        .action = groundAction
-    });
+    // GROUND is created by GGlobals::initGlobalObjects (gglobals.zil:164-168).
 
     
     // LEAVES - Pile of leaves in Grating Clearing

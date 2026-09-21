@@ -227,10 +227,10 @@ TEST(KillVerbSynonym) {
     // Set up verb context
     g.prso = trollPtr;
     g.prsi = swordPtr;
-    g.prsa = V_KILL;
+    g.prsa = V_ATTACK;
     
     // Test KILL verb (should work like ATTACK)
-    bool result = Verbs::vKill();
+    bool result = Verbs::vAttack();
     ASSERT_TRUE(result);
     
     // Combat is probabilistic - just verify command was handled

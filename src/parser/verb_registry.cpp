@@ -73,8 +73,10 @@ void VerbRegistry::initializeVerbSynonyms() {
     registerVerb(V_DISEMBARK, {"disembark"});
     
     // Combat verbs
-    registerVerb(V_ATTACK, {"attack", "fight", "hurt", "injure", "hit", "strike"});
-    registerVerb(V_KILL, {"kill", "murder", "slay", "dispatch"});
+    // ZIL: KILL MURDER SLAY DISPATCH are a separate verb word whose SYNTAX
+    // lines all map to V-ATTACK (gsyntax.zil:264-266)
+    registerVerb(V_ATTACK, {"attack", "fight", "hurt", "injure", "hit", "strike",
+                            "kill", "murder", "slay", "dispatch"});
     registerVerb(V_THROW, {"throw", "hurl", "chuck", "toss"});
     registerVerb(V_SWING, {"swing", "thrust"});
     
@@ -478,12 +480,12 @@ void VerbRegistry::initializeSyntaxPatterns() {
         Elem obj1(ET::OBJECT, ObjectFlag::ACTORBIT);
         Elem prep(ET::PREPOSITION, {"with"});
         Elem obj2(ET::OBJECT, ObjectFlag::WEAPONBIT);
-        registerSyntax(V_KILL, SyntaxPattern(V_KILL, {Elem(ET::VERB), obj1, prep, obj2}));
+        registerSyntax(V_ATTACK, SyntaxPattern(V_ATTACK, {Elem(ET::VERB), obj1, prep, obj2}));
     }
     
     {
         Elem objElem(ET::OBJECT, ObjectFlag::ACTORBIT);
-        registerSyntax(V_KILL, SyntaxPattern(V_KILL, {Elem(ET::VERB), objElem}));
+        registerSyntax(V_ATTACK, SyntaxPattern(V_ATTACK, {Elem(ET::VERB), objElem}));
     }
     
     // THROW verb patterns

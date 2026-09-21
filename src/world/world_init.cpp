@@ -2892,17 +2892,7 @@ void initializeWorld() {
     
     g.registerObject(OBJ_KITCHEN_WINDOW, std::move(kitchenWindow));
     
-    // Create Ground global object (ZIL: GROUND in GLOBAL-OBJECTS)
-    // Handles PUT X ON GROUND -> DROP X
-    auto ground = std::make_unique<ZObject>(ObjectIds::GROUND, "ground");
-    ground->addSynonym("ground");
-    ground->addSynonym("floor");
-    ground->addSynonym("dirt");
-    ground->addSynonym("sand");
-    ground->setFlag(ObjectFlag::NDESCBIT);
-    ground->setFlag(ObjectFlag::INVISIBLE);
-    ground->setAction(groundAction);
-    g.registerObject(ObjectIds::GROUND, std::move(ground));
+    // GROUND is created by GGlobals::initGlobalObjects (gglobals.zil:164-168).
 
     // Create Hands global object (ZIL: HANDS in GLOBAL-OBJECTS)
     auto hands = std::make_unique<ZObject>(ObjectIds::HANDS, "pair of hands");
@@ -3803,7 +3793,7 @@ void initializeWorld() {
         }
         
         // Handle ATTACK/KILL - delegate to NPC combat system
-        if (g.prsa == V_ATTACK || g.prsa == V_KILL) {
+        if (g.prsa == V_ATTACK) {
             return NPCSystem::thiefCombat() ? RTRUE : RFALSE;
         }
         
@@ -3882,14 +3872,7 @@ void initializeWorld() {
     cyclops->moveTo(g.getObject(RoomIds::CYCLOPS_ROOM));
     g.registerObject(ObjectIds::CYCLOPS, std::move(cyclops));
     
-    // Create GRUE object (for darkness attacks)
-    // The grue is never seen, only felt - it's not a physical object in the world
-    auto grue = std::make_unique<ZObject>(ObjectIds::GRUE, "grue");
-    grue->addSynonym("grue");
-    grue->setFlag(ObjectFlag::INVISIBLE);      // Never visible
-    // The grue doesn't have a location - it exists in darkness
-    // TODO: Add action handler for grue attacks in darkness
-    g.registerObject(ObjectIds::GRUE, std::move(grue));
+    // GRUE is created by GGlobals::initGlobalObjects (gglobals.zil:184-189).
     
     // ===== TASK 24.2: Verify all object placements =====
     // All objects have been placed in their initial locations above

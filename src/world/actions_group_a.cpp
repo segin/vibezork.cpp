@@ -593,7 +593,7 @@ bool deadFunction() {
 
   // Denied Verbs
   if (g.prsa == V_ATTACK || g.prsa == V_MUNG || g.prsa == V_ALARM ||
-      g.prsa == V_SWING || g.prsa == V_KILL) {
+      g.prsa == V_SWING) {
     printLine("All such attacks are vain in your condition.");
     return true;
   }
@@ -801,7 +801,7 @@ bool ghostsAction() {
     return true;
   }
 
-  if (g.prsa == V_ATTACK || g.prsa == V_MUNG || g.prsa == V_KILL) {
+  if (g.prsa == V_ATTACK || g.prsa == V_MUNG) {
     if (g.prso && g.prso->getId() == ObjectIds::GHOSTS) {
       printLine("How can you attack a spirit with material objects?");
       return true;
@@ -2152,7 +2152,7 @@ bool batAction() {
   }
 
   // Handle TAKE, ATTACK, MUNG
-  if (g.prsa == V_TAKE || g.prsa == V_ATTACK || g.prsa == V_KILL) {
+  if (g.prsa == V_TAKE || g.prsa == V_ATTACK) {
     // Check for garlic - protects player from bat
     // ZIL: <EQUAL? <LOC ,GARLIC> ,WINNER ,HERE>
     ZObject *garlic = g.getObject(ObjectIds::GARLIC);
@@ -2199,7 +2199,7 @@ bool boardedWindowAction() {
     printLine("The windows are boarded and can't be opened.");
     return true;
   }
-  if (g.prsa == V_ATTACK || g.prsa == V_KILL ||
+  if (g.prsa == V_ATTACK ||
       g.prsa == V_MUNG) { // MUNG = break
     printLine("You can't break the windows open.");
     return true;

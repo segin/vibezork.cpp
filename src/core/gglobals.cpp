@@ -9,6 +9,7 @@
 #include "core/flags.h"
 #include "core/globals.h"
 #include "core/io.h"
+#include "core/gmain.h"
 #include "core/object.h"
 #include "parser/gparser.h"
 #include "systems/death.h"
@@ -50,28 +51,21 @@ bool notHereObjectF() {
 }
 
 // ZIL: <ROUTINE NOT-HERE-PRINT (PRSO?) ...> (gglobals.zil:76-84)
+// R119 prints the orphaned adjective and noun back to back (the R88
+// source inserted spaces); the leading text already ends in a space.
 void notHerePrint(bool prso) {
   auto &g = Globals::instance();
   if (g.pOflag) {
     if (!g.pXadjn.empty()) {
       print(g.pXadjn);
-      print(" ");
     }
     if (!g.pXnam.empty()) {
       print(g.pXnam);
     }
   } else if (prso) {
-    if (!g.pNc1.empty()) {
-      GParser::bufferPrint(g.pNc1, false);
-    } else {
-      print("such thing");
-    }
+    GParser::bufferPrint(g.pNc1, false);
   } else {
-    if (!g.pNc2.empty()) {
-      GParser::bufferPrint(g.pNc2, false);
-    } else {
-      print("such thing");
-    }
+    GParser::bufferPrint(g.pNc2, false);
   }
 }
 
@@ -123,9 +117,9 @@ bool groundFunction() {
   ZObject *ground = g.getObject(ObjectIds::GROUND);
   if ((g.prsa == V_PUT || g.prsa == V_PUT_ON) && g.prsi &&
       (g.prsi == ground || g.prsi->getId() == ObjectIds::GROUND)) {
-    g.prsa = V_DROP;
-    g.prsi = nullptr;
-    return Verbs::vDrop();
+    // ZIL: <PERFORM ,V?DROP ,PRSO> <RTRUE>
+    perform(V_DROP, g.prso);
+    return true;
   }
   if (g.here && g.here->getId() == RoomIds::SANDY_CAVE) {
     return ::sandAction();
@@ -176,9 +170,9 @@ bool cretinFcn() {
   if (g.prsa == V_GIVE && g.prsi &&
       (g.prsi == meObj || g.prsi == g.player ||
        g.prsi->getId() == ObjectIds::ME || g.prsi->getId() == ObjectIds::ADVENTURER)) {
-    g.prsa = V_TAKE;
-    g.prsi = nullptr;
-    return Verbs::vTake();
+    // ZIL: <PERFORM ,V?TAKE ,PRSO> <RTRUE>
+    perform(V_TAKE, g.prso);
+    return true;
   }
   if (g.prsa == V_MAKE) {
     printLine("Only you can do that.");
@@ -192,7 +186,7 @@ bool cretinFcn() {
     printLine("Auto-cannibalism is not the answer.");
     return true;
   }
-  if (g.prsa == V_ATTACK || g.prsa == V_MUNG || g.prsa == V_KILL) {
+  if (g.prsa == V_ATTACK || g.prsa == V_MUNG) {
     if (g.prsi && g.prsi->hasFlag(ObjectFlag::WEAPONBIT)) {
       DeathSystem::jigsUp("If you insist.... Poof, you're dead!");
     } else {
@@ -302,7 +296,6 @@ void initGlobalObjects(Globals &g) {
   auto *intnum = getOrCreate(ObjectIds::INTNUM, "number");
   intnum->moveTo(glob);
   intnum->addSynonym("intnum");
-  intnum->addSynonym("number");
   intnum->setFlag(ObjectFlag::TOOLBIT);
 
   // 5. PSEUDO-OBJECT (gglobals.zil:37-40)
@@ -363,18 +356,17 @@ void initGlobalObjects(Globals &g) {
   ground->addSynonym("sand");
   ground->addSynonym("dirt");
   ground->addSynonym("floor");
-  ground->setFlag(ObjectFlag::NDESCBIT);
-  ground->setFlag(ObjectFlag::INVISIBLE);
   ground->setAction(groundFunction);
 
-  // 12. GRUE (gglobals.zil:184-189)
-  auto *grue = getOrCreate(ObjectIds::GRUE, "grue");
+  // 12. GRUE (gglobals.zil:184-189): (IN GLOBAL-OBJECTS), DESC "lurking grue",
+  // no flags -- it can always be examined, found and listened to.
+  auto *grue = getOrCreate(ObjectIds::GRUE, "lurking grue");
+  grue->moveTo(glob);
   grue->addSynonym("grue");
   grue->addAdjective("lurking");
   grue->addAdjective("sinister");
   grue->addAdjective("hungry");
   grue->addAdjective("silent");
-  grue->setFlag(ObjectFlag::INVISIBLE);
   grue->setAction(grueFunction);
 
   // 13. LUNGS (gglobals.zil:208-212)

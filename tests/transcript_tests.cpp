@@ -65,7 +65,6 @@ static std::map<VerbId, std::function<bool()>> verbHandlers = {
     {V_RUB, Verbs::vRub},
     {V_RING, Verbs::vRing},
     {V_ATTACK, Verbs::vAttack},
-    {V_KILL, Verbs::vKill},
     {V_THROW, Verbs::vThrow},
     {V_SWING, Verbs::vSwing},
     {V_SCORE, Verbs::vScore},
