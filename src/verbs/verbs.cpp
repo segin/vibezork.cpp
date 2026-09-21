@@ -1545,17 +1545,10 @@ bool vSmell() {
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-YELL () <TELL "Aaaarrrrgggghhhh!" CR>>
+// Source: zil/gverbs.zil:1616
 bool vYell() {
-  auto &g = Globals::instance();
-
-  // Call room action handler for special yell behavior
-  ZRoom *room = dynamic_cast<ZRoom *>(g.here);
-  if (room) {
-    room->performRoomAction(M_YELL);
-  }
-
-  // Default message
-  printLine("Aaaarrrrgggghhhh!");
+  tell("Aaaarrrrgggghhhh!", CR);
   return RTRUE;
 }
 
@@ -1805,18 +1798,15 @@ bool vDeflate() {
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-PRAY () ...>
+// Source: zil/gverbs.zil:1046-1054
 bool vPray() {
   auto &g = Globals::instance();
-
-  // PRAY is typically a room-specific action
-  // Call room action handler if present
-  ZRoom *room = dynamic_cast<ZRoom *>(g.here);
-  if (room) {
-    room->performRoomAction(M_PRAY);
+  if (g.here && g.here->getId() == RoomIds::SOUTH_TEMPLE) {
+    goTo(g.getObject(RoomIds::FOREST_1));
+    return RTRUE;
   }
-
-  // Authentic ZIL V-PRAY default
-  printLine("If you pray enough, your prayers may be answered.");
+  tell("If you pray enough, your prayers may be answered.", CR);
   return RTRUE;
 }
 
@@ -2212,79 +2202,29 @@ bool vUnscript() {
 
 // Communication Verbs
 
-bool vTalk() {
-  auto &g = Globals::instance();
 
-  // Check if target is specified
-  if (!g.prso) {
-    printLine("Talk to whom?");
-    return RTRUE;
-  }
 
-  // Check if target is an actor/NPC
-  if (!g.prso->hasFlag(ObjectFlag::ACTORBIT)) {
-    printLine("You can't talk to that.");
-    return RTRUE;
-  }
-
-  // Call object action handler for custom responses
-  if (g.prso->performAction()) {
-    return RTRUE;
-  }
-
-  // Default response
-  printLine("There is no response.");
-  return RTRUE;
-}
-
-bool vAsk() {
-  auto &g = Globals::instance();
-
-  // Check if target is specified
-  if (!g.prso) {
-    printLine("Ask whom?");
-    return RTRUE;
-  }
-
-  // Check if target is an actor/NPC
-  if (!g.prso->hasFlag(ObjectFlag::ACTORBIT)) {
-    printLine("You can't ask that.");
-    return RTRUE;
-  }
-
-  // Call object action handler for custom responses
-  if (g.prso->performAction()) {
-    return RTRUE;
-  }
-
-  // Default response
-  printLine("There is no response.");
-  return RTRUE;
-}
-
+// ZIL: <ROUTINE V-TELL () ...>
+// Source: zil/gverbs.zil:1389-1402. With a quoted command following, the
+// actor becomes WINNER for the rest of the turn.
 bool vTell() {
   auto &g = Globals::instance();
-
-  // Check if target is specified
-  if (!g.prso) {
-    printLine("Tell whom?");
+  if (g.prso && g.prso->hasFlag(ObjectFlag::ACTORBIT)) {
+    if (g.pCont) {
+      g.winner = g.prso;
+      g.here = g.winner->getLocation();
+    } else {
+      tell("The ", g.prso,
+           " pauses for a moment, perhaps thinking that you should reread the "
+           "manual.",
+           CR);
+    }
     return RTRUE;
   }
-
-  // Check if target is an actor/NPC
-  if (!g.prso->hasFlag(ObjectFlag::ACTORBIT)) {
-    printLine("You can't tell that anything.");
-    return RTRUE;
-  }
-
-  // Call object action handler for custom responses
-  if (g.prso->performAction()) {
-    return RTRUE;
-  }
-
-  // Default response
-  printLine("There is no response.");
-  return RTRUE;
+  tell("You can't talk to the ", g.prso, "!", CR);
+  g.quoteFlag = false;
+  g.pCont = 0;
+  return GMacros::rfatal();
 }
 
 bool vOdysseus() {
@@ -2295,32 +2235,20 @@ bool vOdysseus() {
 
 // Easter eggs / special words - authentic ZIL responses
 
+// ZIL: <ROUTINE V-HELLO () ...>
+// Source: zil/gverbs.zil:723-734
 bool vHello() {
   auto &g = Globals::instance();
-
-  // If object specified, greet that object
   if (g.prso) {
     if (g.prso->hasFlag(ObjectFlag::ACTORBIT)) {
-      print("The ");
-      print(g.prso->getDesc());
-      printLine(" bows his head to you in greeting.");
+      tell("The ", g.prso, " bows his head to you in greeting.", CR);
     } else {
-      print("It's a well known fact that only schizophrenics say \"Hello\" to "
-            "a ");
-      print(g.prso->getDesc());
-      printLine(".");
+      tell("It's a well known fact that only schizophrenics say \"Hello\" to a ",
+           g.prso, ".", CR);
     }
-    return RTRUE;
+  } else {
+    tell(VerbTables::hellos().pickOne(), CR);
   }
-
-  // No object - generic hello responses
-  // ZIL has a PICK-ONE from HELLOS table
-  static const char *hellos[] = {"Hello.", "Good day.",
-                                 "Nice weather we've been having lately.",
-                                 "Goodbye."};
-  static int helloIdx = 0;
-  printLine(hellos[helloIdx % 4]);
-  helloIdx++;
   return RTRUE;
 }
 
@@ -2386,18 +2314,18 @@ bool vJump() {
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-CURSES () ...>
+// Source: zil/gverbs.zil:374-382
 bool vCurse() {
   auto &g = Globals::instance();
-
-  // Authentic ZIL V-CURSES
   if (g.prso) {
     if (g.prso->hasFlag(ObjectFlag::ACTORBIT)) {
-      printLine("Insults of this nature won't help you.");
+      tell("Insults of this nature won't help you.", CR);
     } else {
-      printLine("What a loony!");
+      tell("What a loony!", CR);
     }
   } else {
-    printLine("Such language in a high-class establishment like this!");
+    tell("Such language in a high-class establishment like this!", CR);
   }
   return RTRUE;
 }
@@ -2453,8 +2381,22 @@ bool vLeap() {
   return vJump(); // Share logic with JUMP
 }
 
+// ZIL: <ROUTINE V-SAY ("AUX" V) ...>
+// Source: zil/gverbs.zil:1167-1194
 bool vSay() {
-  printLine("Talking to yourself is a sign of impending mental collapse.");
+  auto &g = Globals::instance();
+  if (!g.pCont) {
+    tell("Say what?", CR);
+    return RTRUE;
+  }
+  g.quoteFlag = false;
+  if (ZObject *v = findIn(g.here, ObjectFlag::ACTORBIT)) {
+    tell("You must address the ", v, " directly.", CR);
+    g.pCont = 0;
+  } else {
+    g.pCont = 0;
+    tell("Talking to yourself is a sign of impending mental collapse.", CR);
+  }
   return RTRUE;
 }
 
@@ -2624,26 +2566,34 @@ bool vTieUp() {
 
 // Phase 10.3 Batch 3: Interactions
 
+// ZIL: <ROUTINE V-ANSWER () ...>
+// Source: zil/gverbs.zil:170-174
 bool vAnswer() {
-  printLine("There is no one waiting for an answer.");
+  auto &g = Globals::instance();
+  tell("Nobody seems to be awaiting your answer.", CR);
+  g.pCont = 0;
+  g.quoteFlag = false;
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-REPLY () ...>
+// Source: zil/gverbs.zil:1156-1160
 bool vReply() {
-  printLine("It is hardly likely that the ");
-  if (Globals::instance().prso)
-    print(Globals::instance().prso->getDesc());
-  printLine(" is interested.");
+  auto &g = Globals::instance();
+  tell("It is hardly likely that the ", g.prso, " is interested.", CR);
+  g.pCont = 0;
+  g.quoteFlag = false;
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-COMMAND () ...>
+// Source: zil/gverbs.zil:359-363
 bool vCommand() {
-  if (Globals::instance().prso) {
-    print("The ");
-    print(Globals::instance().prso->getDesc());
-    printLine(" pays no attention.");
+  auto &g = Globals::instance();
+  if (g.prso && g.prso->hasFlag(ObjectFlag::ACTORBIT)) {
+    tell("The ", g.prso, " pays no attention.", CR);
   } else {
-    printLine("Command whom?");
+    tell("You cannot talk to that!", CR);
   }
   return RTRUE;
 }
@@ -2663,13 +2613,17 @@ bool vKiss() {
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-MUMBLE () ...>
+// Source: zil/gverbs.zil:920-921
 bool vMumble() {
-  printLine("You'll have to speak up if you expect me to hear you!");
+  tell("You'll have to speak up if you expect me to hear you!", CR);
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-REPENT () <TELL "It could very well be too late!" CR>>
+// Source: zil/gverbs.zil:1153-1154
 bool vRepent() {
-  printLine("It could well be too late!");
+  tell("It could very well be too late!", CR);
   return RTRUE;
 }
 

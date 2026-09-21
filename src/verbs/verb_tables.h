@@ -18,4 +18,7 @@ namespace VerbTables {
 /// ZIL: <GLOBAL YUKS <LTABLE 0 ...>> (gverbs.zil:2210-2216)
 GMacros::ZilRandomTable<std::string> &yuks();
 
+/// ZIL: <GLOBAL HELLOS <LTABLE 0 ...>> (gverbs.zil:2200-2204)
+GMacros::ZilRandomTable<std::string> &hellos();
+
 } // namespace VerbTables

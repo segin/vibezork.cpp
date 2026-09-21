@@ -22,4 +22,17 @@ GMacros::ZilRandomTable<std::string> &yuks() {
   return table;
 }
 
+// ZIL: <GLOBAL HELLOS <LTABLE 0 "Hello." "Good day."
+//         "Nice weather we've been having lately." "Goodbye.">>
+// Source: zil/gverbs.zil:2200-2204
+GMacros::ZilRandomTable<std::string> &hellos() {
+  static GMacros::ZilRandomTable<std::string> table{
+      "Hello.",
+      "Good day.",
+      "Nice weather we've been having lately.",
+      "Goodbye.",
+  };
+  return table;
+}
+
 } // namespace VerbTables

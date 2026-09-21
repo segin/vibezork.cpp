@@ -413,8 +413,6 @@ namespace Verbs {
     bool vUnscript();
     
     // Communication verbs
-    bool vTalk();
-    bool vAsk();
     bool vTell();
     bool vOdysseus();
     

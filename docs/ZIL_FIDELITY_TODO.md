@@ -10,7 +10,7 @@ test, build, commit, push; then mark `[x]` and update the counters. Every routin
 ported carries `// ZIL:` and `// Source: <file>:<lines>` comments. Never simplify
 away a ZIL behaviour.
 
-Progress: 32/74 (43%)
+Progress: 33/74 (45%)
 
 ## Phase A: engine foundations (src/core, src/systems/timer)
 
@@ -52,7 +52,7 @@ Progress: 32/74 (43%)
 - [x] C6 SCORE-UPD (350 side effects), SCORE-OBJ, V-SCORE with exact G? thresholds, YES? (">" then first word YES/Y) (gverbs.zil:1841-1877; 1actions.zil:4026-4045)
 - [x] C7 Game commands: V-VERBOSE, V-BRIEF, V-SUPER-BRIEF, V-QUIT, V-RESTART, V-RESTORE ("Ok."/"Failed.", V-FIRST-LOOK), V-SAVE, V-SCRIPT, V-UNSCRIPT, V-VERSION (exact text, Release 119 / Serial 880429), FINISH loop (gverbs.zil:9-121)
 - [x] C8 V-WAIT: "Time passes..." then up to three CLOCKER ticks with early stop, CLOCK-WAIT (gverbs.zil:1514-1519)
-- [ ] C9 V-TELL actor-command mode (WINNER/HERE switch), V-SAY, V-COMMAND, V-HELLO with HELLOS, V-ANSWER, V-REPLY, V-YELL, V-CURSES, V-MUMBLE, V-REPENT, V-PRAY (gverbs.zil:151-176, 314-330, 738-766, 1050-1073, 1195-1204, 1389-1400, 1612-1618)
+- [x] C9 V-TELL actor-command mode (WINNER/HERE switch), V-SAY, V-COMMAND, V-HELLO with HELLOS, V-ANSWER, V-REPLY, V-YELL, V-CURSES, V-MUMBLE, V-REPENT, V-PRAY (gverbs.zil:151-176, 314-330, 738-766, 1050-1073, 1195-1204, 1389-1400, 1612-1618)
 - [ ] C10 Light verbs: V-LAMP-ON (CRLF + V-LOOK when dark), V-LAMP-OFF ("It is now pitch black."), V-BURN, PRE-BURN ("With a X??!?"), V-STRIKE, REMOVE-CAREFULLY (P-IT-OBJECT clear, LIT recompute, "You are left in the dark..."), TELL-NO-PRSI ("You didn't say with what!") (gverbs.zil:240-270, 610-628, 792-826, 1329-1350)
 - [ ] C11 V-ATTACK (HERO-BLOW dispatch, HANDS case), V-SWING, V-STAB with FIND-WEAPON, V-MUNG, PRE-MUNG, V-KICK, V-KISS, V-RAPE, V-ALARM with AWAKEN (gverbs.zil:176-199, 923-964, 1288-1327, 1360-1362)
 - [ ] C12 Remaining generic verbs A-L verbatim: V-ADVENT, V-BACK, V-BLAST, V-BOARD, PRE-BOARD, V-BREATHE, V-BRUSH, V-BUG, V-CHOMP, V-CLIMB-UP/DOWN/FOO/ON, V-COUNT, V-CROSS, V-CUT, V-DEFLATE, V-DIG, V-DISEMBARK, V-DISENCHANT, V-DRINK, V-DRINK-FROM, V-EAT, V-ECHO, V-ENCHANT, V-ENTER, V-EXIT, V-EXORCISE, V-FILL, PRE-FILL, V-FIND, V-FOLLOW, V-FROBOZZ, V-HATCH, V-INCANT, V-INFLATE, V-KNOCK, V-LAUNCH, V-LEAN-ON, V-LEAP with JUMPLOSS/WHEEEEE, V-LEAVE, V-LISTEN, V-LOCK, V-LOOK-BEHIND, V-LOOK-UNDER, V-LOWER

@@ -166,8 +166,10 @@ void initializeAllVerbHandlers() {
   registerVerbHandler(V_BURN, Verbs::vBurn);
 
   // Communication & Easter eggs
-  registerVerbHandler(V_TALK, Verbs::vTalk);
-  registerVerbHandler(V_ASK, Verbs::vAsk);
+  // TALK TO and ASK are SYNTAX lines for V-TELL (gsyntax.zil:421, 484);
+  // ZIL has no separate V-TALK or V-ASK routine.
+  registerVerbHandler(V_TALK, Verbs::vTell);
+  registerVerbHandler(V_ASK, Verbs::vTell);
   registerVerbHandler(V_TELL, Verbs::vTell);
   registerVerbHandler(V_ODYSSEUS, Verbs::vOdysseus);
   registerVerbHandler(V_HELLO, Verbs::vHello);
