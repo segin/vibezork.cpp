@@ -1,0 +1,3052 @@
+{
+ "source": {
+  "1actions.zil": "94be62a8e11e488e866dc1fc126d63bcf2674fa1fd3710cca1d8d01cb3fb4f8b",
+  "gverbs.zil": "e1150d6300e262f774b59fe96f8139980dfad3c41f0e93f3af49140b5f57e74e",
+  "1dungeon.zil": "8e223dc75ce64cff8542266101742ea73774533787c5257e8df4a262e4f02766"
+ },
+ "constants": {
+  "F-BUSY?": {
+   "value": 1,
+   "line": 3236
+  },
+  "F-DEAD": {
+   "value": 2,
+   "line": 3237
+  },
+  "F-UNCONSCIOUS": {
+   "value": 3,
+   "line": 3238
+  },
+  "F-CONSCIOUS": {
+   "value": 4,
+   "line": 3239
+  },
+  "F-FIRST?": {
+   "value": 5,
+   "line": 3240
+  },
+  "MISSED": {
+   "value": 1,
+   "line": 3246
+  },
+  "UNCONSCIOUS": {
+   "value": 2,
+   "line": 3247
+  },
+  "KILLED": {
+   "value": 3,
+   "line": 3248
+  },
+  "LIGHT-WOUND": {
+   "value": 4,
+   "line": 3249
+  },
+  "SERIOUS-WOUND": {
+   "value": 5,
+   "line": 3250
+  },
+  "STAGGER": {
+   "value": 6,
+   "line": 3251
+  },
+  "LOSE-WEAPON": {
+   "value": 7,
+   "line": 3252
+  },
+  "HESITATE": {
+   "value": 8,
+   "line": 3253
+  },
+  "SITTING-DUCK": {
+   "value": 9,
+   "line": 3254
+  },
+  "STRENGTH-MAX": {
+   "value": 7,
+   "line": 3323
+  },
+  "STRENGTH-MIN": {
+   "value": 2,
+   "line": 3324
+  },
+  "CURE-WAIT": {
+   "value": 30,
+   "line": 3325
+  },
+  "F-WEP": {
+   "value": 0,
+   "line": 3608
+  },
+  "F-DEF": {
+   "value": 1,
+   "line": 3609
+  },
+  "V-VILLAIN": {
+   "value": 0,
+   "line": 3793
+  },
+  "V-BEST": {
+   "value": 1,
+   "line": 3794
+  },
+  "V-BEST-ADV": {
+   "value": 2,
+   "line": 3795
+  },
+  "V-PROB": {
+   "value": 3,
+   "line": 3796
+  },
+  "V-MSGS": {
+   "value": 4,
+   "line": 3797
+  }
+ },
+ "tables": {
+  "BAT-DROPS": {
+   "line": 332,
+   "file": "1actions.zil",
+   "kind": "LTABLE",
+   "pure": false,
+   "table_flags": [],
+   "elements": [
+    {
+     "int": 0
+    },
+    {
+     "atom": "MINE-1"
+    },
+    {
+     "atom": "MINE-2"
+    },
+    {
+     "atom": "MINE-3"
+    },
+    {
+     "atom": "MINE-4"
+    },
+    {
+     "atom": "LADDER-TOP"
+    },
+    {
+     "atom": "LADDER-BOTTOM"
+    },
+    {
+     "atom": "SQUEEKY-ROOM"
+    },
+    {
+     "atom": "MINE-ENTRANCE"
+    }
+   ]
+  },
+  "LOUD-RUNS": {
+   "line": 1261,
+   "file": "1actions.zil",
+   "kind": "LTABLE",
+   "pure": false,
+   "table_flags": [],
+   "elements": [
+    {
+     "int": 0
+    },
+    {
+     "atom": "DAMP-CAVE"
+    },
+    {
+     "atom": "ROUND-ROOM"
+    },
+    {
+     "atom": "DEEP-CANYON"
+    }
+   ]
+  },
+  "DROWNINGS": {
+   "line": 1284,
+   "file": "1actions.zil",
+   "kind": "TABLE",
+   "pure": true,
+   "table_flags": [
+    "PURE"
+   ],
+   "elements": [
+    {
+     "str": "up to your ankles."
+    },
+    {
+     "str": "up to your shin."
+    },
+    {
+     "str": "up to your knees."
+    },
+    {
+     "str": "up to your hips."
+    },
+    {
+     "str": "up to your waist."
+    },
+    {
+     "str": "up to your chest."
+    },
+    {
+     "str": "up to your neck."
+    },
+    {
+     "str": "over your head."
+    },
+    {
+     "str": "high in your lungs."
+    }
+   ]
+  },
+  "CYCLOMAD": {
+   "line": 1644,
+   "file": "1actions.zil",
+   "kind": "TABLE",
+   "pure": true,
+   "table_flags": [
+    "PURE"
+   ],
+   "elements": [
+    {
+     "str": "The cyclops seems somewhat agitated."
+    },
+    {
+     "str": "The cyclops appears to be getting more agitated."
+    },
+    {
+     "str": "The cyclops is moving about the room, looking for something."
+    },
+    {
+     "str": "The cyclops was looking for salt and pepper. No doubt they are condiments for his upcoming snack."
+    },
+    {
+     "str": "The cyclops is moving toward you in an unfriendly manner."
+    },
+    {
+     "str": "You have two choices: 1. Leave  2. Become dinner."
+    }
+   ]
+  },
+  "LAMP-TABLE": {
+   "line": 2220,
+   "file": "1actions.zil",
+   "kind": "TABLE",
+   "pure": true,
+   "table_flags": [
+    "PURE"
+   ],
+   "elements": [
+    {
+     "int": 100
+    },
+    {
+     "str": "The lamp appears a bit dimmer."
+    },
+    {
+     "int": 70
+    },
+    {
+     "str": "The lamp is definitely dimmer now."
+    },
+    {
+     "int": 15
+    },
+    {
+     "str": "The lamp is nearly out."
+    },
+    {
+     "int": 0
+    }
+   ]
+  },
+  "CANDLE-TABLE": {
+   "line": 2406,
+   "file": "1actions.zil",
+   "kind": "TABLE",
+   "pure": true,
+   "table_flags": [
+    "PURE"
+   ],
+   "elements": [
+    {
+     "int": 20
+    },
+    {
+     "str": "The candles grow shorter."
+    },
+    {
+     "int": 10
+    },
+    {
+     "str": "The candles are becoming quite short."
+    },
+    {
+     "int": 5
+    },
+    {
+     "str": "The candles won't last long now."
+    },
+    {
+     "int": 0
+    }
+   ]
+  },
+  "RIVER-SPEEDS": {
+   "line": 2692,
+   "file": "1actions.zil",
+   "kind": "LTABLE",
+   "pure": true,
+   "table_flags": [
+    "PURE"
+   ],
+   "elements": [
+    {
+     "atom": "RIVER-1"
+    },
+    {
+     "int": 4
+    },
+    {
+     "atom": "RIVER-2"
+    },
+    {
+     "int": 4
+    },
+    {
+     "atom": "RIVER-3"
+    },
+    {
+     "int": 3
+    },
+    {
+     "atom": "RIVER-4"
+    },
+    {
+     "int": 2
+    },
+    {
+     "atom": "RIVER-5"
+    },
+    {
+     "int": 1
+    }
+   ]
+  },
+  "RIVER-NEXT": {
+   "line": 2695,
+   "file": "1actions.zil",
+   "kind": "LTABLE",
+   "pure": true,
+   "table_flags": [
+    "PURE"
+   ],
+   "elements": [
+    {
+     "atom": "RIVER-1"
+    },
+    {
+     "atom": "RIVER-2"
+    },
+    {
+     "atom": "RIVER-3"
+    },
+    {
+     "atom": "RIVER-4"
+    },
+    {
+     "atom": "RIVER-5"
+    }
+   ]
+  },
+  "RIVER-LAUNCH": {
+   "line": 2698,
+   "file": "1actions.zil",
+   "kind": "LTABLE",
+   "pure": true,
+   "table_flags": [
+    "PURE"
+   ],
+   "elements": [
+    {
+     "atom": "DAM-BASE"
+    },
+    {
+     "atom": "RIVER-1"
+    },
+    {
+     "atom": "WHITE-CLIFFS-NORTH"
+    },
+    {
+     "atom": "RIVER-3"
+    },
+    {
+     "atom": "WHITE-CLIFFS-SOUTH"
+    },
+    {
+     "atom": "RIVER-4"
+    },
+    {
+     "atom": "SHORE"
+    },
+    {
+     "atom": "RIVER-5"
+    },
+    {
+     "atom": "SANDY-BEACH"
+    },
+    {
+     "atom": "RIVER-4"
+    },
+    {
+     "atom": "RESERVOIR-SOUTH"
+    },
+    {
+     "atom": "RESERVOIR"
+    },
+    {
+     "atom": "RESERVOIR-NORTH"
+    },
+    {
+     "atom": "RESERVOIR"
+    },
+    {
+     "atom": "STREAM-VIEW"
+    },
+    {
+     "atom": "IN-STREAM"
+    }
+   ]
+  },
+  "BDIGS": {
+   "line": 2871,
+   "file": "1actions.zil",
+   "kind": "TABLE",
+   "pure": true,
+   "table_flags": [
+    "PURE"
+   ],
+   "elements": [
+    {
+     "str": "You seem to be digging a hole here."
+    },
+    {
+     "str": "The hole is getting deeper, but that's about it."
+    },
+    {
+     "str": "You are surrounded by a wall of sand on all sides."
+    }
+   ]
+  },
+  "DEF1": {
+   "line": 3258,
+   "file": "1actions.zil",
+   "kind": "TABLE",
+   "pure": true,
+   "table_flags": [
+    "PURE"
+   ],
+   "elements": [
+    {
+     "atom": "MISSED"
+    },
+    {
+     "atom": "MISSED"
+    },
+    {
+     "atom": "MISSED"
+    },
+    {
+     "atom": "MISSED"
+    },
+    {
+     "atom": "STAGGER"
+    },
+    {
+     "atom": "STAGGER"
+    },
+    {
+     "atom": "UNCONSCIOUS"
+    },
+    {
+     "atom": "UNCONSCIOUS"
+    },
+    {
+     "atom": "KILLED"
+    },
+    {
+     "atom": "KILLED"
+    },
+    {
+     "atom": "KILLED"
+    },
+    {
+     "atom": "KILLED"
+    },
+    {
+     "atom": "KILLED"
+    }
+   ]
+  },
+  "DEF2A": {
+   "line": 3265,
+   "file": "1actions.zil",
+   "kind": "TABLE",
+   "pure": true,
+   "table_flags": [
+    "PURE"
+   ],
+   "elements": [
+    {
+     "atom": "MISSED"
+    },
+    {
+     "atom": "MISSED"
+    },
+    {
+     "atom": "MISSED"
+    },
+    {
+     "atom": "MISSED"
+    },
+    {
+     "atom": "MISSED"
+    },
+    {
+     "atom": "STAGGER"
+    },
+    {
+     "atom": "STAGGER"
+    },
+    {
+     "atom": "LIGHT-WOUND"
+    },
+    {
+     "atom": "LIGHT-WOUND"
+    },
+    {
+     "atom": "UNCONSCIOUS"
+    }
+   ]
+  },
+  "DEF2B": {
+   "line": 3272,
+   "file": "1actions.zil",
+   "kind": "TABLE",
+   "pure": true,
+   "table_flags": [
+    "PURE"
+   ],
+   "elements": [
+    {
+     "atom": "MISSED"
+    },
+    {
+     "atom": "MISSED"
+    },
+    {
+     "atom": "MISSED"
+    },
+    {
+     "atom": "STAGGER"
+    },
+    {
+     "atom": "STAGGER"
+    },
+    {
+     "atom": "LIGHT-WOUND"
+    },
+    {
+     "atom": "LIGHT-WOUND"
+    },
+    {
+     "atom": "LIGHT-WOUND"
+    },
+    {
+     "atom": "UNCONSCIOUS"
+    },
+    {
+     "atom": "KILLED"
+    },
+    {
+     "atom": "KILLED"
+    },
+    {
+     "atom": "KILLED"
+    }
+   ]
+  },
+  "DEF3A": {
+   "line": 3280,
+   "file": "1actions.zil",
+   "kind": "TABLE",
+   "pure": true,
+   "table_flags": [
+    "PURE"
+   ],
+   "elements": [
+    {
+     "atom": "MISSED"
+    },
+    {
+     "atom": "MISSED"
+    },
+    {
+     "atom": "MISSED"
+    },
+    {
+     "atom": "MISSED"
+    },
+    {
+     "atom": "MISSED"
+    },
+    {
+     "atom": "STAGGER"
+    },
+    {
+     "atom": "STAGGER"
+    },
+    {
+     "atom": "LIGHT-WOUND"
+    },
+    {
+     "atom": "LIGHT-WOUND"
+    },
+    {
+     "atom": "SERIOUS-WOUND"
+    },
+    {
+     "atom": "SERIOUS-WOUND"
+    }
+   ]
+  },
+  "DEF3B": {
+   "line": 3287,
+   "file": "1actions.zil",
+   "kind": "TABLE",
+   "pure": true,
+   "table_flags": [
+    "PURE"
+   ],
+   "elements": [
+    {
+     "atom": "MISSED"
+    },
+    {
+     "atom": "MISSED"
+    },
+    {
+     "atom": "MISSED"
+    },
+    {
+     "atom": "STAGGER"
+    },
+    {
+     "atom": "STAGGER"
+    },
+    {
+     "atom": "LIGHT-WOUND"
+    },
+    {
+     "atom": "LIGHT-WOUND"
+    },
+    {
+     "atom": "LIGHT-WOUND"
+    },
+    {
+     "atom": "SERIOUS-WOUND"
+    },
+    {
+     "atom": "SERIOUS-WOUND"
+    },
+    {
+     "atom": "SERIOUS-WOUND"
+    }
+   ]
+  },
+  "DEF3C": {
+   "line": 3294,
+   "file": "1actions.zil",
+   "kind": "TABLE",
+   "pure": true,
+   "table_flags": [
+    "PURE"
+   ],
+   "elements": [
+    {
+     "atom": "MISSED"
+    },
+    {
+     "atom": "STAGGER"
+    },
+    {
+     "atom": "STAGGER"
+    },
+    {
+     "atom": "LIGHT-WOUND"
+    },
+    {
+     "atom": "LIGHT-WOUND"
+    },
+    {
+     "atom": "LIGHT-WOUND"
+    },
+    {
+     "atom": "LIGHT-WOUND"
+    },
+    {
+     "atom": "SERIOUS-WOUND"
+    },
+    {
+     "atom": "SERIOUS-WOUND"
+    },
+    {
+     "atom": "SERIOUS-WOUND"
+    }
+   ]
+  },
+  "DEF1-RES": {
+   "line": 3301,
+   "file": "1actions.zil",
+   "kind": "TABLE",
+   "pure": false,
+   "table_flags": [],
+   "elements": [
+    {
+     "atom": "DEF1"
+    },
+    {
+     "int": 0
+    },
+    {
+     "int": 0
+    }
+   ]
+  },
+  "DEF2-RES": {
+   "line": 3306,
+   "file": "1actions.zil",
+   "kind": "TABLE",
+   "pure": false,
+   "table_flags": [],
+   "elements": [
+    {
+     "atom": "DEF2A"
+    },
+    {
+     "atom": "DEF2B"
+    },
+    {
+     "int": 0
+    },
+    {
+     "int": 0
+    }
+   ]
+  },
+  "DEF3-RES": {
+   "line": 3312,
+   "file": "1actions.zil",
+   "kind": "TABLE",
+   "pure": false,
+   "table_flags": [],
+   "elements": [
+    {
+     "atom": "DEF3A"
+    },
+    {
+     "int": 0
+    },
+    {
+     "atom": "DEF3B"
+    },
+    {
+     "int": 0
+    },
+    {
+     "atom": "DEF3C"
+    }
+   ]
+  },
+  "HERO-MELEE": {
+   "line": 3611,
+   "file": "1actions.zil",
+   "kind": "TABLE",
+   "pure": true,
+   "table_flags": [
+    "PURE"
+   ],
+   "elements": [
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "Your "
+          },
+          {
+           "atom": "F-WEP"
+          },
+          {
+           "str": " misses the "
+          },
+          {
+           "atom": "F-DEF"
+          },
+          {
+           "str": " by an inch."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "A good slash, but it misses the "
+          },
+          {
+           "atom": "F-DEF"
+          },
+          {
+           "str": " by a mile."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "You charge, but the "
+          },
+          {
+           "atom": "F-DEF"
+          },
+          {
+           "str": " jumps nimbly aside."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "Clang! Crash! The "
+          },
+          {
+           "atom": "F-DEF"
+          },
+          {
+           "str": " parries."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "A quick stroke, but the "
+          },
+          {
+           "atom": "F-DEF"
+          },
+          {
+           "str": " is on guard."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "A good stroke, but it's too slow; the "
+          },
+          {
+           "atom": "F-DEF"
+          },
+          {
+           "str": " dodges."
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "Your "
+          },
+          {
+           "atom": "F-WEP"
+          },
+          {
+           "str": " crashes down, knocking the "
+          },
+          {
+           "atom": "F-DEF"
+          },
+          {
+           "str": " into dreamland."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The "
+          },
+          {
+           "atom": "F-DEF"
+          },
+          {
+           "str": " is battered into unconsciousness."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "A furious exchange, and the "
+          },
+          {
+           "atom": "F-DEF"
+          },
+          {
+           "str": " is knocked out!"
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The haft of your "
+          },
+          {
+           "atom": "F-WEP"
+          },
+          {
+           "str": " knocks out the "
+          },
+          {
+           "atom": "F-DEF"
+          },
+          {
+           "str": "."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The "
+          },
+          {
+           "atom": "F-DEF"
+          },
+          {
+           "str": " is knocked out!"
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "It's curtains for the "
+          },
+          {
+           "atom": "F-DEF"
+          },
+          {
+           "str": " as your "
+          },
+          {
+           "atom": "F-WEP"
+          },
+          {
+           "str": " removes his head."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The fatal blow strikes the "
+          },
+          {
+           "atom": "F-DEF"
+          },
+          {
+           "str": " square in the heart: He dies."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The "
+          },
+          {
+           "atom": "F-DEF"
+          },
+          {
+           "str": " takes a fatal blow and slumps to the floor dead."
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The "
+          },
+          {
+           "atom": "F-DEF"
+          },
+          {
+           "str": " is struck on the arm; blood begins to trickle down."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "Your "
+          },
+          {
+           "atom": "F-WEP"
+          },
+          {
+           "str": " pinks the "
+          },
+          {
+           "atom": "F-DEF"
+          },
+          {
+           "str": " on the wrist, but it's not serious."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "Your stroke lands, but it was only the flat of the blade."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The blow lands, making a shallow gash in the "
+          },
+          {
+           "atom": "F-DEF"
+          },
+          {
+           "str": "'s arm!"
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The "
+          },
+          {
+           "atom": "F-DEF"
+          },
+          {
+           "str": " receives a deep gash in his side."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "A savage blow on the thigh! The "
+          },
+          {
+           "atom": "F-DEF"
+          },
+          {
+           "str": " is stunned but can still fight!"
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "Slash! Your blow lands! That one hit an artery, it could be serious!"
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "Slash! Your stroke connects! This could be serious!"
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The "
+          },
+          {
+           "atom": "F-DEF"
+          },
+          {
+           "str": " is staggered, and drops to his knees."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The "
+          },
+          {
+           "atom": "F-DEF"
+          },
+          {
+           "str": " is momentarily disoriented and can't fight back."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The force of your blow knocks the "
+          },
+          {
+           "atom": "F-DEF"
+          },
+          {
+           "str": " back, stunned."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The "
+          },
+          {
+           "atom": "F-DEF"
+          },
+          {
+           "str": " is confused and can't fight back."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The quickness of your thrust knocks the "
+          },
+          {
+           "atom": "F-DEF"
+          },
+          {
+           "str": " back, stunned."
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The "
+          },
+          {
+           "atom": "F-DEF"
+          },
+          {
+           "str": "'s weapon is knocked to the floor, leaving him unarmed."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The "
+          },
+          {
+           "atom": "F-DEF"
+          },
+          {
+           "str": " is disarmed by a subtle feint past his guard."
+          }
+         ]
+        }
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "CYCLOPS-MELEE": {
+   "line": 3654,
+   "file": "1actions.zil",
+   "kind": "TABLE",
+   "pure": true,
+   "table_flags": [
+    "PURE"
+   ],
+   "elements": [
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The Cyclops misses, but the backwash almost knocks you over."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The Cyclops rushes you, but runs into the wall."
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The Cyclops sends you crashing to the floor, unconscious."
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The Cyclops breaks your neck with a massive smash."
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "A quick punch, but it was only a glancing blow."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "A glancing blow from the Cyclops' fist."
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The monster smashes his huge fist into your chest, breaking several ribs."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The Cyclops almost knocks the wind out of you with a quick punch."
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The Cyclops lands a punch that knocks the wind out of you."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "Heedless of your weapons, the Cyclops tosses you against the rock wall of the room."
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The Cyclops grabs your "
+          },
+          {
+           "atom": "F-WEP"
+          },
+          {
+           "str": ", tastes it, and throws it to the ground in disgust."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The monster grabs you on the wrist, squeezes, and you drop your "
+          },
+          {
+           "atom": "F-WEP"
+          },
+          {
+           "str": " in pain."
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The Cyclops seems unable to decide whether to broil or stew his dinner."
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The Cyclops, no sportsman, dispatches his unconscious victim."
+          }
+         ]
+        }
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "TROLL-MELEE": {
+   "line": 3689,
+   "file": "1actions.zil",
+   "kind": "TABLE",
+   "pure": true,
+   "table_flags": [
+    "PURE"
+   ],
+   "elements": [
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The troll swings his axe, but it misses."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The troll's axe barely misses your ear."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The axe sweeps past as you jump aside."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The axe crashes against the rock, throwing sparks!"
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The flat of the troll's axe hits you delicately on the head, knocking you out."
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The troll neatly removes your head."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The troll's axe stroke cleaves you from the nave to the chops."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The troll's axe removes your head."
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The axe gets you right in the side. Ouch!"
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The flat of the troll's axe skins across your forearm."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The troll's swing almost knocks you over as you barely parry in time."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The troll swings his axe, and it nicks your arm as you dodge."
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The troll charges, and his axe slashes you on your "
+          },
+          {
+           "atom": "F-WEP"
+          },
+          {
+           "str": " arm."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "An axe stroke makes a deep wound in your leg."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The troll's axe swings down, gashing your shoulder."
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The troll hits you with a glancing blow, and you are momentarily stunned."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The troll swings; the blade turns on your armor but crashes broadside into your head."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "You stagger back under a hail of axe strokes."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The troll's mighty blow drops you to your knees."
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The axe hits your "
+          },
+          {
+           "atom": "F-WEP"
+          },
+          {
+           "str": " and knocks it spinning."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The troll swings, you parry, but the force of his blow knocks your "
+          },
+          {
+           "atom": "F-WEP"
+          },
+          {
+           "str": " away."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The axe knocks your "
+          },
+          {
+           "atom": "F-WEP"
+          },
+          {
+           "str": " out of your hand. It falls to the floor."
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The troll hesitates, fingering his axe."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The troll scratches his head ruminatively:  Might you be magically protected, he wonders?"
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "Conquering his fears, the troll puts you to death."
+          }
+         ]
+        }
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "THIEF-MELEE": {
+   "line": 3735,
+   "file": "1actions.zil",
+   "kind": "TABLE",
+   "pure": true,
+   "table_flags": [
+    "PURE"
+   ],
+   "elements": [
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The thief stabs nonchalantly with his stiletto and misses."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "You dodge as the thief comes in low."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "You parry a lightning thrust, and the thief salutes you with a grim nod."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The thief tries to sneak past your guard, but you twist away."
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "Shifting in the midst of a thrust, the thief knocks you unconscious with the haft of his stiletto."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The thief knocks you out."
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "Finishing you off, the thief inserts his blade into your heart."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The thief comes in from the side, feints, and inserts the blade into your ribs."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The thief bows formally, raises his stiletto, and with a wry grin, ends the battle and your life."
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "A quick thrust pinks your left arm, and blood starts to trickle down."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The thief draws blood, raking his stiletto across your arm."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The stiletto flashes faster than you can follow, and blood wells from your leg."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The thief slowly approaches, strikes like a snake, and leaves you wounded."
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The thief strikes like a snake! The resulting wound is serious."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The thief stabs a deep cut in your upper arm."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The stiletto touches your forehead, and the blood obscures your vision."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The thief strikes at your wrist, and suddenly your grip is slippery with blood."
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The butt of his stiletto cracks you on the skull, and you stagger back."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The thief rams the haft of his blade into your stomach, leaving you out of breath."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The thief attacks, and you fall back desperately."
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "A long, theatrical slash. You catch it on your "
+          },
+          {
+           "atom": "F-WEP"
+          },
+          {
+           "str": ", but the thief twists his knife, and the "
+          },
+          {
+           "atom": "F-WEP"
+          },
+          {
+           "str": " goes flying."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The thief neatly flips your "
+          },
+          {
+           "atom": "F-WEP"
+          },
+          {
+           "str": " out of your hands, and it drops to the floor."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "You parry a low thrust, and your "
+          },
+          {
+           "atom": "F-WEP"
+          },
+          {
+           "str": " slips out of your hand."
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The thief, a man of superior breeding, pauses for a moment to consider the propriety of finishing you off."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The thief amuses himself by searching your pockets."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The thief entertains himself by rifling your pack."
+          }
+         ]
+        }
+       }
+      ]
+     }
+    },
+    {
+     "table": {
+      "kind": "LTABLE",
+      "pure": true,
+      "table_flags": [
+       "PURE"
+      ],
+      "elements": [
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The thief, forgetting his essentially genteel upbringing, cuts your throat."
+          }
+         ]
+        }
+       },
+       {
+        "table": {
+         "kind": "LTABLE",
+         "pure": true,
+         "table_flags": [
+          "PURE"
+         ],
+         "elements": [
+          {
+           "str": "The thief, a pragmatist, dispatches you as a threat to his livelihood."
+          }
+         ]
+        }
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "VILLAINS": {
+   "line": 3801,
+   "file": "1actions.zil",
+   "kind": "LTABLE",
+   "pure": false,
+   "table_flags": [],
+   "elements": [
+    {
+     "table": {
+      "kind": "TABLE",
+      "pure": false,
+      "table_flags": [],
+      "elements": [
+       {
+        "atom": "TROLL"
+       },
+       {
+        "atom": "SWORD"
+       },
+       {
+        "int": 1
+       },
+       {
+        "int": 0
+       },
+       {
+        "atom": "TROLL-MELEE"
+       }
+      ]
+     }
+    },
+    {
+     "table": {
+      "kind": "TABLE",
+      "pure": false,
+      "table_flags": [],
+      "elements": [
+       {
+        "atom": "THIEF"
+       },
+       {
+        "atom": "KNIFE"
+       },
+       {
+        "int": 1
+       },
+       {
+        "int": 0
+       },
+       {
+        "atom": "THIEF-MELEE"
+       }
+      ]
+     }
+    },
+    {
+     "table": {
+      "kind": "TABLE",
+      "pure": false,
+      "table_flags": [],
+      "elements": [
+       {
+        "atom": "CYCLOPS"
+       },
+       {
+        "atom": null
+       },
+       {
+        "int": 0
+       },
+       {
+        "int": 0
+       },
+       {
+        "atom": "CYCLOPS-MELEE"
+       }
+      ]
+     }
+    }
+   ]
+  },
+  "JUMPLOSS": {
+   "line": 844,
+   "file": "gverbs.zil",
+   "kind": "LTABLE",
+   "pure": false,
+   "table_flags": [],
+   "elements": [
+    {
+     "int": 0
+    },
+    {
+     "str": "You should have looked before you leaped."
+    },
+    {
+     "str": "In the movies, your life would be passing before your eyes."
+    },
+    {
+     "str": "Geronimo..."
+    }
+   ]
+  },
+  "WHEEEEE": {
+   "line": 1272,
+   "file": "gverbs.zil",
+   "kind": "LTABLE",
+   "pure": false,
+   "table_flags": [],
+   "elements": [
+    {
+     "int": 0
+    },
+    {
+     "str": "Very good. Now you can go to the second grade."
+    },
+    {
+     "str": "Are you enjoying yourself?"
+    },
+    {
+     "str": "Wheeeeeeeeee!!!!!"
+    },
+    {
+     "str": "Do you expect me to applaud?"
+    }
+   ]
+  },
+  "HO-HUM": {
+   "line": 2031,
+   "file": "gverbs.zil",
+   "kind": "LTABLE",
+   "pure": false,
+   "table_flags": [],
+   "elements": [
+    {
+     "int": 0
+    },
+    {
+     "str": " doesn't seem to work."
+    },
+    {
+     "str": " isn't notably helpful."
+    },
+    {
+     "str": " has no effect."
+    }
+   ]
+  },
+  "SWIMYUKS": {
+   "line": 2195,
+   "file": "gverbs.zil",
+   "kind": "LTABLE",
+   "pure": false,
+   "table_flags": [],
+   "elements": [
+    {
+     "int": 0
+    },
+    {
+     "str": "You can't swim in the dungeon."
+    }
+   ]
+  },
+  "HELLOS": {
+   "line": 2198,
+   "file": "gverbs.zil",
+   "kind": "LTABLE",
+   "pure": false,
+   "table_flags": [],
+   "elements": [
+    {
+     "int": 0
+    },
+    {
+     "str": "Hello."
+    },
+    {
+     "str": "Good day."
+    },
+    {
+     "str": "Nice weather we've been having lately."
+    },
+    {
+     "str": "Goodbye."
+    }
+   ]
+  },
+  "YUKS": {
+   "line": 2204,
+   "file": "gverbs.zil",
+   "kind": "LTABLE",
+   "pure": false,
+   "table_flags": [],
+   "elements": [
+    {
+     "int": 0
+    },
+    {
+     "str": "A valiant attempt."
+    },
+    {
+     "str": "You can't be serious."
+    },
+    {
+     "str": "An interesting idea..."
+    },
+    {
+     "str": "What a concept!"
+    }
+   ]
+  },
+  "DUMMY": {
+   "line": 2213,
+   "file": "gverbs.zil",
+   "kind": "LTABLE",
+   "pure": false,
+   "table_flags": [],
+   "elements": [
+    {
+     "int": 0
+    },
+    {
+     "str": "Look around."
+    },
+    {
+     "str": "Too late for that."
+    },
+    {
+     "str": "Have your eyes checked."
+    }
+   ]
+  }
+ },
+ "go_fixups": [
+  {
+   "table": "DEF1-RES",
+   "index": 1,
+   "source": "DEF1",
+   "offset_words": 1
+  },
+  {
+   "table": "DEF1-RES",
+   "index": 2,
+   "source": "DEF1",
+   "offset_words": 2
+  },
+  {
+   "table": "DEF2-RES",
+   "index": 2,
+   "source": "DEF2B",
+   "offset_words": 1
+  },
+  {
+   "table": "DEF2-RES",
+   "index": 3,
+   "source": "DEF2B",
+   "offset_words": 2
+  },
+  {
+   "table": "DEF3-RES",
+   "index": 1,
+   "source": "DEF3A",
+   "offset_words": 1
+  },
+  {
+   "table": "DEF3-RES",
+   "index": 3,
+   "source": "DEF3B",
+   "offset_words": 1
+  }
+ ],
+ "other_tables_not_extracted": [
+  "gverbs.zil:2015 INDENTS"
+ ],
+ "missing": []
+}

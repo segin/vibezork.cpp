@@ -135,10 +135,14 @@ TEST(DefTablesVerbatim) {
   ASSERT_EQ(DEF3A[10], SERIOUS_WOUND);
   ASSERT_EQ(DEF3B.size(), static_cast<size_t>(11));
   ASSERT_EQ(DEF3B[3], STAGGER);
-  ASSERT_EQ(DEF3C.size(), static_cast<size_t>(11));
+  // 1actions.zil:3294-3299 lists ten results: MISSED, two STAGGER, four
+  // LIGHT-WOUND and three SERIOUS-WOUND. The earlier hand transcription
+  // declared eleven slots, leaving a zero (no such blow result) at the end.
+  ASSERT_EQ(DEF3C.size(), static_cast<size_t>(10));
   ASSERT_EQ(DEF3C[0], MISSED);
   ASSERT_EQ(DEF3C[1], STAGGER);
   ASSERT_EQ(DEF3C[3], LIGHT_WOUND);
+  ASSERT_EQ(DEF3C[9], SERIOUS_WOUND);
   ASSERT_EQ(STRENGTH_MAX, 7);
   ASSERT_EQ(STRENGTH_MIN, 2);
   ASSERT_EQ(CURE_WAIT, 30);

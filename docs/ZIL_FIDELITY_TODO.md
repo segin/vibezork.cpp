@@ -10,7 +10,7 @@ test, build, commit, push; then mark `[x]` and update the counters. Every routin
 ported carries `// ZIL:` and `// Source: <file>:<lines>` comments. Never simplify
 away a ZIL behaviour.
 
-Progress: 42/69 (60%)
+Progress: 43/69 (62%)
 
 ## Phase A: engine foundations (src/core, src/systems/timer)
 
@@ -68,7 +68,7 @@ Progress: 42/69 (60%)
 
 ## Phase E: melee, NPCs, death (1actions.zil:622-769, 1491-2177, 3236-3990, 4046-4177)
 
-- [ ] E1 Melee data: F-* constants, DEF1/DEF2A/DEF2B/DEF3A/DEF3B/DEF3C, DEF*-RES sliding windows, HERO/CYCLOPS/TROLL/THIEF-MELEE message tables verbatim, VILLAINS table (1actions.zil:3236-3330, 3606-3803)
+- [x] E1 Melee data: F-* constants, DEF1/DEF2A/DEF2B/DEF3A/DEF3B/DEF3C, DEF*-RES sliding windows, HERO/CYCLOPS/TROLL/THIEF-MELEE message tables verbatim, VILLAINS table (1actions.zil:3236-3330, 3606-3803)
 - [ ] E2 Melee engine: DO-FIGHT, REMARK, FIGHT-STRENGTH, VILLAIN-STRENGTH (V-BEST-ADV, THIEF-ENGROSSED, sword advantage on the troll's own blow), VILLAIN-BLOW, HERO-BLOW, WINNER-RESULT, VILLAIN-RESULT, WINNING?, I-FIGHT, AWAKEN, I-CURE, CURE-WAIT, wounds as negative STRENGTH and LOAD-ALLOWED changes (1actions.zil:3331-3606, 3810-3849)
 - [ ] E3 Troll: TROLL-FCN all modes, WEAPON-FUNCTION, AXE-F, TROLL-ROOM-F, TROLL-FLAG (1actions.zil:622-769, 4160-4177)
 - [ ] E4 Thief: I-THIEF, THIEF-VS-ADVENTURER, ROB, STEAL-JUNK, ROB-MAZE, DROP-JUNK, DEPOSIT-BOOTY, RECOVER-STILETTO, HACK-TREASURES, STOLE-LIGHT?, ROBBER-FUNCTION, ROBBER-C-DESC/U-DESC, LARGE-BAG-F, STILETTO handling, CHALICE-FCN, TREASURE-ROOM-FCN, THIEF-IN-TREASURE, EGG-SOLVE (1actions.zil:1748-2177, 3851-3990)
