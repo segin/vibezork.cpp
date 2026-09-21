@@ -236,6 +236,7 @@ if(BUILD_TESTS)
 
     # GVERBS Tests (gverbs.zil routines and preactions verification)
     add_zork_test(GVerbsTests gverbs_tests tests/gverbs_tests.cpp)
+    add_zork_test(VerbTablesTests verb_tables_tests tests/verb_tables_tests.cpp)
 
     # GMACROS Tests (gmacros.zil macros and routines verification)
     add_zork_test(GMacrosTests gmacros_tests tests/gmacros_tests.cpp)
