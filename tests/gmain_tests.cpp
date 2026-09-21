@@ -119,6 +119,9 @@ void testPerformDispatchHierarchy() {
 
   auto playerObj = std::make_unique<ZObject>(5002, "adventurer");
   auto roomObj = std::make_unique<ZRoom>(5003, "Living Room", "Living room desc");
+  // GOTO refuses a room without RLANDBIT unless the actor is in a
+  // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
+  roomObj->setFlag(ObjectFlag::RLANDBIT);
   auto swordObj = std::make_unique<ZObject>(5004, "elvish sword");
   auto caseObj = std::make_unique<ZObject>(5005, "trophy case");
 
@@ -228,6 +231,9 @@ void testRoomMBegStopsDispatch() {
 
   auto playerObj = std::make_unique<ZObject>(5101, "adventurer");
   auto roomObj = std::make_unique<ZRoom>(5102, "Kitchen", "Kitchen desc");
+  // GOTO refuses a room without RLANDBIT unless the actor is in a
+  // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
+  roomObj->setFlag(ObjectFlag::RLANDBIT);
   auto objA = std::make_unique<ZObject>(5103, "sack");
   g.player = playerObj.get();
   g.winner = playerObj.get();
@@ -297,6 +303,9 @@ void testRfatalAbortsLoopAndSkipsMEnd() {
 
   auto playerObj = std::make_unique<ZObject>(5201, "adventurer");
   auto roomObj = std::make_unique<ZRoom>(5202, "Cellar", "Cellar desc");
+  // GOTO refuses a room without RLANDBIT unless the actor is in a
+  // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
+  roomObj->setFlag(ObjectFlag::RLANDBIT);
   auto objA = std::make_unique<ZObject>(5203, "sack");
   auto objB = std::make_unique<ZObject>(5204, "bottle");
   g.player = playerObj.get();
@@ -378,7 +387,13 @@ void testDirectionThroughPerform() {
 
   auto playerObj = std::make_unique<ZObject>(5301, "adventurer");
   auto roomA = std::make_unique<ZRoom>(5302, "Room A", "Room A desc");
+  // GOTO refuses a room without RLANDBIT unless the actor is in a
+  // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
+  roomA->setFlag(ObjectFlag::RLANDBIT);
   auto roomB = std::make_unique<ZRoom>(5303, "Room B", "Room B desc");
+  // GOTO refuses a room without RLANDBIT unless the actor is in a
+  // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
+  roomB->setFlag(ObjectFlag::RLANDBIT);
   roomA->setFlag(ObjectFlag::ONBIT);
   roomB->setFlag(ObjectFlag::ONBIT);
   roomA->setExit(Direction::NORTH, RoomExit(5303));
@@ -458,7 +473,13 @@ void testItSubstitution() {
 
   auto playerObj = std::make_unique<ZObject>(5401, "adventurer");
   auto roomObj = std::make_unique<ZRoom>(5402, "Attic", "Attic desc");
+  // GOTO refuses a room without RLANDBIT unless the actor is in a
+  // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
+  roomObj->setFlag(ObjectFlag::RLANDBIT);
   auto elsewhere = std::make_unique<ZRoom>(5403, "Cellar", "Cellar desc");
+  // GOTO refuses a room without RLANDBIT unless the actor is in a
+  // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
+  elsewhere->setFlag(ObjectFlag::RLANDBIT);
   auto objA = std::make_unique<ZObject>(5404, "rope");
   auto objB = std::make_unique<ZObject>(5405, "knife");
   auto itUnique = std::make_unique<ZObject>(ObjectIds::IT, "random object");
@@ -595,6 +616,9 @@ void testMultiObjectLoop() {
 
   auto playerObj = std::make_unique<ZObject>(5501, "adventurer");
   auto roomObj = std::make_unique<ZRoom>(5502, "Kitchen", "Kitchen desc");
+  // GOTO refuses a room without RLANDBIT unless the actor is in a
+  // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
+  roomObj->setFlag(ObjectFlag::RLANDBIT);
   auto sack = std::make_unique<ZObject>(5503, "brown sack");
   auto bottle = std::make_unique<ZObject>(5504, "glass bottle");
   auto table = std::make_unique<ZObject>(5505, "kitchen table");
@@ -753,6 +777,9 @@ void testZeroObjectBranch() {
 
   auto playerObj = std::make_unique<ZObject>(5601, "adventurer");
   auto roomObj = std::make_unique<ZRoom>(5602, "Cellar", "Cellar desc");
+  // GOTO refuses a room without RLANDBIT unless the actor is in a
+  // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
+  roomObj->setFlag(ObjectFlag::RLANDBIT);
   g.player = playerObj.get();
   g.winner = playerObj.get();
   g.here = roomObj.get();
@@ -809,6 +836,9 @@ void testEmptyInput() {
   initializeAllVerbHandlers();
   auto playerObj = std::make_unique<ZObject>(5701, "adventurer");
   auto roomObj = std::make_unique<ZRoom>(5702, "Cellar", "Cellar desc");
+  // GOTO refuses a room without RLANDBIT unless the actor is in a
+  // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
+  roomObj->setFlag(ObjectFlag::RLANDBIT);
   g.player = playerObj.get();
   g.winner = playerObj.get();
   g.here = roomObj.get();

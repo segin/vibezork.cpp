@@ -12,7 +12,13 @@ TEST(BasicDirectionalMovement) {
     
     // Create two rooms
     auto room1 = std::make_unique<ZRoom>(1, "Room 1", "You are in room 1.");
+    // GOTO refuses a room without RLANDBIT unless the actor is in a
+    // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
+    room1->setFlag(ObjectFlag::RLANDBIT);
     auto room2 = std::make_unique<ZRoom>(2, "Room 2", "You are in room 2.");
+    // GOTO refuses a room without RLANDBIT unless the actor is in a
+    // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
+    room2->setFlag(ObjectFlag::RLANDBIT);
     
     // Set up exit from room1 to room2
     room1->setExit(Direction::NORTH, RoomExit(2));
@@ -47,6 +53,9 @@ TEST(BlockedExits) {
     
     // Create room with blocked exit
     auto room1 = std::make_unique<ZRoom>(1, "Room 1", "You are in room 1.");
+    // GOTO refuses a room without RLANDBIT unless the actor is in a
+    // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
+    room1->setFlag(ObjectFlag::RLANDBIT);
     room1->setExit(Direction::NORTH, RoomExit("A wall blocks your path."));
     
     ZRoom* r1 = room1.get();
@@ -73,7 +82,13 @@ TEST(DoorExits) {
     
     // Create two rooms
     auto room1 = std::make_unique<ZRoom>(1, "Room 1", "You are in room 1.");
+    // GOTO refuses a room without RLANDBIT unless the actor is in a
+    // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
+    room1->setFlag(ObjectFlag::RLANDBIT);
     auto room2 = std::make_unique<ZRoom>(2, "Room 2", "You are in room 2.");
+    // GOTO refuses a room without RLANDBIT unless the actor is in a
+    // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
+    room2->setFlag(ObjectFlag::RLANDBIT);
     
     // Create door object
     auto door = std::make_unique<ZObject>(50, "door");
@@ -122,7 +137,13 @@ TEST(LockedDoorExits) {
     
     // Create two rooms
     auto room1 = std::make_unique<ZRoom>(1, "Room 1", "You are in room 1.");
+    // GOTO refuses a room without RLANDBIT unless the actor is in a
+    // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
+    room1->setFlag(ObjectFlag::RLANDBIT);
     auto room2 = std::make_unique<ZRoom>(2, "Room 2", "You are in room 2.");
+    // GOTO refuses a room without RLANDBIT unless the actor is in a
+    // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
+    room2->setFlag(ObjectFlag::RLANDBIT);
     
     // Create closed door (ZIL has no lock flag; a closed DOORBIT exit blocks)
     auto door = std::make_unique<ZObject>(50, "door");
@@ -157,7 +178,13 @@ TEST(ConditionalExits) {
     
     // Create two rooms
     auto room1 = std::make_unique<ZRoom>(1, "Room 1", "You are in room 1.");
+    // GOTO refuses a room without RLANDBIT unless the actor is in a
+    // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
+    room1->setFlag(ObjectFlag::RLANDBIT);
     auto room2 = std::make_unique<ZRoom>(2, "Room 2", "You are in room 2.");
+    // GOTO refuses a room without RLANDBIT unless the actor is in a
+    // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
+    room2->setFlag(ObjectFlag::RLANDBIT);
     
     // Create a flag to control the condition
     bool puzzleSolved = false;
@@ -201,7 +228,13 @@ TEST(ExitsRequiringItems) {
     
     // Create two rooms
     auto room1 = std::make_unique<ZRoom>(1, "Room 1", "You are in room 1.");
+    // GOTO refuses a room without RLANDBIT unless the actor is in a
+    // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
+    room1->setFlag(ObjectFlag::RLANDBIT);
     auto room2 = std::make_unique<ZRoom>(2, "Room 2", "You are in room 2.");
+    // GOTO refuses a room without RLANDBIT unless the actor is in a
+    // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
+    room2->setFlag(ObjectFlag::RLANDBIT);
     
     // Create key item
     auto key = std::make_unique<ZObject>(50, "key");
@@ -247,7 +280,13 @@ TEST(SpecialMovementClimb) {
     
     // Create two rooms
     auto room1 = std::make_unique<ZRoom>(1, "Ground", "You are on the ground.");
+    // GOTO refuses a room without RLANDBIT unless the actor is in a
+    // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
+    room1->setFlag(ObjectFlag::RLANDBIT);
     auto room2 = std::make_unique<ZRoom>(2, "Tree Top", "You are in a tree.");
+    // GOTO refuses a room without RLANDBIT unless the actor is in a
+    // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
+    room2->setFlag(ObjectFlag::RLANDBIT);
     
     // Set up special exit requiring CLIMB
     room1->setExit(Direction::UP, RoomExit::createSpecial(
@@ -283,7 +322,13 @@ TEST(OneWayExits) {
     
     // Create two rooms
     auto room1 = std::make_unique<ZRoom>(1, "Room 1", "You are in room 1.");
+    // GOTO refuses a room without RLANDBIT unless the actor is in a
+    // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
+    room1->setFlag(ObjectFlag::RLANDBIT);
     auto room2 = std::make_unique<ZRoom>(2, "Room 2", "You are in room 2.");
+    // GOTO refuses a room without RLANDBIT unless the actor is in a
+    // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
+    room2->setFlag(ObjectFlag::RLANDBIT);
     
     // Set up one-way exit from room1 to room2
     room1->setExit(Direction::NORTH, RoomExit::createOneWay(2));

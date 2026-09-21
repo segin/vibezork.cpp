@@ -702,117 +702,197 @@ int vWalk() {
   return vWalkDir(*g.pWalkDir);
 }
 
-// ZIL: every failing branch of V-WALK ends in <RFATAL>; a completed move
-// returns true (gverbs.zil:1521-1580).
+// ZIL: <ROUTINE NO-GO-TELL (AV WLOC) ...>
+// Source: zil/gverbs.zil:2038-2043
+void noGoTell(ZObject *av, ZObject *wloc) {
+  if (av) {
+    tell("You can't go there in a ", wloc, ".");
+  } else {
+    tell("You can't go there without a vehicle.");
+  }
+  crlf();
+}
+
+// ZIL: <ROUTINE GOTO (RM "OPTIONAL" (V? T) ...) ...>
+// Source: zil/gverbs.zil:2045-2137
+bool goTo(ZObject *rm, bool v) {
+  auto &g = Globals::instance();
+  if (!rm) return RFALSE;
+  bool lb = rm->hasFlag(ObjectFlag::RLANDBIT);
+  ZObject *wloc = g.winner ? g.winner->getLocation() : nullptr;
+  std::optional<ObjectFlag> av;
+  bool olit = g.lit;
+  ZObject *ohere = g.here;
+  if (wloc && wloc->hasFlag(ObjectFlag::VEHBIT)) {
+    av = wloc->getVehicleType();
+  }
+  if (!lb && !av) {
+    noGoTell(nullptr, wloc);
+    return RFALSE;
+  }
+  if (!lb && !rm->hasFlag(*av)) {
+    noGoTell(wloc, wloc);
+    return RFALSE;
+  }
+  if (g.here && g.here->hasFlag(ObjectFlag::RLANDBIT) && lb && av &&
+      *av != ObjectFlag::RLANDBIT && !rm->hasFlag(*av)) {
+    noGoTell(wloc, wloc);
+    return RFALSE;
+  }
+  if (rm->hasFlag(ObjectFlag::RMUNGBIT)) {
+    tell(rm->getLongDesc(), CR);
+    return RFALSE;
+  }
+  if (lb && g.here && !g.here->hasFlag(ObjectFlag::RLANDBIT) &&
+      !DeathSystem::isDead() && wloc && wloc->hasFlag(ObjectFlag::VEHBIT)) {
+    tell("The ", wloc, " comes to a rest on the shore.", CR, CR);
+  }
+  if (av) {
+    wloc->moveTo(rm);
+  } else if (g.winner) {
+    g.winner->moveTo(rm);
+  }
+  g.here = rm;
+  g.lit = GParser::isLit(g.here);
+  if (!olit && !g.lit && GMacros::prob(80)) {
+    if (g.sprayed) {
+      tell("There are sinister gurgling noises in the darkness all around you!",
+           CR);
+    } else {
+      tell("Oh, no! A lurking grue slithered into the ");
+      ZObject *wl = g.winner ? g.winner->getLocation() : nullptr;
+      if (wl && wl->hasFlag(ObjectFlag::VEHBIT)) {
+        tell(wl);
+      } else {
+        tell("room");
+      }
+      DeathSystem::jigsUp(" and devoured you!");
+      return RTRUE;
+    }
+  }
+  if (!g.lit && g.winner == g.player) {
+    tell("You have moved into a dark place.", CR);
+    g.pCont = 0;
+  }
+  if (ZRoom *room = dynamic_cast<ZRoom *>(g.here)) {
+    room->performRoomAction(M_ENTER);
+  }
+  scoreObj(rm);
+  if (g.here != rm) {
+    return RTRUE;
+  }
+  if (g.winner != g.player && g.player && g.player->getLocation() == ohere) {
+    tell("The ", g.winner, " leaves the room.", CR);
+    return RTRUE;
+  }
+  // ZIL: no double description when re-entering Hades from itself.
+  if (g.here == ohere && g.here->getId() == RoomIds::ENTRANCE_TO_HADES) {
+    return RTRUE;
+  }
+  if (v && g.winner == g.player) {
+    vFirstLook();
+  }
+  return RTRUE;
+}
+
+// ZIL: <ROUTINE V-WALK ("AUX" PT PTS STR OBJ RM) ...>
+// Source: zil/gverbs.zil:1521-1580
 int vWalkDir(Direction dir) {
   auto &g = Globals::instance();
   ZRoom *currentRoom = dynamic_cast<ZRoom *>(g.here);
+  RoomExit *exit = currentRoom ? currentRoom->getExit(dir) : nullptr;
 
-  if (!currentRoom) {
-    printLine("You can't go that way.");
-    return M_FATAL;
-  }
-
-  RoomExit *exit = currentRoom->getExit(dir);
-  if (!exit) {
-    printLine("You can't go that way.");
-    return M_FATAL;
-  }
-
-  // Handle different exit types
-  switch (exit->type) {
-  case ExitType::DOOR: {
-    // Check if door exists and is accessible
-    if (exit->doorObject == 0) {
-      printLine("You can't go that way.");
-      return M_FATAL;
-    }
-
-    ZObject *door = g.getObject(exit->doorObject);
-    if (!door) {
-      printLine("You can't go that way.");
-      return M_FATAL;
-    }
-
-    // Check if door is closed
-    if (!door->hasFlag(ObjectFlag::OPENBIT)) {
-      printLine("The door is closed.");
-      return M_FATAL;
-    }
-
-    // Door is open, allow passage
-    break;
-  }
-
-  case ExitType::SPECIAL: {
-    // Special exits require specific verbs (CLIMB, ENTER, etc.)
-    // For now, just block with message
-    if (!exit->specialMessage.empty()) {
-      printLine(exit->specialMessage);
-    } else {
-      printLine("You can't go that way.");
-    }
-    return M_FATAL;
-  }
-
-  case ExitType::CONDITIONAL: {
-    // Check condition if present
-    if (exit->condition && !exit->condition()) {
+  if (exit) {
+    switch (exit->type) {
+    case ExitType::DOOR: {
+      // ZIL DEXIT (gverbs.zil:1550-1558)
+      ZObject *obj = g.getObject(exit->doorObject);
+      if (obj && obj->hasFlag(ObjectFlag::OPENBIT)) {
+        return goTo(g.getObject(exit->targetRoom)) ? M_HANDLED : GMacros::rfatal();
+      }
       if (!exit->message.empty()) {
-        printLine(exit->message);
-      } else {
-        printLine("You can't go that way.");
+        tell(exit->message, CR);
+        return GMacros::rfatal();
       }
-      return M_FATAL;
+      tell("The ", obj, " is closed.", CR);
+      thisIsIt(obj);
+      return GMacros::rfatal();
     }
-    break;
-  }
-
-  case ExitType::PROCEDURAL: {
-    if (exit->procedural) {
-      ObjectId target = exit->procedural();
-      if (target == 0) {
-        return M_FATAL; // Movement blocked or output handled by procedural routine
+    case ExitType::CONDITIONAL: {
+      // ZIL CEXIT (gverbs.zil:1541-1549)
+      if (!exit->condition || exit->condition()) {
+        return goTo(g.getObject(exit->targetRoom)) ? M_HANDLED : GMacros::rfatal();
       }
-      exit->targetRoom = target;
-    } else {
-      printLine("You can't go that way.");
-      return M_FATAL;
+      if (!exit->message.empty()) {
+        tell(exit->message, CR);
+        return GMacros::rfatal();
+      }
+      tell("You can't go that way.", CR);
+      return GMacros::rfatal();
     }
-    break;
-  }
-
-  case ExitType::ONE_WAY:
-  case ExitType::NORMAL:
-  default:
-    // Normal exits - just check for message
-    if (!exit->message.empty()) {
-      printLine(exit->message);
-      return M_FATAL;
+    case ExitType::PROCEDURAL: {
+      // ZIL FEXIT (gverbs.zil:1531-1540)
+      ObjectId target = exit->procedural ? exit->procedural() : 0;
+      if (target != 0) {
+        return goTo(g.getObject(target)) ? M_HANDLED : GMacros::rfatal();
+      }
+      return GMacros::rfatal();
     }
-    break;
-  }
-
-  // Check for dam-related water rooms (Requirement 70.2: Dam puzzle)
-  // Block entry to reservoir and stream when dam gates are closed
-  if (!damGatesOpen) {
-    ObjectId targetId = exit->targetRoom;
-    if (targetId == RoomIds::RESERVOIR || targetId == RoomIds::IN_STREAM) {
-      printLine("The water level is too high to enter. The reservoir is full.");
-      return M_FATAL;
+    case ExitType::SPECIAL:
+    case ExitType::ONE_WAY:
+    case ExitType::NORMAL:
+    default:
+      // ZIL NEXIT: an exit that is only a string (gverbs.zil:1528-1530)
+      if (!exit->message.empty()) {
+        tell(exit->message, CR);
+        return GMacros::rfatal();
+      }
+      if (!exit->specialMessage.empty()) {
+        tell(exit->specialMessage, CR);
+        return GMacros::rfatal();
+      }
+      // ZIL UEXIT
+      return goTo(g.getObject(exit->targetRoom)) ? M_HANDLED : GMacros::rfatal();
     }
   }
 
-  // Move to new room
-  ZObject *newRoom = g.getObject(exit->targetRoom);
-  if (newRoom) {
-    g.here = newRoom;
-    g.winner->moveTo(newRoom);
-    vLook();
+  // No exit that way. In the dark this is usually fatal (gverbs.zil:1559-1577).
+  if (!g.lit && GMacros::prob(80) && g.winner == g.player && g.here &&
+      !g.here->hasFlag(ObjectFlag::NONLANDBIT)) {
+    if (g.sprayed) {
+      tell("There are odd noises in the darkness, and there is no exit in that "
+           "direction.",
+           CR);
+      return GMacros::rfatal();
+    }
+    DeathSystem::jigsUp(
+        "Oh, no! You have walked into the slavering fangs of a lurking grue!");
+    return GMacros::rfatal();
   }
-
-  return M_HANDLED;
+  tell("You can't go that way.", CR);
+  return GMacros::rfatal();
 }
+
+// ZIL: <ROUTINE V-WALK-AROUND () <TELL "Use compass directions for movement." CR>>
+// Source: zil/gverbs.zil:1582-1583
+bool vWalkAround() {
+  tell("Use compass directions for movement.", CR);
+  return RTRUE;
+}
+
+// ZIL: <ROUTINE V-WALK-TO () ...>
+// Source: zil/gverbs.zil:1585-1591
+bool vWalkTo() {
+  auto &g = Globals::instance();
+  if (g.prso && (g.prso->getLocation() == g.here ||
+                 globalIn(g.prso->getId(), g.here))) {
+    tell("It's here!", CR);
+  } else {
+    tell("You should supply a direction!", CR);
+  }
+  return RTRUE;
+}
+
 
 bool trySpecialMovement(int verbId, Direction dir) {
   auto &g = Globals::instance();
@@ -2730,15 +2810,7 @@ bool vAlarm() {
   return RTRUE;
 }
 
-bool vWalkAround() {
-  printLine("Use compass directions for movement.");
-  return RTRUE;
-}
 
-bool vWalkTo() {
-  printLine("You should use a direction.");
-  return RTRUE;
-}
 
 bool vLaunch() {
   auto &g = Globals::instance();
@@ -3399,21 +3471,6 @@ bool globalIn(ObjectId objId, const ZObject *room) {
   return false;
 }
 
-// ZIL: <ROUTINE GOTO (RM "OPTIONAL" (V? T) "AUX" (LB <>) (OLIT ,LIT) W) ...> (gverbs.zil:733-772)
-bool goTo(ZObject *room) {
-  if (!room) return false;
-  auto &g = Globals::instance();
-  if (g.winner) {
-    g.winner->moveTo(room);
-  }
-  g.here = room;
-  g.lit = LightSystem::isRoomLit(room);
-  if (auto *zroom = dynamic_cast<ZRoom *>(room)) {
-    zroom->performRoomAction(M_ENTER);
-  }
-  vLook();
-  return true;
-}
 
 // ZIL: <ROUTINE HACK-HACK (STR) ...> (gverbs.zil:720-725)
 void hackHack(std::string_view str) {
@@ -3544,10 +3601,6 @@ void mungRoom(ZObject *room, std::string_view desc) {
   }
 }
 
-// ZIL: <ROUTINE NO-GO-TELL (DIR) ...> (gverbs.zil:940-955)
-void noGoTell(Direction dir) {
-  printLine("You can't go that way.");
-}
 
 // ZIL: <ROUTINE OTHER-SIDE (DOOR) ...> (gverbs.zil:1050-1065)
 ZObject *otherSide(const ZObject *door) {

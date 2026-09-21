@@ -77,10 +77,12 @@ public:
   int matchCount = 5;         // Number of matches in matchbook
   bool buoyFlag = true;       // Notice buoy feel on river (ZIL: BUOY-FLAG)
 
-  // Display modes
-  bool verboseMode = true;     // Full descriptions
-  bool briefMode = false;      // Short descriptions for visited rooms
-  bool superbriefMode = false; // Minimal descriptions
+  // Display modes. ZIL starts in brief: <GLOBAL VERBOSE <>> and
+  // <GLOBAL SUPER-BRIEF <>> (gverbs.zil:9-10), so a room that has already
+  // been visited prints only its name until VERBOSE is typed.
+  bool verboseMode = false;    // ZIL: ,VERBOSE
+  bool briefMode = true;       // Neither VERBOSE nor SUPER-BRIEF
+  bool superbriefMode = false; // ZIL: ,SUPER-BRIEF
   bool scripting = false;      // Transcript output enabled
 
   // ZIL: GMAIN.ZIL & GCLOCK.ZIL globals

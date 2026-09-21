@@ -343,11 +343,9 @@ int forestRoom(int rarg) {
     if ((g.prsa == V_CLIMB_FOO || g.prsa == V_CLIMB_UP) && (g.prso && g.prso->getId() == ObjectIds::TREE)) {
       return Verbs::doWalk(Direction::UP);
     }
-  } else if (rarg == M_LOOK) {
-    if (g.here && !g.here->getLongDesc().empty()) {
-      printLine(g.here->getLongDesc());
-    }
   }
+  // ZIL FOREST-ROOM has no M-LOOK branch: the forest rooms carry their own
+  // LDESC, which DESCRIBE-ROOM prints (1actions.zil:3004-3009).
   return M_NOT_HANDLED;
 }
 

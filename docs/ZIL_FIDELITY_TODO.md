@@ -10,7 +10,7 @@ test, build, commit, push; then mark `[x]` and update the counters. Every routin
 ported carries `// ZIL:` and `// Source: <file>:<lines>` comments. Never simplify
 away a ZIL behaviour.
 
-Progress: 28/74 (38%)
+Progress: 29/74 (39%)
 
 ## Phase A: engine foundations (src/core, src/systems/timer)
 
@@ -48,7 +48,7 @@ Progress: 28/74 (38%)
 - [x] C2 V-PUT (with the NOT-ITAKE truthiness quirk), PRE-PUT=PRE-GIVE, V-PUT-ON, V-PUT-UNDER, V-PUT-BEHIND, V-GIVE, PRE-GIVE, V-SGIVE, PRE-SGIVE (gverbs.zil:704-733, 1075-1135, 1206-1240)
 - [x] C3 V-OPEN (single-untouched-FDESC case, PRINT-CONTENTS, THIS-IS-IT), V-CLOSE (CAPACITY/SURFACEBIT gate, "It is now pitch black."), SEE-INSIDE?, V-LOOK-INSIDE, V-LOOK-ON, V-SEARCH, V-EXAMINE (gverbs.zil:336-360, 574-600, 866-905, 966-994, 1730-1748, 1837-1840)
 - [x] C4 DESCRIBE-ROOM (MAZEBIT always verbose, vehicle suffix, M-FLASH), DESCRIBE-OBJECTS ("Only bats can see in the dark. And you're not one."), DESCRIBE-OBJECT (FDESC/TOUCHBIT/LDESC rule, " (providing light)", " (outside the X)"), PRINT-CONT two-pass with INDENTS, FIRSTER, V-LOOK, V-FIRST-LOOK, V-INVENTORY, fixed "A "/"a " articles (gverbs.zil:29-31, 1622-1840)
-- [ ] C5 GOTO (VTYPE vehicle check, RMUNGBIT rooms, dark-to-dark 80 percent grue with SPRAYED?, "You have moved into a dark place.", SCORE-OBJ on rooms, ENTRANCE-TO-HADES suppression, "comes to a rest on the shore."), V-WALK (dark death rule), DO-WALK, NO-GO-TELL, V-WALK-AROUND, V-WALK-TO, OTHER-SIDE, LKP, MUNG-ROOM, THIS-IS-IT, GLOBAL-IN?, FIND-IN, HELD? (gverbs.zil:1521-1580, 2000-2216)
+- [x] C5 GOTO (VTYPE vehicle check, RMUNGBIT rooms, dark-to-dark 80 percent grue with SPRAYED?, "You have moved into a dark place.", SCORE-OBJ on rooms, ENTRANCE-TO-HADES suppression, "comes to a rest on the shore."), V-WALK (dark death rule), DO-WALK, NO-GO-TELL, V-WALK-AROUND, V-WALK-TO, OTHER-SIDE, LKP, MUNG-ROOM, THIS-IS-IT, GLOBAL-IN?, FIND-IN, HELD? (gverbs.zil:1521-1580, 2000-2216)
 - [ ] C6 SCORE-UPD (350 side effects), SCORE-OBJ, V-SCORE with exact G? thresholds, YES? (">" then first word YES/Y) (gverbs.zil:1841-1877; 1actions.zil:4026-4045)
 - [ ] C7 Game commands: V-VERBOSE, V-BRIEF, V-SUPER-BRIEF, V-QUIT, V-RESTART, V-RESTORE ("Ok."/"Failed.", V-FIRST-LOOK), V-SAVE, V-SCRIPT, V-UNSCRIPT, V-VERSION (exact text, Release 119 / Serial 880429), FINISH loop (gverbs.zil:9-121)
 - [ ] C8 V-WAIT: "Time passes..." then up to three CLOCKER ticks with early stop, CLOCK-WAIT (gverbs.zil:1514-1519)

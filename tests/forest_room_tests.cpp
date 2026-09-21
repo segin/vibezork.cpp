@@ -53,29 +53,27 @@ TEST(ForestRoomFcn_LookOutputsRoomDescription) {
   setupTestWorld();
   auto &g = Globals::instance();
 
-  g.here = g.getObject(RoomIds::FOREST_1);
-  {
+  // ZIL FOREST-ROOM has no M-LOOK branch (1actions.zil:3004-3009): the forest
+  // rooms carry their own LDESC and DESCRIBE-ROOM prints it, so the room
+  // action must not print anything of its own and must not claim M-LOOK.
+  for (ObjectId id : {RoomIds::FOREST_1, RoomIds::FOREST_PATH, RoomIds::CLEARING}) {
+    g.here = g.getObject(id);
     OutputCapture cap;
-    forestRoom(M_LOOK);
-    std::string output = cap.getOutput();
-    ASSERT_TRUE(output.find("This is a forest, with trees in all directions") != std::string::npos);
+    int result = forestRoom(M_LOOK);
+    ASSERT_TRUE(cap.getOutput().empty());
+    ASSERT_EQ(result, M_NOT_HANDLED);
   }
 
-  g.here = g.getObject(RoomIds::FOREST_PATH);
-  {
-    OutputCapture cap;
-    forestRoom(M_LOOK);
-    std::string output = cap.getOutput();
-    ASSERT_TRUE(output.find("This is a path winding through a dimly lit forest") != std::string::npos);
-  }
-
-  g.here = g.getObject(RoomIds::CLEARING);
-  {
-    OutputCapture cap;
-    forestRoom(M_LOOK);
-    std::string output = cap.getOutput();
-    ASSERT_TRUE(output.find("You are in a small clearing in a well marked forest path") != std::string::npos);
-  }
+  // The descriptions themselves come from the room data.
+  ASSERT_TRUE(g.getObject(RoomIds::FOREST_1)->getLongDesc().find(
+                  "This is a forest, with trees in all directions") !=
+              std::string::npos);
+  ASSERT_TRUE(g.getObject(RoomIds::FOREST_PATH)->getLongDesc().find(
+                  "This is a path winding through a dimly lit forest") !=
+              std::string::npos);
+  ASSERT_TRUE(g.getObject(RoomIds::CLEARING)->getLongDesc().find(
+                  "You are in a small clearing in a well marked forest path") !=
+              std::string::npos);
 }
 
 TEST(ForestRoomFcn_ClimbTreeOnPathWalksUp) {

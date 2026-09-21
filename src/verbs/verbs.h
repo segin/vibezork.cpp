@@ -481,7 +481,8 @@ namespace Verbs {
     /// ZIL FIRSTER (gverbs.zil:1818-1835): prints the container header
     bool firster(const ZObject *obj, int level);
     bool globalIn(ObjectId objId, const ZObject *room);
-    bool goTo(ZObject *room);
+    /// ZIL GOTO (gverbs.zil:2045-2137)
+    bool goTo(ZObject *rm, bool v = true);
     void hackHack(std::string_view str);
     bool isHeld(const ZObject *obj);
     bool hitSpot();
@@ -491,7 +492,8 @@ namespace Verbs {
     int iTake(bool vb = true);
     bool lkp(std::string_view text);
     void mungRoom(ZObject *room, std::string_view desc);
-    void noGoTell(Direction dir);
+    /// ZIL NO-GO-TELL (gverbs.zil:2038-2043)
+    void noGoTell(ZObject *av, ZObject *wloc);
     ZObject *otherSide(const ZObject *door);
     /// ZIL PRINT-CONT (gverbs.zil:1750-1816)
     bool printCont(const ZObject *obj, bool v = false, int level = 0);
