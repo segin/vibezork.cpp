@@ -1836,59 +1836,45 @@ bool vRing() {
 
 // Combat Verbs (Requirement 29)
 
+// ZIL: <ROUTINE FIND-WEAPON (O "AUX" W) ...>
+// Source: zil/1actions.zil:3401-3409
+ZObject *findWeapon(const ZObject *o) {
+  if (!o) return nullptr;
+  for (ZObject *w : o->getContents()) {
+    ObjectId id = w->getId();
+    if (id == ObjectIds::STILETTO || id == ObjectIds::AXE ||
+        id == ObjectIds::SWORD || id == ObjectIds::KNIFE ||
+        id == ObjectIds::RUSTY_KNIFE) {
+      return w;
+    }
+  }
+  return nullptr;
+}
+
+// ZIL: <ROUTINE V-ATTACK () ...>
+// Source: zil/gverbs.zil:176-193
 bool vAttack() {
   auto &g = Globals::instance();
-
-  // Check if target is specified
-  if (!g.prso) {
-    printLine("What do you want to attack?");
+  if (!g.prso || !g.prso->hasFlag(ObjectFlag::ACTORBIT)) {
+    tell("I've known strange people, but fighting a ", g.prso, "?", CR);
     return RTRUE;
   }
-
-  // Authentic ZIL V-ATTACK logic
-  // Check if target is an actor
-  if (!g.prso->hasFlag(ObjectFlag::ACTORBIT)) {
-    print("I've known strange people, but fighting a ");
-    print(g.prso->getDesc());
-    printLine("?");
+  if (!g.prsi || g.prsi == g.getObject(ObjectIds::HANDS)) {
+    tell("Trying to attack a ", g.prso, " with your bare hands is suicidal.",
+         CR);
     return RTRUE;
   }
-
-  // Check for weapon - must have one
-  if (!g.prsi) {
-    print("Trying to attack a ");
-    print(g.prso->getDesc());
-    printLine(" with your bare hands is suicidal.");
-    return RTRUE;
-  }
-
-  // Check if holding the weapon
   if (g.prsi->getLocation() != g.winner) {
-    print("You aren't even holding the ");
-    print(g.prsi->getDesc());
-    printLine(".");
+    tell("You aren't even holding the ", g.prsi, ".", CR);
     return RTRUE;
   }
-
-  // Check if it's actually a weapon
   if (!g.prsi->hasFlag(ObjectFlag::WEAPONBIT)) {
-    print("Trying to attack the ");
-    print(g.prso->getDesc());
-    print(" with a ");
-    print(g.prsi->getDesc());
-    printLine(" is suicidal.");
+    tell("Trying to attack the ", g.prso, " with a ", g.prsi, " is suicidal.",
+         CR);
     return RTRUE;
   }
-
-  // Call object action handler first
-  if (g.prso->performAction()) {
-    return RTRUE;
-  }
-
-  // Start combat using the combat system
+  // TODO(E2): ZIL calls HERO-BLOW, which rolls on the DEF tables.
   CombatSystem::startCombat(g.prso, g.prsi);
-  CombatSystem::processCombatRound();
-
   return RTRUE;
 }
 
@@ -1935,36 +1921,16 @@ bool vThrow() {
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-SWING () ...>
+// Source: zil/gverbs.zil:1347-1351
 bool vSwing() {
   auto &g = Globals::instance();
-
-  // Check if object is specified
-  if (!g.prso) {
-    printLine("What do you want to swing?");
-    return RTRUE;
-  }
-
-  // Authentic ZIL V-SWING
   if (!g.prsi) {
-    // No target - just swing
-    printLine("Whoosh!");
+    tell("Whoosh!", CR);
     return RTRUE;
   }
-
-  // Target specified - perform attack with swapped objects
-  // SWING weapon AT target -> ATTACK target WITH weapon
-  ZObject *weapon = g.prso;
-  ZObject *target = g.prsi;
-  g.prso = target;
-  g.prsi = weapon;
-
-  bool result = vAttack();
-
-  // Restore original values
-  g.prso = weapon;
-  g.prsi = target;
-
-  return result;
+  perform(V_ATTACK, g.prsi, g.prso);
+  return RTRUE;
 }
 
 // Meta-Game Verbs (Requirement 32, 65, 66, 67, 68)
@@ -2308,9 +2274,15 @@ bool vOverboard() {
   return RTRUE;
 }
 
-// New ZIL Audit Verbs implementation
+// ZIL: <ROUTINE V-MUNG () ...>
+// Source: zil/gverbs.zil:938-943
 bool vMung() {
-  printLine("Trying to destroy things is a waste of time.");
+  auto &g = Globals::instance();
+  if (g.prso && g.prso->hasFlag(ObjectFlag::ACTORBIT)) {
+    perform(V_ATTACK, g.prso);
+    return RTRUE;
+  }
+  tell("Nice try.", CR);
   return RTRUE;
 }
 
@@ -2350,8 +2322,10 @@ bool vSay() {
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-KICK () <HACK-HACK "Kicking the ">>
+// Source: zil/gverbs.zil:760
 bool vKick() {
-  printLine("Violence isn't the answer to this one.");
+  hackHack("Kicking the ");
   return RTRUE;
 }
 
@@ -2360,8 +2334,10 @@ bool vBreathe() {
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-RAPE () <TELL "What a (ahem!) strange idea." CR>>
+// Source: zil/gverbs.zil:1134-1135
 bool vRape() {
-  printLine("What a loony!");
+  tell("What a (ahem!) strange idea.", CR);
   return RTRUE;
 }
 
@@ -2399,11 +2375,20 @@ bool vStand() {
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-ALARM () ...>
+// Source: zil/gverbs.zil:156-168. A negative STRENGTH means unconscious.
 bool vAlarm() {
-  print("The ");
-  if (Globals::instance().prso)
-    print(Globals::instance().prso->getDesc());
-  printLine(" isn't sleeping.");
+  auto &g = Globals::instance();
+  if (g.prso && g.prso->hasFlag(ObjectFlag::ACTORBIT)) {
+    if (g.prso->getProperty(P_STRENGTH) < 0) {
+      tell("The ", g.prso, " is rudely awakened.", CR);
+      // TODO(E2): ZIL calls AWAKEN, which restores the villain's strength.
+    } else {
+      tell("He's wide awake, or haven't you noticed...", CR);
+    }
+    return RTRUE;
+  }
+  tell("The ", g.prso, " isn't sleeping.", CR);
   return RTRUE;
 }
 
@@ -2558,8 +2543,10 @@ bool vFollow() {
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-KISS () <TELL "I'd sooner kiss a pig." CR>>
+// Source: zil/gverbs.zil:762-763
 bool vKiss() {
-  printLine("I'd sooner kiss a pig.");
+  tell("I'd sooner kiss a pig.", CR);
   return RTRUE;
 }
 
@@ -2748,9 +2735,16 @@ bool vOil() {
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-STAB ("AUX" W) ...>
+// Source: zil/gverbs.zil:1297-1303
 bool vStab() {
-  // Alias to Attack
-  return Verbs::vAttack();
+  auto &g = Globals::instance();
+  if (ZObject *w = findWeapon(g.winner)) {
+    perform(V_ATTACK, g.prso, w);
+    return RTRUE;
+  }
+  tell("No doubt you propose to stab the ", g.prso, " with your pinky?", CR);
+  return RTRUE;
 }
 
 bool vDrinkFrom() {
@@ -2933,22 +2927,21 @@ bool preMove() {
   return false;
 }
 
-// ZIL: <ROUTINE PRE-MUNG () ...> (gverbs.zil:923-937)
+// ZIL: <ROUTINE PRE-MUNG () ...>
+// Source: zil/gverbs.zil:923-936. One sentence, built in three pieces.
 bool preMung() {
   auto &g = Globals::instance();
   if (!g.prsi || !g.prsi->hasFlag(ObjectFlag::WEAPONBIT)) {
-    if (g.prso) {
-      if (!g.prsi) {
-        printLine(std::format("Trying to destroy the {} with your bare hands is futile.", g.prso->getDesc()));
-      } else {
-        printLine(std::format("Trying to destroy the {} with a {} is futile.", g.prso->getDesc(), g.prsi->getDesc()));
-      }
+    tell("Trying to destroy the ", g.prso, " with ");
+    if (!g.prsi) {
+      tell("your bare hands");
     } else {
-      printLine("Trying to destroy things with your bare hands is futile.");
+      tell("a ", g.prsi);
     }
-    return true;
+    tell(" is futile.", CR);
+    return RTRUE;
   }
-  return false;
+  return RFALSE;
 }
 
 // ZIL: <ROUTINE PRE-PUT () ...> (gverbs.zil:1075-1081)
@@ -3130,14 +3123,17 @@ bool globalIn(ObjectId objId, const ZObject *room) {
 }
 
 
-// ZIL: <ROUTINE HACK-HACK (STR) ...> (gverbs.zil:720-725)
+// ZIL: <ROUTINE HACK-HACK (STR) ...>
+// Source: zil/gverbs.zil:2024-2028
 void hackHack(std::string_view str) {
   auto &g = Globals::instance();
-  if (g.prso) {
-    printLine(std::format("{} {}", str, g.prso->getDesc()));
-  } else {
-    printLine(std::format("{} that.", str));
+  ZObject *globals = g.getObject(ObjectIds::GLOBAL_OBJECTS);
+  if (g.prso && globals && g.prso->getLocation() == globals &&
+      (g.prsa == V_WAVE || g.prsa == V_RAISE || g.prsa == V_LOWER)) {
+    tell("The ", g.prso, " isn't here!", CR);
+    return;
   }
+  tell(str, g.prso, VerbTables::hoHum().pickOne(), CR);
 }
 
 // ZIL: <ROUTINE HELD? (CAN "AUX" (LOC <LOC .CAN>)) ...> (gverbs.zil:722-727)

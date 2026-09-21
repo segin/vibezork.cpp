@@ -35,4 +35,17 @@ GMacros::ZilRandomTable<std::string> &hellos() {
   return table;
 }
 
+// ZIL: <GLOBAL HO-HUM <LTABLE 0 " doesn't seem to work."
+//         " isn't notably helpful." " has no effect.">>
+// Source: zil/gverbs.zil:2030-2036. Each entry begins with a space because
+// HACK-HACK prints it straight after the object name.
+GMacros::ZilRandomTable<std::string> &hoHum() {
+  static GMacros::ZilRandomTable<std::string> table{
+      " doesn't seem to work.",
+      " isn't notably helpful.",
+      " has no effect.",
+  };
+  return table;
+}
+
 } // namespace VerbTables

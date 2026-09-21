@@ -504,6 +504,8 @@ namespace Verbs {
     bool shakeLoop(ZObject *obj);
     void tellNoPrsi();
     void thisIsIt(ZObject *obj);
+    /// ZIL FIND-WEAPON (1actions.zil:3401-3409)
+    ZObject *findWeapon(const ZObject *o);
     int weight(const ZObject *obj);
     bool yes();
 }
