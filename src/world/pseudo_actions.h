@@ -31,3 +31,7 @@ bool gasPseudo();
 
 // ZIL: CHAIN-PSEUDO (zil/1actions.zil:4167-4174)
 bool chainPseudo();
+
+// Registers every room's (PSEUDO ...) clauses from 1dungeon.zil on the
+// ZRoom objects so GLOBAL-CHECK can resolve them (gparser.zil:1181-1194).
+void registerRoomPseudos();

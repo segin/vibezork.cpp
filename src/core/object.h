@@ -83,6 +83,9 @@ public:
   // Identification
   ObjectId getId() const { return id_; }
   const std::string &getDesc() const { return desc_; }
+  /// GLOBAL-CHECK overwrites PSEUDO-OBJECT's DESC with the matched noun
+  /// (gparser.zil:1187-1190)
+  void setDesc(std::string_view desc) { desc_ = desc; }
   void addSynonym(std::string_view syn);
   void addAdjective(std::string_view adj);
   const std::vector<std::string> &getSynonyms() const { return synonyms_; }

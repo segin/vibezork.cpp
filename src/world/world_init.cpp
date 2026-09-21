@@ -4,6 +4,7 @@
 #include "rooms.h"
 #include "world_objects.h"
 #include "dungeon.h"
+#include "pseudo_actions.h"
 #include "core/gglobals.h"
 #include "core/globals.h"
 #include "core/io.h"
@@ -3916,6 +3917,9 @@ void initializeWorld() {
     
     // Initialize global objects from gglobals.zil
     GGlobals::initGlobalObjects(g);
+
+    // ZIL: (PSEUDO ...) clauses of the rooms (1dungeon.zil)
+    registerRoomPseudos();
 }
 
 

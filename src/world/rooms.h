@@ -317,9 +317,21 @@ public:
     
     /// Get all global objects accessible in this room
     std::span<const ObjectId> getGlobals() const { return globals_; }
+
+    /// ZIL: (PSEUDO "WORD" ROUTINE ...): a noun that GLOBAL-CHECK resolves
+    /// to PSEUDO-OBJECT with the given action (gparser.zil:1181-1194)
+    struct PseudoEntry {
+        std::string word;
+        ZObject::ActionFunc action;
+    };
+    void addPseudo(std::string_view word, ZObject::ActionFunc action) {
+        pseudos_.push_back({std::string(word), std::move(action)});
+    }
+    std::span<const PseudoEntry> getPseudos() const { return pseudos_; }
     
 private:
     std::map<Direction, RoomExit> exits_;     ///< Exits by direction
     RoomActionFunc roomAction_;               ///< Optional action handler
     std::vector<ObjectId> globals_;           ///< Global objects in room (ZIL: GLOBAL)
+    std::vector<PseudoEntry> pseudos_;        ///< ZIL: PSEUDO clauses
 };

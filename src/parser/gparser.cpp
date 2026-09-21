@@ -124,6 +124,9 @@ void buildDictionary() {
     for (const auto &[id, obj] : g.getAllObjects()) {
       for (const auto &syn : obj->getSynonyms()) addWord(syn, PS_OBJECT);
       for (const auto &adj : obj->getAdjectives()) addWord(adj, PS_ADJECTIVE);
+      if (auto *room = dynamic_cast<const ZRoom *>(obj.get())) {
+        for (const auto &entry : room->getPseudos()) addWord(entry.word, PS_OBJECT);
+      }
     }
     d.objectCount = g.getAllObjects().size();
     return;
@@ -212,10 +215,14 @@ void buildDictionary() {
     addWord(b, PS_BUZZ_WORD);
   }
 
-  // Object SYNONYMs and ADJECTIVEs.
+  // Object SYNONYMs and ADJECTIVEs, and the rooms' PSEUDO words (ZILCH
+  // enters those in the vocabulary as object words).
   for (const auto &[id, obj] : g.getAllObjects()) {
     for (const auto &syn : obj->getSynonyms()) addWord(syn, PS_OBJECT);
     for (const auto &adj : obj->getAdjectives()) addWord(adj, PS_ADJECTIVE);
+    if (auto *room = dynamic_cast<const ZRoom *>(obj.get())) {
+      for (const auto &entry : room->getPseudos()) addWord(entry.word, PS_OBJECT);
+    }
   }
 
   d.objectCount = g.getAllObjects().size();
@@ -618,8 +625,6 @@ void syntaxFound(const Syntax *syn) {
   state().syntax = syn;
   Globals::instance().prsa = syn ? syn->action : 0;
 }
-void whichPrint(int, int, const std::vector<ZObject *> &) {}
-void globalCheck(std::vector<ZObject *> &) {}
 bool takeCheck() { return true; }
 bool itakeCheck(std::vector<ZObject *> &, int) { return true; }
 bool manyCheck() { return true; }
@@ -1479,6 +1484,82 @@ bool getObject(std::vector<ZObject *> &tbl, bool vrb) {
     s.nam = nullptr;
     s.adj = nullptr;
     return true;
+  }
+}
+
+
+// ============================================================================
+// WHICH-PRINT and GLOBAL-CHECK (gparser.zil:1146-1200)
+// ============================================================================
+
+// ZIL: <ROUTINE WHICH-PRINT (TLEN LEN TBL ...> (gparser.zil:1146-1166)
+void whichPrint(int tlen, int len, const std::vector<ZObject *> &tbl) {
+  auto &g = Globals::instance();
+  auto &s = state();
+  int rlen = len;
+  print("Which ");
+  if (g.pOflag || g.pMerged || s.pAnd) {
+    const DictWord *w = s.nam ? s.nam : (s.adj ? s.adjn : W("one"));
+    if (w) print(w->key);
+  } else {
+    thingPrint(&tbl == &s.prso);
+  }
+  print(" do you mean, ");
+  while (true) {
+    tlen += 1;
+    ZObject *obj = (tlen - 1 < static_cast<int>(tbl.size())) ? tbl[tlen - 1] : nullptr;
+    print("the ");
+    if (obj) printDesc(obj);
+    if (len == 2) {
+      if (rlen != 2) print(",");
+      print(" or ");
+    } else if (len > 2) {
+      print(", ");
+    }
+    if (--len < 1) {
+      printLine("?");
+      return;
+    }
+  }
+}
+
+// ZIL: <ROUTINE GLOBAL-CHECK (TBL ...> (gparser.zil:1169-1200)
+void globalCheck(std::vector<ZObject *> &tbl) {
+  auto &g = Globals::instance();
+  auto &s = state();
+  int len = static_cast<int>(tbl.size());
+  int obits = g.pSlocbits;
+  auto *room = dynamic_cast<ZRoom *>(g.here);
+  if (room) {
+    // <GETPT ,HERE ,P?GLOBAL>: the room's GLOBAL list
+    for (ObjectId id : room->getGlobals()) {
+      ZObject *obj = g.getObject(id);
+      if (obj && thisIt(obj)) objFound(obj, tbl);
+    }
+    // <GETPT ,HERE ,P?PSEUDO>: PSEUDO-OBJECT takes the matched routine
+    // and the noun's name
+    if (!room->getPseudos().empty()) {
+      for (const auto &entry : room->getPseudos()) {
+        if (s.nam && zkey(entry.word) == s.nam->key) {
+          ZObject *pseudo = g.getObject(ObjectIds::PSEUDO_OBJECT);
+          if (pseudo) {
+            pseudo->setAction(entry.action);
+            pseudo->setDesc(s.nam->key);
+            objFound(pseudo, tbl);
+          }
+          break;
+        }
+      }
+    }
+  }
+  if (static_cast<int>(tbl.size()) == len) {
+    g.pSlocbits = -1;
+    s.table = &tbl;
+    doSl(g.getObject(ObjectIds::GLOBAL_OBJECTS), 1, 1);
+    g.pSlocbits = obits;
+    if (tbl.empty() && (g.prsa == V_LOOK_INSIDE || g.prsa == V_SEARCH || g.prsa == V_EXAMINE)) {
+      doSl(g.getObject(ObjectIds::ROOMS), 1, 1);
+    }
   }
 }
 

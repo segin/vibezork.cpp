@@ -769,6 +769,76 @@ void testGetObject() {
   std::println("✓ GET-OBJECT");
 }
 
+// ---------------------------------------------------------------------------
+// B7: GLOBAL-CHECK (room globals, pseudo objects, GLOBAL-OBJECTS) and
+//     WHICH-PRINT
+// ---------------------------------------------------------------------------
+
+void testGlobalCheckAndWhichPrint() {
+  std::println("Testing GLOBAL-CHECK / WHICH-PRINT...");
+  setupWorld();
+  auto &g = Globals::instance();
+  auto &s = GParser::state();
+  ZObject *pseudo = g.getObject(ObjectIds::PSEUDO_OBJECT);
+  ZObject *grue = g.getObject(ObjectIds::GRUE);
+  assert(pseudo && grue);
+
+  // GLOBAL-OBJECTS are found anywhere
+  auto r = runParser("examine grue");
+  assert(r.first && s.prso.size() == 1 && s.prso[0] == grue);
+
+  // Pseudo objects resolve to PSEUDO-OBJECT in their room only
+  g.here = g.getObject(RoomIds::LIVING_ROOM);
+  g.player->moveTo(g.here);
+  r = runParser("examine nails");
+  assert(r.first && s.prso.size() == 1 && s.prso[0] == pseudo);
+  assert(pseudo->getDesc() == "nails" && pseudo->hasAction());
+  r = runParser("examine nail");
+  assert(r.first && s.prso[0] == pseudo && pseudo->getDesc() == "nail");
+  g.here = g.getObject(RoomIds::WEST_OF_HOUSE);
+  g.player->moveTo(g.here);
+  r = runParser("examine nails");
+  assert(r.first && s.prso.size() == 1 && s.prso[0] == g.getObject(ObjectIds::NOT_HERE_OBJECT));
+  // A pseudo object is never ACCESSIBLE? (LAST-PSEUDO-LOC is commented out)
+  assert(!GParser::isAccessible(pseudo));
+
+  // WHICH-PRINT: two candidates
+  ZObject *leaflet = g.getObject(ObjectIds::ADVERTISEMENT);
+  g.getObject(ObjectIds::MAILBOX)->setFlag(ObjectFlag::OPENBIT);
+  auto other = std::make_unique<ZObject>(9998, "other leaflet");
+  other->addSynonym("leaflet");
+  other->addAdjective("other");
+  other->setFlag(ObjectFlag::TAKEBIT);
+  ZObject *otherPtr = other.get();
+  g.registerObject(9998, std::move(other));
+  otherPtr->moveTo(g.here);
+  r = runParser("take leaflet");
+  assert(!r.first);
+  assert(r.second == "\n>Which leaflet do you mean, the leaflet or the other leaflet?\n" ||
+         r.second == "\n>Which leaflet do you mean, the other leaflet or the leaflet?\n");
+  assert(g.pOflag);
+  // Answer with the distinguishing adjective: ACLAUSE-WIN merges it
+  r = runParser("other");
+  assert(r.first && s.prso.size() == 1 && s.prso[0] == otherPtr);
+  assert(g.pMerged);
+  // Three candidates: an Oxford comma
+  auto third = std::make_unique<ZObject>(9997, "third leaflet");
+  third->addSynonym("leaflet");
+  third->addAdjective("third");
+  third->setFlag(ObjectFlag::TAKEBIT);
+  ZObject *thirdPtr = third.get();
+  g.registerObject(9997, std::move(third));
+  thirdPtr->moveTo(g.here);
+  r = runParser("take leaflet");
+  assert(!r.first && r.second.starts_with("\n>Which leaflet do you mean, the "));
+  assert(r.second.contains(", or the ") && r.second.ends_with("?\n"));
+  r = runParser("third");
+  assert(r.first && s.prso.size() == 1 && s.prso[0] == thirdPtr);
+  // With P-OFLAG the noun is printed from the dictionary (truncated)
+  (void)leaflet;
+  std::println("✓ GLOBAL-CHECK");
+}
+
 } // namespace
 
 int main() {
@@ -788,6 +858,7 @@ int main() {
   testAgain();
   testSyntaxCheckAndOrphan();
   testGetObject();
+  testGlobalCheckAndWhichPrint();
   std::println("All gparser tests passed.");
   return 0;
 }
