@@ -2,6 +2,7 @@
 #include "core/globals.h"
 #include "core/io.h"
 #include "parser/gparser.h"
+#include "parser/gsyntax.h"
 #include "verb_registry.h"
 #include "verbs/verbs.h"
 #include "world/objects.h"
@@ -231,7 +232,20 @@ void Parser::tokenize(const std::string &input,
   std::string word;
   while (iss >> word) {
     std::transform(word.begin(), word.end(), word.begin(), ::tolower);
-    tokens.push_back(word);
+    // ZIL: "," is a word-break character that becomes its own word
+    // (gparser.zil:12, SIBREAKS); keep the rest of the clause splitting for
+    // Phase B.
+    while (!word.empty() && word.back() == ',') {
+      word.pop_back();
+      if (!word.empty()) {
+        tokens.push_back(word);
+        word.clear();
+      }
+      tokens.push_back(",");
+    }
+    if (!word.empty()) {
+      tokens.push_back(word);
+    }
   }
 }
 
@@ -606,44 +620,310 @@ bool Parser::isPronoun(const std::string &word) const {
 }
 
 
-std::vector<ZObject *> Parser::findAllApplicableObjects(VerbId verb) const {
-  std::vector<ZObject *> applicable;
-  auto &g = Globals::instance();
+// ---------------------------------------------------------------------------
+// Interim stand-ins for SNARFEM / GET-OBJECT / DO-SL / SEARCH-LIST /
+// GLOBAL-CHECK / BUT-MERGE (gparser.zil:928-1030, 1040-1140, 1169-1243).
+// They feed the ZIL match tables consumed by MAIN-LOOP-1; Phase B replaces
+// them with the verbatim parser.
+// ---------------------------------------------------------------------------
 
-  // Determine which objects are applicable based on the verb
-  for (const auto &[id, objPtr] : g.getAllObjects()) {
-    ZObject *obj = objPtr.get();
+// ZIL: THIS-IT? with P-NAM and P-ADJ empty and P-GWIMBIT zero
+// (gparser.zil:1357-1370): everything that is not INVISIBLE matches.
+static bool thisItAll(const ZObject *obj) {
+  return obj && !obj->hasFlag(ObjectFlag::INVISIBLE);
+}
 
-    // Skip invisible objects
-    if (!isObjectVisible(obj)) {
-      continue;
-    }
+// ZIL: <ROUTINE OBJ-FOUND (OBJ TBL ...> (gparser.zil:1239-1242)
+static void objFoundTable(ZObject *obj, std::vector<ZObject *> &table) {
+  table.push_back(obj);
+}
 
-    // Skip objects with INHIBIT flag (not selected in bulk operations)
-    if (obj->hasFlag(ObjectFlag::INHIBIT)) {
-      continue;
+// ZIL: <ROUTINE SEARCH-LIST (OBJ TBL LVL ...> (gparser.zil:1216-1237)
+void Parser::searchList(ZObject *obj, std::vector<ZObject *> &table,
+                        int level) const {
+  if (!obj) {
+    return;
+  }
+  // Iterate a copy: OBJ-FOUND never moves objects, but callers may.
+  std::vector<ZObject *> children = obj->getContents();
+  for (ZObject *child : children) {
+    if (level != GParser::P_SRCBOT && !child->getSynonyms().empty() &&
+        thisItAll(child)) {
+      objFoundTable(child, table);
     }
-
-    // For TAKE: objects in room that can be taken
-    if (verb == V_TAKE) {
-      if (obj->getLocation() == g.here && obj->hasFlag(ObjectFlag::TAKEBIT) &&
-          !obj->hasFlag(ObjectFlag::TRYTAKEBIT)) {
-        applicable.push_back(obj);
-      }
-    }
-    // For DROP: objects in inventory
-    else if (verb == V_DROP) {
-      if (obj->getLocation() == g.winner) {
-        applicable.push_back(obj);
-      }
-    }
-    // For other verbs, include visible objects
-    else {
-      applicable.push_back(obj);
+    if ((level != GParser::P_SRCTOP || child->hasFlag(ObjectFlag::SEARCHBIT) ||
+         child->hasFlag(ObjectFlag::SURFACEBIT)) &&
+        !child->getContents().empty() &&
+        (child->hasFlag(ObjectFlag::OPENBIT) ||
+         child->hasFlag(ObjectFlag::TRANSBIT))) {
+      int next = child->hasFlag(ObjectFlag::SURFACEBIT)   ? GParser::P_SRCALL
+                 : child->hasFlag(ObjectFlag::SEARCHBIT) ? GParser::P_SRCALL
+                                                          : GParser::P_SRCTOP;
+      searchList(child, table, next);
     }
   }
+}
 
-  return applicable;
+// ZIL: <ROUTINE DO-SL (OBJ BIT1 BIT2 ...> (gparser.zil:1202-1210).
+// BTST is (X & Y) == Y.
+void Parser::doSl(ZObject *obj, int bit1, int bit2,
+                  std::vector<ZObject *> &table) const {
+  auto btst = [this](int bits) { return (pSlocbits_ & bits) == bits; };
+  if (btst(bit1 + bit2)) {
+    searchList(obj, table, GParser::P_SRCALL);
+  } else if (btst(bit1)) {
+    searchList(obj, table, GParser::P_SRCTOP);
+  } else if (btst(bit2)) {
+    searchList(obj, table, GParser::P_SRCBOT);
+  }
+}
+
+// ZIL: <ROUTINE GLOBAL-CHECK (TBL ...> (gparser.zil:1169-1200) for the
+// P-NAM-less (ALL) case: the PSEUDO clause can never match.
+void Parser::globalCheck(const ParsedCommand &cmd,
+                         std::vector<ZObject *> &table) const {
+  auto &g = Globals::instance();
+  size_t len = table.size();
+  int obits = pSlocbits_;
+  if (auto *room = dynamic_cast<ZRoom *>(g.here)) {
+    for (ObjectId id : room->getGlobals()) {
+      ZObject *obj = g.getObject(id);
+      if (thisItAll(obj)) {
+        objFoundTable(obj, table);
+      }
+    }
+  }
+  if (table.size() == len) {
+    pSlocbits_ = -1;
+    doSl(g.getObject(ObjectIds::GLOBAL_OBJECTS), 1, 1, table);
+    pSlocbits_ = obits;
+    if (table.empty() && (cmd.verb == V_LOOK_INSIDE || cmd.verb == V_SEARCH ||
+                          cmd.verb == V_EXAMINE)) {
+      // ZIL: <DO-SL ,ROOMS 1 1>. Rooms are not children of ROOMS in this
+      // port yet (Phase D); scan them directly in registration order.
+      for (const auto &[id, objPtr] : g.getAllObjects()) {
+        auto *room = dynamic_cast<ZRoom *>(objPtr.get());
+        if (room && !room->getSynonyms().empty() && thisItAll(room)) {
+          objFoundTable(room, table);
+        }
+      }
+    }
+  }
+}
+
+// ZIL: the object element's location bits of the matched SYNTAX line
+// (gsyntax.zil), read through the GSyntax transcription.
+int Parser::syntaxScopeBits(const ParsedCommand &cmd, bool directSlot) const {
+  if (cmd.words.empty()) {
+    return 0;
+  }
+  std::vector<std::string> preps;
+  if (auto prepIdx = findPrepositionIndex(cmd.words);
+      prepIdx && *prepIdx + 1 < cmd.words.size()) {
+    preps.push_back(cmd.words[*prepIdx]);
+  }
+  size_t objectCount = 1;
+  if (!preps.empty()) {
+    // "verb prep obj" has one object; "verb obj prep obj" has two.
+    auto prepIdx = *findPrepositionIndex(cmd.words);
+    objectCount = prepIdx > 1 ? 2 : 1;
+  }
+  const GSyntax::ZilSyntax *syn =
+      GSyntax::matchSyntax(cmd.words[0], preps, objectCount);
+  if (!syn) {
+    return 0;
+  }
+  int seen = 0;
+  for (const auto &elem : syn->elements) {
+    if (elem.type != GSyntax::SyntaxElement::Type::OBJECT) {
+      continue;
+    }
+    ++seen;
+    if ((directSlot && seen == 1) || (!directSlot && seen == 2)) {
+      int bits = 0;
+      if (elem.scopeFlags & GSyntax::SH_HELD) bits |= GParser::SH;
+      if (elem.scopeFlags & GSyntax::SH_CARRIED) bits |= GParser::SC;
+      if (elem.scopeFlags & GSyntax::SH_ON_GROUND) bits |= GParser::SOG;
+      if (elem.scopeFlags & GSyntax::SH_IN_ROOM) bits |= GParser::SIR;
+      if (elem.many) bits |= GParser::SMANY;
+      if (elem.have) bits |= GParser::SHAVE;
+      if (elem.take) bits |= GParser::STAKE;
+      return bits;
+    }
+  }
+  return 0;
+}
+
+// ZIL: GET-OBJECT with P-GETFLAGS = P-ALL (gparser.zil:1040-1140)
+bool Parser::collectAll(ParsedCommand &cmd, bool directSlot,
+                        std::vector<ZObject *> &table) {
+  auto &g = Globals::instance();
+  int xbits = syntaxScopeBits(cmd, directSlot);
+  pSlocbits_ = xbits;
+  // ZIL: <COND (<OR <NOT <EQUAL? ,P-GETFLAGS ,P-ALL>> <ZERO? ,P-SLOCBITS>>
+  //             <SETG P-SLOCBITS -1>)>
+  if (pSlocbits_ == 0) {
+    pSlocbits_ = -1;
+  }
+  size_t tlen = table.size();
+  bool gcheck = false;
+  while (true) {
+    if (gcheck) {
+      globalCheck(cmd, table);
+    } else {
+      if (g.lit) {
+        // ZIL: <FCLEAR ,PLAYER ,TRANSBIT> <DO-SL ,HERE ,SOG ,SIR>
+        //      <FSET ,PLAYER ,TRANSBIT>
+        if (g.player) g.player->clearFlag(ObjectFlag::TRANSBIT);
+        doSl(g.here, GParser::SOG, GParser::SIR, table);
+        if (g.player) g.player->setFlag(ObjectFlag::TRANSBIT);
+      }
+      doSl(g.player, GParser::SH, GParser::SC, table);
+    }
+    size_t len = table.size() - tlen;
+    if (len == 0 && gcheck) {
+      pSlocbits_ = xbits;
+      if (g.lit || cmd.verb == V_TELL) {
+        objFoundTable(g.getObject(ObjectIds::NOT_HERE_OBJECT), table);
+        g.pXnam.clear();
+        g.pXadjn.clear();
+        return true;
+      }
+      printLine("It's too dark to see!");
+      return false;
+    }
+    if (len == 0) {
+      gcheck = true;
+      continue;
+    }
+    pSlocbits_ = xbits;
+    return true;
+  }
+}
+
+// One noun clause -> match table. Handles AND / "," lists, ALL, ALL EXCEPT
+// (BUT) lists, pronouns, unknown words and NOT-HERE-OBJECT.
+bool Parser::snarfPhrase(ParsedCommand &cmd,
+                         const std::vector<std::string> &phrase,
+                         bool directSlot, std::vector<ZObject *> &table) {
+  auto &g = Globals::instance();
+  std::vector<ZObject *> buts;
+  bool inBut = false;
+
+  // Split into sub-phrases on AND / ","; EXCEPT / BUT switches to the BUTS
+  // table (gparser.zil:1001-1004, 1013-1016).
+  std::vector<std::vector<std::string>> parts;
+  std::vector<bool> partIsBut;
+  parts.emplace_back();
+  partIsBut.push_back(false);
+  for (const auto &word : phrase) {
+    if (word == "and" || word == ",") {
+      if (!parts.back().empty()) {
+        parts.emplace_back();
+        partIsBut.push_back(inBut);
+      }
+      continue;
+    }
+    if (isExceptKeyword(word)) {
+      inBut = true;
+      if (!parts.back().empty()) {
+        parts.emplace_back();
+      } else {
+        partIsBut.pop_back();
+      }
+      partIsBut.push_back(true);
+      continue;
+    }
+    parts.back().push_back(word);
+  }
+  if (parts.back().empty()) {
+    parts.pop_back();
+    partIsBut.pop_back();
+  }
+
+  for (size_t p = 0; p < parts.size(); ++p) {
+    const auto &part = parts[p];
+    std::vector<ZObject *> &dest = partIsBut[p] ? buts : table;
+
+    // ALL / ALL OF
+    std::vector<std::string> content;
+    for (const auto &w : part) {
+      if (w == "the" || w == "a" || w == "an" || w == "of") {
+        continue;
+      }
+      content.push_back(w);
+    }
+    if (content.size() == 1 && isAllKeyword(content[0])) {
+      cmd.getFlags = GParser::P_ALL;
+      if (directSlot && !partIsBut[p] && p == 0) {
+        cmd.nc1IsAll = true;
+      }
+      if (!collectAll(cmd, directSlot, dest)) {
+        return false;
+      }
+      continue;
+    }
+    if (content.empty()) {
+      continue;
+    }
+
+    auto matches = findObjects(part, 0);
+    if (!matches.empty()) {
+      ZObject *chosen = matches.size() == 1
+                            ? matches[0]
+                            : disambiguate(matches, content.back());
+      if (!chosen) {
+        return false;
+      }
+      objFoundTable(chosen, dest);
+      continue;
+    }
+
+    // No visible object: an unknown word wins (gparser.zil:665-675)
+    for (const auto &word : part) {
+      if (word == "the" || word == "a" || word == "an" || isPreposition(word)) {
+        continue;
+      }
+      if (!isKnownObjectWord(word)) {
+        setLastUnknownWord(word);
+        printLine("I don't know the word \"" + word + "\".");
+        return false;
+      }
+    }
+    // Known words, nothing here: NOT-HERE-OBJECT when lit or TELL
+    // (gparser.zil:1122-1128), else "It's too dark to see!" (1129).
+    if (g.lit || cmd.verb == V_TELL) {
+      objFoundTable(g.getObject(ObjectIds::NOT_HERE_OBJECT), dest);
+      // The clause words echoed by NOT-HERE-PRINT / BUFFER-PRINT; the
+      // buzzwords THE / A / AN are not part of it ("take the lamp" ->
+      // "You can't see any lamp here!").
+      if (directSlot) {
+        g.pNc1 = content;
+      } else {
+        g.pNc2 = content;
+      }
+      g.pXnam.clear();
+      g.pXadjn.clear();
+      continue;
+    }
+    printLine("It's too dark to see!");
+    return false;
+  }
+
+  // ZIL: BUT-MERGE (gparser.zil:945-958)
+  if (!buts.empty()) {
+    std::vector<ZObject *> merged;
+    for (ZObject *obj : table) {
+      if (std::find(buts.begin(), buts.end(), obj) == buts.end()) {
+        merged.push_back(obj);
+      }
+    }
+    table = std::move(merged);
+    if (directSlot && !buts.empty()) {
+      cmd.exceptObject = buts.front();
+    }
+  }
+  return true;
 }
 
 std::string Parser::replaceOopsWord(const std::string &original,
@@ -983,40 +1263,6 @@ ParsedCommand Parser::parse(const std::string &input) {
     }
   }
 
-  // Check for "all" keyword
-  if (cmd.words.size() > 1 && isAllKeyword(cmd.words[1])) {
-    cmd.isAll = true;
-
-    // Check for "all except [object]"
-    if (cmd.words.size() > 2 && isExceptKeyword(cmd.words[2])) {
-      // Find the exception object
-      if (cmd.words.size() > 3) {
-        std::vector<std::string> exceptWords(cmd.words.begin() + 3,
-                                             cmd.words.end());
-        auto exceptMatches = findObjects(exceptWords, 0);
-        if (!exceptMatches.empty()) {
-          cmd.exceptObject =
-              exceptMatches.size() == 1
-                  ? exceptMatches[0]
-                  : disambiguate(exceptMatches, exceptWords.back());
-        }
-      }
-    }
-
-    // Find all applicable objects for this verb
-    cmd.allObjects = findAllApplicableObjects(cmd.verb);
-
-    // Remove the exception object if specified
-    if (cmd.exceptObject) {
-      cmd.allObjects.erase(std::remove(cmd.allObjects.begin(),
-                                       cmd.allObjects.end(), cmd.exceptObject),
-                           cmd.allObjects.end());
-    }
-
-    finishTables(cmd);
-    return cmd;
-  }
-
   // Find preposition and extract indirect object (PRSI)
   if (cmd.verb != 0 && !cmd.isDirection) {
     auto prepIdx = findPrepositionIndex(cmd.words);
@@ -1048,36 +1294,24 @@ ParsedCommand Parser::parse(const std::string &input) {
       std::vector<std::string> indirectObjWords(
           cmd.words.begin() + prepIdx.value() + 1, cmd.words.end());
 
-      // Find objects
+      // ZIL: SNARF-OBJECTS resolves NC2 before NC1 (gparser.zil:928-936)
       if (!directObjWords.empty()) {
-        auto directMatches = findObjects(directObjWords, 0);
-        if (!directMatches.empty()) {
-          cmd.directObj =
-              directMatches.size() == 1
-                  ? directMatches[0]
-                  : disambiguate(directMatches, directObjWords.back());
+        if (!indirectObjWords.empty() &&
+            !snarfPhrase(cmd, indirectObjWords, false, cmd.prsiTable)) {
+          cmd.verb = 0;
+          return cmd;
         }
-
-        if (!indirectObjWords.empty()) {
-          auto indirectMatches = findObjects(indirectObjWords, 0);
-          if (!indirectMatches.empty()) {
-            cmd.indirectObj =
-                indirectMatches.size() == 1
-                    ? indirectMatches[0]
-                    : disambiguate(indirectMatches, indirectObjWords.back());
-          }
+        if (!snarfPhrase(cmd, directObjWords, true, cmd.prsoTable)) {
+          cmd.verb = 0;
+          return cmd;
         }
       } else {
-        // Preposition immediately follows verb (e.g., "turn on lamp", "look at sword", "look in box")
-        // The object after the preposition is the direct object (PRSO)
-        if (!indirectObjWords.empty()) {
-          auto matches = findObjects(indirectObjWords, 0);
-          if (!matches.empty()) {
-            cmd.directObj =
-                matches.size() == 1
-                    ? matches[0]
-                    : disambiguate(matches, indirectObjWords.back());
-          }
+        // Preposition immediately follows verb (e.g., "turn on lamp",
+        // "look at sword"): the object after it is the direct object (PRSO)
+        if (!indirectObjWords.empty() &&
+            !snarfPhrase(cmd, indirectObjWords, true, cmd.prsoTable)) {
+          cmd.verb = 0;
+          return cmd;
         }
       }
     } else if (cmd.verb != 0) {
@@ -1085,40 +1319,9 @@ ParsedCommand Parser::parse(const std::string &input) {
       if (cmd.words.size() > 1) {
         std::vector<std::string> objWords(cmd.words.begin() + 1,
                                           cmd.words.end());
-        auto matches = findObjects(objWords, 0);
-        if (!matches.empty()) {
-          cmd.directObj = matches.size() == 1
-                              ? matches[0]
-                              : disambiguate(matches, objWords.back());
-        } else if (!objWords.empty()) {
-          // No visible object found - check if word is known or unknown
-          bool foundUnknown = false;
-          std::string objectNoun;
-
-          for (const auto &word : objWords) {
-            if (word == "the" || word == "a" || word == "an" ||
-                isPreposition(word)) {
-              continue;
-            }
-
-            if (!isKnownObjectWord(word)) {
-              // Unknown word - save for OOPS
-              setLastUnknownWord(word);
-              printLine("I don't know the word \"" + word + "\".");
-              cmd.verb = 0; // Mark as failed
-              foundUnknown = true;
-              break;
-            } else {
-              // Known word but object not visible
-              objectNoun = word;
-            }
-          }
-
-          if (!foundUnknown && !objectNoun.empty()) {
-            // Word is known but object not here
-            printLine("You can't see any " + objectNoun + " here!");
-            cmd.verb = 0; // Mark as failed
-          }
+        if (!snarfPhrase(cmd, objWords, true, cmd.prsoTable)) {
+          cmd.verb = 0;
+          return cmd;
         }
       } else if (verbRequiresObject(cmd.verb)) {
         // Verb requires object but none given - orphan the command
@@ -1136,11 +1339,7 @@ ParsedCommand Parser::parse(const std::string &input) {
 // Fill the ZIL match tables (P-PRSO / P-PRSI) from the single-object
 // results of the interim parser, and keep the legacy mirrors coherent.
 void Parser::finishTables(ParsedCommand &cmd) {
-  if (cmd.isAll) {
-    cmd.prsoTable = cmd.allObjects;
-    cmd.getFlags = GParser::P_ALL;
-    cmd.nc1IsAll = true;
-  } else if (cmd.directObj && cmd.prsoTable.empty()) {
+  if (cmd.directObj && cmd.prsoTable.empty()) {
     cmd.prsoTable.push_back(cmd.directObj);
   }
   if (cmd.indirectObj && cmd.prsiTable.empty()) {
@@ -1148,6 +1347,11 @@ void Parser::finishTables(ParsedCommand &cmd) {
   }
   cmd.directObj = cmd.prsoTable.empty() ? nullptr : cmd.prsoTable.front();
   cmd.indirectObj = cmd.prsiTable.empty() ? nullptr : cmd.prsiTable.front();
+  // Legacy mirrors
+  cmd.isAll = cmd.nc1IsAll;
+  if (cmd.isAll) {
+    cmd.allObjects = cmd.prsoTable;
+  }
 }
 
 ParseExpected Parser::tryParse(std::string_view input) {

@@ -95,6 +95,21 @@ public:
 private:
     void initializeVerbsAndDirections();
     void finishTables(ParsedCommand& cmd);
+
+    // Interim stand-ins for SNARFEM / GET-OBJECT (gparser.zil:978-1140)
+    // until Phase B ports the parser: resolve one noun clause (which may be
+    // an AND/comma list, ALL, ALL EXCEPT ..., or a pronoun) into a match
+    // table. Returns false when the parser must give up (message printed).
+    bool snarfPhrase(ParsedCommand& cmd, const std::vector<std::string>& phrase,
+                     bool directSlot, std::vector<ZObject*>& table);
+    // ZIL: GET-OBJECT with P-GETFLAGS = P-ALL: DO-SL over HERE and the
+    // player with the syntax's search bits, then GLOBAL-CHECK.
+    bool collectAll(ParsedCommand& cmd, bool directSlot, std::vector<ZObject*>& table);
+    int syntaxScopeBits(const ParsedCommand& cmd, bool directSlot) const;
+    void searchList(ZObject* obj, std::vector<ZObject*>& table, int level) const;
+    void doSl(ZObject* obj, int bit1, int bit2, std::vector<ZObject*>& table) const;
+    void globalCheck(const ParsedCommand& cmd, std::vector<ZObject*>& table) const;
+    mutable int pSlocbits_ = 0;  // ZIL: ,P-SLOCBITS during a GET-OBJECT
     void tokenize(const std::string& input, std::vector<std::string>& tokens);
     VerbId findVerb(const std::string& word) const;
     ZObject* findObject(const std::string& word);
@@ -123,7 +138,6 @@ private:
     // (gglobals.zil:42-46); findObjects yields that object for them.
     bool isPronoun(const std::string& word) const;
     bool isKnownObjectWord(const std::string& word) const;
-    std::vector<ZObject*> findAllApplicableObjects(VerbId verb) const;
     std::string replaceOopsWord(const std::string& original, const std::string& replacement);
     
     // Using unordered containers for O(1) lookup

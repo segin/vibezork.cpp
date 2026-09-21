@@ -10,7 +10,7 @@ test, build, commit, push; then mark `[x]` and update the counters. Every routin
 ported carries `// ZIL:` and `// Source: <file>:<lines>` comments. Never simplify
 away a ZIL behaviour.
 
-Progress: 9/74 (12%)
+Progress: 10/74 (14%)
 
 ## Phase A: engine foundations (src/core, src/systems/timer)
 
@@ -23,7 +23,7 @@ Progress: 9/74 (12%)
 - [x] A7 GO startup: queue I-FIGHT -1 enabled, I-SWORD -1 disabled, I-THIEF -1 enabled, I-CANDLES 40, I-LANTERN 200; DEF*-RES patch; INFLATED-BOAT VTYPE=NONLANDBIT; V-VERSION when WEST-OF-HOUSE untouched; V-LOOK (1dungeon.zil:2637-2660; §2.8)
 - [x] A8 Output layer: TELL does not append CRLF, no automatic inter-print spacing, source newlines inside strings become spaces, wrap at screen width like the Z-machine; prompt is ">" (io.cpp; §2.14, §2.16)
 - [x] A9 IT: substitution in P-PRSI then P-PRSO, PERFORM's ACCESSIBLE? check with "I don't see what you are referring to." + RFATAL, P-IT-OBJECT rule with the PRSI!=IT and WALK guards; THEM/HER/HIM are IT synonyms (gmain.zil:45-64, 194-203; §2.4)
-- [ ] A10 Multi-object loop per MAIN-LOOP-1: NUM>1 without ALL, "name: " prefix, the three "multiple exceptions", P-NOT-HERE and "The [other] object[s] that you mentioned is/aren't here.", any-verb "There's nothing here you can take.", PRSO/PRSI role swap (gmain.zil:65-150; §2.5)
+- [x] A10 Multi-object loop per MAIN-LOOP-1: NUM>1 without ALL, "name: " prefix, the three "multiple exceptions", P-NOT-HERE and "The [other] object[s] that you mentioned is/aren't here.", any-verb "There's nothing here you can take.", PRSO/PRSI role swap (gmain.zil:65-150; §2.5)
 - [ ] A11 Zero-object branch: "It's too dark to see." / "It's not clear what you're referring to." (gmain.zil:82-90; §2.6)
 - [ ] A12 gglobals fidelity: GROUND-FUNCTION and CRETIN-FCN use PERFORM; GRUE is "lurking grue" in GLOBAL-OBJECTS without INVISIBLE; GROUND without NDESCBIT/INVISIBLE; NOT-HERE-PRINT spacing; "I beg your pardon?" on empty input; remove "That command is too long." and "Goodbye!" (gglobals.zil; §2.11-2.13, §2.16)
 
@@ -34,7 +34,7 @@ Progress: 9/74 (12%)
 - [ ] B3 OOPS: all messages, INBUF-STUFF/INBUF-ADD splice, first-word-only warning (gparser.zil:177-206, 402-428)
 - [ ] B4 AGAIN/G: "Beg pardon?", "It's difficult to repeat fragments.", "That would just repeat a mistake.", "AGAIN, x" via RESERVE-LEXV, P-OTBL restore, STUFF 29-entry limit (gparser.zil:132-138, 211-250, 387-400)
 - [ ] B5 SYNTAX-CHECK, GWIM (incl. the FIND RMUNGBIT no-object idiom and "(the X)"/"(with your hands)" echoes), ORPHAN, ORPHAN-MERGE, ACLAUSE-WIN/NCLAUSE-WIN, CANT-ORPHAN (gparser.zil:543-655, 707-926)
-- [ ] B6 SNARF-OBJECTS, SNARFEM, BUT-MERGE, GET-OBJECT two-pass search with the TRANSBIT trick, DO-SL/SEARCH-LIST with syntax scope bits, OBJ-FOUND, "(How about the X?)", "There seems to be a noun missing in that sentence!", "It's too dark to see!" (gparser.zil:928-1140, 1202-1243)
+- [ ] B6 SNARF-OBJECTS, SNARFEM, BUT-MERGE, GET-OBJECT two-pass search with the TRANSBIT trick, DO-SL/SEARCH-LIST with syntax scope bits, OBJ-FOUND, "(How about the X?)", "There seems to be a noun missing in that sentence!", "It's too dark to see!" (gparser.zil:928-1140, 1202-1243). Oracle check: at West of House "take all except mailbox" prints "There's nothing here you can take." (dfrotz, R119), which the source reading of BUT-MERGE (empty P-PRSO -> zero-object branch) does not predict; reproduce whatever the verbatim port yields and compare
 - [ ] B7 GLOBAL-CHECK with pseudo objects (PSEUDO-OBJECT action rewrite) and the ROOMS-only-for-LOOK-INSIDE/SEARCH/EXAMINE rule; WHICH-PRINT single-line question answered by orphaning (gparser.zil:1146-1200)
 - [ ] B8 MANY-CHECK, TAKE-CHECK, ITAKE-CHECK with "(Taken)", "You don't have the X.", "You don't have that!", HANDS/ME exemptions (gparser.zil:1244-1313)
 - [ ] B9 NUMBER? with all rejection rules and W?INTNUM substitution; INTNUM object (gparser.zil:512-534)

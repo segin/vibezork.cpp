@@ -514,32 +514,120 @@ int executeCommand(const ParsedCommand &cmdIn) {
     g.pWalkDir = cmd.direction;
   }
 
-  // Multi-object handling (ZIL: lines 91-150)
-  if (cmd.isAll) {
-    g.pMult = true;
+  // ZIL: MAIN-LOOP-1 lines 65-150. ICNT/OCNT are the table lengths; NUM,
+  // TBL, OBJ and PTBL select which table drives the loop.
+  const size_t icnt = cmd.prsiTable.size();
+  const size_t ocnt = cmd.prsoTable.size();
+  ZObject *obj = nullptr;
+  bool ptbl = true;
+  size_t num = 0;
+  if (ocnt == 0) {
+    num = 0;
+  } else if (ocnt > 1) {
+    obj = icnt == 0 ? nullptr : cmd.prsiTable[0];
+    num = ocnt;
+  } else if (icnt > 1) {
+    ptbl = false;
+    obj = cmd.prsoTable[0];
+    num = icnt;
+  } else {
+    num = 1;
+  }
+  // ZIL: <COND (<AND <NOT .OBJ> <1? .ICNT>> <SET OBJ <GET ,P-PRSI 1>>)>
+  if (!obj && icnt == 1) {
+    obj = cmd.prsiTable[0];
+  }
+
+  ZObject *notHere = g.getObject(ObjectIds::NOT_HERE_OBJECT);
+
+  if (cmd.verb == V_WALK && g.pWalkDir) {
+    // ZIL: <COND (<AND <==? ,PRSA ,V?WALK> <NOT <ZERO? ,P-WALK-DIR>>>
+    //             <SET V <PERFORM ,PRSA ,PRSO>>) (gmain.zil:79-81)
+    v = perform(V_WALK, nullptr, nullptr);
+  } else if (num == 0) {
+    // ZIL: gmain.zil:82-90 -- completed by TODO item A11.
+    v = perform(cmd.verb, nullptr, nullptr);
+    g.prso = nullptr;
+  } else {
+    // ZIL: <SETG P-NOT-HERE 0> <SETG P-MULT <>>
+    //      <COND (<G? .NUM 1> <SETG P-MULT T>)> (gmain.zil:92-94)
     g.pNotHere = 0;
+    g.pMult = num > 1;
+    bool tmp = false;
+    size_t cnt = 0;
+    while (true) {
+      if (++cnt > num) {
+        // ZIL: gmain.zil:98-112
+        if (g.pNotHere > 0) {
+          print("The ");
+          if (g.pNotHere != static_cast<int>(num)) {
+            print("other ");
+          }
+          print("object");
+          if (g.pNotHere != 1) {
+            print("s");
+          }
+          print(" that you mentioned ");
+          if (g.pNotHere != 1) {
+            print("are");
+          } else {
+            print("is");
+          }
+          printLine("n't here.");
+        } else if (!tmp) {
+          printLine("There's nothing here you can take.");
+        }
+        break;
+      }
+      ZObject *obj1 = ptbl ? cmd.prsoTable[cnt - 1] : cmd.prsiTable[cnt - 1];
+      ZObject *o = ptbl ? obj1 : obj;
+      ZObject *i = ptbl ? obj : obj1;
 
-    if (cmd.prsoTable.empty()) {
-      printLine(std::format("There's nothing here to {}.", cmd.words[0]));
-      return v;
-    }
+      // ZIL: "multiple exceptions" (gmain.zil:120-145)
+      if (num > 1 || cmd.nc1IsAll) {
+        ZObject *vloc = g.winner ? g.winner->getLocation() : nullptr;
+        if (o == notHere) {
+          // ZIL: <SETG P-NOT-HERE <+ ,P-NOT-HERE 1>> <AGAIN>
+          g.pNotHere++;
+          continue;
+        }
+        if (cmd.verb == V_TAKE && i && cmd.nc1IsAll &&
+            !(o && o->getLocation() == i)) {
+          // ZIL: <AND <VERB? TAKE> .I <EQUAL? NC1[0] ,W?ALL> <NOT <IN? .O .I>>>
+          continue;
+        }
+        if (cmd.getFlags == GParser::P_ALL && cmd.verb == V_TAKE && o) {
+          ZObject *loc = o->getLocation();
+          bool wrongPlace = loc != g.winner && loc != g.here && loc != vloc &&
+                            loc != i &&
+                            !(loc && loc->hasFlag(ObjectFlag::SURFACEBIT));
+          bool notTakeable = !(o->hasFlag(ObjectFlag::TAKEBIT) ||
+                               o->hasFlag(ObjectFlag::TRYTAKEBIT));
+          if (wrongPlace || notTakeable) {
+            continue;
+          }
+        }
+        // ZIL: <COND (<EQUAL? .OBJ1 ,IT> <PRINTD ,P-IT-OBJECT>)
+        //            (T <PRINTD .OBJ1>)> <TELL ": ">
+        if (itObj && obj1 == itObj && g.it) {
+          print(g.it->getDesc());
+        } else if (obj1) {
+          print(obj1->getDesc());
+        }
+        print(": ");
+      }
 
-    for (auto *obj : cmd.prsoTable) {
-      print(std::format("{}: ", obj->getDesc()));
-      v = perform(cmd.verb, obj, cmd.indirectObj);
+      // ZIL: <SETG PRSO .O> <SETG PRSI .I> <SET TMP T>
+      //      <SET V <PERFORM ,PRSA ,PRSO ,PRSI>>
+      g.prso = o;
+      g.prsi = i;
+      tmp = true;
+      v = perform(cmd.verb, o, i);
       // ZIL: <COND (<==? .V ,M-FATAL> <RETURN>)> (gmain.zil:150)
       if (v == M_FATAL) {
         break;
       }
     }
-  } else if (cmd.verb == V_WALK && g.pWalkDir) {
-    // ZIL: <COND (<AND <==? ,PRSA ,V?WALK> <NOT <ZERO? ,P-WALK-DIR>>>
-    //             <SET V <PERFORM ,PRSA ,PRSO>>) (gmain.zil:79-81)
-    g.pMult = false;
-    v = perform(V_WALK, nullptr, nullptr);
-  } else {
-    g.pMult = false;
-    v = perform(cmd.verb, cmd.directObj, cmd.indirectObj);
   }
 
   // Room action (M-END) (ZIL: lines 151-154), skipped after RFATAL

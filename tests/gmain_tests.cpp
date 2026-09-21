@@ -3,8 +3,10 @@
 #include "core/gglobals.h"
 #include "core/gmacros.h"
 #include "core/gmain.h"
+#include "core/io.h"
 #include "core/object.h"
 #include "core/types.h"
+#include "parser/gparser.h"
 #include "parser/parser.h"
 #include "verbs/verbs.h"
 #include "world/objects.h"
@@ -581,6 +583,165 @@ void testItSubstitution() {
   std::println("✓ IT handling verified against gmain.zil:45-64, 194-206");
 }
 
+// ZIL: MAIN-LOOP-1 multi-object loop and "multiple exceptions"
+// (gmain.zil:65-150)
+void testMultiObjectLoop() {
+  std::println("Testing the multi-object loop...");
+  auto &g = Globals::instance();
+  g.reset();
+  initializeAllVerbHandlers();
+
+  auto playerObj = std::make_unique<ZObject>(5501, "adventurer");
+  auto roomObj = std::make_unique<ZRoom>(5502, "Kitchen", "Kitchen desc");
+  auto sack = std::make_unique<ZObject>(5503, "brown sack");
+  auto bottle = std::make_unique<ZObject>(5504, "glass bottle");
+  auto table = std::make_unique<ZObject>(5505, "kitchen table");
+  auto water = std::make_unique<ZObject>(5506, "quantity of water");
+  auto box = std::make_unique<ZObject>(5507, "box");
+  auto notHereUnique =
+      std::make_unique<ZObject>(ObjectIds::NOT_HERE_OBJECT, "such thing");
+  ZObject *notHere = notHereUnique.get();
+  notHere->setAction(GGlobals::notHereObjectF);
+  g.registerObject(ObjectIds::NOT_HERE_OBJECT, std::move(notHereUnique));
+  g.player = playerObj.get();
+  g.winner = playerObj.get();
+  g.here = roomObj.get();
+  roomObj->setFlag(ObjectFlag::ONBIT);
+  g.lit = true;
+  playerObj->moveTo(roomObj.get());
+  table->moveTo(roomObj.get());
+  table->setFlag(ObjectFlag::SURFACEBIT);
+  table->setFlag(ObjectFlag::OPENBIT);
+  sack->moveTo(table.get());
+  sack->setFlag(ObjectFlag::TAKEBIT);
+  bottle->moveTo(table.get());
+  bottle->setFlag(ObjectFlag::TAKEBIT);
+  bottle->setFlag(ObjectFlag::OPENBIT);
+  water->moveTo(bottle.get());
+  water->setFlag(ObjectFlag::TAKEBIT);
+  box->moveTo(roomObj.get());
+  box->setFlag(ObjectFlag::TRYTAKEBIT);
+
+  std::vector<ZObject *> performed;
+  registerVerbHandler(V_PRAY, [&]() -> int {
+    performed.push_back(g.prso);
+    return M_HANDLED;
+  });
+  registerVerbHandler(V_TAKE, [&]() -> int {
+    performed.push_back(g.prso);
+    print("Taken.");
+    crlf();
+    return M_HANDLED;
+  });
+
+  auto run = [&](ParsedCommand &cmd) {
+    std::stringstream buf;
+    auto *old = std::cout.rdbuf(buf.rdbuf());
+    executeCommand(cmd);
+    crlf(); // flush the word-wrap buffer
+    std::cout.rdbuf(old);
+    return buf.str();
+  };
+
+  // 1. Two objects: each is prefixed "name: " and performed in order.
+  //    (The handlers here print nothing, so the prefix ends the line and the
+  //    output layer drops its trailing space.)
+  ParsedCommand cmd;
+  cmd.verb = V_PRAY;
+  cmd.words = {"pray"};
+  cmd.prsoTable = {sack.get(), bottle.get()};
+  std::string out = run(cmd);
+  assert(performed.size() == 2 && performed[0] == sack.get() &&
+         performed[1] == bottle.get());
+  assert(out.find("brown sack:") != std::string::npos);
+  assert(out.find("glass bottle:") != std::string::npos);
+  assert(g.pMult);
+
+  // 2. One object without ALL: no prefix, P-MULT false.
+  performed.clear();
+  cmd.prsoTable = {sack.get()};
+  out = run(cmd);
+  assert(performed.size() == 1);
+  assert(out.find("brown sack:") == std::string::npos);
+  assert(!g.pMult);
+
+  // 3. NOT-HERE-OBJECT counting: both missing -> plural, no "other".
+  performed.clear();
+  cmd.prsoTable = {notHere, notHere};
+  out = run(cmd);
+  assert(performed.empty());
+  assert(out.find("The objects that you mentioned aren't here.") !=
+         std::string::npos);
+
+  // 4. One of two missing -> "The other object that you mentioned isn't here."
+  performed.clear();
+  cmd.prsoTable = {sack.get(), notHere};
+  out = run(cmd);
+  assert(performed.size() == 1);
+  assert(out.find("brown sack:") != std::string::npos);
+  assert(out.find("The other object that you mentioned isn't here.") !=
+         std::string::npos);
+
+  // 5. Nothing performed at all (all skipped) -> the any-verb message.
+  //    TAKE ALL with only a non-takeable object on offer.
+  performed.clear();
+  cmd.verb = V_TAKE;
+  cmd.words = {"take", "all"};
+  cmd.nc1IsAll = true;
+  cmd.getFlags = GParser::P_ALL;
+  cmd.prsoTable = {table.get()};
+  out = run(cmd);
+  assert(performed.empty());
+  assert(out.find("There's nothing here you can take.") != std::string::npos);
+
+  // 6. TAKE ALL skip rules: the table (no TAKEBIT) is skipped, the sack and
+  //    bottle (on a SURFACEBIT object) are taken, the water (inside the
+  //    bottle) is skipped, the TRYTAKEBIT box is performed.
+  performed.clear();
+  cmd.prsoTable = {table.get(), sack.get(), bottle.get(), water.get(),
+                   box.get()};
+  out = run(cmd);
+  assert(performed.size() == 3);
+  assert(performed[0] == sack.get() && performed[1] == bottle.get() &&
+         performed[2] == box.get());
+  assert(out.find("quantity of water:") == std::string::npos);
+
+  // 7. TAKE ALL FROM <container>: objects not inside the named container are
+  //    skipped (gmain.zil:127-131).
+  performed.clear();
+  cmd.prsiTable = {bottle.get()};
+  cmd.prsoTable = {sack.get(), water.get()};
+  out = run(cmd);
+  assert(performed.size() == 1 && performed[0] == water.get());
+  cmd.prsiTable.clear();
+
+  // 8. Role swap: when P-PRSI holds the list, PRSO is fixed and the loop
+  //    runs over the indirect objects (gmain.zil:72-76, 115-118).
+  performed.clear();
+  std::vector<ZObject *> seenPrsi;
+  registerVerbHandler(V_PRAY, [&]() -> int {
+    performed.push_back(g.prso);
+    seenPrsi.push_back(g.prsi);
+    return M_HANDLED;
+  });
+  cmd.verb = V_PRAY;
+  cmd.words = {"pray"};
+  cmd.nc1IsAll = false;
+  cmd.getFlags = 0;
+  cmd.prsoTable = {sack.get()};
+  cmd.prsiTable = {bottle.get(), box.get()};
+  out = run(cmd);
+  assert(performed.size() == 2);
+  assert(performed[0] == sack.get() && performed[1] == sack.get());
+  assert(seenPrsi[0] == bottle.get() && seenPrsi[1] == box.get());
+  assert(out.find("glass bottle:") != std::string::npos);
+  assert(out.find("box:") != std::string::npos);
+
+  registerVerbHandler(V_PRAY, nullptr);
+  registerVerbHandler(V_TAKE, Verbs::vTake);
+  std::println("✓ Multi-object loop verified against gmain.zil:65-150");
+}
+
 void testMetaVerbs() {
   std::println("Testing meta-verb recognition...");
 
@@ -648,6 +809,7 @@ int main() {
   testRfatalAbortsLoopAndSkipsMEnd();
   testDirectionThroughPerform();
   testItSubstitution();
+  testMultiObjectLoop();
   testMetaVerbs();
   testMovesCountedOnlyByClocker();
 

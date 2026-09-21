@@ -155,6 +155,8 @@ TEST(ObjectRecognitionNoObjects) {
     
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     Parser parser;
@@ -174,6 +176,8 @@ TEST(ObjectRecognitionEmptyWord) {
     
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     Parser parser;
@@ -193,6 +197,8 @@ TEST(ObjectRecognitionMultipleMatches) {
     
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create multiple objects with same synonym
@@ -223,6 +229,8 @@ TEST(ObjectRecognitionInvisibleObjects) {
     
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create invisible object
@@ -250,6 +258,8 @@ TEST(ObjectRecognitionClosedContainerContents) {
     
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create closed container
@@ -285,6 +295,8 @@ TEST(ObjectRecognitionTransparentContainerContents) {
     
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create transparent container (closed but transparent)
@@ -411,6 +423,8 @@ TEST(ParsingFlowSimpleCommand) {
     
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     auto lamp = std::make_unique<ZObject>(1, "lamp");
@@ -440,6 +454,8 @@ TEST(ParsingFlowComplexCommand) {
     
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     auto lamp = std::make_unique<ZObject>(1, "brass lamp");
@@ -489,6 +505,8 @@ TEST(ParsingFlowDirectionCommand) {
     
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     Parser parser;
@@ -509,6 +527,8 @@ TEST(ParsingFlowAllCommand) {
     
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     auto lamp = std::make_unique<ZObject>(1, "lamp");

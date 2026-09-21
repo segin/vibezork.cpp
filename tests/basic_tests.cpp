@@ -404,6 +404,8 @@ TEST(ObjectRecognitionLocationPriority) {
     // Create player object
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create three lamps in different locations
@@ -463,6 +465,8 @@ TEST(ObjectRecognitionOpenContainerPriority) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create open container in room
@@ -736,6 +740,8 @@ TEST(DisambiguationFormatDescription) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create container
@@ -794,6 +800,8 @@ TEST(PrepositionPutObjectInContainer) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create lamp object
@@ -838,6 +846,8 @@ TEST(PrepositionAttackTrollWithSword) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create troll NPC
@@ -881,6 +891,8 @@ TEST(PrepositionInvalidPreposition) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create lamp object
@@ -932,6 +944,8 @@ TEST(PrepositionOptionalPreposition) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create troll NPC
@@ -982,6 +996,8 @@ TEST(PrepositionMultipleValidPrepositions) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create lamp object
@@ -1093,6 +1109,8 @@ TEST(PrepositionExtractObjects) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create multiple objects
@@ -1147,6 +1165,8 @@ TEST(SpecialFeaturesTakeAll) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create multiple takeable objects in room
@@ -1169,6 +1189,7 @@ TEST(SpecialFeaturesTakeAll) {
     house->addSynonym("house");
     house->setFlag(ObjectFlag::TRYTAKEBIT);  // Anchored, can't be taken
     house->moveTo(&testRoom);
+    ZObject* housePtr = house.get();
     g.registerObject(3, std::move(house));
     
     // Create parser
@@ -1189,12 +1210,14 @@ TEST(SpecialFeaturesTakeAll) {
     for (auto* obj : cmd.allObjects) {
         if (obj == lampPtr) foundLamp = true;
         if (obj == knifePtr) foundKnife = true;
-        if (obj == house.get()) foundHouse = true;
+        if (obj == housePtr) foundHouse = true;
     }
     
     ASSERT_TRUE(foundLamp);
     ASSERT_TRUE(foundKnife);
-    ASSERT_FALSE(foundHouse);  // House should not be included (anchored)
+    // ZIL: the P-ALL search keeps TRYTAKEBIT objects in P-PRSO; MAIN-LOOP-1
+    // decides what to do with them (gmain.zil:132-139).
+    ASSERT_TRUE(foundHouse);
     
     // Cleanup
     g.reset();
@@ -1210,6 +1233,8 @@ TEST(SpecialFeaturesTakeAllExcept) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create multiple takeable objects
@@ -1273,6 +1298,8 @@ TEST(SpecialFeaturesAgainCommand) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create lamp object
@@ -1330,6 +1357,8 @@ TEST(SpecialFeaturesOopsCorrection) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create lamp object
@@ -1380,6 +1409,8 @@ TEST(SpecialFeaturesPronounIt) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
 
     // ZIL: the IT object lives in GLOBAL-OBJECTS with synonyms IT THEM HER
@@ -1436,6 +1467,8 @@ TEST(SpecialFeaturesPronounThem) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
 
     auto itUnique = std::make_unique<ZObject>(ObjectIds::IT, "random object");
@@ -1485,6 +1518,8 @@ TEST(SpecialFeaturesPronounWithoutReference) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
 
     auto itUnique = std::make_unique<ZObject>(ObjectIds::IT, "random object");
@@ -1521,6 +1556,8 @@ TEST(SpecialFeaturesDropAll) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create objects in player inventory
@@ -1574,6 +1611,8 @@ TEST(SpecialFeaturesAllButSynonym) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create multiple takeable objects
@@ -1627,6 +1666,8 @@ TEST(SpecialFeaturesEverythingSynonym) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create takeable objects
@@ -1661,6 +1702,8 @@ TEST(IntegrationParserCompleteFlow) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create lamp object
@@ -1705,6 +1748,8 @@ TEST(IntegrationParserErrorHandling) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create parser
@@ -1794,6 +1839,8 @@ TEST(IntegrationParserWhitespaceNormalization) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create lamp object
@@ -1836,6 +1883,8 @@ TEST(IntegrationParserComplexCommand) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create lamp object
@@ -1887,6 +1936,8 @@ TEST(IntegrationParserDirectionCommand) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create parser
@@ -1926,6 +1977,8 @@ TEST(IntegrationParserMultipleCommands) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create lamp object
@@ -1969,6 +2022,8 @@ TEST(IntegrationParserCaseInsensitivity) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create lamp object
@@ -2011,6 +2066,8 @@ TEST(IntegrationParserArticleIgnoring) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create lamp object
@@ -2053,6 +2110,8 @@ TEST(IntegrationParserErrorRecovery) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create lamp object
@@ -2212,6 +2271,8 @@ TEST(VerboseModeFullDescription) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Set verbose mode
@@ -2251,6 +2312,8 @@ TEST(BriefModeVisitedRoom) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Set brief mode
@@ -2291,6 +2354,8 @@ TEST(BriefModeUnvisitedRoom) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Set brief mode
@@ -2328,6 +2393,8 @@ TEST(SuperbriefModeRoomName) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Set superbrief mode
@@ -2364,6 +2431,8 @@ TEST(SuperbriefModeOmitsObjects) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Set superbrief mode
@@ -2396,6 +2465,8 @@ TEST(ModeSwitchingAffectsDisplay) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Start in verbose mode
@@ -2482,6 +2553,8 @@ TEST(TakeVerbNormalObject) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create takeable object
@@ -2518,6 +2591,8 @@ TEST(TakeVerbAnchoredObject) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create anchored object (TRYTAKEBIT set)
@@ -2553,6 +2628,8 @@ TEST(TakeVerbWeightLimit) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Set a low weight limit for testing
@@ -2598,6 +2675,8 @@ TEST(WeightCalculation) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create multiple objects with different sizes
@@ -2639,6 +2718,8 @@ TEST(TakeVerbWithinWeightLimit) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Set weight limit
@@ -2684,6 +2765,8 @@ TEST(TakeVerbHeavyObject) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Set weight limit
@@ -2723,6 +2806,8 @@ TEST(TakeVerbFromOpenContainer) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create open container in room
@@ -2768,6 +2853,8 @@ TEST(TakeVerbFromClosedContainer) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create closed container in room
@@ -2813,6 +2900,8 @@ TEST(TakeVerbNonTakeableObject) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create non-takeable object (no TAKEBIT flag)
@@ -2848,6 +2937,8 @@ TEST(TakeVerbAlreadyHeld) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Create object already in inventory
@@ -2884,6 +2975,8 @@ TEST(TakeVerbNoObject) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true; // ZIL: GET-OBJECT searches HERE only when ,LIT
     g.registerObject(999, std::move(player));
     
     // Set up for TAKE command with no object
