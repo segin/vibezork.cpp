@@ -43,10 +43,10 @@ static void setupTestWorld() {
 
 TEST(ForestRoomFcn_EnterQueuesInterrupt) {
   setupTestWorld();
-  TimerSystem::TimerManager::instance().disableTimer("I-FOREST-ROOM");
+  TimerSystem::TimerManager::instance().disable("I-FOREST-ROOM");
   forestRoom(M_ENTER);
 
-  ASSERT_TRUE(TimerSystem::TimerManager::instance().isTimerEnabled("I-FOREST-ROOM"));
+  ASSERT_TRUE(TimerSystem::TimerManager::instance().isEnabled("I-FOREST-ROOM"));
 }
 
 TEST(ForestRoomFcn_LookOutputsRoomDescription) {
@@ -193,9 +193,9 @@ TEST(ForestRoomFcn_SongbirdInterrupt) {
   g.here = g.getObject(RoomIds::LIVING_ROOM);
   ASSERT_FALSE(isForestRoom());
 
-  TimerSystem::TimerManager::instance().enableTimer("I-FOREST-ROOM");
+  TimerSystem::TimerManager::instance().enable("I-FOREST-ROOM");
   ASSERT_FALSE(iForestRoom());
-  ASSERT_FALSE(TimerSystem::TimerManager::instance().isTimerEnabled("I-FOREST-ROOM"));
+  ASSERT_FALSE(TimerSystem::TimerManager::instance().isEnabled("I-FOREST-ROOM"));
 }
 
 int main(int argc, char *argv[]) {

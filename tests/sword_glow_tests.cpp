@@ -18,9 +18,12 @@ void testSwordGlowInitialization() {
     initializeWorld();
     SwordSystem::initialize();
     
-    // Verify the I-SWORD timer is registered and enabled
-    TEST_ASSERT(TimerSystem::isTimerEnabled("I-SWORD"), 
-                "I-SWORD timer should be enabled after initialization");
+    // ZIL: GO queues I-SWORD but does NOT enable it (<QUEUE I-SWORD -1>,
+    // 1dungeon.zil:2639); SWORD-FCN enables it when the sword is taken
+    TEST_ASSERT(TimerSystem::TimerManager::instance().find("I-SWORD") != nullptr,
+                "I-SWORD interrupt should be registered after initialization");
+    TEST_ASSERT(!TimerSystem::isEnabled("I-SWORD"),
+                "I-SWORD interrupt starts disabled");
     
     std::cout << "✓ Sword glow initialization test passed" << std::endl;
 }

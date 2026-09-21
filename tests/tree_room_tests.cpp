@@ -96,10 +96,10 @@ TEST(TreeRoomFcn_LookShowsItemsOnGround) {
 
 TEST(TreeRoomFcn_EnterQueuesInterrupt) {
   setupTestWorld();
-  TimerSystem::TimerManager::instance().disableTimer("I-FOREST-ROOM");
+  TimerSystem::TimerManager::instance().disable("I-FOREST-ROOM");
   treeRoom(M_ENTER);
 
-  ASSERT_TRUE(TimerSystem::TimerManager::instance().isTimerEnabled("I-FOREST-ROOM"));
+  ASSERT_TRUE(TimerSystem::TimerManager::instance().isEnabled("I-FOREST-ROOM"));
 }
 
 TEST(TreeRoomFcn_ClimbDownMovesPlayer) {
@@ -282,9 +282,9 @@ TEST(TreeRoomFcn_ForestInterrupt) {
   g.here = g.getObject(RoomIds::LIVING_ROOM);
   ASSERT_FALSE(isForestRoom());
 
-  TimerSystem::TimerManager::instance().enableTimer("I-FOREST-ROOM");
+  TimerSystem::TimerManager::instance().enable("I-FOREST-ROOM");
   ASSERT_FALSE(iForestRoom());
-  ASSERT_FALSE(TimerSystem::TimerManager::instance().isTimerEnabled("I-FOREST-ROOM"));
+  ASSERT_FALSE(TimerSystem::TimerManager::instance().isEnabled("I-FOREST-ROOM"));
 }
 
 int main(int argc, char *argv[]) {

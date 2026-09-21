@@ -205,12 +205,13 @@ void testTimerSerialization() {
     
     // Register a test timer
     bool timerFired = false;
-    TimerSystem::registerTimer("TEST_TIMER", 10, [&]() {
+    TimerSystem::interrupt("TEST_TIMER", [&]() {
         timerFired = true;
     });
     
     // Set timer to specific state
-    TimerSystem::queueTimer("TEST_TIMER", 5);
+    TimerSystem::queue("TEST_TIMER", 5);
+    TimerSystem::enable("TEST_TIMER");
     
     // Save
     auto saveResult = SaveSystem::save(TEST_SAVE_FILE);
@@ -218,15 +219,19 @@ void testTimerSerialization() {
                 "Save with timers should succeed");
     
     // Modify timer state
-    TimerSystem::queueTimer("TEST_TIMER", 99);
+    TimerSystem::queue("TEST_TIMER", 99);
+    TimerSystem::disable("TEST_TIMER");
     
     // Restore
     auto restoreResult = SaveSystem::restore(TEST_SAVE_FILE);
     TEST_ASSERT(restoreResult == SaveSystem::SaveError::SUCCESS,
                 "Restore with timers should succeed");
     
-    // Note: We can't directly verify timer counter was restored without
-    // exposing more timer internals, but we've tested the serialization path
+    auto* restored = TimerSystem::TimerManager::instance().find("TEST_TIMER");
+    TEST_ASSERT(restored != nullptr, "Interrupt should exist after restore");
+    TEST_ASSERT(restored->tick == 5, "Tick should be restored to 5");
+    TEST_ASSERT(restored->enabled, "Enabled state should be restored");
+    (void)timerFired;
     
     cleanupTestFile();
     std::cout << "✓ Timer serialization test passed" << std::endl;

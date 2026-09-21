@@ -76,7 +76,14 @@ void initialize() {
     // Register the I-CANDLES timer
     // Fires every turn (interval = 1)
     // Repeating timer
-    TimerSystem::registerTimer("I-CANDLES", 1, candleTimerCallback, true);
+    // Register the I-CANDLES routine in C-TABLE; GO queues it
+    // (ZIL: <QUEUE I-CANDLES 40>, 1dungeon.zil:2641). The per-turn wax body
+    // re-queues itself every turn until the CANDLE-TABLE port (TODO F2).
+    TimerSystem::interrupt("I-CANDLES", []() {
+        candleTimerCallback();
+        TimerSystem::queue("I-CANDLES", 1);
+        return false;
+    });
     
     // Check if candles exist and are lit
     auto& g = Globals::instance();
@@ -84,20 +91,24 @@ void initialize() {
     
     // Enable if candles exist and are lit, otherwise disable
     if (candles && candles->hasFlag(ObjectFlag::ONBIT)) {
-        TimerSystem::enableTimer("I-CANDLES");
+        enableCandleTimer();
     } else {
-        TimerSystem::disableTimer("I-CANDLES");
+        TimerSystem::disable("I-CANDLES");
     }
 }
 
 // Enable the candle timer (Requirement 48: Enable when candles are lit)
 void enableCandleTimer() {
-    TimerSystem::enableTimer("I-CANDLES");
+    // ZIL: <ENABLE <INT I-CANDLES>> (1actions.zil:2345)
+    if (TimerSystem::interrupt("I-CANDLES")->tick == 0) {
+        TimerSystem::queue("I-CANDLES", 1);
+    }
+    TimerSystem::enable("I-CANDLES");
 }
 
 // Disable the candle timer (Requirement 48: Disable when candles burn out)
 void disableCandleTimer() {
-    TimerSystem::disableTimer("I-CANDLES");
+    TimerSystem::disable("I-CANDLES");
 }
 
 // Check if candles have wax remaining

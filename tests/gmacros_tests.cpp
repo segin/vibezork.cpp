@@ -146,8 +146,7 @@ void testRandomTables() {
 
 void testInterruptControl() {
   std::println("Testing ENABLE and DISABLE macros...");
-  TimerSystem::Timer timer("I-TEST", 5, nullptr, true);
-  timer.enabled = false;
+  TimerSystem::Interrupt timer{"I-TEST", false, 5, nullptr};
 
   GMacros::enable(&timer);
   assert(timer.enabled);

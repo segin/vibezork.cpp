@@ -128,10 +128,10 @@ bool serializeState(std::ofstream& out) {
     
     // Requirement 60.5: Save timer states
     auto& timerMgr = TimerSystem::TimerManager::instance();
-    for (const auto& [name, timer] : timerMgr.getAllTimers()) {
-        out << "TIMER=" << name << ","
-            << (timer.enabled ? 1 : 0) << ","
-            << timer.counter << "\n";
+    for (const auto* cint : timerMgr.entries()) {
+        out << "TIMER=" << cint->name << ","
+            << (cint->enabled ? 1 : 0) << ","
+            << cint->tick << "\n";
     }
     
     return out.good();
@@ -338,7 +338,7 @@ bool deserializeTimer(std::ifstream& in, const std::string& line) {
     
     // Restore timer state
     auto& timerMgr = TimerSystem::TimerManager::instance();
-    timerMgr.setTimerState(name, enabled, counter);
+    timerMgr.setInterruptState(name, enabled, counter);
     
     return true;
 }

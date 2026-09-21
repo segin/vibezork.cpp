@@ -158,11 +158,14 @@ void initializeThief() {
         bag->moveTo(thief);
     }
     
-    // Register thief timer (I-THIEF)
-    // Based on original ZIL: fires every 3-5 turns
-    // We'll use an interval of 4 turns as a middle ground
-    TimerSystem::registerTimer("I-THIEF", 4, thiefTimerCallback, true);
-    TimerSystem::enableTimer("I-THIEF");
+    // Register the I-THIEF routine in C-TABLE; GO queues it enabled
+    // (ZIL: <ENABLE <QUEUE I-THIEF -1>>, 1dungeon.zil:2640): every turn.
+    TimerSystem::interrupt("I-THIEF", []() {
+        thiefTimerCallback();
+        return false;
+    });
+    TimerSystem::queue("I-THIEF", -1);
+    TimerSystem::enable("I-THIEF");
 }
 
 void thiefTimerCallback() {
@@ -170,7 +173,7 @@ void thiefTimerCallback() {
     // Process thief actions: wandering, stealing, attacking
     if (!thiefState.isAlive) {
         // Thief is dead, disable the timer
-        TimerSystem::disableTimer("I-THIEF");
+        TimerSystem::disable("I-THIEF");
         return;
     }
     

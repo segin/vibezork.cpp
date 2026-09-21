@@ -147,20 +147,24 @@ void initialize() {
     // Register the I-SWORD timer
     // Fires every turn (interval = 1)
     // Repeating timer
-    TimerSystem::registerTimer("I-SWORD", 1, swordTimerCallback, true);
-    
-    // Start enabled - will check if player has sword in callback
-    TimerSystem::enableTimer("I-SWORD");
+    // Register the I-SWORD routine in C-TABLE; GO queues it disabled
+    // (ZIL: <QUEUE I-SWORD -1>, 1dungeon.zil:2639) and SWORD-FCN enables it
+    // on TAKE (1actions.zil:2434). Negative tick = runs every turn.
+    TimerSystem::interrupt("I-SWORD", []() {
+        swordTimerCallback();
+        return false;
+    });
+    TimerSystem::queue("I-SWORD", -1);
 }
 
 // Enable the sword timer
 void enableSwordTimer() {
-    TimerSystem::enableTimer("I-SWORD");
+    TimerSystem::enable("I-SWORD");
 }
 
 // Disable the sword timer
 void disableSwordTimer() {
-    TimerSystem::disableTimer("I-SWORD");
+    TimerSystem::disable("I-SWORD");
 }
 
 } // namespace SwordSystem

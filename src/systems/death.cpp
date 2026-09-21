@@ -132,15 +132,15 @@ static void randomizeObjects() {
 // Based on ZIL KILL-INTERRUPTS routine
 static void killInterrupts() {
     // Disable all timers
-    TimerSystem::disableTimer("I-THIEF");
-    TimerSystem::disableTimer("I-TROLL");
-    TimerSystem::disableTimer("I-CYCLOPS");
-    TimerSystem::disableTimer("I-LANTERN");
-    TimerSystem::disableTimer("I-CANDLES");
-    TimerSystem::disableTimer("I-SWORD");
-    TimerSystem::disableTimer("I-FOREST-ROOM");
-    TimerSystem::disableTimer("I-MATCH");
-    TimerSystem::disableTimer("I-FIGHT");
+    TimerSystem::disable("I-THIEF");
+    TimerSystem::disable("I-TROLL");
+    TimerSystem::disable("I-CYCLOPS");
+    TimerSystem::disable("I-LANTERN");
+    TimerSystem::disable("I-CANDLES");
+    TimerSystem::disable("I-SWORD");
+    TimerSystem::disable("I-FOREST-ROOM");
+    TimerSystem::disable("I-MATCH");
+    TimerSystem::disable("I-FIGHT");
     
     // Turn off match if lit
     auto& g = Globals::instance();

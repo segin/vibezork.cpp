@@ -70,23 +70,31 @@ void lampTimerCallback() {
 // Initialize the lamp timer
 // Requirement 47: Register lamp battery timer
 void initialize() {
-    // Register the I-LANTERN timer
-    // Fires every turn (interval = 1)
-    // Repeating timer
-    TimerSystem::registerTimer("I-LANTERN", 1, lampTimerCallback, true);
-    
-    // Start disabled - will be enabled when lamp is turned on
-    TimerSystem::disableTimer("I-LANTERN");
+    // Register the I-LANTERN routine in C-TABLE; GO queues it
+    // (ZIL: <QUEUE I-LANTERN 200>, 1dungeon.zil:2642) and LANTERN enables it.
+    // The per-turn battery body re-queues itself every turn until the
+    // LAMP-TABLE port (TODO F1) replaces it.
+    TimerSystem::interrupt("I-LANTERN", []() {
+        lampTimerCallback();
+        TimerSystem::queue("I-LANTERN", 1);
+        return false;
+    });
+    TimerSystem::disable("I-LANTERN");
 }
 
 // Enable the lamp timer (Requirement 47: Enable when lamp is turned on)
 void enableLampTimer() {
-    TimerSystem::enableTimer("I-LANTERN");
+    // ZIL: <ENABLE <INT I-LANTERN>> (1actions.zil:2241); the interrupt
+    // must hold a tick to run, so re-arm it for the next turn
+    if (TimerSystem::interrupt("I-LANTERN")->tick == 0) {
+        TimerSystem::queue("I-LANTERN", 1);
+    }
+    TimerSystem::enable("I-LANTERN");
 }
 
 // Disable the lamp timer (Requirement 47: Disable when lamp is turned off)
 void disableLampTimer() {
-    TimerSystem::disableTimer("I-LANTERN");
+    TimerSystem::disable("I-LANTERN");
 }
 
 // Check if lamp has battery remaining

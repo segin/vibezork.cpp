@@ -53,13 +53,14 @@ void CombatManager::startCombat(ZObject* enemy, ZObject* weapon) {
     
     inCombat_ = true;
     
-    // Register and enable the I-FIGHT timer
-    // Combat round every turn (interval = 1)
-    TimerSystem::registerTimer("I-FIGHT", 1, []() {
+    // ZIL: I-FIGHT is queued at GO (<ENABLE <QUEUE I-FIGHT -1>>,
+    // 1dungeon.zil:2638) and runs every turn.
+    TimerSystem::interrupt("I-FIGHT", []() {
         CombatManager::instance().processCombatRound();
-    }, true);
-    
-    TimerSystem::enableTimer("I-FIGHT");
+        return false;
+    });
+    TimerSystem::queue("I-FIGHT", -1);
+    TimerSystem::enable("I-FIGHT");
     
     printLine("Combat begins!");
 }
@@ -69,8 +70,8 @@ void CombatManager::endCombat() {
         return;
     }
     
-    // Disable the I-FIGHT timer
-    TimerSystem::disableTimer("I-FIGHT");
+    // Disable the I-FIGHT interrupt
+    TimerSystem::disable("I-FIGHT");
     
     // Clear combat state
     player_.reset();

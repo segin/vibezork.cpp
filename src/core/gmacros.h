@@ -242,14 +242,14 @@ inline const T &randomElement(const ZilRandomTable<T> &table) {
 // ============================================================================
 
 // ZIL: <DEFMAC ENABLE ('INT) <FORM PUT .INT ,C-ENABLED? 1>> (gmacros.zil:141)
-inline void enable(TimerSystem::Timer *cint) {
+inline void enable(TimerSystem::Interrupt *cint) {
   if (cint) {
     cint->enabled = true;
   }
 }
 
 // ZIL: <DEFMAC DISABLE ('INT) <FORM PUT .INT ,C-ENABLED? 0>> (gmacros.zil:143)
-inline void disable(TimerSystem::Timer *cint) {
+inline void disable(TimerSystem::Interrupt *cint) {
   if (cint) {
     cint->enabled = false;
   }

@@ -213,7 +213,7 @@ bool isForestRoom() {
 // ZIL: <ROUTINE I-FOREST-ROOM () ...> (1actions.zil:2996-3002)
 bool iForestRoom() {
   if (!isForestRoom()) {
-    TimerSystem::TimerManager::instance().disableTimer("I-FOREST-ROOM");
+    TimerSystem::disable("I-FOREST-ROOM");
     return RFALSE;
   }
   if (GMacros::prob(15)) {
@@ -310,8 +310,9 @@ int treeRoom(int rarg) {
   } else if (rarg == M_ENTER) {
     // ZIL: (<EQUAL? .RARG ,M-ENTER> <ENABLE <QUEUE I-FOREST-ROOM -1>>)
     // Source: zil/1actions.zil:2917
-    TimerSystem::TimerManager::instance().registerTimer("I-FOREST-ROOM", 1, iForestRoom, true, true);
-    TimerSystem::TimerManager::instance().enableTimer("I-FOREST-ROOM");
+    TimerSystem::interrupt("I-FOREST-ROOM", iForestRoom);
+    TimerSystem::queue("I-FOREST-ROOM", -1);
+    TimerSystem::enable("I-FOREST-ROOM");
   }
   return M_NOT_HANDLED;
 }
@@ -324,8 +325,9 @@ int forestRoom(int rarg) {
   if (rarg == M_ENTER) {
     // ZIL: (<EQUAL? .RARG ,M-ENTER> <ENABLE <QUEUE I-FOREST-ROOM -1>>)
     // Source: zil/1actions.zil:3005
-    TimerSystem::TimerManager::instance().registerTimer("I-FOREST-ROOM", 1, iForestRoom, true, true);
-    TimerSystem::TimerManager::instance().enableTimer("I-FOREST-ROOM");
+    TimerSystem::interrupt("I-FOREST-ROOM", iForestRoom);
+    TimerSystem::queue("I-FOREST-ROOM", -1);
+    TimerSystem::enable("I-FOREST-ROOM");
   } else if (rarg == M_BEG) {
     // ZIL: (<AND <VERB? CLIMB-FOO CLIMB-UP> <EQUAL? ,PRSO ,TREE>> <DO-WALK ,P?UP>)
     // Source: zil/1actions.zil:3007-3009
@@ -416,13 +418,14 @@ int lldRoom(int rarg) {
         candles->clearFlag(ObjectFlag::ONBIT);
         CandleSystem::disableCandleTimer();
       }
-      TimerSystem::TimerManager::instance().interrupt("I-XB", false, iXb);
+      // ZIL: <ENABLE <QUEUE I-XB 6>> <ENABLE <QUEUE I-XBH 20>> (1actions.zil:1100-1101)
+      TimerSystem::interrupt("I-XB", iXb);
       TimerSystem::queue("I-XB", 6);
-      TimerSystem::enableTimer("I-XB");
+      TimerSystem::enable("I-XB");
 
-      TimerSystem::TimerManager::instance().interrupt("I-XBH", false, iXbh);
+      TimerSystem::interrupt("I-XBH", iXbh);
       TimerSystem::queue("I-XBH", 20);
-      TimerSystem::enableTimer("I-XBH");
+      TimerSystem::enable("I-XBH");
       return M_HANDLED;
     } else if (g.xc && g.prsa == V_READ && g.prso &&
                g.prso->getId() == ObjectIds::BOOK && !g.lldFlag) {
@@ -435,7 +438,7 @@ int lldRoom(int rarg) {
         Verbs::removeCarefully(ghosts);
       }
       g.lldFlag = true;
-      TimerSystem::disableTimer("I-XC");
+      TimerSystem::disable("I-XC");
       return M_HANDLED;
     }
   } else if (rarg == M_END) {
@@ -447,10 +450,11 @@ int lldRoom(int rarg) {
       printLine("The flames flicker wildly and appear to dance. The earth beneath "
                 "your feet trembles, and your legs nearly buckle beneath you. "
                 "The spirits cower at your unearthly power.");
-      TimerSystem::disableTimer("I-XB");
-      TimerSystem::TimerManager::instance().interrupt("I-XC", false, iXc);
+      // ZIL: <DISABLE <INT I-XB>> <ENABLE <QUEUE I-XC 3>> (1actions.zil:1124-1125)
+      TimerSystem::disable("I-XB");
+      TimerSystem::interrupt("I-XC", iXc);
       TimerSystem::queue("I-XC", 3);
-      TimerSystem::enableTimer("I-XC");
+      TimerSystem::enable("I-XC");
       return M_HANDLED;
     }
   }
