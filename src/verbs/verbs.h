@@ -260,6 +260,7 @@ namespace Verbs {
     bool vTake();
     bool vDrop();
     bool vPut();
+    bool vPutOn();
     bool vExamine();
     bool vRead();
     bool vLookInside();

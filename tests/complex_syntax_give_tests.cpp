@@ -94,10 +94,14 @@ TEST(GiveNotHoldingFailure) {
     g.prsi = trollPtr;
     
     startCapture();
-    Verbs::vGive();
+    // PERFORM runs the preaction first (gmain.zil:213); the refusal for an
+    // object the player is not holding is PRE-GIVE's (gverbs.zil:708-711).
+    if (!Verbs::preGive()) {
+        Verbs::vGive();
+    }
     std::string output = stopCapture();
     
-    ASSERT_CONTAINS(output, "not holding that");
+    ASSERT_CONTAINS(output, "you don't even have the sword");
 }
 
 int main() {

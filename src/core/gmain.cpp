@@ -75,7 +75,7 @@ void initializeAllVerbHandlers() {
   registerVerbHandler(V_TAKE, Verbs::vTake);
   registerVerbHandler(V_DROP, Verbs::vDrop);
   registerVerbHandler(V_PUT, Verbs::vPut);
-  registerVerbHandler(V_PUT_ON, Verbs::vPut);
+  registerVerbHandler(V_PUT_ON, Verbs::vPutOn);
   registerVerbHandler(V_GIVE, Verbs::vGive);
 
   // Examination

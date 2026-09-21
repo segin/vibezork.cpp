@@ -4,6 +4,7 @@
 #include "world/rooms.h"
 #include "systems/score.h"
 #include "verbs/verbs.h"
+#include "core/gmain.h"
 
 // Forward declare action handler
 extern bool trophyCaseAction();
@@ -27,6 +28,9 @@ TEST(TrophyCaseStoreScore) {
     auto caseObj = std::make_unique<ZObject>(ObjectIds::TROPHY_CASE, "trophy case");
     caseObj->setFlag(ObjectFlag::CONTBIT);
     caseObj->setFlag(ObjectFlag::OPENBIT); // Make it open so we can put things in
+    // <CAPACITY 10000> in 1dungeon.zil:340; without it V-PUT's capacity test
+    // refuses everything, since <PROPDEF CAPACITY 0> is the default.
+    caseObj->setProperty(P_CAPACITY, 10000);
     caseObj->setAction(trophyCaseAction); // Important: Set the action handler!
     g.registerObject(ObjectIds::TROPHY_CASE, std::move(caseObj));
     
@@ -54,8 +58,9 @@ TEST(TrophyCaseStoreScore) {
     ASSERT_EQ(score.getScore(), 0);
     ASSERT_FALSE(score.isTreasureScored(eggPtr->getId()));
     
-    // Execute command - calling the generic vPut which triggers action handlers
-    Verbs::vPut();
+    // Execute the command through PERFORM so the container's own action runs
+    // before the default V-PUT, exactly as in play (gmain.zil:211-224).
+    perform(V_PUT, eggPtr, casePtr);
     
     // Verify egg is in case
     ASSERT_EQ(eggPtr->getLocation(), casePtr);

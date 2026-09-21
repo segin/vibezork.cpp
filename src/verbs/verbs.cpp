@@ -1200,113 +1200,97 @@ bool vSearchOld() {
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-PUT () ...>
+// Source: zil/gverbs.zil:1085-1113
+// Note the <NOT <ITAKE>> test: ITAKE returns RFATAL (2) for an overload,
+// which is truthy, so the object is still moved after "Your load is too
+// heavy." This is the original's behaviour and is reproduced deliberately.
 bool vPut() {
   auto &g = Globals::instance();
-
-  // PRE-PUT checks (Requirement 22, 34, 64)
-
-  // Check if direct object is specified
-  if (!g.prso) {
-    printLine("What do you want to put?");
+  if (!(g.prsi && (g.prsi->hasFlag(ObjectFlag::OPENBIT) ||
+                   GMacros::isOpenable(g.prsi) ||
+                   g.prsi->hasFlag(ObjectFlag::VEHBIT)))) {
+    tell("You can't do that.", CR);
     return RTRUE;
   }
-
-  // Check if indirect object is specified
-  if (!g.prsi) {
-    printLine("What do you want to put it in?");
-    return RTRUE;
-  }
-
-  // Call indirect object's action handler first (ZIL behavior)
-  // This allows special objects like GROUND to intercept PUT
-  if (g.prsi->performAction()) {
-    return RTRUE;
-  }
-
-  // Verify direct object is takeable (has TAKEBIT flag)
-  if (!g.prso->hasFlag(ObjectFlag::TAKEBIT)) {
-    printLine("You can't take that.");
-    return RTRUE;
-  }
-
-  // Check if direct object is accessible
-  ZObject *objLocation = g.prso->getLocation();
-  bool accessible = false;
-
-  if (objLocation == g.here || objLocation == g.winner) {
-    accessible = true;
-  } else if (objLocation) {
-    // Check if object is in an open container
-    if (objLocation->hasFlag(ObjectFlag::CONTBIT) &&
-        objLocation->hasFlag(ObjectFlag::OPENBIT)) {
-      ZObject *containerLocation = objLocation->getLocation();
-      if (containerLocation == g.here || containerLocation == g.winner) {
-        accessible = true;
-      }
-    }
-  }
-
-  if (!accessible) {
-    printLine("You can't see any such thing.");
-    return RTRUE;
-  }
-
-  // Verify indirect object has CONTBIT flag (is a container)
-  if (!g.prsi->hasFlag(ObjectFlag::CONTBIT)) {
-    printLine("You can't put something in that.");
-    return RTRUE;
-  }
-
-  // Check if container is open
   if (!g.prsi->hasFlag(ObjectFlag::OPENBIT)) {
-    printLine("The " + g.prsi->getDesc() + " is closed.");
+    tell("The ", g.prsi, " isn't open.", CR);
+    thisIsIt(g.prsi);
     return RTRUE;
   }
-
-  // Check container capacity (Requirement 64)
-  // ZIL formula: (WEIGHT(container) + WEIGHT(object) - SIZE(container)) >
-  // CAPACITY(container) This means the net contents (excluding the container's
-  // own size) must fit within capacity
-  int capacity = g.prsi->getProperty(P_CAPACITY);
-  if (capacity == 0) {
-    capacity = 100; // Default capacity if not specified
-  }
-
-  // Calculate weight of container (including all nested contents)
-  int containerWeight = calculateWeight(g.prsi);
-
-  // Calculate weight of object to be added (including all nested contents)
-  int objectWeight = calculateWeight(g.prso);
-
-  // Get container's own size
-  int containerSize = g.prsi->getProperty(P_SIZE);
-  if (containerSize == 0) {
-    containerSize = 10; // Default size if not specified
-  }
-
-  // Check if adding this object would exceed capacity
-  // Formula: (containerWeight + objectWeight - containerSize) > capacity
-  if (containerWeight + objectWeight - containerSize > capacity) {
-    printLine("There's no room.");
+  if (g.prsi == g.prso) {
+    tell("How can you do that?", CR);
     return RTRUE;
   }
-
-  // Call object action handlers (Requirement 22)
-  // First check if direct object has special PUT behavior
-  if (g.prso->performAction()) {
+  if (g.prso->getLocation() == g.prsi) {
+    tell("The ", g.prso, " is already in the ", g.prsi, ".", CR);
     return RTRUE;
   }
-
-  // Then check if indirect object (container) has special PUT behavior
-  if (g.prsi->performAction()) {
+  if (weight(g.prsi) + weight(g.prso) - g.prsi->getProperty(P_SIZE) >
+      g.prsi->getProperty(P_CAPACITY)) {
+    tell("There's no room.", CR);
     return RTRUE;
   }
-
-  // Default PUT behavior
-  // Move object to container
+  if (!isHeld(g.prso) && g.prso->hasFlag(ObjectFlag::TRYTAKEBIT)) {
+    tell("You don't have the ", g.prso, ".", CR);
+    return RTRUE;
+  }
+  if (!isHeld(g.prso) && !iTake()) {
+    return RTRUE;
+  }
   g.prso->moveTo(g.prsi);
-  printLine("Done.");
+  g.prso->setFlag(ObjectFlag::TOUCHBIT);
+  scoreObj(g.prso);
+  tell("Done.", CR);
+  return RTRUE;
+}
 
+// ZIL: <ROUTINE V-PUT-ON () ...>
+// Source: zil/gverbs.zil:1118-1126
+bool vPutOn() {
+  auto &g = Globals::instance();
+  if (g.prsi == g.getObject(ObjectIds::GROUND)) {
+    perform(V_DROP, g.prso);
+    return RTRUE;
+  }
+  if (g.prsi && g.prsi->hasFlag(ObjectFlag::SURFACEBIT)) {
+    return vPut();
+  }
+  tell("There's no good surface on the ", g.prsi, ".", CR);
+  return RTRUE;
+}
+
+// ZIL: <ROUTINE V-PUT-UNDER () <TELL "You can't do that." CR>>
+// Source: zil/gverbs.zil:1128-1129
+bool vPutUnder() {
+  tell("You can't do that.", CR);
+  return RTRUE;
+}
+
+// ZIL: <ROUTINE V-PUT-BEHIND () ...>
+// Source: zil/gverbs.zil:1115-1116
+bool vPutBehind() {
+  tell("That hiding place is too obvious.", CR);
+  return RTRUE;
+}
+
+// ZIL: <ROUTINE V-GIVE () ...>
+// Source: zil/gverbs.zil:714-718
+bool vGive() {
+  auto &g = Globals::instance();
+  if (!g.prsi || !g.prsi->hasFlag(ObjectFlag::ACTORBIT)) {
+    tell("You can't give a ", g.prso, " to a ", g.prsi, "!", CR);
+  } else {
+    tell("The ", g.prsi, " refuses it politely.", CR);
+  }
+  return RTRUE;
+}
+
+// ZIL: <ROUTINE V-SGIVE () <TELL "Foo!" CR>>
+// Source: zil/gverbs.zil:1210-1211. Unreachable in play: PRE-SGIVE always
+// re-performs the command as GIVE.
+bool vSgive() {
+  tell("Foo!", CR);
   return RTRUE;
 }
 
@@ -1545,36 +1529,6 @@ bool vTouch() {
   return RTRUE;
 }
 
-bool vGive() {
-  auto &g = Globals::instance();
-
-  // Check if player has the object being given
-  if (g.prso->getLocation() != g.winner) {
-    printLine("You're not holding that!");
-    return RTRUE;
-  }
-
-  // Check if recipient is valid (PRSI is set via syntax `GIVE OBJ TO OBJ`)
-  if (!g.prsi) {
-    printLine("Give it to whom?");
-    return RTRUE;
-  }
-
-  // Interact with recipient (PRSI) via M-GIVE action
-  // In Zork, giving to an actor triggers their action handler with M-GIVE logic
-  // We simulate this by calling performAction() on PRSI.
-  // The action handler (e.g., Troll, Cyclops) checks for M-GIVE.
-  // If PRSI performs action, it handled the gift (accepted/refused).
-  if (g.prsi->performAction()) {
-    return RTRUE;
-  }
-
-  // Default if recipient doesn't handle M-GIVE
-  print("The ");
-  print(g.prsi->getDesc());
-  printLine(" refuses it politely.");
-  return RTRUE;
-}
 
 // Consumption Verbs (Requirement 28)
 
@@ -2890,15 +2844,7 @@ bool vPushTo() {
   return RTRUE;
 }
 
-bool vPutUnder() {
-  printLine("You can't do that.");
-  return RTRUE;
-}
 
-bool vPutBehind() {
-  printLine("You can't do that.");
-  return RTRUE;
-}
 
 bool vShake() {
   printLine("Shaken.");
@@ -3187,10 +3133,6 @@ bool vLookOn() {
 }
 
 // ZIL: <ROUTINE V-SGIVE () ...> (gverbs.zil:1210-1212)
-bool vSgive() {
-  printLine("Foo!");
-  return true;
-}
 
 // ZIL: <ROUTINE V-SKIP () ...> (gverbs.zil:1269-1277)
 bool vSkip() {
@@ -3284,14 +3226,16 @@ bool preFill() {
   return false;
 }
 
-// ZIL: <ROUTINE PRE-GIVE () ...> (gverbs.zil:708-713)
+// ZIL: <ROUTINE PRE-GIVE () ...>
+// Source: zil/gverbs.zil:708-711
 bool preGive() {
   auto &g = Globals::instance();
   if (g.prso && !isHeld(g.prso)) {
-    printLine("That's easy for you to say since you don't have it.");
-    return true;
+    tell("That's easy for you to say since you don't even have the ", g.prso,
+         ".", CR);
+    return RTRUE;
   }
-  return false;
+  return RFALSE;
 }
 
 // ZIL: <ROUTINE PRE-MOVE () ...> (gverbs.zil:910-922)
@@ -3324,17 +3268,9 @@ bool preMung() {
 
 // ZIL: <ROUTINE PRE-PUT () ...> (gverbs.zil:1075-1081)
 bool prePut() {
-  auto &g = Globals::instance();
-  if (!g.prso) return false;
-  if (!g.prso->hasFlag(ObjectFlag::TAKEBIT)) {
-    printLine("You can't do that.");
-    return true;
-  }
-  if (!isHeld(g.prso)) {
-    printLine(std::format("You don't have the {}.", g.prso->getDesc()));
-    return true;
-  }
-  return false;
+  // ZIL: the Zork I branch of PRE-PUT is just PRE-GIVE, so PUT of something
+  // the player is not holding gets "That's easy for you to say...".
+  return preGive();
 }
 
 // ZIL: <ROUTINE PRE-READ () ...> (gverbs.zil:1137-1144)
@@ -3354,8 +3290,8 @@ bool preRead() {
 // ZIL: <ROUTINE PRE-SGIVE () ...> (gverbs.zil:1206-1210)
 bool preSGive() {
   auto &g = Globals::instance();
-  std::swap(g.prso, g.prsi);
-  return vGive();
+  perform(V_GIVE, g.prsi, g.prso);
+  return RTRUE;
 }
 
 // ZIL: <ROUTINE PRE-TAKE () ...>

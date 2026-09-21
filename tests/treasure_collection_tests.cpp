@@ -17,6 +17,7 @@
 #include "../src/world/objects.h"
 #include "../src/parser/parser.h"
 #include "../src/verbs/verbs.h"
+#include "../src/core/gmain.h"
 #include "../src/systems/score.h"
 #include <memory>
 #include <iostream>
@@ -214,11 +215,10 @@ TEST(TreasuresCanBeScored) {
         // Move treasure to player first
         treasure->moveTo(g.winner);
 
-        // Put treasure in trophy case
-        g.prso = treasure;
-        g.prsi = trophyCase;
-        g.prsa = V_PUT;
-        Verbs::vPut();
+        // Put treasure in trophy case through PERFORM, so the case's own
+        // action (which awards TVALUE) runs before the default V-PUT
+        // (gmain.zil:211-224).
+        perform(V_PUT, treasure, trophyCase);
 
         // Verify treasure is in trophy case
         ASSERT_EQ(treasure->getLocation(), trophyCase);
