@@ -275,13 +275,11 @@ struct RoomExit {
  * - Exits in various directions (N, S, E, W, UP, DOWN, etc.)
  * - Optional room action handler for special behaviors
  * 
- * Room actions are triggered with action codes:
- * - M_LOOK (1): Display room description
- * - M_ENTER (2): Player entering room
- * - M_END (3): End of turn processing
- * - M_PRAY (4): Prayer action in room
- * - M_LISTEN (5): Listen action in room
- * - M_YELL (6): Yell action in room
+ * Room actions are triggered with the action codes from core/types.h
+ * (ZIL gmain.zil:19-29): M_BEG (1), M_ENTER (2), M_LOOK (3), M_FLASH (4),
+ * M_OBJDESC (5), M_END (6), plus the port-only M_PRAY/M_LISTEN/M_YELL.
+ * A room action returns M_NOT_HANDLED (0), M_HANDLED (1) or M_FATAL (2),
+ * exactly like a ZIL room routine returning RFALSE/RTRUE/RFATAL.
  * 
  * @see ZIL equivalent: <ROOM> definitions in 1DUNGEON.ZIL
  */
@@ -296,14 +294,15 @@ public:
     RoomExit* getExit(Direction dir);
     const RoomExit* getExit(Direction dir) const;
     
-    /// Room action handler type (receives action code like M_LOOK)
-    using RoomActionFunc = std::function<void(int)>;
+    /// Room action handler type (receives action code like M_LOOK) and
+    /// returns M_NOT_HANDLED / M_HANDLED / M_FATAL (ZIL RFALSE/RTRUE/RFATAL)
+    using RoomActionFunc = std::function<int(int)>;
     
     /// Set the room's action handler
     void setRoomAction(RoomActionFunc func) { roomAction_ = func; }
     
     /// Execute room action with given action code
-    void performRoomAction(int arg) { if (roomAction_) roomAction_(arg); }
+    int performRoomAction(int arg) { return roomAction_ ? roomAction_(arg) : M_NOT_HANDLED; }
     
     /// Check if room has an action handler
     bool hasRoomAction() const { return roomAction_ != nullptr; }

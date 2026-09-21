@@ -4,11 +4,11 @@
 #include "room_builder.h"
 
 // Forward declarations for room action handlers
-void westHouseAction(int rarg);
-void northHouseAction(int rarg);
-void southHouseAction(int rarg);
-void behindHouseAction(int rarg);
-void stoneBarrowAction(int rarg);
+int westHouseAction(int rarg);
+int northHouseAction(int rarg);
+int southHouseAction(int rarg);
+int behindHouseAction(int rarg);
+int stoneBarrowAction(int rarg);
 
 void initializeExteriorRooms() {
     using namespace RoomIds;

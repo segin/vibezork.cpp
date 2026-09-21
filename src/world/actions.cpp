@@ -22,7 +22,7 @@ bool wonFlag = false;
 bool damGatesOpen = false;
 
 // Room action functions
-void westHouseAction(int rarg) {
+int westHouseAction(int rarg) {
   if (rarg == M_LOOK) {
     print("You are standing in an open field west of a white house, with a "
           "boarded front door.");
@@ -31,26 +31,29 @@ void westHouseAction(int rarg) {
     }
     crlf();
   }
+  return M_NOT_HANDLED;
 }
 
-void northHouseAction(int rarg) {
+int northHouseAction(int rarg) {
   if (rarg == M_LOOK) {
     printLine("You are facing the north side of a white house. There is no "
               "door here, and all the windows are boarded up. To the north a "
               "narrow path winds through the trees.");
   }
+  return M_NOT_HANDLED;
 }
 
-void southHouseAction(int rarg) {
+int southHouseAction(int rarg) {
   if (rarg == M_LOOK) {
     printLine("You are facing the south side of a white house. There is no "
               "door here, and all the windows are boarded.");
   }
+  return M_NOT_HANDLED;
 }
 
 // ZIL: EAST-HOUSE (ACTION for BEHIND-HOUSE)
 // Source: zil/1actions.zil:17-26
-void behindHouseAction(int rarg) {
+int behindHouseAction(int rarg) {
   if (rarg == M_LOOK) {
     auto &g = Globals::instance();
     auto *kitchenWindow = g.getObject(ObjectIds::KITCHEN_WINDOW);
@@ -64,16 +67,17 @@ void behindHouseAction(int rarg) {
     }
     crlf();
   }
+  return M_NOT_HANDLED;
 }
 
 // Canonical ZIL routine alias
-void eastHouse(int rarg) {
-  behindHouseAction(rarg);
+int eastHouse(int rarg) {
+  return behindHouseAction(rarg);
 }
 
 // ZIL: CAVE2-ROOM (ACTION for TINY-CAVE)
 // Source: zil/1actions.zil:2416-2430
-void cave2Room(int rarg) {
+int cave2Room(int rarg) {
   if (rarg == M_LOOK) {
     printLine("This is a tiny cave with entrances west and north, and a dark, "
               "forbidding staircase leading down.");
@@ -92,11 +96,12 @@ void cave2Room(int rarg) {
       }
     }
   }
+  return M_NOT_HANDLED;
 }
 
 // ZIL: BOOM-ROOM (ACTION for GAS-ROOM)
 // Source: zil/1actions.zil:2446-2467
-void boomRoom(int rarg) {
+int boomRoom(int rarg) {
   if (rarg == M_LOOK) {
     printLine("This is a small room which smells strongly of coal gas. There is a "
               "short climb up some stairs and a narrow tunnel leading east.");
@@ -137,11 +142,12 @@ void boomRoom(int rarg) {
       DeathSystem::jigsUp("\n    ** BOOOOOOOOOOOM **");
     }
   }
+  return M_NOT_HANDLED;
 }
 
 // ZIL: BATS-ROOM (ACTION for BAT-ROOM)
 // Source: zil/1actions.zil:2478-2486
-void batsRoom(int rarg) {
+int batsRoom(int rarg) {
   if (rarg == M_LOOK) {
     printLine("You are in a small room which has doors only to the east and south.");
   } else if (rarg == M_ENTER && !DeathSystem::isDead()) {
@@ -156,11 +162,12 @@ void batsRoom(int rarg) {
       flyMe();
     }
   }
+  return M_NOT_HANDLED;
 }
 
 // ZIL: FALLS-ROOM (ACTION for ARAGAIN-FALLS)
 // Source: zil/1actions.zil:2621-2632
-void fallsRoom(int rarg) {
+int fallsRoom(int rarg) {
   if (rarg == M_LOOK) {
     printLine("You are at the top of Aragain Falls, an enormous waterfall with a "
               "drop of about 450 feet. The only path here is on the north end.");
@@ -171,11 +178,12 @@ void fallsRoom(int rarg) {
       printLine("A beautiful rainbow can be seen over the falls and to the west.");
     }
   }
+  return M_NOT_HANDLED;
 }
 
 // ZIL: RIVR4-ROOM (ACTION for RIVER-4)
 // Source: zil/1actions.zil:2844-2853
-void rivr4Room(int rarg) {
+int rivr4Room(int rarg) {
   if (rarg == M_LOOK) {
     printLine("The river is running faster here and the sound ahead appears to be "
               "that of rushing water. On the east shore is a sandy beach. A small "
@@ -189,6 +197,7 @@ void rivr4Room(int rarg) {
       g.buoyFlag = false;
     }
   }
+  return M_NOT_HANDLED;
 }
 
 // ZIL: <ROUTINE FOREST-ROOM? () ...> (1actions.zil:2992-2994)
@@ -216,7 +225,7 @@ bool iForestRoom() {
 
 // ZIL: TREE-ROOM (ACTION for UP-A-TREE)
 // Source: zil/1actions.zil:2880-2917
-void treeRoom(int rarg) {
+int treeRoom(int rarg) {
   auto &g = Globals::instance();
 
   if (rarg == M_LOOK) {
@@ -247,20 +256,18 @@ void treeRoom(int rarg) {
   } else if (rarg == M_BEG) {
     // ZIL: 1actions.zil:2890-2916
     if (g.prsa == V_CLIMB_DOWN && (!g.prso || g.prso->getId() == ObjectIds::TREE || g.prso->getId() == ObjectIds::ROOMS)) {
-      Verbs::doWalk(Direction::DOWN);
-      return;
+      return Verbs::doWalk(Direction::DOWN) ? M_HANDLED : M_NOT_HANDLED;
     }
     if ((g.prsa == V_CLIMB_UP || g.prsa == V_CLIMB_FOO) && (g.prso && g.prso->getId() == ObjectIds::TREE)) {
-      Verbs::doWalk(Direction::UP);
-      return;
+      return Verbs::doWalk(Direction::UP) ? M_HANDLED : M_NOT_HANDLED;
     }
     if (g.prsa == V_LEAP) {
       DeathSystem::jigsUp("That was just a bit too far down.");
-      return;
+      return M_HANDLED;
     }
     if (g.prsa == V_DROP) {
       if (!Verbs::iDrop()) {
-        return;
+        return M_HANDLED;
       }
       ZObject *path = g.getObject(RoomIds::FOREST_PATH);
       if (g.prso && g.prso->getId() == ObjectIds::NEST) {
@@ -276,7 +283,7 @@ void treeRoom(int rarg) {
           if (path) {
             g.prso->moveTo(path);
           }
-          return;
+          return M_HANDLED;
         }
       }
       if (g.prso && g.prso->getId() == ObjectIds::EGG) {
@@ -290,14 +297,14 @@ void treeRoom(int rarg) {
         if (!hasCanary) {
           crlf();
         }
-        return;
+        return M_HANDLED;
       }
       if (g.prso && g.prso != g.winner && g.prso != g.player && g.prso->getId() != ObjectIds::TREE) {
         if (path) {
           g.prso->moveTo(path);
         }
         printLine(std::format("The {} falls to the ground.", g.prso->getDesc()));
-        return;
+        return M_HANDLED;
       }
     }
   } else if (rarg == M_ENTER) {
@@ -306,11 +313,12 @@ void treeRoom(int rarg) {
     TimerSystem::TimerManager::instance().registerTimer("I-FOREST-ROOM", 1, iForestRoom, true, true);
     TimerSystem::TimerManager::instance().enableTimer("I-FOREST-ROOM");
   }
+  return M_NOT_HANDLED;
 }
 
 // ZIL: FOREST-ROOM (ACTION for FOREST-1, FOREST-2, FOREST-3, PATH, CLEARING)
 // Source: zil/1actions.zil:3004-3009
-void forestRoom(int rarg) {
+int forestRoom(int rarg) {
   auto &g = Globals::instance();
 
   if (rarg == M_ENTER) {
@@ -322,19 +330,19 @@ void forestRoom(int rarg) {
     // ZIL: (<AND <VERB? CLIMB-FOO CLIMB-UP> <EQUAL? ,PRSO ,TREE>> <DO-WALK ,P?UP>)
     // Source: zil/1actions.zil:3007-3009
     if ((g.prsa == V_CLIMB_FOO || g.prsa == V_CLIMB_UP) && (g.prso && g.prso->getId() == ObjectIds::TREE)) {
-      Verbs::doWalk(Direction::UP);
-      return;
+      return Verbs::doWalk(Direction::UP) ? M_HANDLED : M_NOT_HANDLED;
     }
   } else if (rarg == M_LOOK) {
     if (g.here && !g.here->getLongDesc().empty()) {
       printLine(g.here->getLongDesc());
     }
   }
+  return M_NOT_HANDLED;
 }
 
 // ZIL: MIRROR-ROOM (ACTION for MIRROR-ROOM-1, MIRROR-ROOM-2)
 // Source: zil/1actions.zil:958-966
-void mirrorRoom(int rarg) {
+int mirrorRoom(int rarg) {
   auto &g = Globals::instance();
 
   if (rarg == M_LOOK) {
@@ -345,11 +353,12 @@ void mirrorRoom(int rarg) {
       printLine("Unfortunately, the mirror has been destroyed by your recklessness.");
     }
   }
+  return M_NOT_HANDLED;
 }
 
 // ZIL: LLD-ROOM (ACTION for ENTRANCE-TO-HADES)
 // Source: zil/1actions.zil:1058-1125
-void lldRoom(int rarg) {
+int lldRoom(int rarg) {
   auto &g = Globals::instance();
 
   if (rarg == M_LOOK) {
@@ -378,7 +387,10 @@ void lldRoom(int rarg) {
         } else {
           printLine("You aren't equipped for an exorcism.");
         }
+        return M_HANDLED;
       }
+      // ZIL: LLD-FLAG set -> inner COND is false, PERFORM continues
+      return M_NOT_HANDLED;
     } else if (!g.lldFlag && g.prsa == V_RING && g.prso &&
                g.prso->getId() == ObjectIds::BELL) {
       g.xb = true;
@@ -411,6 +423,7 @@ void lldRoom(int rarg) {
       TimerSystem::TimerManager::instance().interrupt("I-XBH", false, iXbh);
       TimerSystem::queue("I-XBH", 20);
       TimerSystem::enableTimer("I-XBH");
+      return M_HANDLED;
     } else if (g.xc && g.prsa == V_READ && g.prso &&
                g.prso->getId() == ObjectIds::BOOK && !g.lldFlag) {
       printLine("Each word of the prayer reverberates through the hall in a deafening "
@@ -423,6 +436,7 @@ void lldRoom(int rarg) {
       }
       g.lldFlag = true;
       TimerSystem::disableTimer("I-XC");
+      return M_HANDLED;
     }
   } else if (rarg == M_END) {
     auto *candles = g.getObject(ObjectIds::CANDLES);
@@ -437,8 +451,10 @@ void lldRoom(int rarg) {
       TimerSystem::TimerManager::instance().interrupt("I-XC", false, iXc);
       TimerSystem::queue("I-XC", 3);
       TimerSystem::enableTimer("I-XC");
+      return M_HANDLED;
     }
   }
+  return M_NOT_HANDLED;
 }
 
 // ZIL: I-XB
@@ -481,16 +497,17 @@ bool iXbh() {
 }
 
 
-void stoneBarrowAction(int rarg) {
+int stoneBarrowAction(int rarg) {
   if (rarg == M_LOOK) {
     printLine("You are standing in front of a massive barrow of stone. In the "
               "east face is a huge stone door which is open. You cannot see "
               "into the dark of the tomb.");
   }
+  return M_NOT_HANDLED;
 }
 
 // Maze room action helper - all maze rooms behave similarly
-void mazeRoomAction(int rarg) {
+int mazeRoomAction(int rarg) {
   if (rarg == M_LOOK) {
     printLine("This is part of a maze of twisty little passages, all alike.");
   } else if (rarg == M_LISTEN) {
@@ -499,6 +516,7 @@ void mazeRoomAction(int rarg) {
     printLine("Your shout echoes through the passages, making it even harder "
               "to tell where you are.");
   }
+  return M_NOT_HANDLED;
 }
 
 // Object action functions

@@ -14,13 +14,13 @@
 
 // Forward declarations for action handlers (defined in actions.cpp)
 extern bool wonFlag;
-void westHouseAction(int rarg);
-void trollRoomAction(int rarg);
-void northHouseAction(int rarg);
-void southHouseAction(int rarg);
-void behindHouseAction(int rarg);
-void stoneBarrowAction(int rarg);
-void mazeRoomAction(int rarg);
+int westHouseAction(int rarg);
+int trollRoomAction(int rarg);
+int northHouseAction(int rarg);
+int southHouseAction(int rarg);
+int behindHouseAction(int rarg);
+int stoneBarrowAction(int rarg);
+int mazeRoomAction(int rarg);
 bool mailboxAction();
 bool trophyCaseAction();
 bool coffinAction();
@@ -52,8 +52,8 @@ bool pumpAction();
 bool machineAction();
 bool mirrorAction();
 bool damAction();
-bool damRoomAction(int rarg);
-void deepCanyonRoomAction(int rarg); // DEEP-CANYON-F
+int damRoomAction(int rarg);
+int deepCanyonRoomAction(int rarg); // DEEP-CANYON-F
 bool inflatableBoatAction(); // IBOAT-FUNCTION
 bool puncturedBoatAction(); // DBOAT-FUNCTION
 bool boltAction();
@@ -261,10 +261,11 @@ void initializeWorld() {
     mountains->setFlag(ObjectFlag::RLANDBIT);
     mountains->setFlag(ObjectFlag::ONBIT);
     mountains->setFlag(ObjectFlag::SACREDBIT);
-    mountains->setRoomAction([](int rarg) {
+    mountains->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("The forest thins out, revealing impassable mountains.");
         }
+        return M_NOT_HANDLED;
     });
     // Mountains is a dead end - all directions lead back to FOREST_2
     mountains->setExit(Direction::UP, RoomExit("The mountains are impassable."));
@@ -303,10 +304,11 @@ void initializeWorld() {
     gratingClearing->setFlag(ObjectFlag::RLANDBIT);
     gratingClearing->setFlag(ObjectFlag::ONBIT);
     gratingClearing->setFlag(ObjectFlag::SACREDBIT);
-    gratingClearing->setRoomAction([](int rarg) {
+    gratingClearing->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You are in a clearing, with a forest surrounding you on all sides. A path leads south.");
         }
+        return M_NOT_HANDLED;
     });
     // Exits (ZIL: 1dungeon.zil:1388-1398)
     gratingClearing->setExit(Direction::NORTH, RoomExit("The forest becomes impenetrable to the north."));
@@ -405,10 +407,11 @@ void initializeWorld() {
     livingRoom->setFlag(ObjectFlag::RLANDBIT);
     livingRoom->setFlag(ObjectFlag::ONBIT);
     livingRoom->setFlag(ObjectFlag::SACREDBIT);
-    livingRoom->setRoomAction([](int rarg) {
+    livingRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You are in the living room. There is a doorway to the east, a wooden door with strange gothic lettering to the west, which appears to be nailed shut, a trophy case, and a large oriental rug in the center of the room.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Living Room (ZIL: 1dungeon.zil:1449-1460)
@@ -436,10 +439,11 @@ void initializeWorld() {
     kitchen->setFlag(ObjectFlag::RLANDBIT);
     kitchen->setFlag(ObjectFlag::ONBIT);
     kitchen->setFlag(ObjectFlag::SACREDBIT);
-    kitchen->setRoomAction([](int rarg) {
+    kitchen->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You are in the kitchen of the white house. A table seems to have been used recently for the preparation of food. A passage leads to the west and a dark staircase can be seen leading upward. A dark chimney leads down and to the east is a small window which is open.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Kitchen (ZIL: 1dungeon.zil:1429-1442)
@@ -471,10 +475,11 @@ void initializeWorld() {
     attic->setFlag(ObjectFlag::RLANDBIT);
     attic->setFlag(ObjectFlag::ONBIT);
     attic->setFlag(ObjectFlag::SACREDBIT);
-    attic->setRoomAction([](int rarg) {
+    attic->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is the attic. The only exit is a stairway leading down.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Attic (ZIL: 1dungeon.zil:1444-1447)
@@ -493,10 +498,11 @@ void initializeWorld() {
     // Cellar is dark - no ONBIT flag
     cellar->setFlag(ObjectFlag::RLANDBIT);
     cellar->setFlag(ObjectFlag::SACREDBIT);
-    cellar->setRoomAction([](int rarg) {
+    cellar->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You are in a dark and damp cellar with a narrow passageway leading north, and a crawlway to the south. On the west is the bottom of a steep metal ramp which is unclimbable.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Cellar (ZIL: 1dungeon.zil:1475-1486)
@@ -527,10 +533,11 @@ void initializeWorld() {
     gallery->setFlag(ObjectFlag::RLANDBIT);
     gallery->setFlag(ObjectFlag::ONBIT);
     gallery->setFlag(ObjectFlag::SACREDBIT);
-    gallery->setRoomAction([](int rarg) {
+    gallery->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is an art gallery. Most of the paintings which were here have been stolen by vandals with exceptional taste. The vandals left through either the north or west exits.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Gallery
@@ -548,10 +555,11 @@ void initializeWorld() {
     studio->setFlag(ObjectFlag::RLANDBIT);
     studio->setFlag(ObjectFlag::ONBIT);
     studio->setFlag(ObjectFlag::SACREDBIT);
-    studio->setRoomAction([](int rarg) {
+    studio->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This appears to have been an artist's studio. The walls and floors are splattered with paints of 69 different colors. Strangely enough, nothing of value is hanging here. At the south end of the room is an open door (also covered with paint). A dark and narrow chimney leads up from a fireplace; although you might be able to get up it, it seems unlikely you could get back down.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Studio (ZIL: 1dungeon.zil:1526-1532)
@@ -580,10 +588,11 @@ void initializeWorld() {
     );
     // Troll room is dark - no ONBIT flag
     trollRoom->setFlag(ObjectFlag::RLANDBIT);
-    trollRoom->setRoomAction([](int rarg) {
+    trollRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a small room with passages to the east and south and a forbidding hole leading west. Bloodstains and deep scratches (perhaps made by an axe) mar the walls.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Troll Room
@@ -612,10 +621,11 @@ void initializeWorld() {
     );
     // Dark room - no ONBIT flag
     eastOfChasm->setFlag(ObjectFlag::RLANDBIT);
-    eastOfChasm->setRoomAction([](int rarg) {
+    eastOfChasm->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You are on the east edge of a chasm, the bottom of which cannot be seen. A narrow passage goes north, and the path you are on continues to the east.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for East of Chasm
@@ -645,10 +655,11 @@ void initializeWorld() {
     );
     // Dark room - no ONBIT flag
     ewPassage->setFlag(ObjectFlag::RLANDBIT);
-    ewPassage->setRoomAction([](int rarg) {
+    ewPassage->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a narrow east-west passageway. There is a narrow stairway leading down at the north end of the room.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for East-West Passage
@@ -667,10 +678,11 @@ void initializeWorld() {
     );
     // Dark room - no ONBIT flag
     nsPassage->setFlag(ObjectFlag::RLANDBIT);
-    nsPassage->setRoomAction([](int rarg) {
+    nsPassage->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a high north-south passage, which forks to the northeast.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for North-South Passage
@@ -688,10 +700,11 @@ void initializeWorld() {
     );
     // Dark room - no ONBIT flag
     chasmRoom->setFlag(ObjectFlag::RLANDBIT);
-    chasmRoom->setRoomAction([](int rarg) {
+    chasmRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("A chasm runs southwest to northeast and the path follows it. You are on the south side of the chasm, where a crack opens into a passage.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Chasm Room
@@ -711,12 +724,13 @@ void initializeWorld() {
     );
     // Dark room - no ONBIT flag
     roundRoom->setFlag(ObjectFlag::RLANDBIT);
-    roundRoom->setRoomAction([](int rarg) {
+    roundRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a circular stone room with passages in all directions. Several of them have unfortunately been blocked by cave-ins.");
         } else if (rarg == M_LISTEN) {
             printLine("The round room has strange acoustics. You hear faint echoes from the various passages.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Round Room - it connects to many rooms
@@ -736,7 +750,7 @@ void initializeWorld() {
     );
     // Dark room - no ONBIT flag
     loudRoom->setFlag(ObjectFlag::RLANDBIT);
-    loudRoom->setRoomAction([](int rarg) {
+    loudRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a large room with a ceiling which cannot be detected from the ground. There is a narrow passage from east to west and a stone stairway leading upward. The room is extremely noisy. In fact, it is difficult to hear yourself think.");
         } else if (rarg == M_LISTEN) {
@@ -744,6 +758,7 @@ void initializeWorld() {
         } else if (rarg == M_YELL) {
             printLine("Your shout echoes loudly, amplified by the room's acoustics. The sound is deafening!");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Loud Room
@@ -779,10 +794,11 @@ void initializeWorld() {
     );
     // Dark room - no ONBIT flag
     dampCave->setFlag(ObjectFlag::RLANDBIT);
-    dampCave->setRoomAction([](int rarg) {
+    dampCave->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This cave has exits to the west and east, and narrows to a crack toward the south. The earth is particularly damp here.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Damp Cave
@@ -800,10 +816,11 @@ void initializeWorld() {
     );
     // Dark room - no ONBIT flag
     coldPassage->setFlag(ObjectFlag::RLANDBIT);
-    coldPassage->setRoomAction([](int rarg) {
+    coldPassage->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a cold and damp corridor where a long east-west passageway turns into a southward path.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Cold Passage
@@ -820,10 +837,11 @@ void initializeWorld() {
     );
     // Dark room - no ONBIT flag
     narrowPassage->setFlag(ObjectFlag::RLANDBIT);
-    narrowPassage->setRoomAction([](int rarg) {
+    narrowPassage->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a long and narrow corridor where a long north-south passageway briefly narrows even further.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Narrow Passage
@@ -840,10 +858,11 @@ void initializeWorld() {
     );
     // Dark room - no ONBIT flag
     slideRoom->setFlag(ObjectFlag::RLANDBIT);
-    slideRoom->setRoomAction([](int rarg) {
+    slideRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a small chamber, which appears to have been part of a coal mine. On the south wall of the chamber the letters \"Granite Wall\" are etched in the rock. To the east is a long passage, and there is a steep metal slide twisting downward. To the north is a small opening.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Slide Room
@@ -861,10 +880,11 @@ void initializeWorld() {
     );
     // Dark room - no ONBIT flag
     mineEntrance->setFlag(ObjectFlag::RLANDBIT);
-    mineEntrance->setRoomAction([](int rarg) {
+    mineEntrance->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You are standing at the entrance of what might have been a coal mine. The shaft enters the west wall, and there is another exit on the south end of the room.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Mine Entrance
@@ -882,10 +902,11 @@ void initializeWorld() {
     );
     // Dark room - no ONBIT flag
     squeekyRoom->setFlag(ObjectFlag::RLANDBIT);
-    squeekyRoom->setRoomAction([](int rarg) {
+    squeekyRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You are in a small room. Strange squeaky sounds may be heard coming from the passage at the north end. You may also escape to the east.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Squeaky Room
@@ -919,10 +940,11 @@ void initializeWorld() {
     );
     // Dark room - no ONBIT flag
     shaftRoom->setFlag(ObjectFlag::RLANDBIT);
-    shaftRoom->setRoomAction([](int rarg) {
+    shaftRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a large room, in the middle of which is a small shaft descending through the floor into darkness below. To the west and the north are exits from this room. Constructed over the top of the shaft is a metal framework to which a heavy iron chain is attached.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Shaft Room
@@ -940,10 +962,11 @@ void initializeWorld() {
     );
     // Dark room - no ONBIT flag
     smellyRoom->setFlag(ObjectFlag::RLANDBIT);
-    smellyRoom->setRoomAction([](int rarg) {
+    smellyRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a small nondescript room. However, from the direction of a small descending staircase a foul odor can be detected. To the south is a narrow tunnel.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Smelly Room
@@ -977,10 +1000,11 @@ void initializeWorld() {
     );
     // Dark room - no ONBIT flag
     ladderTop->setFlag(ObjectFlag::RLANDBIT);
-    ladderTop->setRoomAction([](int rarg) {
+    ladderTop->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a very small room. In the corner is a rickety wooden ladder, leading downward. It might be safe to descend. There is also a staircase leading upward.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Ladder Top
@@ -997,10 +1021,11 @@ void initializeWorld() {
     );
     // Dark room - no ONBIT flag
     ladderBottom->setFlag(ObjectFlag::RLANDBIT);
-    ladderBottom->setRoomAction([](int rarg) {
+    ladderBottom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a rather wide room. On one side is the bottom of a narrow wooden ladder. To the west and the south are passages leaving the room.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Ladder Bottom
@@ -1019,10 +1044,11 @@ void initializeWorld() {
     // Dark room - no ONBIT flag
     timberRoom->setFlag(ObjectFlag::RLANDBIT);
     timberRoom->setFlag(ObjectFlag::SACREDBIT);
-    timberRoom->setRoomAction([](int rarg) {
+    timberRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a long and narrow passage, which is cluttered with broken timbers. A wide passage comes from the east and turns at the west end of the room into a very narrow passageway. From the west comes a strong draft.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Timber Room (ZIL: 1dungeon.zil:2528-2534)
@@ -1050,10 +1076,11 @@ void initializeWorld() {
     // Dark room - no ONBIT flag
     lowerShaft->setFlag(ObjectFlag::RLANDBIT);
     lowerShaft->setFlag(ObjectFlag::SACREDBIT);
-    lowerShaft->setRoomAction([](int rarg) {
+    lowerShaft->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a small drafty room in which is the bottom of a long shaft. To the south is a passageway and to the east a very narrow passage. In the shaft can be seen a heavy iron chain.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Lower Shaft (ZIL: 1dungeon.zil:2543-2550)
@@ -1073,10 +1100,11 @@ void initializeWorld() {
     );
     // Dark room - no ONBIT flag
     machineRoom->setFlag(ObjectFlag::RLANDBIT);
-    machineRoom->setRoomAction([](int rarg) {
+    machineRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a large room full of assorted heavy machinery, whirring noisily. The room smells of burned resistors. Along one wall of the room are three buttons which are, respectively, round, triangular, and square. Naturally, above these buttons are instructions written in EBCDIC. A large sign above the buttons says \"DANGER: DEADLY RADIATION BEYOND THIS POINT!\" There are exits to the north and east.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Machine Room
@@ -1092,10 +1120,11 @@ void initializeWorld() {
     );
     // Dark room - no ONBIT flag
     deadEnd5->setFlag(ObjectFlag::RLANDBIT);
-    deadEnd5->setRoomAction([](int rarg) {
+    deadEnd5->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You have come to a dead end in the mine.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Dead End 5
@@ -1110,10 +1139,11 @@ void initializeWorld() {
         "This is a nondescript part of a coal mine."
     );
     mine1->setFlag(ObjectFlag::RLANDBIT);
-    mine1->setRoomAction([](int rarg) {
+    mine1->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a nondescript part of a coal mine.");
         }
+        return M_NOT_HANDLED;
     });
     mine1->setExit(Direction::NORTH, RoomExit(RoomIds::GAS_ROOM));
     mine1->setExit(Direction::EAST, RoomExit(RoomIds::MINE_1));  // Loops to itself
@@ -1127,10 +1157,11 @@ void initializeWorld() {
         "This is a nondescript part of a coal mine."
     );
     mine2->setFlag(ObjectFlag::RLANDBIT);
-    mine2->setRoomAction([](int rarg) {
+    mine2->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a nondescript part of a coal mine.");
         }
+        return M_NOT_HANDLED;
     });
     mine2->setExit(Direction::NORTH, RoomExit(RoomIds::MINE_2));  // Loops to itself
     mine2->setExit(Direction::SOUTH, RoomExit(RoomIds::MINE_1));
@@ -1144,10 +1175,11 @@ void initializeWorld() {
         "This is a nondescript part of a coal mine."
     );
     mine3->setFlag(ObjectFlag::RLANDBIT);
-    mine3->setRoomAction([](int rarg) {
+    mine3->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a nondescript part of a coal mine.");
         }
+        return M_NOT_HANDLED;
     });
     mine3->setExit(Direction::SOUTH, RoomExit(RoomIds::MINE_3));  // Loops to itself
     mine3->setExit(Direction::SW, RoomExit(RoomIds::MINE_4));
@@ -1161,10 +1193,11 @@ void initializeWorld() {
         "This is a nondescript part of a coal mine."
     );
     mine4->setFlag(ObjectFlag::RLANDBIT);
-    mine4->setRoomAction([](int rarg) {
+    mine4->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a nondescript part of a coal mine.");
         }
+        return M_NOT_HANDLED;
     });
     mine4->setExit(Direction::NORTH, RoomExit(RoomIds::MINE_3));
     mine4->setExit(Direction::WEST, RoomExit(RoomIds::MINE_4));  // Loops to itself
@@ -1182,10 +1215,11 @@ void initializeWorld() {
     );
     // Dark room - no ONBIT flag
     reservoirSouth->setFlag(ObjectFlag::RLANDBIT);
-    reservoirSouth->setRoomAction([](int rarg) {
+    reservoirSouth->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You are in a long room on the south shore of a large lake, far too deep and wide for crossing. There is a path along the stream to the east or west, and a steep pathway climbing southwest along the edge of a chasm.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Reservoir South (ZIL: 1dungeon.zil:1807-1815)
@@ -1211,10 +1245,11 @@ void initializeWorld() {
         "You are on the lake. The water is cold and the current is strong. It is difficult to stay afloat."
     );
     // Water room - NONLANDBIT
-    reservoir->setRoomAction([](int rarg) {
+    reservoir->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You are on the lake. The water is cold and the current is strong. It is difficult to stay afloat.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Reservoir (ZIL: 1dungeon.zil:1820-1821)
@@ -1236,10 +1271,11 @@ void initializeWorld() {
     );
     // Dark room - no ONBIT flag
     reservoirNorth->setFlag(ObjectFlag::RLANDBIT);
-    reservoirNorth->setRoomAction([](int rarg) {
+    reservoirNorth->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You are in a long room on the north shore of a large lake, far too deep and wide for crossing.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Reservoir North (ZIL: 1dungeon.zil:1828-1830)
@@ -1263,10 +1299,11 @@ void initializeWorld() {
     );
     // Dark room - no ONBIT flag
     streamView->setFlag(ObjectFlag::RLANDBIT);
-    streamView->setRoomAction([](int rarg) {
+    streamView->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You are standing on a path beside a gently flowing stream. The path follows the stream, which flows from west to east.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Stream View
@@ -1282,10 +1319,11 @@ void initializeWorld() {
         "You are on the gently flowing stream. The upstream route is too narrow to navigate, and the downstream route is invisible due to twisting walls. There is a narrow beach to land on."
     );
     // Water room - NONLANDBIT
-    inStream->setRoomAction([](int rarg) {
+    inStream->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You are on the gently flowing stream. The upstream route is too narrow to navigate, and the downstream route is invisible due to twisting walls. There is a narrow beach to land on.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for In Stream
@@ -1304,10 +1342,11 @@ void initializeWorld() {
     );
     damRoom->setFlag(ObjectFlag::RLANDBIT);
     damRoom->setFlag(ObjectFlag::ONBIT);
-    damRoom->setRoomAction([](int rarg) {
+    damRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You are standing on the top of the Flood Control Dam #3, which was quite a tourist attraction in times far distant. There are paths to the north, south, and west, and a scramble down.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Dam Room
@@ -1327,10 +1366,11 @@ void initializeWorld() {
     );
     damLobby->setFlag(ObjectFlag::RLANDBIT);
     damLobby->setFlag(ObjectFlag::ONBIT);
-    damLobby->setRoomAction([](int rarg) {
+    damLobby->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This room appears to have been the waiting room for groups touring the dam. There are open doorways here to the north and east marked \"Private\", and there is a path leading south over the top of the dam.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Dam Lobby
@@ -1348,10 +1388,11 @@ void initializeWorld() {
     );
     // Dark room - no ONBIT flag
     maintenanceRoom->setFlag(ObjectFlag::RLANDBIT);
-    maintenanceRoom->setRoomAction([](int rarg) {
+    maintenanceRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is what appears to have been the maintenance room for Flood Control Dam #3. Apparently, this room has been ransacked recently, for most of the valuable equipment is gone. On the wall in front of you is a group of buttons colored blue, yellow, brown, and red. There are doorways to the west and south.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Maintenance Room
@@ -1369,10 +1410,11 @@ void initializeWorld() {
     damBase->setFlag(ObjectFlag::RLANDBIT);
     damBase->setFlag(ObjectFlag::ONBIT);
     damBase->setFlag(ObjectFlag::SACREDBIT);
-    damBase->setRoomAction([](int rarg) {
+    damBase->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You are at the base of Flood Control Dam #3, which looms above you and to the north. The river Frigid is flowing by here. Along the river are the White Cliffs which seem to form giant walls stretching from north to south along the shores of the river as it winds its way downstream.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Dam Base
@@ -1636,10 +1678,11 @@ void initializeWorld() {
     );
     // Dark room - no ONBIT flag
     engravingsCave->setFlag(ObjectFlag::RLANDBIT);
-    engravingsCave->setRoomAction([](int rarg) {
+    engravingsCave->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You have entered a low cave with passages leading northwest and east.");
         }
+        return M_NOT_HANDLED;
     });
     
     // Set up exits for Engravings Cave
@@ -1824,10 +1867,11 @@ void initializeWorld() {
         "You are in a small room near the maze. There are twisty passages in the immediate vicinity."
     );
     gratingRoom->setFlag(ObjectFlag::RLANDBIT);
-    gratingRoom->setRoomAction([](int rarg) {
+    gratingRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You are in a small room near the maze. There are twisty passages in the immediate vicinity.");
         }
+        return M_NOT_HANDLED;
     });
     g.registerObject(RoomIds::GRATING_ROOM, std::move(gratingRoom));
     
@@ -1838,10 +1882,11 @@ void initializeWorld() {
         "You have come to a dead end in the maze."
     );
     deadEnd1->setFlag(ObjectFlag::RLANDBIT);
-    deadEnd1->setRoomAction([](int rarg) {
+    deadEnd1->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You have come to a dead end in the maze.");
         }
+        return M_NOT_HANDLED;
     });
     g.registerObject(RoomIds::DEAD_END_1, std::move(deadEnd1));
     
@@ -1851,10 +1896,11 @@ void initializeWorld() {
         "You have come to a dead end in the maze."
     );
     deadEnd2->setFlag(ObjectFlag::RLANDBIT);
-    deadEnd2->setRoomAction([](int rarg) {
+    deadEnd2->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You have come to a dead end in the maze.");
         }
+        return M_NOT_HANDLED;
     });
     g.registerObject(RoomIds::DEAD_END_2, std::move(deadEnd2));
     
@@ -1864,10 +1910,11 @@ void initializeWorld() {
         "You have come to a dead end in the maze."
     );
     deadEnd3->setFlag(ObjectFlag::RLANDBIT);
-    deadEnd3->setRoomAction([](int rarg) {
+    deadEnd3->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You have come to a dead end in the maze.");
         }
+        return M_NOT_HANDLED;
     });
     g.registerObject(RoomIds::DEAD_END_3, std::move(deadEnd3));
     
@@ -1877,10 +1924,11 @@ void initializeWorld() {
         "You have come to a dead end in the maze."
     );
     deadEnd4->setFlag(ObjectFlag::RLANDBIT);
-    deadEnd4->setRoomAction([](int rarg) {
+    deadEnd4->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You have come to a dead end in the maze.");
         }
+        return M_NOT_HANDLED;
     });
     g.registerObject(RoomIds::DEAD_END_4, std::move(deadEnd4));
     
@@ -2094,7 +2142,7 @@ void initializeWorld() {
         "This is a large room with a ceiling which cannot be detected from the ground. There is a narrow passage from east to west and a stone stairway leading upward. The room is eerie in its quietness."
     );
     cyclopsRoom->setFlag(ObjectFlag::RLANDBIT);
-    cyclopsRoom->setRoomAction([](int rarg) {
+    cyclopsRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This room has an exit on the northwest, and a staircase leading up.");
             
@@ -2119,6 +2167,7 @@ void initializeWorld() {
                 // Cyclops is agitated - timer is active
             }
         }
+        return M_NOT_HANDLED;
     });
     // ZIL: 1dungeon.zil:1722-1736
     cyclopsRoom->setExit(Direction::NORTH, RoomExit("The cyclops doesn't look like he'll let you past."));
@@ -2155,10 +2204,11 @@ void initializeWorld() {
         "This is a long passage. To the west is one entrance. On the east there is an old wooden door, with a large hole in it (about cyclops sized)."
     );
     strangePassage->setFlag(ObjectFlag::RLANDBIT);
-    strangePassage->setRoomAction([](int rarg) {
+    strangePassage->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a long passage. To the west is one entrance. On the east there is an old wooden door, with a large hole in it (about cyclops sized).");
         }
+        return M_NOT_HANDLED;
     });
     strangePassage->setExit(Direction::NORTH, RoomExit(RoomIds::LIVING_ROOM));
     strangePassage->setExit(Direction::EAST, RoomExit(RoomIds::LIVING_ROOM));
@@ -2176,7 +2226,7 @@ void initializeWorld() {
     );
     treasureRoom->setFlag(ObjectFlag::RLANDBIT);
     treasureRoom->setProperty(P_VALUE, 25);  // Room has value for scoring
-    treasureRoom->setRoomAction([](int rarg) {
+    treasureRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a large room, whose east wall is solid granite. A number of discarded bags, which crumble at your touch, are scattered about on the floor. There is an exit down a staircase.");
             // Note: Stolen treasures will be listed here when thief system is active
@@ -2187,6 +2237,7 @@ void initializeWorld() {
         } else if (rarg == M_LISTEN) {
             printLine("You hear nothing unusual.");
         }
+        return M_NOT_HANDLED;
     });
     treasureRoom->setExit(Direction::DOWN, RoomExit(RoomIds::CYCLOPS_ROOM));
     // ZIL: (GLOBAL CHALICE) (1dungeon.zil:1759)
@@ -2222,10 +2273,11 @@ void initializeWorld() {
     );
     landOfLivingDead->setFlag(ObjectFlag::RLANDBIT);
     landOfLivingDead->setFlag(ObjectFlag::ONBIT);
-    landOfLivingDead->setRoomAction([](int rarg) {
+    landOfLivingDead->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You have entered the Land of the Living Dead. Thousands of lost souls can be heard weeping and moaning. In the corner are stacked the remains of dozens of previous adventurers less fortunate than yourself. A passage exits to the north.");
         }
+        return M_NOT_HANDLED;
     });
     landOfLivingDead->setExit(Direction::OUT, RoomExit(RoomIds::ENTRANCE_TO_HADES));
     landOfLivingDead->setExit(Direction::NORTH, RoomExit(RoomIds::ENTRANCE_TO_HADES));
@@ -2238,10 +2290,11 @@ void initializeWorld() {
         "You are at the periphery of a large dome, which forms the ceiling of another room below. Protecting you from a precipitous drop is a wooden railing which circles the dome."
     );
     domeRoom->setFlag(ObjectFlag::RLANDBIT);
-    domeRoom->setRoomAction([](int rarg) {
+    domeRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You are at the periphery of a large dome, which forms the ceiling of another room below. Protecting you from a precipitous drop is a wooden railing which circles the dome.");
         }
+        return M_NOT_HANDLED;
     });
     domeRoom->setExit(Direction::WEST, RoomExit(RoomIds::ENGRAVINGS_CAVE));
     // ZIL: (DOWN TO TORCH-ROOM IF DOME-FLAG ELSE "You cannot go down without fracturing many bones.")
@@ -2261,10 +2314,11 @@ void initializeWorld() {
         "This is a large room with a prominent doorway leading to a down staircase. To the west is a narrow twisting tunnel, through which is coming a horrible stench. Above you is a large dome painted with scenes depicting elvish hacking rites. Up around the edge of the dome (20 feet up) is a wooden railing. In the center of the room there is a white marble pedestal."
     );
     torchRoom->setFlag(ObjectFlag::RLANDBIT);
-    torchRoom->setRoomAction([](int rarg) {
+    torchRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a large room with a prominent doorway leading to a down staircase. To the west is a narrow twisting tunnel, through which is coming a horrible stench. Above you is a large dome painted with scenes depicting elvish hacking rites. Up around the edge of the dome (20 feet up) is a wooden railing. In the center of the room there is a white marble pedestal.");
         }
+        return M_NOT_HANDLED;
     });
     torchRoom->setExit(Direction::UP, RoomExit("You cannot reach the rope."));
     torchRoom->setExit(Direction::SOUTH, RoomExit(RoomIds::NORTH_TEMPLE));
@@ -2283,7 +2337,7 @@ void initializeWorld() {
     northTemple->setFlag(ObjectFlag::RLANDBIT);
     northTemple->setFlag(ObjectFlag::ONBIT);
     northTemple->setFlag(ObjectFlag::SACREDBIT);
-    northTemple->setRoomAction([](int rarg) {
+    northTemple->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is the north end of a large temple. On the east wall is an ancient inscription, probably a prayer in a long-forgotten language. Below the prayer is a staircase leading down. The west wall is solid granite. The exit to the north end of the room is through huge marble pillars.");
         } else if (rarg == M_PRAY) {
@@ -2291,6 +2345,7 @@ void initializeWorld() {
         } else if (rarg == M_LISTEN) {
             printLine("The temple is silent, but you sense a profound peace.");
         }
+        return M_NOT_HANDLED;
     });
     northTemple->setExit(Direction::DOWN, RoomExit(RoomIds::EGYPT_ROOM));
     northTemple->setExit(Direction::EAST, RoomExit(RoomIds::EGYPT_ROOM));
@@ -2309,7 +2364,7 @@ void initializeWorld() {
     southTemple->setFlag(ObjectFlag::RLANDBIT);
     southTemple->setFlag(ObjectFlag::ONBIT);
     southTemple->setFlag(ObjectFlag::SACREDBIT);
-    southTemple->setRoomAction([](int rarg) {
+    southTemple->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is the south end of a large temple. In front of you is what appears to be an altar. In one corner is a small hole in the floor which leads into darkness. You probably could not get back up it.");
         } else if (rarg == M_PRAY) {
@@ -2317,6 +2372,7 @@ void initializeWorld() {
         } else if (rarg == M_LISTEN) {
             printLine("The temple is silent except for a faint echo from the hole in the floor.");
         }
+        return M_NOT_HANDLED;
     });
     southTemple->setExit(Direction::NORTH, RoomExit(RoomIds::NORTH_TEMPLE));
     // ZIL: (DOWN TO TINY-CAVE IF COFFIN-CURE ELSE "You haven't a prayer of getting the coffin down there.")
@@ -2340,7 +2396,7 @@ void initializeWorld() {
         "This is a room which looks like an Egyptian tomb. There is an ascending staircase to the west."
     );
     egyptRoom->setFlag(ObjectFlag::RLANDBIT);
-    egyptRoom->setRoomAction([](int rarg) {
+    egyptRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a room which looks like an Egyptian tomb. There is an ascending staircase to the west.");
         } else if (rarg == M_LISTEN) {
@@ -2348,6 +2404,7 @@ void initializeWorld() {
         } else if (rarg == M_PRAY) {
             printLine("You offer a prayer to the ancient Egyptian gods.");
         }
+        return M_NOT_HANDLED;
     });
     egyptRoom->setExit(Direction::WEST, RoomExit(RoomIds::NORTH_TEMPLE));
     egyptRoom->setExit(Direction::UP, RoomExit(RoomIds::NORTH_TEMPLE));
@@ -2387,10 +2444,11 @@ void initializeWorld() {
         "This is a tiny cave with entrances west and north, and a staircase leading down."
     );
     smallCave->setFlag(ObjectFlag::RLANDBIT);
-    smallCave->setRoomAction([](int rarg) {
+    smallCave->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a tiny cave with entrances west and north, and a staircase leading down.");
         }
+        return M_NOT_HANDLED;
     });
     smallCave->setExit(Direction::NORTH, RoomExit(RoomIds::MIRROR_ROOM_1));
     smallCave->setExit(Direction::DOWN, RoomExit(RoomIds::ATLANTIS_ROOM));
@@ -2418,10 +2476,11 @@ void initializeWorld() {
         "This is a winding passage. It seems that there are only exits on the east and north."
     );
     windingPassage->setFlag(ObjectFlag::RLANDBIT);
-    windingPassage->setRoomAction([](int rarg) {
+    windingPassage->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a winding passage. It seems that there are only exits on the east and north.");
         }
+        return M_NOT_HANDLED;
     });
     windingPassage->setExit(Direction::NORTH, RoomExit(RoomIds::MIRROR_ROOM_2));
     windingPassage->setExit(Direction::EAST, RoomExit(RoomIds::TINY_CAVE));
@@ -2434,10 +2493,11 @@ void initializeWorld() {
         "This is a winding passage. It seems that there are only exits on the east and north."
     );
     twistingPassage->setFlag(ObjectFlag::RLANDBIT);
-    twistingPassage->setRoomAction([](int rarg) {
+    twistingPassage->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a winding passage. It seems that there are only exits on the east and north.");
         }
+        return M_NOT_HANDLED;
     });
     twistingPassage->setExit(Direction::NORTH, RoomExit(RoomIds::MIRROR_ROOM_1));
     twistingPassage->setExit(Direction::EAST, RoomExit(RoomIds::SMALL_CAVE));
@@ -2450,10 +2510,11 @@ void initializeWorld() {
         "This is an ancient room, long under water. There is an exit to the south and a staircase leading up."
     );
     atlantisRoom->setFlag(ObjectFlag::RLANDBIT);
-    atlantisRoom->setRoomAction([](int rarg) {
+    atlantisRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is an ancient room, long under water. There is an exit to the south and a staircase leading up.");
         }
+        return M_NOT_HANDLED;
     });
     atlantisRoom->setExit(Direction::UP, RoomExit(RoomIds::SMALL_CAVE));
     atlantisRoom->setExit(Direction::SOUTH, RoomExit(RoomIds::RESERVOIR_NORTH));

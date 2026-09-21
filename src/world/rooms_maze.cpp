@@ -4,7 +4,7 @@
 #include "room_builder.h"
 
 // Forward declaration for maze room action
-void mazeRoomAction(int rarg);
+int mazeRoomAction(int rarg);
 
 void initializeMazeRooms() {
   using namespace RoomIds;

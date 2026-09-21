@@ -10,11 +10,11 @@ test, build, commit, push; then mark `[x]` and update the counters. Every routin
 ported carries `// ZIL:` and `// Source: <file>:<lines>` comments. Never simplify
 away a ZIL behaviour.
 
-Progress: 0/74 (0%)
+Progress: 1/74 (1%)
 
 ## Phase A: engine foundations (src/core, src/systems/timer)
 
-- [ ] A1 Room and object action handlers return a tri-state (M-NOT-HANDLED / M-HANDLED / M-FATAL) instead of void/bool; PERFORM stops when the room's M-BEG call returns true (gmain.zil:212; cpp_vs_zil_audit §2.1)
+- [x] A1 Room and object action handlers return a tri-state (M-NOT-HANDLED / M-HANDLED / M-FATAL) instead of void/bool; PERFORM stops when the room's M-BEG call returns true (gmain.zil:212; cpp_vs_zil_audit §2.1)
 - [ ] A2 RFATAL propagation: value 2 aborts the multi-object loop, skips M-END, clears P-CONT; P-CONT cleared on parse failure (gmain.zil:150-163; §2.3)
 - [ ] A3 Direction commands go through PERFORM with PRSA=V?WALK and P-WALK-DIR (gmain.zil:79-81; §2.2)
 - [ ] A4 Object model: FDESC property, VTYPE property, PROPDEF defaults SIZE 5 / CAPACITY 0 / VALUE 0 / TVALUE 0 honoured by getProperty; remove LOCKEDBIT/DEADBIT concepts (§2.15, §7.2, §7.7)

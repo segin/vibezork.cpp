@@ -13,33 +13,37 @@
 #include <unordered_map>
 
 // ZIL: ACTIONS table mapping
-static std::unordered_map<VerbId, std::function<bool()>> verbHandlers_;
+static std::unordered_map<VerbId, ActionHandler> verbHandlers_;
 
 // ZIL: PREACTIONS table mapping
-static std::unordered_map<VerbId, std::function<bool()>> preactions_;
+static std::unordered_map<VerbId, ActionHandler> preactions_;
 
-void registerVerbHandler(VerbId verb, std::function<bool()> handler) {
+void registerVerbHandler(VerbId verb, ActionHandler handler) {
   verbHandlers_[verb] = std::move(handler);
 }
 
-void registerPreaction(VerbId verb, std::function<bool()> handler) {
+void registerPreaction(VerbId verb, ActionHandler handler) {
   preactions_[verb] = std::move(handler);
 }
 
+// ZIL: <GET ,ACTIONS .A> / <GET ,PREACTIONS .A> yield 0 when no routine is
+// stored; a null handler registered for a verb counts as "no routine".
 bool hasVerbHandler(VerbId verb) {
-  return verbHandlers_.find(verb) != verbHandlers_.end();
+  auto it = verbHandlers_.find(verb);
+  return it != verbHandlers_.end() && static_cast<bool>(it->second);
 }
 
 bool hasPreaction(VerbId verb) {
-  return preactions_.find(verb) != preactions_.end();
+  auto it = preactions_.find(verb);
+  return it != preactions_.end() && static_cast<bool>(it->second);
 }
 
-std::function<bool()> getVerbHandler(VerbId verb) {
+ActionHandler getVerbHandler(VerbId verb) {
   auto it = verbHandlers_.find(verb);
   return it != verbHandlers_.end() ? it->second : nullptr;
 }
 
-std::function<bool()> getPreaction(VerbId verb) {
+ActionHandler getPreaction(VerbId verb) {
   auto it = preactions_.find(verb);
   return it != preactions_.end() ? it->second : nullptr;
 }
@@ -313,15 +317,16 @@ int perform(VerbId a, ZObject *o, ZObject *i) {
   // 1. Actor (WINNER) action: <DD-APPLY "Actor" ,WINNER <GETP ,WINNER ,P?ACTION>>
   if (g.winner && g.winner->hasAction()) {
     v = ddApply("Actor", g.winner, [&]() -> int {
-      return g.winner->performAction() ? M_HANDLED : M_NOT_HANDLED;
+      return g.winner->performAction();
     });
   }
 
   // 2. Room (M-BEG) action: <D-APPLY "Room (M-BEG)" <GETP <LOC ,WINNER> ,P?ACTION> ,M-BEG>
+  // ZIL: a true result from the room ends PERFORM (gmain.zil:212).
   if (!v && g.here) {
     v = dApply("Room (M-BEG)", [&]() -> int {
       if (auto *room = dynamic_cast<ZRoom *>(g.here)) {
-        room->performRoomAction(M_BEG);
+        return room->performRoomAction(M_BEG);
       }
       return M_NOT_HANDLED;
     });
@@ -329,16 +334,12 @@ int perform(VerbId a, ZObject *o, ZObject *i) {
 
   // 3. Preaction: <D-APPLY "Preaction" <GET ,PREACTIONS .A>>
   if (!v && hasPreaction(a)) {
-    v = dApply("Preaction", [&]() -> int {
-      return getPreaction(a)() ? M_HANDLED : M_NOT_HANDLED;
-    });
+    v = dApply("Preaction", [&]() -> int { return getPreaction(a)(); });
   }
 
   // 4. PRSI action: <AND .I <SET V <D-APPLY "PRSI" <GETP .I ,P?ACTION>>>>
   if (!v && g.prsi && g.prsi->hasAction()) {
-    v = dApply("PRSI", [&]() -> int {
-      return g.prsi->performAction() ? M_HANDLED : M_NOT_HANDLED;
-    });
+    v = dApply("PRSI", [&]() -> int { return g.prsi->performAction(); });
   }
 
   // 5. Container action: <AND .O <NOT <==? .A ,V?WALK>> <LOC .O> <GETP <LOC .O> ,P?CONTFCN> ...>
@@ -346,23 +347,19 @@ int perform(VerbId a, ZObject *o, ZObject *i) {
     ZObject *loc = g.prso->getLocation();
     if (loc->hasContainerAction()) {
       v = ddApply("Container", loc, [&]() -> int {
-        return loc->performContainerAction() ? M_HANDLED : M_NOT_HANDLED;
+        return loc->performContainerAction();
       });
     }
   }
 
   // 6. PRSO action: <AND .O <NOT <==? .A ,V?WALK>> <SET V <D-APPLY "PRSO" <GETP .O ,P?ACTION>>>>
   if (!v && g.prso && a != V_WALK && g.prso->hasAction()) {
-    v = dApply("PRSO", [&]() -> int {
-      return g.prso->performAction() ? M_HANDLED : M_NOT_HANDLED;
-    });
+    v = dApply("PRSO", [&]() -> int { return g.prso->performAction(); });
   }
 
   // 7. Default action: <SET V <D-APPLY <> <GET ,ACTIONS .A>>>
   if (!v && hasVerbHandler(a)) {
-    v = dApply("", [&]() -> int {
-      return getVerbHandler(a)() ? M_HANDLED : M_NOT_HANDLED;
-    });
+    v = dApply("", [&]() -> int { return getVerbHandler(a)(); });
   }
 
   // ZIL: <SETG PRSA .OA> <SETG PRSO .OO> <SETG PRSI .OI>
@@ -458,7 +455,7 @@ void mainLoop1() {
   // Room action (M-END) (ZIL: line 154)
   if (v != M_FATAL && g.here) {
     if (auto *room = dynamic_cast<ZRoom *>(g.here)) {
-      room->performRoomAction(M_END);
+      v = room->performRoomAction(M_END);
     }
   }
 

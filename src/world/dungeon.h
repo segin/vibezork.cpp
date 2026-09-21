@@ -43,7 +43,7 @@ ObjectId mazeDiodes();
 // ZIL: <ROUTINE CANYON-VIEW-F (RARG) ...>
 // Action handler for CANYON-VIEW room: leaps result in fatal fall.
 // Source: zil/1dungeon.zil:2406-2411
-void canyonViewRoomAction(int rarg);
+int canyonViewRoomAction(int rarg);
 
 // ZIL: Random walk tables for walk-around and navigation
 // Source: zil/1dungeon.zil:2620-2633

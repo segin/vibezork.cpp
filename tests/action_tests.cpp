@@ -902,7 +902,7 @@ TEST(CandlesFcn_LampOffHandled) {
 // ZIL Logic: Room handler for cellar - currently stub
 // =============================================================================
 
-extern void cellarAction(int rarg);
+extern int cellarAction(int rarg);
 
 TEST(CellarFcn_StubDoesNotCrash) {
   setupTestWorld();
@@ -948,7 +948,7 @@ TEST(ChimneyF_ClimbUpBlocked) {
 // CLEARING-FCN Tests (room handler stub)
 // =============================================================================
 
-extern void clearingAction(int rarg);
+extern int clearingAction(int rarg);
 
 TEST(ClearingFcn_StubDoesNotCrash) {
   setupTestWorld();
@@ -1461,7 +1461,7 @@ TEST(CandlesFcn_LampOffExtinguishes) {
 // =============================================================================
 
 // Forward declare logic function if not exported
-extern void cellarAction(int rarg);
+extern int cellarAction(int rarg);
 
 TEST(CellarFcn_LookPrintsDescription) {
   setupTestWorld();
@@ -1749,7 +1749,7 @@ TEST(ChimneyFcn_ClimbLogic) {
 // =============================================================================
 
 // Forward declare logic function if not exported
-extern void clearingAction(int rarg);
+extern int clearingAction(int rarg);
 
 TEST(ClearingFcn_EnterHidesUnrevealedGrate) {
   setupTestWorld();
@@ -2037,7 +2037,7 @@ TEST(CyclopsFcn_SleepWake) {
 // =============================================================================
 
 // Forward decl
-extern void cyclopsRoomAction(int rarg);
+extern int cyclopsRoomAction(int rarg);
 
 TEST(CyclopsRoomFcn_Look) {
   setupTestWorld();
@@ -2206,7 +2206,7 @@ TEST(DamFcn_ExamineFallsThrough) {
 // =============================================================================
 
 // Forward decl
-extern void damRoomAction(int rarg);
+extern int damRoomAction(int rarg);
 
 // TODO: Complex test needs investigation
 TEST(DamRoomFcn_Look) {
@@ -2478,7 +2478,7 @@ TEST(DeadFcn_WalkRestrictions) {
 // =============================================================================
 
 // Forward decl
-extern void deepCanyonRoomAction(int rarg);
+extern int deepCanyonRoomAction(int rarg);
 
 TEST(DeepCanyonFcn_Look) {
   setupTestWorld();
@@ -2544,7 +2544,7 @@ TEST(DeepCanyonFcn_Look) {
 // =============================================================================
 
 // Forward decl
-extern void domeRoomAction(int rarg);
+extern int domeRoomAction(int rarg);
 
 TEST(DomeRoomFcn_Look) {
   setupTestWorld();

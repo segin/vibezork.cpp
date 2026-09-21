@@ -209,6 +209,76 @@ void testPerformDispatchHierarchy() {
   std::println("✓ PERFORM hierarchy verified against gmain.zil:182-288");
 }
 
+
+// ZIL: <COND ... (<SET V <APPLY <GETP <LOC ,WINNER> ,P?ACTION> ,M-BEG>> .V) ...>
+// A true result from the room's M-BEG call ends PERFORM (gmain.zil:212).
+void testRoomMBegStopsDispatch() {
+  std::println("Testing room M-BEG result stops PERFORM...");
+  auto &g = Globals::instance();
+  g.reset();
+  initializeAllVerbHandlers();
+
+  auto playerObj = std::make_unique<ZObject>(5101, "adventurer");
+  auto roomObj = std::make_unique<ZRoom>(5102, "Kitchen", "Kitchen desc");
+  auto objA = std::make_unique<ZObject>(5103, "sack");
+  g.player = playerObj.get();
+  g.winner = playerObj.get();
+  g.here = roomObj.get();
+
+  bool defaultInvoked = false;
+  bool prsoInvoked = false;
+  registerVerbHandler(V_PRAY, [&]() -> bool {
+    defaultInvoked = true;
+    return true;
+  });
+  objA->setAction([&]() -> bool {
+    prsoInvoked = true;
+    return true;
+  });
+
+  // Room returns M_NOT_HANDLED at M-BEG: dispatch continues to PRSO.
+  int begCalls = 0;
+  roomObj->setRoomAction([&](int rarg) -> int {
+    if (rarg == M_BEG) {
+      ++begCalls;
+    }
+    return M_NOT_HANDLED;
+  });
+  int res = perform(V_PRAY, objA.get(), nullptr);
+  assert(res == M_HANDLED);
+  assert(begCalls == 1);
+  assert(prsoInvoked);
+  assert(!defaultInvoked);
+
+  // Room returns M_HANDLED at M-BEG: nothing after it runs.
+  prsoInvoked = false;
+  roomObj->setRoomAction([&](int rarg) -> int {
+    return rarg == M_BEG ? M_HANDLED : M_NOT_HANDLED;
+  });
+  res = perform(V_PRAY, objA.get(), nullptr);
+  assert(res == M_HANDLED);
+  assert(!prsoInvoked);
+  assert(!defaultInvoked);
+
+  // Room returns M_FATAL at M-BEG: PERFORM returns M_FATAL unchanged.
+  roomObj->setRoomAction([&](int rarg) -> int {
+    return rarg == M_BEG ? M_FATAL : M_NOT_HANDLED;
+  });
+  res = perform(V_PRAY, objA.get(), nullptr);
+  assert(res == M_FATAL);
+  assert(!prsoInvoked);
+
+  // Object and verb handlers pass M_FATAL through as well.
+  roomObj->setRoomAction(nullptr);
+  objA->setAction([&]() -> int { return M_FATAL; });
+  res = perform(V_PRAY, objA.get(), nullptr);
+  assert(res == M_FATAL);
+  assert(!defaultInvoked);
+
+  registerVerbHandler(V_PRAY, nullptr);
+  std::println("✓ Room M-BEG / M-FATAL propagation verified against gmain.zil:211-224");
+}
+
 void testMetaVerbs() {
   std::println("Testing meta-verb recognition...");
 
@@ -242,6 +312,7 @@ int main() {
   testGlobals();
   testDApplyAndDDApply();
   testPerformDispatchHierarchy();
+  testRoomMBegStopsDispatch();
   testMetaVerbs();
 
   std::println("========================================");

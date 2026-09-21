@@ -79,15 +79,17 @@ public:
   bool hasAdjective(std::string_view word) const;
 
   // Action handler
-  using ActionFunc = std::function<bool()>;
+  /// Action handlers return M_NOT_HANDLED / M_HANDLED / M_FATAL
+  /// (ZIL RFALSE / RTRUE / RFATAL); a bool-returning callable converts.
+  using ActionFunc = std::function<int()>;
   void setAction(ActionFunc func) { action_ = func; }
-  bool performAction() { return action_ ? action_() : false; }
+  int performAction() { return action_ ? action_() : M_NOT_HANDLED; }
   bool hasAction() const { return action_ != nullptr; }
 
   // Container action handler (ZIL: P?CONTFCN)
-  using ContActionFunc = std::function<bool()>;
+  using ContActionFunc = std::function<int()>;
   void setContainerAction(ContActionFunc func) { contAction_ = func; }
-  bool performContainerAction() { return contAction_ ? contAction_() : false; }
+  int performContainerAction() { return contAction_ ? contAction_() : M_NOT_HANDLED; }
   bool hasContainerAction() const { return contAction_ != nullptr; }
 
   // Serialization support (for save/restore system)

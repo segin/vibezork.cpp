@@ -184,7 +184,7 @@ bool barrowAction() {
 // CELLAR-FCN - Cellar room handler
 // ZIL: M-LOOK prints desc. M-ENTER slams TRAP-DOOR if open/untouched.
 // Source: 1actions.zil lines 531-543
-void cellarAction(int rarg) {
+int cellarAction(int rarg) {
   auto &g = Globals::instance();
 
   if (rarg == M_LOOK) {
@@ -200,6 +200,7 @@ void cellarAction(int rarg) {
       printLine("The trap door crashes shut, and you hear someone barring it.");
     }
   }
+  return M_NOT_HANDLED;
 }
 
 // CHIMNEY-F
@@ -285,7 +286,7 @@ bool chimneyAction() {
 // CLEARING-FCN - Clearing room handler
 // ZIL: M-ENTER hides grate if not revealed. M-LOOK prints desc + grate status.
 // Source: 1actions.zil lines 815-831
-void clearingAction(int rarg) {
+int clearingAction(int rarg) {
   auto &g = Globals::instance();
   ZObject *grate = g.getObject(ObjectIds::GRATE);
 
@@ -307,6 +308,7 @@ void clearingAction(int rarg) {
       }
     }
   }
+  return M_NOT_HANDLED;
 }
 
 // CRACK-FCN
@@ -346,7 +348,7 @@ bool cretinAction() {
 // CYCLOPS-ROOM-FCN (Room action)
 // ZIL: Handles M-LOOK (Desc + Cyclops state) and M-BEG (Blocking Up/East if
 // active). Source: 1actions.zil lines 1616-1660+
-void cyclopsRoomAction(int rarg) {
+int cyclopsRoomAction(int rarg) {
   auto &g = Globals::instance();
   auto &state = NPCSystem::getCyclopsState();
 
@@ -425,13 +427,14 @@ void cyclopsRoomAction(int rarg) {
   // add `return` logic if I change signature. Given usage, I will likely need
   // to change signature to `bool` eventually. But for this step, I'll match
   // existing file.
+  return M_NOT_HANDLED;
 }
 
 // DAM-ROOM-FCN (Room action for Dam)
 // DAM-ROOM-FCN (Room action for Dam)
 // ZIL: Handles M-LOOK logic based on water level and gates status.
 // Source: 1actions.zil lines 1156-1185
-void damRoomAction(int rarg) {
+int damRoomAction(int rarg) {
   auto &g = Globals::instance();
 
   if (rarg == M_LOOK) {
@@ -461,6 +464,7 @@ void damRoomAction(int rarg) {
     }
     printLine(".");
   }
+  return M_NOT_HANDLED;
 }
 
 // DBOAT-FUNCTION (Deflated boat)
@@ -673,7 +677,7 @@ bool deadFunction() {
 // DEEP-CANYON-F (Room Action)
 // ZIL: M-LOOK with water sound logic.
 // Source: 1actions.zil lines 1730-1745
-void deepCanyonRoomAction(int rarg) {
+int deepCanyonRoomAction(int rarg) {
   auto &g = Globals::instance();
 
   if (rarg == M_LOOK) {
@@ -689,13 +693,14 @@ void deepCanyonRoomAction(int rarg) {
       printLine(" You can hear the sound of flowing water from below.");
     }
   }
+  return M_NOT_HANDLED;
 }
 
 // DOME-ROOM-FCN (Room action)
 // DOME-ROOM-FCN (Room action)
 // ZIL: M-LOOK with rope (DOME-FLAG). M-ENTER with Spirit/Leap logic.
 // Source: 1actions.zil lines 1030-1050
-void domeRoomAction(int rarg) {
+int domeRoomAction(int rarg) {
   auto &g = Globals::instance();
 
   if (rarg == M_LOOK) {
@@ -716,7 +721,7 @@ void domeRoomAction(int rarg) {
         g.here = torchRoom;
       }
       // RTRUE implies handled/stop?
-      return;
+      return M_HANDLED;
     }
 
     if (g.prsa == V_LEAP) {
@@ -724,6 +729,7 @@ void domeRoomAction(int rarg) {
           "I'm afraid that the leap you attempted has done you in.");
     }
   }
+  return M_NOT_HANDLED;
 }
 
 // FRONT-DOOR-FCN
@@ -1501,11 +1507,11 @@ bool leakAction() {
 static bool rugMoved = false;  // RUG-MOVED flag
 static bool magicFlag = false; // MAGIC-FLAG (cyclops door opened)
 
-void livingRoomAction(int rarg) {
+int livingRoomAction(int rarg) {
   auto &g = Globals::instance();
 
   // M-LOOK: Dynamic room description
-  if (rarg == 0) {
+  if (rarg == M_LOOK) {
     print("You are in the living room. There is a doorway to the east");
 
     // Check door state (magic cyclops door vs nailed shut)
@@ -1535,12 +1541,13 @@ void livingRoomAction(int rarg) {
   }
 
   // M-END: Update score when touching trophy case
-  if (rarg == 2) {
+  if (rarg == M_END) {
     if (g.prsa == V_TAKE || (g.prsa == V_PUT && g.prsi &&
                              g.prsi->getId() == ObjectIds::TROPHY_CASE)) {
       // Score update handled by score system
     }
   }
+  return M_NOT_HANDLED;
 }
 
 // LOUD-ROOM-FCN - Loud room echo puzzle handler
@@ -1549,11 +1556,11 @@ void livingRoomAction(int rarg) {
 static bool loudFlag = false; // LOUD-FLAG - room has been quieted
 extern bool damGatesOpen;     // From actions.cpp - dam gates state
 
-void loudRoomAction(int rarg) {
+int loudRoomAction(int rarg) {
   auto &g = Globals::instance();
 
   // M-LOOK: Dynamic room description
-  if (rarg == 0) {
+  if (rarg == M_LOOK) {
     print("This is a large room with a ceiling which cannot be detected from "
           "the ground. There is a narrow passage from east to west and a stone "
           "stairway leading upward.");
@@ -1570,7 +1577,7 @@ void loudRoomAction(int rarg) {
   }
 
   // M-END: Eject player if room is too loud
-  if (rarg == 2 && damGatesOpen && !loudFlag) {
+  if (rarg == M_END && damGatesOpen && !loudFlag) {
     printLine(
         "It is unbearably loud here, with an ear-splitting roar seeming to "
         "come from all around you. There is a pounding in your head which "
@@ -1579,6 +1586,7 @@ void loudRoomAction(int rarg) {
     // Player gets ejected to random adjacent room (simplified: go west)
     Verbs::vWalkDir(Direction::WEST);
   }
+  return M_NOT_HANDLED;
 }
 
 // Handle ECHO command in loud room (called from verb handler)
@@ -1610,14 +1618,15 @@ bool handleEchoInLoudRoom() {
 }
 
 // MACHINE-ROOM-FCN
-void machineRoomAction(int rarg) {
+int machineRoomAction(int rarg) {
   // Stub
+  return M_NOT_HANDLED;
 }
 
 // MAZE-11-FCN (Special maze room)
 // ZIL: M-LOOK shows grating state (open/closed/hidden)
 // Source: Reference to CLEARING-FCN for grate logic
-void maze11Action(int rarg) {
+int maze11Action(int rarg) {
   auto &g = Globals::instance();
 
   if (rarg == M_LOOK) {
@@ -1633,6 +1642,7 @@ void maze11Action(int rarg) {
       }
     }
   }
+  return M_NOT_HANDLED;
 }
 
 // MOUNTAIN-RANGE-F
@@ -1789,18 +1799,21 @@ bool rainbowAction() {
 }
 
 // RESERVOIR-FCN
-void reservoirAction(int rarg) {
+int reservoirAction(int rarg) {
   // Handle water level, swimming, etc.
+  return M_NOT_HANDLED;
 }
 
 // RESERVOIR-NORTH-FCN
-void reservoirNorthAction(int rarg) {
+int reservoirNorthAction(int rarg) {
   // Stub
+  return M_NOT_HANDLED;
 }
 
 // RESERVOIR-SOUTH-FCN
-void reservoirSouthAction(int rarg) {
+int reservoirSouthAction(int rarg) {
   // Stub
+  return M_NOT_HANDLED;
 }
 
 // ROBBER-FUNCTION (Thief NPC AI)
@@ -1905,8 +1918,9 @@ bool songbirdAction() {
 }
 
 // SOUTH-TEMPLE-FCN
-void southTempleAction(int rarg) {
+int southTempleAction(int rarg) {
   // Stub
+  return M_NOT_HANDLED;
 }
 
 // STAIRS-F (gglobals.zil:110-113)
@@ -1996,8 +2010,9 @@ bool toolChestAction() {
 }
 
 // TORCH-ROOM-FCN
-void torchRoomAction(int rarg) {
+int torchRoomAction(int rarg) {
   // Stub
+  return M_NOT_HANDLED;
 }
 
 // TRAP-DOOR-FCN
@@ -2026,13 +2041,15 @@ bool trapDoorAction() {
 }
 
 // TREASURE-ROOM-FCN
-void treasureRoomAction(int rarg) {
+int treasureRoomAction(int rarg) {
   // Handle thief's lair logic
+  return M_NOT_HANDLED;
 }
 
 // TROLL-ROOM-F
-void trollRoomAction(int rarg) {
+int trollRoomAction(int rarg) {
   // Handle troll blocking passage
+  return M_NOT_HANDLED;
 }
 
 // TRUNK-F is already defined above
@@ -2219,11 +2236,11 @@ bool bodyAction() {
 // KITCHEN-FCN - Kitchen room handler
 // ZIL: Handles M-LOOK (description with window state) and M-BEG (climb stairs)
 // Source: 1actions.zil lines 385-401
-void kitchenAction(int rarg) {
+int kitchenAction(int rarg) {
   auto &g = Globals::instance();
 
   // M-LOOK: Print room description with window state
-  if (rarg == 0) { // M-LOOK equivalent
+  if (rarg == M_LOOK) { // M-LOOK equivalent
     print("You are in the kitchen of the white house. A table seems to "
           "have been used recently for the preparation of food. A passage "
           "leads to the west and a dark staircase can be seen leading "
@@ -2240,16 +2257,23 @@ void kitchenAction(int rarg) {
   }
 
   // M-BEG: Handle CLIMB-UP STAIRS
-  if (rarg == 1) { // M-BEG equivalent
+  // ZIL: (<==? .RARG ,M-BEG>
+  //        <COND (<AND <VERB? CLIMB-UP> <EQUAL? ,PRSO ,STAIRS>> <DO-WALK ,P?UP>)
+  //              (<AND <VERB? CLIMB-UP> <EQUAL? ,PRSO ,STAIRS>>
+  //               <TELL "There are no stairs leading down." CR>)>)
+  // Source: 1actions.zil:396-400. The second clause repeats the CLIMB-UP test
+  // (original bug), so "There are no stairs leading down." is unreachable.
+  if (rarg == M_BEG) {
     ZObject *stairs = g.getObject(ObjectIds::STAIRS);
     if (g.prsa == V_CLIMB_UP && g.prso == stairs) {
-      // Execute walk up (handled by caller triggering direction movement)
-      Verbs::vWalkDir(Direction::UP);
+      return Verbs::doWalk(Direction::UP) ? M_HANDLED : M_NOT_HANDLED;
     }
-    if (g.prsa == V_CLIMB_DOWN && g.prso == stairs) {
+    if (g.prsa == V_CLIMB_UP && g.prso == stairs) {
       printLine("There are no stairs leading down.");
+      return M_HANDLED;
     }
   }
+  return M_NOT_HANDLED;
 }
 
 // =============================================================================

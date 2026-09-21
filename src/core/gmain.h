@@ -17,12 +17,15 @@
  */
 
 // Verb and Preaction handlers registry
-void registerVerbHandler(VerbId verb, std::function<bool()> handler);
-void registerPreaction(VerbId verb, std::function<bool()> handler);
+// Handlers return M_NOT_HANDLED / M_HANDLED / M_FATAL (ZIL RFALSE/RTRUE/RFATAL).
+// A bool-returning callable converts (true -> M_HANDLED).
+using ActionHandler = std::function<int()>;
+void registerVerbHandler(VerbId verb, ActionHandler handler);
+void registerPreaction(VerbId verb, ActionHandler handler);
 bool hasVerbHandler(VerbId verb);
 bool hasPreaction(VerbId verb);
-std::function<bool()> getVerbHandler(VerbId verb);
-std::function<bool()> getPreaction(VerbId verb);
+ActionHandler getVerbHandler(VerbId verb);
+ActionHandler getPreaction(VerbId verb);
 void initializeAllVerbHandlers();
 
 // ZIL: <DEFINE D-APPLY (STR FCN "OPTIONAL" FOO "AUX" RES) ...> (gmain.zil:290-308)

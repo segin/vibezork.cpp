@@ -157,11 +157,13 @@ ObjectId mazeDiodes() {
 // 		<JIGS-UP "Nice view, lousy place to jump.">
 // 		<RTRUE>)>>
 // Source: zil/1dungeon.zil:2406-2411
-void canyonViewRoomAction(int rarg) {
+int canyonViewRoomAction(int rarg) {
     auto& g = Globals::instance();
     if (rarg == M_BEG && g.prsa == V_LEAP && !g.prso) {
         DeathSystem::jigsUp("Nice view, lousy place to jump.");
+        return M_HANDLED;
     }
+  return M_NOT_HANDLED;
 }
 
 // ZIL: RANDOM TABLES FOR WALK-AROUND (1dungeon.zil:2620-2633)
