@@ -742,6 +742,63 @@ void testMultiObjectLoop() {
   std::println("✓ Multi-object loop verified against gmain.zil:65-150");
 }
 
+// ZIL: the zero-object branch of MAIN-LOOP-1 (gmain.zil:82-90)
+void testZeroObjectBranch() {
+  std::println("Testing the zero-object branch...");
+  auto &g = Globals::instance();
+  g.reset();
+  initializeAllVerbHandlers();
+
+  auto playerObj = std::make_unique<ZObject>(5601, "adventurer");
+  auto roomObj = std::make_unique<ZRoom>(5602, "Cellar", "Cellar desc");
+  g.player = playerObj.get();
+  g.winner = playerObj.get();
+  g.here = roomObj.get();
+  playerObj->moveTo(roomObj.get());
+
+  int defaultCalls = 0;
+  registerVerbHandler(V_PRAY, [&]() -> int {
+    ++defaultCalls;
+    return M_HANDLED;
+  });
+  auto run = [&](ParsedCommand &cmd) {
+    std::stringstream buf;
+    auto *old = std::cout.rdbuf(buf.rdbuf());
+    executeCommand(cmd);
+    crlf();
+    std::cout.rdbuf(old);
+    return buf.str();
+  };
+
+  ParsedCommand cmd;
+  cmd.verb = V_PRAY;
+  cmd.words = {"pray"};
+
+  // Syntax takes no objects: PERFORM runs with PRSO cleared.
+  cmd.objectsExpected = 0;
+  g.lit = true;
+  g.prso = playerObj.get();
+  std::string out = run(cmd);
+  assert(defaultCalls == 1);
+  assert(g.prso == nullptr);
+
+  // Syntax wanted an object but the table is empty, room lit.
+  cmd.objectsExpected = 1;
+  out = run(cmd);
+  assert(defaultCalls == 1);
+  assert(out.find("It's not clear what you're referring to.") !=
+         std::string::npos);
+
+  // Same in the dark.
+  g.lit = false;
+  out = run(cmd);
+  assert(defaultCalls == 1);
+  assert(out.find("It's too dark to see.") != std::string::npos);
+
+  registerVerbHandler(V_PRAY, nullptr);
+  std::println("✓ Zero-object branch verified against gmain.zil:82-90");
+}
+
 void testMetaVerbs() {
   std::println("Testing meta-verb recognition...");
 
@@ -810,6 +867,7 @@ int main() {
   testDirectionThroughPerform();
   testItSubstitution();
   testMultiObjectLoop();
+  testZeroObjectBranch();
   testMetaVerbs();
   testMovesCountedOnlyByClocker();
 

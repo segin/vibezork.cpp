@@ -728,8 +728,9 @@ int Parser::syntaxScopeBits(const ParsedCommand &cmd, bool directSlot) const {
     auto prepIdx = *findPrepositionIndex(cmd.words);
     objectCount = prepIdx > 1 ? 2 : 1;
   }
-  const GSyntax::ZilSyntax *syn =
-      GSyntax::matchSyntax(cmd.words[0], preps, objectCount);
+  std::string canonical = GSyntax::canonicalVerb(cmd.words[0]);
+  const GSyntax::ZilSyntax *syn = GSyntax::matchSyntax(
+      canonical.empty() ? cmd.words[0] : canonical, preps, objectCount);
   if (!syn) {
     return 0;
   }
@@ -848,7 +849,8 @@ bool Parser::snarfPhrase(ParsedCommand &cmd,
     // ALL / ALL OF
     std::vector<std::string> content;
     for (const auto &w : part) {
-      if (w == "the" || w == "a" || w == "an" || w == "of") {
+      if (w == "the" || w == "a" || w == "an" || w == "of" ||
+          isPreposition(w)) {
         continue;
       }
       content.push_back(w);
@@ -1110,6 +1112,43 @@ bool Parser::isKnownObjectWord(const std::string &word) const {
   return false;
 }
 
+// ZIL: SYNTAX-CHECK with P-NCN = 0 (gparser.zil:707-775). A syntax line
+// taking no objects (optionally after the typed preposition) is accepted and
+// P-SONUMS is 0; otherwise the ZIL would try GWIM and then orphan with
+// "What do you want to <verb> [<prep>]?". GWIM arrives with Phase B; until
+// then the orphan question is asked directly. Returns false when the parse
+// must stop.
+bool Parser::resolveObjectlessSyntax(ParsedCommand &cmd,
+                                     const std::string &trailingPrep) {
+  const std::string &verbWord = cmd.words[0];
+  std::vector<std::string> preps;
+  if (!trailingPrep.empty()) {
+    preps.push_back(trailingPrep);
+  }
+  bool known = GSyntax::lookupVerb(verbWord).has_value();
+  if (known) {
+    // The syntax tables are keyed by the canonical verb word ("l" -> "look").
+    std::string canonical = GSyntax::canonicalVerb(verbWord);
+    if (GSyntax::matchSyntax(canonical.empty() ? verbWord : canonical, preps,
+                             0)) {
+      cmd.objectsExpected = 0;
+      return true;
+    }
+  } else if (!verbRequiresObject(cmd.verb)) {
+    cmd.objectsExpected = 0;
+    return true;
+  }
+  // ZIL: <ORPHAN .DRIVE1 .DRIVE2> <TELL "What do you want to "> <WORD-PRINT
+  //      verb> <PREP-PRINT prep> <TELL "?" CR> (gparser.zil:762-775)
+  setOrphanDirect(cmd.verb, verbWord);
+  std::string prompt = "What do you want to " + verbWord;
+  if (!trailingPrep.empty()) {
+    prompt += " " + trailingPrep;
+  }
+  printLine(prompt + "?");
+  return false;
+}
+
 ParsedCommand Parser::parse(const std::string &input) {
   // ZIL: <SETG P-WALK-DIR <>> unless the input is a direction (gparser.zil:370-375)
   Globals::instance().pWalkDir.reset();
@@ -1296,6 +1335,7 @@ ParsedCommand Parser::parse(const std::string &input) {
 
       // ZIL: SNARF-OBJECTS resolves NC2 before NC1 (gparser.zil:928-936)
       if (!directObjWords.empty()) {
+        cmd.objectsExpected = indirectObjWords.empty() ? 1 : 2;
         if (!indirectObjWords.empty() &&
             !snarfPhrase(cmd, indirectObjWords, false, cmd.prsiTable)) {
           cmd.verb = 0;
@@ -1308,6 +1348,7 @@ ParsedCommand Parser::parse(const std::string &input) {
       } else {
         // Preposition immediately follows verb (e.g., "turn on lamp",
         // "look at sword"): the object after it is the direct object (PRSO)
+        cmd.objectsExpected = 1;
         if (!indirectObjWords.empty() &&
             !snarfPhrase(cmd, indirectObjWords, true, cmd.prsoTable)) {
           cmd.verb = 0;
@@ -1315,19 +1356,26 @@ ParsedCommand Parser::parse(const std::string &input) {
         }
       }
     } else if (cmd.verb != 0) {
-      // No preposition, just try to find direct object
+      // A trailing preposition with nothing after it ("turn on", "look at")
+      std::string trailingPrep;
+      if (prepIdx.has_value()) {
+        trailingPrep = cmd.words[prepIdx.value()];
+      }
+      std::vector<std::string> objWords;
       if (cmd.words.size() > 1) {
-        std::vector<std::string> objWords(cmd.words.begin() + 1,
-                                          cmd.words.end());
+        size_t last = prepIdx.has_value() ? prepIdx.value() : cmd.words.size();
+        objWords.assign(cmd.words.begin() + 1, cmd.words.begin() + last);
+      }
+      if (!objWords.empty()) {
+        // No preposition, just try to find direct object
+        cmd.objectsExpected = 1;
         if (!snarfPhrase(cmd, objWords, true, cmd.prsoTable)) {
           cmd.verb = 0;
           return cmd;
         }
-      } else if (verbRequiresObject(cmd.verb)) {
-        // Verb requires object but none given - orphan the command
-        setOrphanDirect(cmd.verb, getVerbName(cmd.verb));
-        printLine("What do you want to " + getVerbName(cmd.verb) + "?");
+      } else if (!resolveObjectlessSyntax(cmd, trailingPrep)) {
         cmd.verb = 0;
+        return cmd;
       }
     }
   }

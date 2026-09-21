@@ -545,9 +545,21 @@ int executeCommand(const ParsedCommand &cmdIn) {
     //             <SET V <PERFORM ,PRSA ,PRSO>>) (gmain.zil:79-81)
     v = perform(V_WALK, nullptr, nullptr);
   } else if (num == 0) {
-    // ZIL: gmain.zil:82-90 -- completed by TODO item A11.
-    v = perform(cmd.verb, nullptr, nullptr);
-    g.prso = nullptr;
+    // ZIL: (<0? .NUM>
+    //        <COND (<0? <BAND <GETB ,P-SYNTAX ,P-SBITS> ,P-SONUMS>>
+    //               <SET V <PERFORM ,PRSA>> <SETG PRSO <>>)
+    //              (<NOT ,LIT> <TELL "It's too dark to see." CR>)
+    //              (T <TELL "It's not clear what you're referring to." CR>
+    //                 <SET V <>>)>) (gmain.zil:82-90)
+    if (cmd.objectsExpected <= 0) {
+      v = perform(cmd.verb, nullptr, nullptr);
+      g.prso = nullptr;
+    } else if (!g.lit) {
+      printLine("It's too dark to see.");
+    } else {
+      printLine("It's not clear what you're referring to.");
+      v = M_NOT_HANDLED;
+    }
   } else {
     // ZIL: <SETG P-NOT-HERE 0> <SETG P-MULT <>>
     //      <COND (<G? .NUM 1> <SETG P-MULT T>)> (gmain.zil:92-94)

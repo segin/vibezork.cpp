@@ -95,6 +95,7 @@ public:
 private:
     void initializeVerbsAndDirections();
     void finishTables(ParsedCommand& cmd);
+    bool resolveObjectlessSyntax(ParsedCommand& cmd, const std::string& trailingPrep);
 
     // Interim stand-ins for SNARFEM / GET-OBJECT (gparser.zil:978-1140)
     // until Phase B ports the parser: resolve one noun clause (which may be

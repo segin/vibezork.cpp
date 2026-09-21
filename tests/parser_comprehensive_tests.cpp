@@ -572,6 +572,51 @@ TEST(ParsingErrorMissingObject) {
     ASSERT_EQ(cmd.directObj, nullptr);
 }
 
+// ZIL: SYNTAX-CHECK with no noun clause (gparser.zil:707-775): a verb whose
+// SYNTAX takes no objects is performed with P-SONUMS = 0; otherwise the
+// player is asked "What do you want to <verb> [<prep>]?".
+TEST(ParsingObjectlessSyntax) {
+    auto& g = Globals::instance();
+    ZRoom testRoom(100, "Test Room", "A test room.");
+    g.here = &testRoom;
+    auto player = std::make_unique<ZObject>(999, "player");
+    g.winner = player.get();
+    g.player = g.winner;
+    g.lit = true;
+    g.registerObject(999, std::move(player));
+
+    Parser parser;
+
+    // JUMP = V-LEAP takes no object
+    ParsedCommand cmd = parser.parse("jump");
+    ASSERT_EQ(cmd.verb, V_JUMP);
+    ASSERT_EQ(cmd.objectsExpected, 0);
+
+    // "put" has no objectless syntax -> orphan question
+    {
+        std::stringstream buf;
+        auto* old = std::cout.rdbuf(buf.rdbuf());
+        cmd = parser.parse("put");
+        std::cout.rdbuf(old);
+        ASSERT_EQ(cmd.verb, 0);
+        ASSERT_TRUE(buf.str().find("What do you want to put?") != std::string::npos);
+    }
+    parser.clearOrphan();
+
+    // A trailing preposition is echoed: "turn on" -> "What do you want to turn on?"
+    {
+        std::stringstream buf;
+        auto* old = std::cout.rdbuf(buf.rdbuf());
+        cmd = parser.parse("turn on");
+        std::cout.rdbuf(old);
+        ASSERT_EQ(cmd.verb, 0);
+        ASSERT_TRUE(buf.str().find("What do you want to turn on?") != std::string::npos);
+    }
+    parser.clearOrphan();
+
+    g.reset();
+}
+
 TEST(ParsingErrorInvalidSyntax) {
     Parser parser;
     ParsedCommand cmd = parser.parse("the lamp take");
