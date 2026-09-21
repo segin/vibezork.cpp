@@ -1659,100 +1659,50 @@ bool vDrink() {
 
 // Light Source Verbs (Requirement 30)
 
+// ZIL: <ROUTINE V-LAMP-ON () ...>
+// Source: zil/gverbs.zil:786-801
 bool vLampOn() {
   auto &g = Globals::instance();
-
-  // Check if object is specified
-  if (!g.prso) {
-    printLine("What do you want to turn on?");
-    return RTRUE;
+  if (g.prso && g.prso->hasFlag(ObjectFlag::LIGHTBIT)) {
+    if (g.prso->hasFlag(ObjectFlag::ONBIT)) {
+      tell("It is already on.", CR);
+    } else {
+      g.prso->setFlag(ObjectFlag::ONBIT);
+      tell("The ", g.prso, " is now on.", CR);
+      if (!g.lit) {
+        g.lit = GParser::isLit(g.here);
+        crlf();
+        vLook();
+      }
+    }
+  } else if (g.prso && g.prso->hasFlag(ObjectFlag::BURNBIT)) {
+    tell("If you wish to burn the ", g.prso, ", you should say so.", CR);
+  } else {
+    tell("You can't turn that on.", CR);
   }
-
-  // Check if object has LIGHTBIT flag (is a light source)
-  if (!g.prso->hasFlag(ObjectFlag::LIGHTBIT)) {
-    printLine("You can't turn that on.");
-    return RTRUE;
-  }
-
-  // Check if already on
-  if (g.prso->hasFlag(ObjectFlag::ONBIT)) {
-    printLine("It's already on.");
-    return RTRUE;
-  }
-
-  // Check if lamp has battery/fuel (Requirement 47)
-  // For the lamp, check if it has been depleted
-  if (g.prso->getProperty(P_CAPACITY) == 0) {
-    printLine("The lamp has no more power.");
-    return RTRUE;
-  }
-
-  // Call object action handler first
-  // This allows objects to override default behavior
-  if (g.prso->performAction()) {
-    return RTRUE;
-  }
-
-  // Default LAMP-ON behavior
-  // Set ONBIT flag
-  g.prso->setFlag(ObjectFlag::ONBIT);
-
-  // Enable lamp timer if this is the brass lantern (Requirement 47)
-  if (g.prso->getId() == ObjectIds::LAMP) {
-    LampSystem::enableLampTimer();
-  }
-
-  // Update room lighting
-  // This will be handled by the light system when implemented
-  // For now, just set the flag
-
-  printLine("The " + g.prso->getDesc() + " is now on.");
-
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-LAMP-OFF () ...>
+// Source: zil/gverbs.zil:771-784
 bool vLampOff() {
   auto &g = Globals::instance();
-
-  // Check if object is specified
-  if (!g.prso) {
-    printLine("What do you want to turn off?");
-    return RTRUE;
+  if (g.prso && g.prso->hasFlag(ObjectFlag::LIGHTBIT)) {
+    if (!g.prso->hasFlag(ObjectFlag::ONBIT)) {
+      tell("It is already off.", CR);
+    } else {
+      g.prso->clearFlag(ObjectFlag::ONBIT);
+      if (g.lit) {
+        g.lit = GParser::isLit(g.here);
+      }
+      tell("The ", g.prso, " is now off.", CR);
+      if (!g.lit) {
+        tell("It is now pitch black.", CR);
+      }
+    }
+  } else {
+    tell("You can't turn that off.", CR);
   }
-
-  // Check if object has LIGHTBIT flag (is a light source)
-  if (!g.prso->hasFlag(ObjectFlag::LIGHTBIT)) {
-    printLine("You can't turn that off.");
-    return RTRUE;
-  }
-
-  // Check if lamp is on
-  if (!g.prso->hasFlag(ObjectFlag::ONBIT)) {
-    printLine("It's already off.");
-    return RTRUE;
-  }
-
-  // Call object action handler first
-  // This allows objects to override default behavior
-  if (g.prso->performAction()) {
-    return RTRUE;
-  }
-
-  // Default LAMP-OFF behavior
-  // Clear ONBIT flag
-  g.prso->clearFlag(ObjectFlag::ONBIT);
-
-  // Disable lamp timer if this is the brass lantern (Requirement 47)
-  if (g.prso->getId() == ObjectIds::LAMP) {
-    LampSystem::disableLampTimer();
-  }
-
-  // Update room lighting
-  // This will be handled by the light system when implemented
-  // For now, just clear the flag
-
-  printLine("The " + g.prso->getDesc() + " is now off.");
-
   return RTRUE;
 }
 
@@ -2649,8 +2599,26 @@ bool vBlast() {
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-BURN () ...>
+// Source: zil/gverbs.zil:251-273
 bool vBurn() {
-  printLine("You can't burn that.");
+  auto &g = Globals::instance();
+  if (g.prso && g.prso->hasFlag(ObjectFlag::BURNBIT)) {
+    bool held = g.prso->getLocation() == g.winner;
+    bool inside = g.winner && g.winner->getLocation() == g.prso;
+    if (held || inside) {
+      removeCarefully(g.prso);
+      tell("The ", g.prso);
+      tell(" catches fire. Unfortunately, you were ");
+      tell(inside ? "in" : "holding");
+      DeathSystem::jigsUp(" it at the time.");
+      return RTRUE;
+    }
+    removeCarefully(g.prso);
+    tell("The ", g.prso, " catches fire and is consumed.", CR);
+    return RTRUE;
+  }
+  tell("You can't burn a ", g.prso, ".", CR);
   return RTRUE;
 }
 
@@ -2744,8 +2712,17 @@ bool vPump() {
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-STRIKE () ...>
+// Source: zil/gverbs.zil:1315-1322
 bool vStrike() {
-  printLine("You have to be more specific!"); // Intransitive response
+  auto &g = Globals::instance();
+  if (g.prso && g.prso->hasFlag(ObjectFlag::ACTORBIT)) {
+    tell("Since you aren't versed in hand-to-hand combat, you'd better attack "
+         "the ",
+         g.prso, " with a weapon.", CR);
+    return RTRUE;
+  }
+  perform(V_LAMP_ON, g.prso);
   return RTRUE;
 }
 
@@ -2892,18 +2869,19 @@ bool preBoard() {
   return true;
 }
 
-// ZIL: <ROUTINE PRE-BURN () ...> (gverbs.zil:243-250)
+// ZIL: <ROUTINE PRE-BURN () ...>
+// Source: zil/gverbs.zil:243-249. Note the four punctuation marks.
 bool preBurn() {
   auto &g = Globals::instance();
   if (!g.prsi) {
     tellNoPrsi();
-    return true;
+    return RTRUE;
   }
-  if (g.prsi->hasFlag(ObjectFlag::ONBIT) || g.prsi->hasFlag(ObjectFlag::FLAMEBIT)) {
-    return false;
+  if (GMacros::isFlaming(g.prsi)) {
+    return RFALSE;
   }
-  printLine(std::format("With a {}?!?", g.prsi->getDesc()));
-  return true;
+  tell("With a ", g.prsi, "??!?", CR);
+  return RTRUE;
 }
 
 // ZIL: <ROUTINE PRE-DROP () ...>
@@ -3323,10 +3301,20 @@ void printContents(const ZObject *obj) {
   }
 }
 
-// ZIL: <ROUTINE REMOVE-CAREFULLY (OBJ) ...> (gverbs.zil:1212-1219)
+// ZIL: <ROUTINE REMOVE-CAREFULLY (OBJ "AUX" OLIT) ...>
+// Source: zil/gverbs.zil:610-618
 void removeCarefully(ZObject *obj) {
-  if (obj && obj->getLocation()) {
-    obj->moveTo(nullptr);
+  auto &g = Globals::instance();
+  if (!obj) return;
+  if (obj == g.pItObject) {
+    g.pItObject = nullptr;
+    g.it = nullptr;
+  }
+  bool olit = g.lit;
+  obj->moveTo(nullptr);
+  g.lit = GParser::isLit(g.here);
+  if (olit && olit != g.lit) {
+    tell("You are left in the dark...", CR);
   }
 }
 
@@ -3388,9 +3376,10 @@ bool shakeLoop(ZObject *obj) {
   return false;
 }
 
-// ZIL: <ROUTINE TELL-NO-PRSI () ...> (gverbs.zil:240-242)
+// ZIL: <ROUTINE TELL-NO-PRSI () <TELL "You didn't say with what!" CR>>
+// Source: zil/gverbs.zil:240-241
 void tellNoPrsi() {
-  printLine("You must specify what to use.");
+  tell("You didn't say with what!", CR);
 }
 
 // ZIL: <ROUTINE THIS-IS-IT (OBJ) ...> (gverbs.zil:1420-1424)
