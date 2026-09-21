@@ -7,6 +7,7 @@
 #include "../src/world/rooms.h"
 #include "../src/world/objects.h"
 #include "../src/parser/parser.h"
+#include "../src/core/gmain.h"
 #include "../src/verbs/verbs.h"
 #include "../src/systems/timer.h"
 #include "../src/systems/score.h"
@@ -216,7 +217,9 @@ TEST(PuzzleBoatPump) {
     g.prso = boat;
     g.prsi = pump;
     g.prsa = V_INFLATE;
-    Verbs::vInflate();
+    // ZIL V-INFLATE is just "How can you inflate that?" (gverbs.zil:757-758);
+    // the boat's own ACTION does the work, which is TODO(G7).
+    perform(V_INFLATE, g.prso, g.prsi);
     
     // Verify boat state changed (becomes BOAT_INFLATED object)
     auto* inflatedBoat = g.getObject(ObjectIds::BOAT_INFLATED);

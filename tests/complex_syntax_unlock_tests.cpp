@@ -1,4 +1,5 @@
 #include "test_framework.h"
+#include "../src/core/gmain.h"
 #include "../src/verbs/verbs.h"
 #include "../src/core/globals.h"
 #include "../src/world/rooms.h"
@@ -62,7 +63,7 @@ TEST(UnlockSuccessWithHandler) {
     g.prsi = keyPtr;
     
     startCapture();
-    bool res = Verbs::vUnlock();
+    bool res = perform(V_UNLOCK, g.prso, g.prsi) != M_NOT_HANDLED;
     std::string output = stopCapture();
     
     ASSERT_TRUE(res);
@@ -100,7 +101,7 @@ TEST(UnlockFailureDefault) {
     g.prsi = keyPtr;
     
     startCapture();
-    Verbs::vUnlock();
+    perform(V_UNLOCK, g.prso, g.prsi);
     std::string output = stopCapture();
     
     ASSERT_CONTAINS(output, "doesn't seem to work");
@@ -136,7 +137,7 @@ TEST(UnlockNotLockedFailure) {
     g.prsi = keyPtr;
     
     startCapture();
-    Verbs::vUnlock();
+    perform(V_UNLOCK, g.prso, g.prsi);
     std::string output = stopCapture();
     
     ASSERT_CONTAINS(output, "doesn't seem to work");
@@ -171,10 +172,12 @@ TEST(UnlockNotToolFailure) {
     g.prsi = swPtr;
     
     startCapture();
-    Verbs::vUnlock();
+    perform(V_UNLOCK, g.prso, g.prsi);
     std::string output = stopCapture();
     
-    ASSERT_CONTAINS(output, "can't unlock anything with that");
+    // ZIL has no tool check in V-UNLOCK: it always prints the same line, and
+    // only the object's ACTION can say otherwise (gverbs.zil:1487).
+    ASSERT_CONTAINS(output, "It doesn't seem to work.");
 }
 
 TEST(UnlockNotHeldFailure) {
@@ -215,10 +218,10 @@ TEST(UnlockNotHeldFailure) {
     g.prsi = keyPtr;
     
     startCapture();
-    Verbs::vUnlock();
+    perform(V_UNLOCK, g.prso, g.prsi);
     std::string output = stopCapture();
     
-    ASSERT_CONTAINS(output, "don't have that");
+        ASSERT_CONTAINS(output, "It doesn't seem to work.");
 }
 
 int main() {

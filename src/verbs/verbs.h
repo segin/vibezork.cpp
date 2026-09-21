@@ -356,8 +356,13 @@ namespace Verbs {
     // Special movement verbs
     bool vEnter();
     bool vExit();
+    /// ZIL V-CLIMB-UP (gverbs.zil:300-334)
+    bool climbUp(Direction dir, bool haveObj);
     bool vClimbUp();
     bool vClimbDown();
+    bool vClimbOn();
+    bool vDig();
+    bool vFill();
     bool vBoard();
     bool vDisembark();
     

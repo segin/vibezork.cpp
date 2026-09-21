@@ -597,94 +597,17 @@ bool vClose() {
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-LOCK () <TELL "It doesn't seem to work." CR>>
+// Source: zil/gverbs.zil:855-856
 bool vLock() {
-  auto &g = Globals::instance();
-
-  // PRE-LOCK checks (Requirement 24, 34)
-
-  // Check if object is specified
-  if (!g.prso) {
-    printLine("What do you want to lock?");
-    return RTRUE;
-  }
-
-  // Check if key is specified
-  if (!g.prsi) {
-    printLine("What do you want to lock it with?");
-    return RTRUE;
-  }
-
-  // Verify object can be locked (has DOORBIT or CONTBIT flag)
-  if (!g.prso->hasFlag(ObjectFlag::DOORBIT) &&
-      !g.prso->hasFlag(ObjectFlag::CONTBIT)) {
-    printLine("You can't lock that.");
-    return RTRUE;
-  }
-
-  // Verify player has the key (must be in inventory or accessible)
-  if (!isObjectAccessible(g.prsi)) {
-    printLine("You don't have that.");
-    return RTRUE;
-  }
-
-  // Verify the key has TOOLBIT flag (is a tool/key)
-  if (!g.prsi->hasFlag(ObjectFlag::TOOLBIT)) {
-    printLine("You can't lock anything with that.");
-    return RTRUE;
-  }
-
-  // Call object action handler first (Requirement 24)
-  // This allows objects to override default behavior (e.g., check for correct
-  // key)
-  if (g.prso->performAction()) {
-    return RTRUE;
-  }
-
-  // Default LOCK behavior per ZIL V-LOCK (gverbs.zil:855-856)
-  printLine("It doesn't seem to work.");
-
+  tell("It doesn't seem to work.", CR);
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-UNLOCK () <TELL "It doesn't seem to work." CR>>
+// Source: zil/gverbs.zil:1487 (V-UNLOCK shares V-LOCK's message)
 bool vUnlock() {
-  auto &g = Globals::instance();
-
-  // PRE-UNLOCK checks (Requirement 24, 34)
-
-  // Check if object is specified
-  if (!g.prso) {
-    printLine("What do you want to unlock?");
-    return RTRUE;
-  }
-
-  // Check if key is specified
-  if (!g.prsi) {
-    printLine("What do you want to unlock it with?");
-    return RTRUE;
-  }
-
-  // Verify player has the key (must be in inventory or accessible)
-  if (!isObjectAccessible(g.prsi)) {
-    printLine("You don't have that.");
-    return RTRUE;
-  }
-
-  // Verify the key has TOOLBIT flag (is a tool/key)
-  if (!g.prsi->hasFlag(ObjectFlag::TOOLBIT)) {
-    printLine("You can't unlock anything with that.");
-    return RTRUE;
-  }
-
-  // Call object action handler first (Requirement 24)
-  // This allows objects to override default behavior (e.g., check for correct
-  // key)
-  if (g.prso->performAction()) {
-    return RTRUE;
-  }
-
-  // Default UNLOCK behavior per ZIL V-UNLOCK (gverbs.zil:1508-1509)
-  printLine("It doesn't seem to work.");
-
+  tell("It doesn't seem to work.", CR);
   return RTRUE;
 }
 
@@ -947,130 +870,117 @@ bool trySpecialMovement(int verbId, Direction dir) {
   return true;
 }
 
+// ZIL: <ROUTINE V-ENTER () <DO-WALK ,P?IN>>
+// Source: zil/gverbs.zil:620-621
 bool vEnter() {
-  auto &g = Globals::instance();
-
-  // Try ENTER as special movement first
-  if (trySpecialMovement(V_ENTER, Direction::IN))
-    return RTRUE;
-
-  // Try regular IN direction (e.g., entering through window)
-  ZRoom *currentRoom = dynamic_cast<ZRoom *>(g.here);
-  if (currentRoom) {
-    RoomExit *inExit = currentRoom->getExit(Direction::IN);
-    if (inExit && inExit->type == ExitType::NORMAL) {
-      return vWalkDir(Direction::IN);
-    }
-  }
-
-  // If PRSO is set, try to enter that object
-  if (g.prso) {
-    // Check if it's a vehicle
-    if (g.prso->hasFlag(ObjectFlag::VEHBIT)) {
-      g.winner->moveTo(g.prso);
-      printLine("You are now in the " + g.prso->getDesc() + ".");
-      return RTRUE;
-    }
-    printLine("You can't enter that.");
-    return RTRUE;
-  }
-
-  printLine("You can't go that way.");
+  doWalk(Direction::IN);
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-EXIT () ...>
+// Source: zil/gverbs.zil:632-641
 bool vExit() {
   auto &g = Globals::instance();
-
-  // Try EXIT as special movement, priority to OUT
-  if (trySpecialMovement(V_EXIT, Direction::OUT))
+  ZObject *wloc = g.winner ? g.winner->getLocation() : nullptr;
+  if (!g.prso && wloc && wloc->hasFlag(ObjectFlag::VEHBIT)) {
+    perform(V_DISEMBARK, wloc);
     return RTRUE;
-
-  // Try other directions
-  if (trySpecialMovement(V_EXIT, Direction::NORTH))
+  }
+  if (g.prso && wloc == g.prso) {
+    perform(V_DISEMBARK, g.prso);
     return RTRUE;
-  if (trySpecialMovement(V_EXIT, Direction::SOUTH))
-    return RTRUE;
-  if (trySpecialMovement(V_EXIT, Direction::EAST))
-    return RTRUE;
-  if (trySpecialMovement(V_EXIT, Direction::WEST))
-    return RTRUE;
-
-  printLine("You can't exit here.");
+  }
+  doWalk(Direction::OUT);
   return RTRUE;
 }
 
-bool vClimbUp() {
+// ZIL: <ROUTINE V-CLIMB-UP ("OPTIONAL" (DIR ,P?UP) (OBJ <>) "AUX" X TX) ...>
+// Source: zil/gverbs.zil:300-334
+bool climbUp(Direction dir, bool haveObj) {
   auto &g = Globals::instance();
-
-  // Try CLIMB as special movement UP
-  if (trySpecialMovement(V_CLIMB_UP, Direction::UP))
-    return RTRUE;
-
-  // If PRSO is set, try to climb that object
-  if (g.prso) {
-    printLine("You can't climb that.");
+  ZObject *obj = nullptr;
+  if (haveObj && g.prso && g.prso->getId() != ObjectIds::ROOMS) {
+    obj = g.prso;
+  }
+  ZRoom *room = dynamic_cast<ZRoom *>(g.here);
+  RoomExit *tx = room ? room->getExit(dir) : nullptr;
+  if (tx) {
+    if (obj) {
+      bool blocked = (tx->targetRoom == 0 && !tx->message.empty());
+      if (!blocked && !globalIn(obj->getId(), g.here) &&
+          obj->getLocation() != g.here) {
+        blocked = true;
+      }
+      if (blocked) {
+        tell("The ", obj, " do");
+        if (obj->getId() != ObjectIds::STAIRS) {
+          tell("es");
+        }
+        tell("n't lead ");
+        tell(dir == Direction::UP ? "up" : "down");
+        tell("ward.", CR);
+        return RTRUE;
+      }
+    }
+    doWalk(dir);
     return RTRUE;
   }
-
-  // Default to trying UP direction
-  return Verbs::vWalkDir(Direction::UP);
-}
-
-bool vClimbDown() {
-  auto &g = Globals::instance();
-
-  // Try CLIMB as special movement DOWN
-  if (trySpecialMovement(V_CLIMB_DOWN, Direction::DOWN))
-    return RTRUE;
-
-  // If PRSO is set, try to climb down that object
-  if (g.prso) {
-    printLine("You can't climb down that.");
+  if (obj && obj->hasSynonym("wall")) {
+    tell("Climbing the walls is to no avail.", CR);
     return RTRUE;
   }
-
-  // Default to trying DOWN direction
-  return Verbs::vWalkDir(Direction::DOWN);
+  if (g.here && g.here->getId() != RoomIds::FOREST_PATH &&
+      (!obj || obj->getId() == ObjectIds::TREE) &&
+      globalIn(ObjectIds::TREE, g.here)) {
+    tell("There are no climbable trees here.", CR);
+    return RTRUE;
+  }
+  if (!obj || obj->getId() == ObjectIds::ROOMS) {
+    tell("You can't go that way.", CR);
+    return RTRUE;
+  }
+  tell("You can't do that!", CR);
+  return RTRUE;
 }
 
+bool vClimbUp() { return climbUp(Direction::UP, true); }
+
+// ZIL: <ROUTINE V-CLIMB-DOWN () <V-CLIMB-UP ,P?DOWN ,PRSO>>
+// Source: zil/gverbs.zil:279
+bool vClimbDown() { return climbUp(Direction::DOWN, true); }
+
+// ZIL: <ROUTINE V-BOARD ("AUX" AV) ...>
+// Source: zil/gverbs.zil:224-228
 bool vBoard() {
   auto &g = Globals::instance();
-
-  // If PRSO is set, try to board that object
-  if (g.prso) {
-    // Check if object is a vehicle
-    if (g.prso->hasFlag(ObjectFlag::VEHBIT)) {
-      // Move player into the vehicle
-      g.winner->moveTo(g.prso);
-      printLine("You board the " + g.prso->getDesc() + ".");
-      return RTRUE;
-    }
-    printLine("You can't board that.");
-    return RTRUE;
+  tell("You are now in the ", g.prso, ".", CR);
+  if (g.winner && g.prso) {
+    g.winner->moveTo(g.prso);
+    g.prso->performAction();
   }
-
-  printLine("What do you want to board?");
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-DISEMBARK () ...>
+// Source: zil/gverbs.zil:418-432
 bool vDisembark() {
   auto &g = Globals::instance();
-
-  // Check if player is in a vehicle
-  ZObject *location = g.winner->getLocation();
-  if (location && location->hasFlag(ObjectFlag::VEHBIT)) {
-    // Move player to vehicle's location
-    ZObject *vehicleLocation = location->getLocation();
-    if (vehicleLocation) {
-      g.winner->moveTo(vehicleLocation);
-      printLine("You disembark.");
-      return RTRUE;
-    }
+  ZObject *wloc = g.winner ? g.winner->getLocation() : nullptr;
+  if (!g.prso && wloc && wloc->hasFlag(ObjectFlag::VEHBIT)) {
+    perform(V_DISEMBARK, wloc);
+    return RTRUE;
   }
-
-  printLine("You're not in anything.");
-  return RTRUE;
+  if (wloc != g.prso) {
+    tell("You're not in that!", CR);
+    return GMacros::rfatal();
+  }
+  if (g.here && g.here->hasFlag(ObjectFlag::RLANDBIT)) {
+    tell("You are on your own feet again.", CR);
+    g.winner->moveTo(g.here);
+    return RTRUE;
+  }
+  tell("You realize that getting out here would be fatal.", CR);
+  return GMacros::rfatal();
 }
 
 bool vRead() {
@@ -1495,31 +1405,11 @@ bool vUntie() {
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-LISTEN () <TELL "The " D ,PRSO " makes no sound." CR>>
+// Source: zil/gverbs.zil:852-853
 bool vListen() {
   auto &g = Globals::instance();
-
-  // If object is specified, listen to that object
-  if (g.prso) {
-    // Call object action handler
-    if (g.prso->performAction()) {
-      return RTRUE;
-    }
-
-    // Authentic ZIL V-LISTEN
-    print("The ");
-    print(g.prso->getDesc());
-    printLine(" makes no sound.");
-    return RTRUE;
-  }
-
-  // No object specified - listen to the room
-  ZRoom *room = dynamic_cast<ZRoom *>(g.here);
-  if (room) {
-    room->performRoomAction(M_LISTEN);
-  }
-
-  // Default - no specific message for room listening in ZIL
-  printLine("You hear nothing unusual.");
+  tell("The ", g.prso, " makes no sound.", CR);
   return RTRUE;
 }
 
@@ -1583,78 +1473,55 @@ bool vTouch() {
 
 // Consumption Verbs (Requirement 28)
 
+// ZIL: <ROUTINE V-EAT ("AUX" (EAT? <>) (DRINK? <>) (NOBJ <>)) ...>
+// Source: zil/gverbs.zil:483-517
 bool vEat() {
   auto &g = Globals::instance();
-
-  // Check if object is specified
-  if (!g.prso) {
-    printLine("What do you want to eat?");
+  if (!g.prso) return RFALSE;
+  bool eat = g.prso->hasFlag(ObjectFlag::FOODBIT);
+  bool drink = false;
+  if (eat) {
+    ZObject *loc = g.prso->getLocation();
+    if (loc != g.winner && !(loc && loc->getLocation() == g.winner)) {
+      tell("You're not holding that.");
+    } else if (g.prsa == V_DRINK) {
+      tell("How can you drink that?");
+    } else {
+      tell("Thank you very much. It really hit the spot.");
+      removeCarefully(g.prso);
+    }
+    crlf();
     return RTRUE;
   }
-
-  // Authentic ZIL V-EAT logic
-  if (g.prso->hasFlag(ObjectFlag::FOODBIT)) {
-    // Check if player is holding it
-    if (g.prso->getLocation() != g.winner &&
-        (!g.prso->getLocation() ||
-         g.prso->getLocation()->getLocation() != g.winner)) {
-      printLine("You're not holding that.");
-      return RTRUE;
-    }
-
-    // Call object action handler first
-    if (g.prso->performAction()) {
-      return RTRUE;
-    }
-
-    // Remove and print message
-    g.prso->moveTo(nullptr);
-    printLine("Thank you very much. It really hit the spot.");
-    return RTRUE;
-  }
-
-  // Not food - check if drinkable
   if (g.prso->hasFlag(ObjectFlag::DRINKBIT)) {
-    // Redirect to drink
-    return Verbs::vDrink();
+    drink = true;
+    ZObject *nobj = g.prso->getLocation();
+    ZObject *globals = g.getObject(ObjectIds::GLOBAL_OBJECTS);
+    if ((globals && nobj == globals) ||
+        globalIn(ObjectIds::GLOBAL_WATER, g.here) ||
+        g.prso->getId() == ObjectIds::PSEUDO_OBJECT) {
+      hitSpot();
+    } else if (!nobj || !GParser::isAccessible(nobj)) {
+      tell("There isn't any water here.", CR);
+    } else if (nobj->getLocation() != g.winner) {
+      tell("You have to be holding the ", nobj, " first.", CR);
+    } else if (!nobj->hasFlag(ObjectFlag::OPENBIT)) {
+      tell("You'll have to open the ", nobj, " first.", CR);
+    } else {
+      hitSpot();
+    }
+    return RTRUE;
   }
-
-  // Neither food nor drink
-  print("I don't think that the ");
-  print(g.prso->getDesc());
-  printLine(" would agree with you.");
+  if (!eat && !drink) {
+    tell("I don't think that the ", g.prso, " would agree with you.", CR);
+  }
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-DRINK () <V-EAT>>
+// Source: zil/gverbs.zil:468-469
 bool vDrink() {
-  auto &g = Globals::instance();
-
-  // Check if object is specified
-  if (!g.prso) {
-    printLine("What do you want to drink?");
-    return RTRUE;
-  }
-
-  // Authentic ZIL - V-DRINK calls V-EAT
-  // But check DRINKBIT specifically
-  if (g.prso->hasFlag(ObjectFlag::DRINKBIT)) {
-    // Call object action handler first
-    if (g.prso->performAction()) {
-      return RTRUE;
-    }
-
-    // Remove and print message
-    g.prso->moveTo(nullptr);
-    printLine("Thank you very much. I was rather thirsty (from all this "
-              "talking, probably).");
-    return RTRUE;
-  }
-
-  // Not drinkable
-  print("I don't think that the ");
-  print(g.prso->getDesc());
-  printLine(" would agree with you.");
-  return RTRUE;
+  return vEat();
 }
 
 // Light Source Verbs (Requirement 30)
@@ -1708,43 +1575,17 @@ bool vLampOff() {
 
 // Special Action Verbs (Requirement 31)
 
+// ZIL: <ROUTINE V-INFLATE () <TELL "How can you inflate that?" CR>>
+// Source: zil/gverbs.zil:757-758
 bool vInflate() {
-  auto &g = Globals::instance();
-
-  // Check if object is specified
-  if (!g.prso) {
-    printLine("What do you want to inflate?");
-    return RTRUE;
-  }
-
-  // Call object action handler first
-  // This allows objects to override default behavior (e.g., boat with pump)
-  if (g.prso->performAction()) {
-    return RTRUE;
-  }
-
-  // Default: Can't inflate that
-  printLine("You can't inflate that.");
+  tell("How can you inflate that?", CR);
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-DEFLATE () <TELL "Come on, now!" CR>>
+// Source: zil/gverbs.zil:402-403
 bool vDeflate() {
-  auto &g = Globals::instance();
-
-  // Check if object is specified
-  if (!g.prso) {
-    printLine("What do you want to deflate?");
-    return RTRUE;
-  }
-
-  // Call object action handler first
-  // This allows objects to override default behavior (e.g., boat with pump)
-  if (g.prso->performAction()) {
-    return RTRUE;
-  }
-
-  // Default: Can't deflate that
-  printLine("You can't deflate that.");
+  tell("Come on, now!", CR);
   return RTRUE;
 }
 
@@ -1760,16 +1601,10 @@ bool vPray() {
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-EXORCISE () <TELL "What a bizarre concept!" CR>>
+// Source: zil/gverbs.zil:643-644
 bool vExorcise() {
-  auto &g = Globals::instance();
-
-  // Call object action handler first if object specified
-  if (g.prso && g.prso->performAction()) {
-    return RTRUE;
-  }
-
-  // Authentic ZIL V-EXORCISE
-  printLine("What a bizarre concept!");
+  tell("What a bizarre concept!", CR);
   return RTRUE;
 }
 
@@ -2174,17 +2009,17 @@ bool vZork() {
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-ADVENT () <TELL "A hollow voice says \"Fool.\"" CR>>
+// Source: zil/gverbs.zil:153-154
 bool vPlugh() {
-  // Authentic ZIL V-ADVENT (handles PLUGH and XYZZY)
-  // Reference to Colossal Cave Adventure
-  printLine("A hollow voice says \"Fool.\"");
+  tell("A hollow voice says \"Fool.\"", CR);
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-FROBOZZ () ...>
+// Source: zil/gverbs.zil:704-706
 bool vFrobozz() {
-  // Authentic ZIL V-FROBOZZ
-  printLine(
-      "The FROBOZZ Corporation created, owns, and operates this dungeon.");
+  tell("The FROBOZZ Corporation created, owns, and operates this dungeon.", CR);
   return RTRUE;
 }
 
@@ -2212,22 +2047,16 @@ bool vSwim() {
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-BACK () ...>
+// Source: zil/gverbs.zil:195-196
 bool vBack() {
-  // Authentic ZIL V-BACK
-  printLine("Sorry, my memory is poor. Please give a direction.");
+  tell("Sorry, my memory is poor. Please give a direction.", CR);
   return RTRUE;
 }
 
+// ZIL: JUMP is a SYNONYM of LEAP (gsyntax.zil:249-255).
 bool vJump() {
-  // Authentic ZIL V-LEAP/V-SKIP responses
-  static const char *responses[] = {
-      "Very good. Now you can go to the second grade.",
-      "Are you enjoying yourself?", "Wheeeeeeeeee!!!!!",
-      "Do you expect me to applaud?"};
-  static int idx = 0;
-  printLine(responses[idx % 4]);
-  idx++;
-  return RTRUE;
+  return vLeap();
 }
 
 // ZIL: <ROUTINE V-CURSES () ...>
@@ -2291,16 +2120,77 @@ bool vWear() {
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-FIND ("AUX" (L <LOC ,PRSO>)) ...>
+// Source: zil/gverbs.zil:677-699
 bool vFind() {
-  print("You can't see any ");
-  if (Globals::instance().prso)
-    print(Globals::instance().prso->getDesc());
-  printLine(" here.");
+  auto &g = Globals::instance();
+  if (!g.prso) return RFALSE;
+  ZObject *l = g.prso->getLocation();
+  ObjectId id = g.prso->getId();
+  if (id == ObjectIds::HANDS || id == ObjectIds::LUNGS) {
+    tell("Within six feet of your head, assuming you haven't left that "
+         "somewhere.",
+         CR);
+  } else if (id == ObjectIds::ME) {
+    tell("You're around here somewhere...", CR);
+  } else if (l && l->getId() == ObjectIds::GLOBAL_OBJECTS) {
+    tell("You find it.", CR);
+  } else if (l == g.winner) {
+    tell("You have it.", CR);
+  } else if (l == g.here || globalIn(id, g.here) ||
+             id == ObjectIds::PSEUDO_OBJECT) {
+    tell("It's right here.", CR);
+  } else if (l && l->hasFlag(ObjectFlag::ACTORBIT)) {
+    tell("The ", l, " has it.", CR);
+  } else if (l && l->hasFlag(ObjectFlag::SURFACEBIT)) {
+    tell("It's on the ", l, ".", CR);
+  } else if (l && l->hasFlag(ObjectFlag::CONTBIT)) {
+    tell("It's in the ", l, ".", CR);
+  } else {
+    tell("Beats me.", CR);
+  }
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-LEAP ("AUX" TX S) ...>
+// Source: zil/gverbs.zil:813-842
 bool vLeap() {
-  return vJump(); // Share logic with JUMP
+  auto &g = Globals::instance();
+  if (g.prso) {
+    if (g.prso->getLocation() == g.here) {
+      if (g.prso->hasFlag(ObjectFlag::ACTORBIT)) {
+        tell("The ", g.prso, " is too big to jump over.", CR);
+      } else {
+        return vSkip();
+      }
+    } else {
+      tell("That would be a good trick.", CR);
+    }
+    return RTRUE;
+  }
+  ZRoom *room = dynamic_cast<ZRoom *>(g.here);
+  RoomExit *down = room ? room->getExit(Direction::DOWN) : nullptr;
+  if (down) {
+    bool fatal = false;
+    if (down->type == ExitType::CONDITIONAL) {
+      fatal = down->condition && !down->condition();
+    } else if (down->targetRoom == 0 && !down->message.empty()) {
+      fatal = true;
+    }
+    if (fatal) {
+      tell("This was not a very safe place to try jumping.", CR);
+      DeathSystem::jigsUp(VerbTables::jumploss().pickOne());
+      return RTRUE;
+    }
+    if (g.here && g.here->getId() == RoomIds::UP_A_TREE) {
+      tell("In a feat of unaccustomed daring, you manage to land on your feet "
+           "without killing yourself.",
+           CR, CR);
+      doWalk(Direction::DOWN);
+      return RTRUE;
+    }
+  }
+  return vSkip();
 }
 
 // ZIL: <ROUTINE V-SAY ("AUX" V) ...>
@@ -2329,8 +2219,11 @@ bool vKick() {
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-BREATHE () <PERFORM ,V?INFLATE ,PRSO ,LUNGS>>
+// Source: zil/gverbs.zil:230-231
 bool vBreathe() {
-  printLine("How can you breathe that?");
+  auto &g = Globals::instance();
+  perform(V_INFLATE, g.prso, g.getObject(ObjectIds::LUNGS));
   return RTRUE;
 }
 
@@ -2343,15 +2236,59 @@ bool vRape() {
 
 // Phase 10.3 Batch 1: Movement & Positioning
 
-bool vClimbFoo() {
+// ZIL: <ROUTINE V-CLIMB-FOO () <V-CLIMB-UP ,P?UP ,PRSO>>
+// Source: zil/gverbs.zil:281-288
+bool vClimbFoo() { return climbUp(Direction::UP, true); }
+
+// ZIL: <ROUTINE V-CLIMB-ON () ...>
+// Source: zil/gverbs.zil:290-298
+bool vClimbOn() {
   auto &g = Globals::instance();
-  if (g.prso && g.prso->hasFlag(ObjectFlag::CLIMBBIT)) {
-    print("Climbing the ");
-    print(g.prso->getDesc());
-    printLine(" doesn't get you anywhere.");
+  if (g.prso && g.prso->hasFlag(ObjectFlag::VEHBIT)) {
+    perform(V_BOARD, g.prso);
     return RTRUE;
   }
-  printLine("You can't climb that.");
+  tell("You can't climb onto the ", g.prso, ".", CR);
+  return RTRUE;
+}
+
+// ZIL: <ROUTINE V-DIG () ...>
+// Source: zil/gverbs.zil:405-416
+bool vDig() {
+  auto &g = Globals::instance();
+  if (!g.prsi) {
+    g.prsi = g.getObject(ObjectIds::HANDS);
+  }
+  if (g.prsi && g.prsi->getId() == ObjectIds::SHOVEL) {
+    tell("There's no reason to be digging here.", CR);
+    return RTRUE;
+  }
+  if (g.prsi && g.prsi->hasFlag(ObjectFlag::TOOLBIT)) {
+    tell("Digging with the ", g.prsi, " is slow and tedious.", CR);
+  } else {
+    tell("Digging with a ", g.prsi, " is silly.", CR);
+  }
+  return RTRUE;
+}
+
+// ZIL: <ROUTINE V-FILL () ...>
+// Source: zil/gverbs.zil:664-676
+bool vFill() {
+  auto &g = Globals::instance();
+  if (!g.prsi) {
+    if (globalIn(ObjectIds::GLOBAL_WATER, g.here)) {
+      perform(V_FILL, g.prso, g.getObject(ObjectIds::GLOBAL_WATER));
+      return RTRUE;
+    }
+    ZObject *water = g.getObject(ObjectIds::WATER);
+    if (water && g.winner && water->getLocation() == g.winner->getLocation()) {
+      perform(V_FILL, g.prso, water);
+      return RTRUE;
+    }
+    tell("There's nothing to fill it with.", CR);
+    return RTRUE;
+  }
+  tell("You may know how to do that, but I don't.", CR);
   return RTRUE;
 }
 
@@ -2394,28 +2331,52 @@ bool vAlarm() {
 
 
 
+// ZIL: <ROUTINE V-LAUNCH () ...>
+// Source: zil/gverbs.zil:804-808
 bool vLaunch() {
   auto &g = Globals::instance();
   if (g.prso && g.prso->hasFlag(ObjectFlag::VEHBIT)) {
-    printLine("You can't launch that.");
+    tell("You can't launch that by saying \"launch\"!", CR);
   } else {
-    printLine("That's not a vehicle!");
+    tell("That's pretty weird.", CR);
   }
   return RTRUE;
 }
 
 // Phase 10.3 Batch 2: Manipulation
 
+// ZIL: <ROUTINE V-CUT () ...>
+// Source: zil/gverbs.zil:384-400. The "smanship" suffix is concatenated onto
+// the weapon's name, so a knife gives "knifesmanship".
 bool vCut() {
-  printLine("It doesn't seem to work.");
+  auto &g = Globals::instance();
+  if (g.prso && g.prso->hasFlag(ObjectFlag::ACTORBIT)) {
+    perform(V_ATTACK, g.prso, g.prsi);
+    return RTRUE;
+  }
+  if (g.prso && g.prso->hasFlag(ObjectFlag::BURNBIT) && g.prsi &&
+      g.prsi->hasFlag(ObjectFlag::WEAPONBIT)) {
+    if (g.winner && g.winner->getLocation() == g.prso) {
+      tell("Not a bright idea, especially since you're in it.", CR);
+      return RTRUE;
+    }
+    removeCarefully(g.prso);
+    tell("Your skillful ", g.prsi, "smanship slices the ", g.prso,
+         " into innumerable slivers which blow away.", CR);
+    return RTRUE;
+  }
+  if (!g.prsi || !g.prsi->hasFlag(ObjectFlag::WEAPONBIT)) {
+    tell("The \"cutting edge\" of a ", g.prsi, " is hardly adequate.", CR);
+    return RTRUE;
+  }
+  tell("Strange concept, cutting the ", g.prso, "....", CR);
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-LOWER () <HACK-HACK "Playing in this way with the ">>
+// Source: zil/gverbs.zil:902
 bool vLower() {
-  auto &g = Globals::instance();
-  if (g.prso && g.prso->performAction())
-    return RTRUE;
-  printLine("You can't lower that.");
+  hackHack("Playing in this way with the ");
   return RTRUE;
 }
 
@@ -2533,13 +2494,18 @@ bool vCommand() {
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-ECHO ("AUX" LST MAX (ECH 0) CNT) ...>
+// Source: zil/gverbs.zil:526-548. With no trailing words it prints the
+// fallback; the Loud Room's own routine handles the puzzle (TODO(G5)).
 bool vEcho() {
-  printLine("Echo... echo... echo...");
+  tell("echo echo ...", CR);
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-FOLLOW () <TELL "You're nuts!" CR>>
+// Source: zil/gverbs.zil:701-702
 bool vFollow() {
-  printLine("You're not following anything.");
+  tell("You're nuts!", CR);
   return RTRUE;
 }
 
@@ -2581,8 +2547,10 @@ bool vSpray() {
 
 // Phase 10.3 Batch 4: Magic/Misc
 
+// ZIL: <ROUTINE V-BLAST () ...>
+// Source: zil/gverbs.zil:198-199
 bool vBlast() {
-  printLine("Start small, why don't you?");
+  tell("You can't blast anything by using words.", CR);
   return RTRUE;
 }
 
@@ -2609,23 +2577,31 @@ bool vBurn() {
   return RTRUE;
 }
 
+// ZIL: CHANT is a SYNONYM of INCANT (gsyntax.zil:243-244).
 bool vChant() {
-  printLine("Chanting won't help you.");
-  return RTRUE;
+  return vIncant();
 }
 
+// ZIL: <ROUTINE V-DISENCHANT () ...>
+// Source: zil/gverbs.zil:434-466; the Zork I branch is just "Nothing happens."
 bool vDisenchant() {
-  printLine("You can't disenchant that.");
+  tell("Nothing happens.", CR);
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-ENCHANT () ...>
+// Source: zil/gverbs.zil:550-618; Zork I falls through to V-DISENCHANT.
 bool vEnchant() {
-  printLine("You're not a wizard.");
-  return RTRUE;
+  return vDisenchant();
 }
 
+// ZIL: <ROUTINE V-INCANT () ...>
+// Source: zil/gverbs.zil:736-755
 bool vIncant() {
-  printLine("The incantation fails.");
+  auto &g = Globals::instance();
+  tell("The incantation echoes back faintly, but nothing else happens.", CR);
+  g.quoteFlag = false;
+  g.pCont = 0;
   return RTRUE;
 }
 
@@ -2646,51 +2622,76 @@ bool vStay() {
 
 // Phase 10.3 Batch 5: Cleanup & Edge Cases
 
+// ZIL: <ROUTINE V-BRUSH () ...>
+// Source: zil/gverbs.zil:233-234
 bool vBrush() {
-  printLine("You can't brush that.");
+  tell("If you wish, but heaven only knows why.", CR);
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-BUG () ...>
+// Source: zil/gverbs.zil:236-238
 bool vBug() {
-  printLine(
-      "If you find a bug, please start an issue on the tracker."); // Modernized
+  tell("Bug? Not in a flawless program like this! (Cough, cough).", CR);
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-CHOMP () <TELL "Preposterous!" CR>>
+// Source: zil/gverbs.zil:276-277
 bool vChomp() {
-  printLine("Preposterous!");
-  // ZIL: "I don't know how to do that. I win in all cases."
+  tell("Preposterous!", CR);
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-COUNT () ...>
+// Source: zil/gverbs.zil:365-369
 bool vCount() {
-  printLine("You have lost your mind.");
+  auto &g = Globals::instance();
+  if (g.prso && g.prso->getId() == ObjectIds::BLESSINGS) {
+    tell("Well, for one, you are playing Zork...", CR);
+  } else {
+    tell("You have lost your mind.", CR);
+  }
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-CROSS () <TELL "You can't cross that!" CR>>
+// Source: zil/gverbs.zil:371-372
 bool vCross() {
-  printLine("You can't cross that.");
+  tell("You can't cross that!", CR);
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-HATCH () <TELL "Bizarre!" CR>>
+// Source: zil/gverbs.zil:719-720
 bool vHatch() {
-  printLine("I don't think that can be hatched.");
-  // ZIL: "Bizarre!"
+  tell("Bizarre!", CR);
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-KNOCK () ...>
+// Source: zil/gverbs.zil:765-769
 bool vKnock() {
-  printLine("Why knock on that?");
+  auto &g = Globals::instance();
+  if (g.prso && g.prso->hasFlag(ObjectFlag::DOORBIT)) {
+    tell("Nobody's home.", CR);
+  } else {
+    tell("Why knock on a ", g.prso, "?", CR);
+  }
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-LEAVE () <DO-WALK ,P?OUT>>
+// Source: zil/gverbs.zil:850
 bool vLeave() {
-  printLine("Leave what?");
+  doWalk(Direction::OUT);
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-LEAN-ON () <TELL "Getting tired?" CR>>
+// Source: zil/gverbs.zil:810-811
 bool vLeanOn() {
-  printLine("That's not a good idea.");
+  tell("Getting tired?", CR);
   return RTRUE;
 }
 
@@ -2747,18 +2748,25 @@ bool vStab() {
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-DRINK-FROM () <TELL "How peculiar!" CR>>
+// Source: zil/gverbs.zil:471-472
 bool vDrinkFrom() {
-  printLine("You can't drink from that.");
+  tell("How peculiar!", CR);
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-LOOK-UNDER () ...>
+// Source: zil/gverbs.zil:899-900
 bool vLookUnder() {
-  printLine("There is nothing but dust there.");
+  tell("There is nothing but dust there.", CR);
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-LOOK-BEHIND () ...>
+// Source: zil/gverbs.zil:862-863
 bool vLookBehind() {
-  printLine("There is nothing behind it.");
+  auto &g = Globals::instance();
+  tell("There is nothing behind the ", g.prso, ".", CR);
   return RTRUE;
 }
 
@@ -2812,15 +2820,11 @@ bool vLookOn() {
 
 // ZIL: <ROUTINE V-SGIVE () ...> (gverbs.zil:1210-1212)
 
-// ZIL: <ROUTINE V-SKIP () ...> (gverbs.zil:1269-1277)
+// ZIL: <ROUTINE V-SKIP () <TELL <PICK-ONE ,WHEEEEE> CR>>
+// Source: zil/gverbs.zil:1269-1270
 bool vSkip() {
-  static const std::vector<std::string> wheeeee = {
-    "Very good. Now you can go to the second grade.",
-    "Are you enjoying yourself?",
-    "Wheeeeeeeeee!!!!!"
-  };
-  printLine(wheeeee[GMacros::random(static_cast<int>(wheeeee.size())) - 1]);
-  return true;
+  tell(VerbTables::wheeeee().pickOne(), CR);
+  return RTRUE;
 }
 
 // ZIL: <ROUTINE V-SSPRAY () ...> (gverbs.zil:1294-1296)
@@ -2840,27 +2844,28 @@ bool vCommandFile() {
 // ZIL: GVERBS.ZIL Preaction Routines (zil/gverbs.zil)
 // ============================================================================
 
-// ZIL: <ROUTINE PRE-BOARD ("AUX" AV) ...> (gverbs.zil:201-223)
+// ZIL: <ROUTINE PRE-BOARD ("AUX" AV) ...>
+// Source: zil/gverbs.zil:201-222. Every path but the vehicle-on-the-ground
+// one ends in RFATAL.
 bool preBoard() {
   auto &g = Globals::instance();
-  if (!g.prso) return false;
   ZObject *av = g.winner ? g.winner->getLocation() : nullptr;
-  if (g.prso->hasFlag(ObjectFlag::VEHBIT)) {
+  if (g.prso && g.prso->hasFlag(ObjectFlag::VEHBIT)) {
     if (g.prso->getLocation() != g.here) {
-      printLine(std::format("The {} must be on the ground to be boarded.", g.prso->getDesc()));
-      return true;
+      tell("The ", g.prso, " must be on the ground to be boarded.", CR);
     } else if (av && av->hasFlag(ObjectFlag::VEHBIT)) {
-      printLine(std::format("You are already in the {}!", av->getDesc()));
-      return true;
+      tell("You are already in the ", av, "!", CR);
+    } else {
+      return RFALSE;
     }
-    return false;
+  } else if (g.prso && (g.prso->getId() == ObjectIds::WATER ||
+                        g.prso->getId() == ObjectIds::GLOBAL_WATER)) {
+    perform(V_SWIM, g.prso);
+    return RTRUE;
+  } else {
+    tell("You have a theory on how to board a ", g.prso, ", perhaps?", CR);
   }
-  if (g.prso->getId() == ObjectIds::GLOBAL_WATER) {
-    vSwim();
-    return true;
-  }
-  printLine(std::format("You have a theory on how to board a {}, perhaps?", g.prso->getDesc()));
-  return true;
+  return GMacros::rfatal();
 }
 
 // ZIL: <ROUTINE PRE-BURN () ...>
@@ -2889,20 +2894,31 @@ bool preDrop() {
   return RFALSE;
 }
 
-// ZIL: <ROUTINE PRE-FILL ("AUX" TX) ...> (gverbs.zil:646-654)
+// ZIL: <ROUTINE PRE-FILL ("AUX" TX) ...>
+// Source: zil/gverbs.zil:646-662
 bool preFill() {
   auto &g = Globals::instance();
   if (!g.prsi) {
-    ZObject *water = g.getObject(ObjectIds::GLOBAL_WATER);
-    if (water && globalIn(ObjectIds::GLOBAL_WATER, g.here)) {
-      g.prsi = water;
-      printLine(std::format("(with {})", water->getDesc()));
-      return false;
+    if (globalIn(ObjectIds::GLOBAL_WATER, g.here)) {
+      perform(V_FILL, g.prso, g.getObject(ObjectIds::GLOBAL_WATER));
+      return RTRUE;
     }
-    printLine("There is nothing to fill it with.");
-    return true;
+    ZObject *water = g.getObject(ObjectIds::WATER);
+    if (water && g.winner && water->getLocation() == g.winner->getLocation()) {
+      perform(V_FILL, g.prso, water);
+      return RTRUE;
+    }
+    tell("There is nothing to fill it with.", CR);
+    return RTRUE;
   }
-  return false;
+  if (g.prsi->getId() == ObjectIds::WATER) {
+    return RFALSE;
+  }
+  if (g.prsi->getId() != ObjectIds::GLOBAL_WATER) {
+    perform(V_PUT, g.prsi, g.prso);
+    return RTRUE;
+  }
+  return RFALSE;
 }
 
 // ZIL: <ROUTINE PRE-GIVE () ...>

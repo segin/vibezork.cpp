@@ -48,4 +48,43 @@ GMacros::ZilRandomTable<std::string> &hoHum() {
   return table;
 }
 
+// ZIL: <GLOBAL JUMPLOSS <LTABLE 0 ...>> (gverbs.zil:844-848)
+GMacros::ZilRandomTable<std::string> &jumploss() {
+  static GMacros::ZilRandomTable<std::string> table{
+      "You should have looked before you leaped.",
+      "In the movies, your life would be passing before your eyes.",
+      "Geronimo...",
+  };
+  return table;
+}
+
+// ZIL: <GLOBAL WHEEEEE <LTABLE 0 ...>> (gverbs.zil:1272-1276)
+GMacros::ZilRandomTable<std::string> &wheeeee() {
+  static GMacros::ZilRandomTable<std::string> table{
+      "Very good. Now you can go to the second grade.",
+      "Are you enjoying yourself?",
+      "Wheeeeeeeeee!!!!!",
+      "Do you expect me to applaud?",
+  };
+  return table;
+}
+
+// ZIL: <GLOBAL DUMMY <LTABLE 0 ...>> (gverbs.zil:2213-2217)
+GMacros::ZilRandomTable<std::string> &dummy() {
+  static GMacros::ZilRandomTable<std::string> table{
+      "Look around.",
+      "Too late for that.",
+      "Have your eyes checked.",
+  };
+  return table;
+}
+
+// ZIL: <GLOBAL SWIMYUKS <LTABLE 0 ...>> (gverbs.zil:2194-2196)
+GMacros::ZilRandomTable<std::string> &swimyuks() {
+  static GMacros::ZilRandomTable<std::string> table{
+      "You can't swim in the dungeon.",
+  };
+  return table;
+}
+
 } // namespace VerbTables

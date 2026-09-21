@@ -107,10 +107,10 @@ TEST(EatVerbNoObject) {
     g.prsa = V_EAT;
     
     // Test EAT verb without object
+    // With no PRSO there is nothing to eat; the parser asks the orphan
+    // question now, so V-EAT reports nothing (gverbs.zil:483-517).
     bool result = Verbs::vEat();
-    ASSERT_TRUE(result);
-    
-    // Should display "Eat what?" message
+    ASSERT_FALSE(result);
     
     // Cleanup
     g.reset();
@@ -145,12 +145,11 @@ TEST(DrinkVerbWithLiquid) {
     g.prso = waterPtr;
     g.prsa = V_DRINK;
     
-    // Test DRINK verb
+    // ZIL V-EAT's DRINKBIT path calls HIT-SPOT and never removes the water
+    // (gverbs.zil:501-516); only FOODBIT objects are consumed.
     bool result = Verbs::vDrink();
     ASSERT_TRUE(result);
-    
-    // Verify water was removed from game (consumed)
-    ASSERT_TRUE(waterPtr->getLocation() == nullptr);
+    ASSERT_TRUE(waterPtr->getLocation() != nullptr);
     
     // Cleanup
     g.reset();
@@ -217,9 +216,7 @@ TEST(DrinkVerbNoObject) {
     
     // Test DRINK verb without object
     bool result = Verbs::vDrink();
-    ASSERT_TRUE(result);
-    
-    // Should display "Drink what?" message
+    ASSERT_FALSE(result);
     
     // Cleanup
     g.reset();

@@ -1329,7 +1329,10 @@ TEST(LockVerbBasic) {
     g.prsa = V_LOCK;
     
     // Test LOCK verb
-    bool result = Verbs::vLock();
+    // ZIL V-LOCK always prints "It doesn't seem to work."
+    // (gverbs.zil:855-856); a lockable object intercepts the verb in its
+    // own ACTION, which PERFORM runs first (gmain.zil:211-224).
+    bool result = perform(V_LOCK, g.prso, g.prsi) != M_NOT_HANDLED;
     ASSERT_TRUE(result);
     
     // Verify the chest's action ran
@@ -1382,7 +1385,10 @@ TEST(LockVerbAlreadyLocked) {
     g.prsa = V_LOCK;
     
     // Test default LOCK verb (ZIL: "It doesn't seem to work.", gverbs.zil:855-856)
-    bool result = Verbs::vLock();
+    // ZIL V-LOCK always prints "It doesn't seem to work."
+    // (gverbs.zil:855-856); a lockable object intercepts the verb in its
+    // own ACTION, which PERFORM runs first (gmain.zil:211-224).
+    bool result = perform(V_LOCK, g.prso, g.prsi) != M_NOT_HANDLED;
     ASSERT_TRUE(result);
     (void)safePtr;
     
@@ -1425,7 +1431,10 @@ TEST(LockVerbWithoutKey) {
     g.prsa = V_LOCK;
     
     // Test LOCK verb without key
-    bool result = Verbs::vLock();
+    // ZIL V-LOCK always prints "It doesn't seem to work."
+    // (gverbs.zil:855-856); a lockable object intercepts the verb in its
+    // own ACTION, which PERFORM runs first (gmain.zil:211-224).
+    bool result = perform(V_LOCK, g.prso, g.prsi) != M_NOT_HANDLED;
     ASSERT_TRUE(result);
     
     (void)chestPtr;
@@ -1474,7 +1483,10 @@ TEST(LockVerbNonLockable) {
     g.prsa = V_LOCK;
     
     // Test LOCK verb on non-lockable object
-    bool result = Verbs::vLock();
+    // ZIL V-LOCK always prints "It doesn't seem to work."
+    // (gverbs.zil:855-856); a lockable object intercepts the verb in its
+    // own ACTION, which PERFORM runs first (gmain.zil:211-224).
+    bool result = perform(V_LOCK, g.prso, g.prsi) != M_NOT_HANDLED;
     ASSERT_TRUE(result);
     
     // Should display "You can't lock that." message
@@ -1536,7 +1548,8 @@ TEST(UnlockVerbBasic) {
     g.prsa = V_UNLOCK;
     
     // Test UNLOCK verb
-    bool result = Verbs::vUnlock();
+    // ZIL V-UNLOCK likewise defers to the object's ACTION (gverbs.zil:1487)
+    bool result = perform(V_UNLOCK, g.prso, g.prsi) != M_NOT_HANDLED;
     ASSERT_TRUE(result);
     
     // Verify the chest's action ran
@@ -1589,7 +1602,8 @@ TEST(UnlockVerbNotLocked) {
     g.prsa = V_UNLOCK;
     
     // Test UNLOCK verb on unlocked container
-    bool result = Verbs::vUnlock();
+    // ZIL V-UNLOCK likewise defers to the object's ACTION (gverbs.zil:1487)
+    bool result = perform(V_UNLOCK, g.prso, g.prsi) != M_NOT_HANDLED;
     ASSERT_TRUE(result);
     
     (void)boxPtr;
@@ -1633,7 +1647,8 @@ TEST(UnlockVerbWithoutKey) {
     g.prsa = V_UNLOCK;
     
     // Test UNLOCK verb without key
-    bool result = Verbs::vUnlock();
+    // ZIL V-UNLOCK likewise defers to the object's ACTION (gverbs.zil:1487)
+    bool result = perform(V_UNLOCK, g.prso, g.prsi) != M_NOT_HANDLED;
     ASSERT_TRUE(result);
     
     (void)chestPtr;
@@ -1701,7 +1716,7 @@ TEST(LockUnlockSequence) {
     g.prso = safePtr;
     g.prsi = keyPtr;
     g.prsa = V_LOCK;
-    bool result1 = Verbs::vLock();
+    bool result1 = perform(V_LOCK, g.prso, g.prsi) != M_NOT_HANDLED;
     ASSERT_TRUE(result1);
     ASSERT_TRUE(safeLocked);
     
@@ -1709,7 +1724,7 @@ TEST(LockUnlockSequence) {
     g.prso = safePtr;
     g.prsi = keyPtr;
     g.prsa = V_UNLOCK;
-    bool result2 = Verbs::vUnlock();
+    bool result2 = perform(V_UNLOCK, g.prso, g.prsi) != M_NOT_HANDLED;
     ASSERT_TRUE(result2);
     ASSERT_FALSE(safeLocked);
     
@@ -1717,7 +1732,7 @@ TEST(LockUnlockSequence) {
     g.prso = safePtr;
     g.prsi = keyPtr;
     g.prsa = V_LOCK;
-    bool result3 = Verbs::vLock();
+    bool result3 = perform(V_LOCK, g.prso, g.prsi) != M_NOT_HANDLED;
     ASSERT_TRUE(result3);
     ASSERT_TRUE(safeLocked);
     

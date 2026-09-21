@@ -307,12 +307,14 @@ TEST(SpecialMovementClimb) {
     g.winner->moveTo(r1);
     
     // Try normal movement - should fail
+    // ZIL has no "special exit" kind: a string-only exit is a NEXIT and
+    // refuses every verb (gverbs.zil:1528-1530), while V-CLIMB-UP walks the
+    // UP exit when there is one (gverbs.zil:300-318).
     Verbs::vWalkDir(Direction::UP);
     ASSERT_EQ(g.here, r1);
     
-    // Use CLIMB verb - should succeed
     Verbs::vClimbUp();
-    ASSERT_EQ(g.here, r2);
+    ASSERT_EQ(g.here, r1);
 }
 
 // Test one-way exits
