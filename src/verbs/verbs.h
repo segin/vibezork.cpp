@@ -348,7 +348,9 @@ namespace Verbs {
 
 
     bool vWalk();
-    bool vWalkDir(Direction dir);
+    /// ZIL V-WALK for a direction: returns M_HANDLED on a move, M_FATAL
+    /// (RFATAL) when the move fails (gverbs.zil:1521-1580).
+    int vWalkDir(Direction dir);
     
     // Special movement verbs
     bool vEnter();
@@ -470,7 +472,7 @@ namespace Verbs {
     void describeObject(const ZObject *obj, bool isLook = false);
     void describeObjects(const ZObject *room);
     void describeRoom(bool look = false);
-    bool doWalk(Direction dir);
+    int doWalk(Direction dir);
     ZObject *findIn(const ZObject *container, ObjectFlag flag);
     void finish();
     ZObject *firster(const ZObject *container);

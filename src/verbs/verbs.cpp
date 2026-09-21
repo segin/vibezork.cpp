@@ -799,19 +799,21 @@ bool vWalk() {
   return RTRUE;
 }
 
-bool vWalkDir(Direction dir) {
+// ZIL: every failing branch of V-WALK ends in <RFATAL>; a completed move
+// returns true (gverbs.zil:1521-1580).
+int vWalkDir(Direction dir) {
   auto &g = Globals::instance();
   ZRoom *currentRoom = dynamic_cast<ZRoom *>(g.here);
 
   if (!currentRoom) {
     printLine("You can't go that way.");
-    return RTRUE;
+    return M_FATAL;
   }
 
   RoomExit *exit = currentRoom->getExit(dir);
   if (!exit) {
     printLine("You can't go that way.");
-    return RTRUE;
+    return M_FATAL;
   }
 
   // Handle different exit types
@@ -820,25 +822,25 @@ bool vWalkDir(Direction dir) {
     // Check if door exists and is accessible
     if (exit->doorObject == 0) {
       printLine("You can't go that way.");
-      return RTRUE;
+      return M_FATAL;
     }
 
     ZObject *door = g.getObject(exit->doorObject);
     if (!door) {
       printLine("You can't go that way.");
-      return RTRUE;
+      return M_FATAL;
     }
 
     // Check if door is locked
     if (door->hasFlag(ObjectFlag::LOCKEDBIT)) {
       printLine("The door is locked.");
-      return RTRUE;
+      return M_FATAL;
     }
 
     // Check if door is closed
     if (!door->hasFlag(ObjectFlag::OPENBIT)) {
       printLine("The door is closed.");
-      return RTRUE;
+      return M_FATAL;
     }
 
     // Door is open, allow passage
@@ -853,7 +855,7 @@ bool vWalkDir(Direction dir) {
     } else {
       printLine("You can't go that way.");
     }
-    return RTRUE;
+    return M_FATAL;
   }
 
   case ExitType::CONDITIONAL: {
@@ -864,7 +866,7 @@ bool vWalkDir(Direction dir) {
       } else {
         printLine("You can't go that way.");
       }
-      return RTRUE;
+      return M_FATAL;
     }
     break;
   }
@@ -873,12 +875,12 @@ bool vWalkDir(Direction dir) {
     if (exit->procedural) {
       ObjectId target = exit->procedural();
       if (target == 0) {
-        return RTRUE; // Movement blocked or output handled by procedural routine
+        return M_FATAL; // Movement blocked or output handled by procedural routine
       }
       exit->targetRoom = target;
     } else {
       printLine("You can't go that way.");
-      return RTRUE;
+      return M_FATAL;
     }
     break;
   }
@@ -889,7 +891,7 @@ bool vWalkDir(Direction dir) {
     // Normal exits - just check for message
     if (!exit->message.empty()) {
       printLine(exit->message);
-      return RTRUE;
+      return M_FATAL;
     }
     break;
   }
@@ -900,7 +902,7 @@ bool vWalkDir(Direction dir) {
     ObjectId targetId = exit->targetRoom;
     if (targetId == RoomIds::RESERVOIR || targetId == RoomIds::IN_STREAM) {
       printLine("The water level is too high to enter. The reservoir is full.");
-      return RTRUE;
+      return M_FATAL;
     }
   }
 
@@ -912,7 +914,7 @@ bool vWalkDir(Direction dir) {
     vLook();
   }
 
-  return RTRUE;
+  return M_HANDLED;
 }
 
 bool trySpecialMovement(int verbId, Direction dir) {
@@ -3603,7 +3605,7 @@ void describeRoom(bool look) {
 }
 
 // ZIL: <ROUTINE DO-WALK (DIR) ...> (gverbs.zil:470-473)
-bool doWalk(Direction dir) {
+int doWalk(Direction dir) {
   return vWalkDir(dir);
 }
 

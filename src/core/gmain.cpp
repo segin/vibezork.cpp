@@ -420,44 +420,14 @@ void mainLoop1() {
   ParsedCommand cmd = getGlobalParser().parse(input);
 
   if (cmd.verb == 0) {
+    // ZIL: (T <SETG P-CONT <>>) -- parse failure (gmain.zil:162-163)
     g.pWon = false;
+    g.pCont = false;
     return;
   }
 
   g.pWon = true;
-  int v = M_NOT_HANDLED;
-
-  // Multi-object handling (ZIL: lines 91-150)
-  if (cmd.isAll) {
-    g.pMult = true;
-    g.pNotHere = 0;
-
-    if (cmd.allObjects.empty()) {
-      printLine(std::format("There's nothing here to {}.", cmd.words[0]));
-      return;
-    }
-
-    for (auto *obj : cmd.allObjects) {
-      print(std::format("{}: ", obj->getDesc()));
-      v = perform(cmd.verb, obj, cmd.indirectObj);
-      if (v == M_FATAL) {
-        break;
-      }
-    }
-  } else if (cmd.isDirection) {
-    g.pMult = false;
-    Verbs::vWalkDir(cmd.direction);
-  } else {
-    g.pMult = false;
-    v = perform(cmd.verb, cmd.directObj, cmd.indirectObj);
-  }
-
-  // Room action (M-END) (ZIL: line 154)
-  if (v != M_FATAL && g.here) {
-    if (auto *room = dynamic_cast<ZRoom *>(g.here)) {
-      v = room->performRoomAction(M_END);
-    }
-  }
+  executeCommand(cmd);
 
   // Update last action (ZIL: lines 158-160)
   g.lPrsa = cmd.verb;
@@ -472,6 +442,51 @@ void mainLoop1() {
     NPCSystem::processTrollTurn();
     NPCSystem::processCyclopsTurn();
   }
+}
+
+// ZIL: MAIN-LOOP-1 after <SETG P-WON <PARSER>> succeeded (gmain.zil:42-161)
+int executeCommand(const ParsedCommand &cmd) {
+  auto &g = Globals::instance();
+  int v = M_NOT_HANDLED;
+
+  // Multi-object handling (ZIL: lines 91-150)
+  if (cmd.isAll) {
+    g.pMult = true;
+    g.pNotHere = 0;
+
+    if (cmd.allObjects.empty()) {
+      printLine(std::format("There's nothing here to {}.", cmd.words[0]));
+      return v;
+    }
+
+    for (auto *obj : cmd.allObjects) {
+      print(std::format("{}: ", obj->getDesc()));
+      v = perform(cmd.verb, obj, cmd.indirectObj);
+      // ZIL: <COND (<==? .V ,M-FATAL> <RETURN>)> (gmain.zil:150)
+      if (v == M_FATAL) {
+        break;
+      }
+    }
+  } else if (cmd.isDirection) {
+    g.pMult = false;
+    v = Verbs::vWalkDir(cmd.direction);
+  } else {
+    g.pMult = false;
+    v = perform(cmd.verb, cmd.directObj, cmd.indirectObj);
+  }
+
+  // Room action (M-END) (ZIL: lines 151-154), skipped after RFATAL
+  if (v != M_FATAL && g.here) {
+    if (auto *room = dynamic_cast<ZRoom *>(g.here)) {
+      v = room->performRoomAction(M_END);
+    }
+  }
+
+  // ZIL: <COND (<==? .V ,M-FATAL> <SETG P-CONT <>>)> (gmain.zil:161)
+  if (v == M_FATAL) {
+    g.pCont = false;
+  }
+  return v;
 }
 
 // ZIL: <ROUTINE MAIN-LOOP () ...> (gmain.zil:34-36)

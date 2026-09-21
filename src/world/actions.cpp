@@ -256,10 +256,10 @@ int treeRoom(int rarg) {
   } else if (rarg == M_BEG) {
     // ZIL: 1actions.zil:2890-2916
     if (g.prsa == V_CLIMB_DOWN && (!g.prso || g.prso->getId() == ObjectIds::TREE || g.prso->getId() == ObjectIds::ROOMS)) {
-      return Verbs::doWalk(Direction::DOWN) ? M_HANDLED : M_NOT_HANDLED;
+      return Verbs::doWalk(Direction::DOWN);
     }
     if ((g.prsa == V_CLIMB_UP || g.prsa == V_CLIMB_FOO) && (g.prso && g.prso->getId() == ObjectIds::TREE)) {
-      return Verbs::doWalk(Direction::UP) ? M_HANDLED : M_NOT_HANDLED;
+      return Verbs::doWalk(Direction::UP);
     }
     if (g.prsa == V_LEAP) {
       DeathSystem::jigsUp("That was just a bit too far down.");
@@ -330,7 +330,7 @@ int forestRoom(int rarg) {
     // ZIL: (<AND <VERB? CLIMB-FOO CLIMB-UP> <EQUAL? ,PRSO ,TREE>> <DO-WALK ,P?UP>)
     // Source: zil/1actions.zil:3007-3009
     if ((g.prsa == V_CLIMB_FOO || g.prsa == V_CLIMB_UP) && (g.prso && g.prso->getId() == ObjectIds::TREE)) {
-      return Verbs::doWalk(Direction::UP) ? M_HANDLED : M_NOT_HANDLED;
+      return Verbs::doWalk(Direction::UP);
     }
   } else if (rarg == M_LOOK) {
     if (g.here && !g.here->getLongDesc().empty()) {

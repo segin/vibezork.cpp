@@ -41,6 +41,14 @@ int perform(VerbId a, ZObject* o = nullptr, ZObject* i = nullptr);
 // ZIL: <VERB? TELL BRIEF SUPER-BRIEF VERBOSE SAVE VERSION QUIT RESTART SCORE SCRIPT UNSCRIPT RESTORE> (gmain.zil:170-171)
 bool isMetaVerb(VerbId verb);
 
+struct ParsedCommand;
+
+// The post-parse part of MAIN-LOOP-1 (gmain.zil:42-163): runs the command,
+// the multi-object loop and the room's M-END call. Returns V, the last
+// PERFORM / M-END result; M_FATAL aborts the loop, skips M-END and clears
+// P-CONT.
+int executeCommand(const ParsedCommand& cmd);
+
 // ZIL: <ROUTINE MAIN-LOOP () ...> (gmain.zil:34-36)
 void mainLoop();
 

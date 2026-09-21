@@ -2266,7 +2266,7 @@ int kitchenAction(int rarg) {
   if (rarg == M_BEG) {
     ZObject *stairs = g.getObject(ObjectIds::STAIRS);
     if (g.prsa == V_CLIMB_UP && g.prso == stairs) {
-      return Verbs::doWalk(Direction::UP) ? M_HANDLED : M_NOT_HANDLED;
+      return Verbs::doWalk(Direction::UP);
     }
     if (g.prsa == V_CLIMB_UP && g.prso == stairs) {
       printLine("There are no stairs leading down.");

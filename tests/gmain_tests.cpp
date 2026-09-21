@@ -1,7 +1,9 @@
 #include "core/globals.h"
+#include "core/gmacros.h"
 #include "core/gmain.h"
 #include "core/object.h"
 #include "core/types.h"
+#include "parser/parser.h"
 #include "verbs/verbs.h"
 #include "world/rooms.h"
 #include <cassert>
@@ -279,6 +281,84 @@ void testRoomMBegStopsDispatch() {
   std::println("✓ Room M-BEG / M-FATAL propagation verified against gmain.zil:211-224");
 }
 
+
+// ZIL: MAIN-LOOP-1 multi-object loop and RFATAL handling (gmain.zil:96-161)
+void testRfatalAbortsLoopAndSkipsMEnd() {
+  std::println("Testing RFATAL aborts the object loop and skips M-END...");
+  auto &g = Globals::instance();
+  g.reset();
+  initializeAllVerbHandlers();
+
+  auto playerObj = std::make_unique<ZObject>(5201, "adventurer");
+  auto roomObj = std::make_unique<ZRoom>(5202, "Cellar", "Cellar desc");
+  auto objA = std::make_unique<ZObject>(5203, "sack");
+  auto objB = std::make_unique<ZObject>(5204, "bottle");
+  g.player = playerObj.get();
+  g.winner = playerObj.get();
+  g.here = roomObj.get();
+
+  int mEndCalls = 0;
+  roomObj->setRoomAction([&](int rarg) -> int {
+    if (rarg == M_END) {
+      ++mEndCalls;
+    }
+    return M_NOT_HANDLED;
+  });
+
+  int aCalls = 0;
+  int bCalls = 0;
+  objA->setAction([&]() -> int {
+    ++aCalls;
+    return GMacros::rfatal();
+  });
+  objB->setAction([&]() -> int {
+    ++bCalls;
+    return M_HANDLED;
+  });
+
+  ParsedCommand cmd;
+  cmd.verb = V_PRAY;
+  cmd.words = {"pray"};
+  cmd.isAll = true;
+  cmd.allObjects = {objA.get(), objB.get()};
+
+  // Fatal on the first object: loop aborts, M-END skipped, P-CONT cleared.
+  g.pCont = true;
+  int v = executeCommand(cmd);
+  assert(v == M_FATAL);
+  assert(aCalls == 1);
+  assert(bCalls == 0);
+  assert(mEndCalls == 0);
+  assert(!g.pCont);
+
+  // Non-fatal: both objects run and M-END is called once.
+  objA->setAction([&]() -> int {
+    ++aCalls;
+    return M_HANDLED;
+  });
+  g.pCont = true;
+  v = executeCommand(cmd);
+  assert(v == M_NOT_HANDLED); // value of the room's M-END call
+  assert(aCalls == 2);
+  assert(bCalls == 1);
+  assert(mEndCalls == 1);
+  assert(g.pCont);
+
+  // A fatal M-END result also clears P-CONT (gmain.zil:154, 161).
+  roomObj->setRoomAction([&](int rarg) -> int {
+    return rarg == M_END ? M_FATAL : M_NOT_HANDLED;
+  });
+  cmd.isAll = false;
+  cmd.allObjects.clear();
+  cmd.directObj = objB.get();
+  g.pCont = true;
+  v = executeCommand(cmd);
+  assert(v == M_FATAL);
+  assert(!g.pCont);
+
+  std::println("✓ RFATAL propagation verified against gmain.zil:96-161");
+}
+
 void testMetaVerbs() {
   std::println("Testing meta-verb recognition...");
 
@@ -313,6 +393,7 @@ int main() {
   testDApplyAndDDApply();
   testPerformDispatchHierarchy();
   testRoomMBegStopsDispatch();
+  testRfatalAbortsLoopAndSkipsMEnd();
   testMetaVerbs();
 
   std::println("========================================");
