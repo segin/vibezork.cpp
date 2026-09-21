@@ -2,6 +2,7 @@
 // Tests for MAZEBIT, NONLANDBIT, GWIMBIT, INHIBIT, MULTIBIT, SLOCBIT
 
 #include "core/flags.h"
+#include "core/go.h"
 #include "core/globals.h"
 #include "core/object.h"
 #include "parser/parser.h"
@@ -11,6 +12,7 @@
 
 static void setupTestWorld() {
   initializeWorld();
+  goSetup();
 }
 
 // =============================================================================

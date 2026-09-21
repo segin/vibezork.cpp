@@ -1,5 +1,6 @@
 // Unit tests for ZIL LAKE-PSEUDO (zil/1actions.zil:3177-3184)
 #include "../src/core/globals.h"
+#include "../src/core/go.h"
 #include "../src/core/object.h"
 #include "../src/verbs/verbs.h"
 #include "../src/world/objects.h"
@@ -29,6 +30,7 @@ private:
 // Initialize world for testing
 static void setupTestWorld() {
   initializeWorld();
+  goSetup();
   Globals::instance().lowTide = false;
 }
 

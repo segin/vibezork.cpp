@@ -1,5 +1,6 @@
 // Unit tests for ZIL GATE-PSEUDO (zil/1actions.zil:3207-3215)
 #include "../src/core/globals.h"
+#include "../src/core/go.h"
 #include "../src/core/object.h"
 #include "../src/verbs/verbs.h"
 #include "../src/world/objects.h"
@@ -27,7 +28,11 @@ private:
 };
 
 // Initialize world for testing
-static void setupTestWorld() { initializeWorld(); }
+static void setupTestWorld() {
+  Globals::instance().reset();
+  initializeWorld();
+  goSetup();
+}
 
 // =============================================================================
 // GatePseudoFcn Tests (1actions.zil lines 3207-3215)

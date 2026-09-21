@@ -9,6 +9,8 @@
 #include "transcript_data.h"
 #include "../src/core/globals.h"
 #include "../src/core/io.h"
+#include "../src/core/gmain.h"
+#include "../src/parser/gparser.h"
 #include "../src/parser/parser.h"
 #include "../src/verbs/verbs.h"
 #include "../src/world/world.h"
@@ -86,70 +88,22 @@ static std::map<VerbId, std::function<bool()>> verbHandlers = {
 // Global parser for transcript tests
 static Parser transcriptParser;
 
-// Execute a single command and capture output
+// Execute a single command and capture output.
+//
+// This drives the real per-command path: the parser fills the match tables and
+// MAIN-LOOP-1 dispatches through PERFORM, so the WINNER, room, preaction,
+// PRSI, container and PRSO handlers all get their turn before the default verb
+// routine - which is how, for example, MAILBOX-F answers "take mailbox".
+// Source: zil/gmain.zil:34-172
 std::string executeCommand(const std::string& command) {
-    auto& g = Globals::instance();
-    
-    // Capture output
     std::stringstream buffer;
     std::streambuf* oldCout = std::cout.rdbuf(buffer.rdbuf());
-    
-    // Parse the command
-    ParsedCommand cmd = transcriptParser.parse(command);
-    
-    // Handle parse errors
-    if (cmd.verb == 0) {
-        std::cout.rdbuf(oldCout);
-        return buffer.str();
-    }
-    
-    // Set global state for verb handlers
-    g.prsa = cmd.verb;
-    g.prso = cmd.directObj;
-    g.prsi = cmd.indirectObj;
-    
-    // Handle "all" commands
-    if (cmd.isAll) {
-        if (cmd.allObjects.empty()) {
-            printLine("There's nothing here to " + std::string(cmd.words[0]) + ".");
-        } else {
-            for (auto* obj : cmd.allObjects) {
-                g.prso = obj;
-                print(obj->getDesc() + ": ");
-                
-                auto it = verbHandlers.find(cmd.verb);
-                if (it != verbHandlers.end()) {
-                    it->second();
-                }
-            }
-        }
-        
-        g.moves++;
-        std::cout.rdbuf(oldCout);
-        return buffer.str();
-    }
-    
-    // Handle direction commands
-    if (cmd.isDirection) {
-        Verbs::vWalkDir(cmd.direction);
-    } else {
-        // Execute verb handler
-        auto it = verbHandlers.find(cmd.verb);
-        if (it != verbHandlers.end()) {
-            it->second();
-        } else {
-            printLine("That verb is not implemented yet.");
-        }
-    }
-    
-    g.moves++;
-    
-    // Process timers
-    TimerSystem::tick();
-    
-    // Restore cout
+
+    GParser::setPromptEnabled(false);
+    GParser::setNextInput(command);
+    mainLoop1();
+
     std::cout.rdbuf(oldCout);
-    
     return buffer.str();
 }
 

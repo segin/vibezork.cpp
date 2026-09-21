@@ -1,5 +1,6 @@
 // Unit tests for ZIL NAILS-PSEUDO (zil/1actions.zil:376-380)
 #include "../src/core/globals.h"
+#include "../src/core/go.h"
 #include "../src/core/object.h"
 #include "../src/verbs/verbs.h"
 #include "../src/world/objects.h"
@@ -27,7 +28,11 @@ private:
 };
 
 // Initialize world for testing
-static void setupTestWorld() { initializeWorld(); }
+static void setupTestWorld() {
+  Globals::instance().reset();
+  initializeWorld();
+  goSetup();
+}
 
 // =============================================================================
 // NailsPseudoFcn Tests (1actions.zil lines 376-380)

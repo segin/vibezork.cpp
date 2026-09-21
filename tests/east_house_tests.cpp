@@ -1,5 +1,6 @@
 // Unit tests for ZIL EAST-HOUSE (zil/1actions.zil:17-26)
 #include "../src/core/globals.h"
+#include "../src/core/go.h"
 #include "../src/core/object.h"
 #include "../src/world/objects.h"
 #include "../src/world/rooms.h"
@@ -24,7 +25,11 @@ private:
 };
 
 // Initialize world for testing
-static void setupTestWorld() { initializeWorld(); }
+static void setupTestWorld() {
+  Globals::instance().reset();
+  initializeWorld();
+  goSetup();
+}
 
 // =============================================================================
 // EastHouseFcn Tests (1actions.zil lines 17-26)

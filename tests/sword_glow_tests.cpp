@@ -1,4 +1,5 @@
 #include "test_framework.h"
+#include "core/go.h"
 #include "systems/sword.h"
 #include "systems/timer.h"
 #include "core/globals.h"
@@ -16,6 +17,7 @@
 void testSwordGlowInitialization() {
     // Initialize the world and sword system
     initializeWorld();
+    goSetup();
     SwordSystem::initialize();
     
     // ZIL: GO queues I-SWORD but does NOT enable it (<QUEUE I-SWORD -1>,
@@ -34,6 +36,7 @@ void testEnemyProximityCurrentRoom() {
     
     // Initialize the world
     initializeWorld();
+    goSetup();
     SwordSystem::initialize();
     
     // Get the sword and a test room
@@ -95,6 +98,7 @@ void testDeadEnemyNoGlow() {
     
     // Initialize the world
     initializeWorld();
+    goSetup();
     SwordSystem::initialize();
     
     // Get the sword and a test room
@@ -132,6 +136,7 @@ void testSwordGlowTimerCallback() {
     
     // Initialize the world
     initializeWorld();
+    goSetup();
     SwordSystem::initialize();
     
     // Get the sword and a test room

@@ -22,6 +22,7 @@ ZRoom *room(ObjectId id) {
 void setup() {
   Globals::instance().reset();
   initializeWorld();
+  goSetup();
 }
 
 } // namespace

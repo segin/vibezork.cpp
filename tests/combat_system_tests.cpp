@@ -1,4 +1,5 @@
 #include "test_framework.h"
+#include "core/go.h"
 #include "systems/combat.h"
 #include "systems/timer.h"
 #include "core/globals.h"
@@ -19,6 +20,7 @@ using namespace ObjectIds;
 void testCombatInitialization() {
     auto& g = Globals::instance();
     initializeWorld();
+    goSetup();
     
     // Initially not in combat
     TEST_ASSERT(!isInCombat(), "Should not be in combat initially");
@@ -31,6 +33,7 @@ void testCombatInitialization() {
 void testStartCombat() {
     auto& g = Globals::instance();
     initializeWorld();
+    goSetup();
     
     // Create a test enemy
     auto* enemy = g.getObject(TROLL);
@@ -53,6 +56,7 @@ void testStartCombat() {
 void testEndCombat() {
     auto& g = Globals::instance();
     initializeWorld();
+    goSetup();
     
     // Create a test enemy
     auto* enemy = g.getObject(TROLL);
@@ -73,6 +77,7 @@ void testEndCombat() {
 void testCombatWithWeapon() {
     auto& g = Globals::instance();
     initializeWorld();
+    goSetup();
     
     // Get sword and enemy
     auto* sword = g.getObject(SWORD);
@@ -104,6 +109,7 @@ void testCombatWithWeapon() {
 void testCombatRoundProcessing() {
     auto& g = Globals::instance();
     initializeWorld();
+    goSetup();
     
     // Create a weak enemy for testing
     auto* enemy = g.getObject(THIEF);
@@ -141,6 +147,7 @@ void testCombatRoundProcessing() {
 void testEnemyDeath() {
     auto& g = Globals::instance();
     initializeWorld();
+    goSetup();
     
     // Create enemy
     auto* enemy = g.getObject(THIEF);
@@ -179,6 +186,7 @@ void testEnemyDeath() {
 void testCombatantStructure() {
     auto& g = Globals::instance();
     initializeWorld();
+    goSetup();
     
     // Create combatant
     auto* troll = g.getObject(TROLL);
@@ -213,6 +221,7 @@ void testCombatantStructure() {
 void testCombatBareHands() {
     auto& g = Globals::instance();
     initializeWorld();
+    goSetup();
     
     // Create enemy
     auto* enemy = g.getObject(THIEF);
@@ -239,6 +248,7 @@ void testCombatBareHands() {
 void testMultipleCombatSessions() {
     auto& g = Globals::instance();
     initializeWorld();
+    goSetup();
     
     // First combat
     auto* enemy1 = g.getObject(THIEF);
@@ -267,6 +277,7 @@ void testMultipleCombatSessions() {
 void testCombatTimerIntegration() {
     auto& g = Globals::instance();
     initializeWorld();
+    goSetup();
     
     // Create enemy
     auto* enemy = g.getObject(THIEF);
@@ -290,6 +301,7 @@ void testCombatTimerIntegration() {
 void testDamageApplication() {
     auto& g = Globals::instance();
     initializeWorld();
+    goSetup();
     
     // Create combatant
     auto* troll = g.getObject(TROLL);

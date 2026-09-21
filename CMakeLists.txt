@@ -252,6 +252,7 @@ if(BUILD_TESTS)
     # DUNGEON Tests (1dungeon.zil rooms, objects, exits, tables, and routines)
     add_zork_test(DungeonTests dungeon_tests tests/dungeon_tests.cpp)
     add_zork_test(ZilRoomsTests zil_rooms_tests tests/zil_rooms_tests.cpp)
+    add_zork_test(ZilObjectsTests zil_objects_tests tests/zil_objects_tests.cpp)
 
     # Object model tests (PROPDEF defaults, FDESC, VTYPE)
     add_zork_test(ObjectModelTests object_model_tests tests/object_model_tests.cpp)

@@ -93,8 +93,11 @@ TEST(LampOnVerbAlreadyOn) {
     g.reset();
 }
 
-TEST(LampOnVerbWithDepletedBattery) {
-    // Test LAMP-ON verb on a lamp with depleted battery
+TEST(LampOnVerbIgnoresCapacity) {
+    // ZIL: CAPACITY is how much a container holds, not a battery level.  A
+    // light source with CAPACITY 0 lights normally; the lamp only refuses
+    // once I-LANTERN has burnt it out and LANTERN answers "A burned-out lamp
+    // won't light."  Source: zil/1actions.zil:2178-2254, 2301-2325
     auto& g = Globals::instance();
     
     // Create test room
@@ -107,11 +110,11 @@ TEST(LampOnVerbWithDepletedBattery) {
     g.winner = player.get();
     g.registerObject(999, std::move(player));
     
-    // Create lamp with depleted battery
+    // A light source that holds nothing (CAPACITY 0, as in the ZIL)
     auto lamp = std::make_unique<ZObject>(1, "brass lantern");
     lamp->addSynonym("lamp");
     lamp->setFlag(ObjectFlag::LIGHTBIT);
-    lamp->setProperty(P_CAPACITY, 0);  // Depleted battery
+    lamp->setProperty(P_CAPACITY, 0);
     lamp->moveTo(g.winner);
     ZObject* lampPtr = lamp.get();
     g.registerObject(1, std::move(lamp));
@@ -127,10 +130,8 @@ TEST(LampOnVerbWithDepletedBattery) {
     bool result = Verbs::vLampOn();
     ASSERT_TRUE(result);
     
-    // Verify lamp is still off (can't turn on)
-    ASSERT_FALSE(lampPtr->hasFlag(ObjectFlag::ONBIT));
-    
-    // Should display "The lamp has no more power." message
+    // It lights: nothing in the ZIL ties CAPACITY to lighting
+    ASSERT_TRUE(lampPtr->hasFlag(ObjectFlag::ONBIT));
     
     // Cleanup
     g.reset();

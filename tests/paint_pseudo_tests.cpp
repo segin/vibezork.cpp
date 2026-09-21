@@ -1,5 +1,6 @@
 // Unit tests for ZIL PAINT-PSEUDO (zil/1actions.zil:3222-3225)
 #include "../src/core/globals.h"
+#include "../src/core/go.h"
 #include "../src/core/object.h"
 #include "../src/verbs/verbs.h"
 #include "../src/world/objects.h"
@@ -27,7 +28,11 @@ private:
 };
 
 // Initialize world for testing
-static void setupTestWorld() { initializeWorld(); }
+static void setupTestWorld() {
+  Globals::instance().reset();
+  initializeWorld();
+  goSetup();
+}
 
 // =============================================================================
 // PaintPseudoFcn Tests (1actions.zil lines 3222-3225)

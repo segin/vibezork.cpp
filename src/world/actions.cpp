@@ -1103,12 +1103,11 @@ bool lampAction() {
       return RTRUE;
     }
 
-    // Check if lamp has battery (property P_STRENGTH tracks battery level)
-    int battery = g.prso->getProperty(P_STRENGTH);
-    if (battery <= 0) {
-      printLine("The lamp has no batteries.");
-      return RTRUE;
-    }
+    // ZIL: the lamp has no STRENGTH property and no battery level.  It runs
+    // out through the I-LANTERN interrupt stepping LAMP-TABLE, and only then
+    // does LANTERN refuse to light it.  The port used STRENGTH as a battery,
+    // which the ZIL value (absent, so 0) read as "flat".
+    // Source: zil/1actions.zil:2178-2254, 2301-2325
 
     // Turn on the lamp
     g.prso->setFlag(ObjectFlag::ONBIT);

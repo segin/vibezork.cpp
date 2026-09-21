@@ -3,6 +3,7 @@
 // Source: zil/zork1.zil:24-27; P?FDESC/P?LDESC/P?TEXT (1dungeon.zil);
 // P?VTYPE (1dungeon.zil:2643, gverbs.zil:2050-2062)
 #include "../src/core/globals.h"
+#include "../src/core/go.h"
 #include "../src/core/object.h"
 #include "../src/world/objects.h"
 #include "../src/world/world.h"
@@ -63,6 +64,7 @@ TEST(VehicleTypeRoundTrips) {
 
 TEST(WorldObjectsWithoutSizeWeighFive) {
     initializeWorld();
+    goSetup();
     auto& g = Globals::instance();
     // BLESSINGS has no SIZE in gglobals.zil:96-100 -> PROPDEF default 5
     if (auto* obj = g.getObject(ObjectIds::ADVERTISEMENT)) {

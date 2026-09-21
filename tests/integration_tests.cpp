@@ -169,7 +169,9 @@ TEST(NPCThiefEncounter) {
     
     auto* thief = g.getObject(ObjectIds::THIEF);
     if (thief) {
-        ASSERT_TRUE(thief->hasFlag(ObjectFlag::FIGHTBIT));
+        // ZIL: FIGHTBIT is set when a fight starts, not in the object's
+    // (FLAGS ...).  Source: zil/1dungeon.zil:391, 972, 1041
+        ASSERT_FALSE(thief->hasFlag(ObjectFlag::FIGHTBIT));
         thief->moveTo(g.here);
         ASSERT_EQ(thief->getLocation(), g.here);
     }

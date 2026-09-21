@@ -1,6 +1,7 @@
 // Puzzle Solvability Tests - Task 70
 // Tests that all puzzles have valid solutions and no unwinnable states
 #include "test_framework.h"
+#include "../src/core/go.h"
 #include "../src/core/object.h"
 #include "../src/core/globals.h"
 #include "../src/world/world.h"
@@ -22,6 +23,7 @@ public:
         auto& g = Globals::instance();
         g.reset();
         initializeWorld();
+        goSetup();
     }
     
     ~PuzzleTestHelper() {
@@ -68,7 +70,9 @@ TEST(PuzzleTrollBridge) {
     
     // Ensure troll is present and blocking
     troll->moveTo(g.here);
-    ASSERT_TRUE(troll->hasFlag(ObjectFlag::FIGHTBIT));
+    // ZIL: FIGHTBIT is set when a fight starts, not in the object's
+    // (FLAGS ...).  Source: zil/1dungeon.zil:391, 972, 1041
+    ASSERT_FALSE(troll->hasFlag(ObjectFlag::FIGHTBIT));
     
     // Give player the sword
     helper.givePlayerObject(ObjectIds::SWORD);
@@ -113,7 +117,9 @@ TEST(PuzzleCyclops) {
     cyclops->moveTo(g.here);
     
     // Initially cyclops should be hostile
-    ASSERT_TRUE(cyclops->hasFlag(ObjectFlag::FIGHTBIT));
+    // ZIL: FIGHTBIT is set when a fight starts, not in the object's
+    // (FLAGS ...).  Source: zil/1dungeon.zil:391, 972, 1041
+    ASSERT_FALSE(cyclops->hasFlag(ObjectFlag::FIGHTBIT));
     
     // Give player the lunch
     helper.givePlayerObject(ObjectIds::LUNCH);

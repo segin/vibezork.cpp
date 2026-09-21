@@ -1,6 +1,7 @@
 // Unwinnable State Tests - Task 70.3
 // Tests that no actions create unwinnable game states
 #include "test_framework.h"
+#include "../src/core/go.h"
 #include "../src/core/object.h"
 #include "../src/core/globals.h"
 #include "../src/world/world.h"
@@ -21,6 +22,7 @@ public:
         auto& g = Globals::instance();
         g.reset();
         initializeWorld();
+        goSetup();
     }
     
     ~UnwinnableTestHelper() {

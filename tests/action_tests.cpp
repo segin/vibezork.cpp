@@ -509,11 +509,14 @@ TEST(BatF_FlyMeTeleports) {
   ZObject *finalLoc = g.player->getLocation();
   ASSERT_TRUE(finalLoc != safeRoom); // Should have moved
 
-  // List of valid drops (sync with implementation)
+  // ZIL: BAT-DROPS, the eight rooms PICK-ONE chooses between.  The list ended
+  // with MINE-1 instead of MINE-ENTRANCE, so the test failed whenever the bat
+  // dropped the player at the Mine Entrance.
+  // Source: zil/1actions.zil:332-340
   std::vector<int> coalMineRooms = {
       RoomIds::MINE_1,       RoomIds::MINE_2,     RoomIds::MINE_3,
       RoomIds::MINE_4,       RoomIds::LADDER_TOP, RoomIds::LADDER_BOTTOM,
-      RoomIds::SQUEEKY_ROOM, RoomIds::MINE_1};
+      RoomIds::SQUEEKY_ROOM, RoomIds::MINE_ENTRANCE};
 
   bool found = false;
   for (auto id : coalMineRooms) {

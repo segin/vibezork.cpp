@@ -149,7 +149,13 @@ TEST(WorldInitializationContainmentRelationships) {
     // Test trophy case is empty initially
     ZObject* trophyCase = g.getObject(ObjectIds::TROPHY_CASE);
     ASSERT_TRUE(trophyCase != nullptr);
-    ASSERT_EQ(trophyCase->getContents().size(), 0);
+    // ZIL: MAP is (IN TROPHY-CASE) from the start but INVISIBLE; SCORE-UPD
+    // reveals it when the last point is scored (gverbs.zil:1851-1866).
+    // Source: zil/1dungeon.zil:927-935
+    ASSERT_EQ(trophyCase->getContents().size(), 1);
+    ZObject* map = trophyCase->getContents()[0];
+    ASSERT_EQ(map->getId(), ObjectIds::MAP);
+    ASSERT_TRUE(map->hasFlag(ObjectFlag::INVISIBLE));
     
     g.reset();
 }
@@ -254,19 +260,25 @@ TEST(WorldInitializationNPCStrength) {
     // Test NPCs have strength properties
     ZObject* thief = g.getObject(ObjectIds::THIEF);
     if (thief != nullptr) {
-        ASSERT_TRUE(thief->hasFlag(ObjectFlag::FIGHTBIT));
+        // ZIL: FIGHTBIT is set when a fight starts, not in the object's
+    // (FLAGS ...).  Source: zil/1dungeon.zil:391, 972, 1041
+        ASSERT_FALSE(thief->hasFlag(ObjectFlag::FIGHTBIT));
         ASSERT_TRUE(thief->getProperty(P_STRENGTH) > 0);
     }
     
     ZObject* troll = g.getObject(ObjectIds::TROLL);
     if (troll != nullptr) {
-        ASSERT_TRUE(troll->hasFlag(ObjectFlag::FIGHTBIT));
+        // ZIL: FIGHTBIT is set when a fight starts, not in the object's
+    // (FLAGS ...).  Source: zil/1dungeon.zil:391, 972, 1041
+        ASSERT_FALSE(troll->hasFlag(ObjectFlag::FIGHTBIT));
         ASSERT_TRUE(troll->getProperty(P_STRENGTH) > 0);
     }
     
     ZObject* cyclops = g.getObject(ObjectIds::CYCLOPS);
     if (cyclops != nullptr) {
-        ASSERT_TRUE(cyclops->hasFlag(ObjectFlag::FIGHTBIT));
+        // ZIL: FIGHTBIT is set when a fight starts, not in the object's
+    // (FLAGS ...).  Source: zil/1dungeon.zil:391, 972, 1041
+        ASSERT_FALSE(cyclops->hasFlag(ObjectFlag::FIGHTBIT));
         ASSERT_TRUE(cyclops->getProperty(P_STRENGTH) > 0);
     }
     

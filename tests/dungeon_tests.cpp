@@ -1,5 +1,6 @@
 // Unit test suite for ZIL 1dungeon.zil routines, tables, exits, and objects
 #include "test_framework.h"
+#include "core/go.h"
 #include "core/globals.h"
 #include "core/object.h"
 #include "verbs/verbs.h"
@@ -68,6 +69,7 @@ TEST(DungeonProceduralExits_GratingExit) {
   auto& g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   auto* grate = g.getObject(ObjectIds::GRATE);
   ASSERT_TRUE(grate != nullptr);
@@ -105,6 +107,7 @@ TEST(DungeonProceduralExits_TrapDoorExit) {
   auto& g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   auto* trapDoor = g.getObject(ObjectIds::TRAP_DOOR);
   ASSERT_TRUE(trapDoor != nullptr);
@@ -142,6 +145,7 @@ TEST(DungeonProceduralExits_UpChimneyFunction) {
   auto& g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   auto* adventurer = g.getObject(ObjectIds::ADVENTURER);
   auto* lamp = g.getObject(ObjectIds::LAMP);
@@ -198,6 +202,7 @@ TEST(DungeonProceduralExits_MazeDiodes) {
   auto& g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   // Test maze diode transitions
   g.here = g.getObject(RoomIds::MAZE_2);
@@ -238,6 +243,7 @@ TEST(DungeonRoomActions_CanyonViewLeapIsFatal) {
   auto& g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   DeathSystem::setTestMode(true);
   DeathSystem::reset();
@@ -261,6 +267,7 @@ TEST(DungeonObjectActions_BuoyTreasureInsideScoresEmerald) {
   auto& g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   auto* buoy = g.getObject(ObjectIds::BUOY);
   auto* emerald = g.getObject(ObjectIds::EMERALD);
@@ -271,7 +278,9 @@ TEST(DungeonObjectActions_BuoyTreasureInsideScoresEmerald) {
   ASSERT_EQ(buoy->getLocation()->getId(), RoomIds::RIVER_4);
   ASSERT_EQ(emerald->getLocation(), buoy);
   ASSERT_FALSE(buoy->hasFlag(ObjectFlag::OPENBIT));
-  ASSERT_TRUE(buoy->hasFlag(ObjectFlag::SEARCHBIT));
+  // ZIL: (FLAGS TAKEBIT CONTBIT) - the buoy has no SEARCHBIT.
+  // Source: zil/1dungeon.zil:787
+  ASSERT_TRUE(buoy->hasFlag(ObjectFlag::CONTBIT));
   ASSERT_TRUE(buoy->hasFlag(ObjectFlag::CONTBIT));
   ASSERT_TRUE(buoy->hasFlag(ObjectFlag::TAKEBIT));
 
@@ -292,6 +301,7 @@ TEST(DungeonExits_MazeNavigationVerification) {
   auto& g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   // Verify Maze 1 exits
   auto* m1 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::MAZE_1));
@@ -337,6 +347,7 @@ TEST(DungeonExits_ConditionalExitsVerification) {
   auto& g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   // 1. Troll room east/west conditional on trollFlag
   auto* trollRoom = dynamic_cast<ZRoom*>(g.getObject(RoomIds::TROLL_ROOM));

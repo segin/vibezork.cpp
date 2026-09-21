@@ -1,5 +1,6 @@
 // Unit tests for ZIL MIRROR-ROOM (zil/1actions.zil:958-969)
 #include "../src/core/globals.h"
+#include "../src/core/go.h"
 #include "../src/core/object.h"
 #include "../src/verbs/verbs.h"
 #include "../src/world/objects.h"
@@ -27,6 +28,7 @@ private:
 // Initialize world for testing
 static void setupTestWorld() {
   initializeWorld();
+  goSetup();
   auto &g = Globals::instance();
   g.mirrorMung = false;
   g.lucky = true;

@@ -426,17 +426,11 @@ bool vTake() {
     }
   }
 
-  // Call object action handler FIRST for TRYTAKEBIT objects
-  // This allows objects like mailbox to give custom "anchored" messages
-  if (g.prso->hasFlag(ObjectFlag::TRYTAKEBIT)) {
-    if (g.prso->performAction()) {
-      return RTRUE;
-    }
-    // Default message if no custom handler
-    printLine("You can't take that.");
-    return RTRUE;
-  }
-
+  // ZIL: TRYTAKEBIT does not refuse the take.  It tells the parser not to do
+  // an implicit take (gparser.zil:1248-1277); the object's own action has
+  // already had its say through PERFORM, and ITAKE then looks only at
+  // TAKEBIT.  Objects that carry both, such as the sword and the chalice,
+  // are takeable.  Source: gverbs.zil:1900-1964
   // Check TAKEBIT flag (only takeable objects can be taken)
   if (!g.prso->hasFlag(ObjectFlag::TAKEBIT)) {
     printLine("You can't take that.");
@@ -1784,12 +1778,12 @@ bool vLampOn() {
     return RTRUE;
   }
 
-  // Check if lamp has battery/fuel (Requirement 47)
-  // For the lamp, check if it has been depleted
-  if (g.prso->getProperty(P_CAPACITY) == 0) {
-    printLine("The lamp has no more power.");
-    return RTRUE;
-  }
+  // ZIL: the lamp has no battery property.  Its fuel is the I-LANTERN
+  // interrupt counting down LAMP-TABLE, and a burnt-out lamp is refused by
+  // LANTERN itself with "A burned-out lamp won't light." once it carries
+  // RMUNGBIT.  The port's CAPACITY-as-battery test read the ZIL CAPACITY of
+  // 0 as "empty" and refused to light the lamp at all.
+  // Source: zil/1actions.zil:2178-2254, 2301-2325
 
   // Call object action handler first
   // This allows objects to override default behavior

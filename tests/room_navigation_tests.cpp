@@ -1,4 +1,5 @@
 #include "test_framework.h"
+#include "core/go.h"
 #include "core/object.h"
 #include "core/globals.h"
 #include "world/rooms.h"
@@ -315,6 +316,7 @@ TEST(OneWayExits) {
 TEST(All110RoomsInitialized) {
     extern void initializeWorld();
     initializeWorld();
+    goSetup();
     auto& g = Globals::instance();
 
     std::vector<ObjectId> allRoomIds = {
@@ -372,6 +374,7 @@ TEST(All110RoomsInitialized) {
 TEST(RiverNavigationFlow) {
     extern void initializeWorld();
     initializeWorld();
+    goSetup();
     auto& g = Globals::instance();
 
     auto* r1 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::RIVER_1));
@@ -408,6 +411,7 @@ TEST(RiverNavigationFlow) {
 TEST(CanyonAndRainbowFlow) {
     extern void initializeWorld();
     initializeWorld();
+    goSetup();
     auto& g = Globals::instance();
 
     auto* canyonView = dynamic_cast<ZRoom*>(g.getObject(RoomIds::CANYON_VIEW));

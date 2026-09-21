@@ -1,6 +1,7 @@
 // Tests for the GPARSER.ZIL port (src/parser/gparser.*)
 // Source: zil/gparser.zil:1-1407
 #include "parser/gparser.h"
+#include "core/go.h"
 #include "core/globals.h"
 #include "core/io.h"
 #include "core/object.h"
@@ -32,6 +33,7 @@ void setupWorld() {
   auto &g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
   GParser::invalidateDictionary();
   GParser::resetState();
   g.winner = g.player;
@@ -692,9 +694,13 @@ void testGetObject() {
   assert(r.first && s.prso.size() == 1 && s.prso[0] == leaflet);
   r = runParser("examine small mailbox");
   assert(r.first && s.prso.size() == 1 && s.prso[0] == mailbox);
+  // An adjective with no noun is rejected: GET-OBJECT has no name to match
+  // (gparser.zil:1069).  Confirmed against release 119 under dfrotz, where
+  // "examine small" answers the same way after the leaflet is taken.
   r = runParser("examine small");
-  // adjective-only clause: the adjective word is not an object word
-  assert(r.first && s.prso.size() == 1 && s.prso[0] == mailbox);
+  assert(!r.first);
+  assert(r.second.find("There seems to be a noun missing in that sentence!") !=
+         std::string::npos);
 
   // ALL and EXCEPT
   r = runParser("take all");
@@ -704,8 +710,14 @@ void testGetObject() {
   assert(r.first);
   assert(GParser::zmemq(mailbox, s.prso) && !GParser::zmemq(leaflet, s.prso));
   assert(s.buts.size() == 1 && s.buts[0] == leaflet);
+  // ZIL: FRONT-DOOR is (IN WEST-OF-HOUSE), so it is what ALL still finds
+  // once the mailbox and the leaflet are excluded.  It carries NDESCBIT and
+  // no TAKEBIT, so MAIN-LOOP-1's TAKE-ALL rule drops it and the turn ends
+  // with "There's nothing here you can take." (gmain.zil:127-139, 111-112).
+  // Source: zil/1dungeon.zil:419-425
+  ZObject *frontDoor = g.getObject(ObjectIds::FRONT_DOOR);
   r = runParser("take all except mailbox and leaflet");
-  assert(r.first && s.prso.empty());
+  assert(r.first && s.prso.size() == 1 && s.prso[0] == frontDoor);
   assert(s.buts.size() == 2);
 
   // AND lists and unfound nouns

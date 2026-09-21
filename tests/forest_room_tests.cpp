@@ -1,5 +1,6 @@
 // Unit tests for ZIL FOREST-ROOM (zil/1actions.zil:3004-3009)
 #include "../src/core/globals.h"
+#include "../src/core/go.h"
 #include "../src/core/object.h"
 #include "../src/systems/timer.h"
 #include "../src/verbs/verbs.h"
@@ -28,6 +29,7 @@ private:
 // Initialize world for testing
 static void setupTestWorld() {
   initializeWorld();
+  goSetup();
 }
 
 // =============================================================================

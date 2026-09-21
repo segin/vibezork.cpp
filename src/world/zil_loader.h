@@ -19,6 +19,12 @@ namespace ZilLoader {
 /// Globals.  Objects are loaded separately by loadObjects().
 void loadRooms();
 
+/// Creates every <OBJECT> of 1dungeon.zil and gglobals.zil with its
+/// description, FDESC, LDESC, TEXT, synonyms, adjectives, flags, properties
+/// and ACTION/DESCFCN/CONTFCN, then puts each one where its (IN ...) clause
+/// says.  Must run after loadRooms(), since objects start in rooms.
+void loadObjects();
+
 /// Names of routines the data refers to that have no implementation yet.
 /// Source: ZilRegistry::unresolvedRoutines()
 std::vector<std::string_view> unresolvedRoutines();

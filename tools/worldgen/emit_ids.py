@@ -26,7 +26,19 @@ def constants(path):
     return out
 
 
+# src/world/objects.h declares the three boats twice, under two ids each
+# (BOAT_INFLATED=600 and INFLATED_BOAT=746, and so on).  The rest of the port
+# refers to the BOAT_* spellings, so those are the ids the data must load into.
+ALIASES = {
+    'INFLATED-BOAT': 'BOAT_INFLATED',
+    'PUNCTURED-BOAT': 'BOAT_PUNCTURED',
+    'INFLATABLE-BOAT': 'BOAT_INFLATABLE',
+}
+
+
 def cname(zil_name):
+    if zil_name in ALIASES:
+        return ALIASES[zil_name]
     return zil_name.replace('-', '_').replace('#', '')
 
 

@@ -6,6 +6,7 @@
  */
 
 #include "core/flags.h"
+#include "core/go.h"
 #include "core/gglobals.h"
 #include "core/io.h"
 #include "core/globals.h"
@@ -51,6 +52,7 @@ TEST(NotHereObjectF_BothNotHere) {
   auto &g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   ZObject *notHere = g.getObject(ObjectIds::NOT_HERE_OBJECT);
   assert(notHere != nullptr);
@@ -68,6 +70,7 @@ TEST(NotHereObjectF_PlayerWinner_DirectObject) {
   auto &g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   ZObject *notHere = g.getObject(ObjectIds::NOT_HERE_OBJECT);
   g.prso = notHere;
@@ -90,6 +93,7 @@ TEST(NotHereObjectF_PlayerWinner_IndirectObject) {
   auto &g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   ZObject *notHere = g.getObject(ObjectIds::NOT_HERE_OBJECT);
   g.prso = g.getObject(ObjectIds::SWORD);
@@ -110,6 +114,7 @@ TEST(NotHereObjectF_NPCWinner) {
   auto &g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   ZObject *notHere = g.getObject(ObjectIds::NOT_HERE_OBJECT);
   ZObject *thief = g.getObject(ObjectIds::THIEF);
@@ -133,6 +138,7 @@ TEST(NotHerePrint_OrphanMode) {
   auto &g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   ZObject *notHere = g.getObject(ObjectIds::NOT_HERE_OBJECT);
   g.prso = notHere;
@@ -156,6 +162,7 @@ TEST(StairsF_Through) {
   auto &g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   g.prsa = V_THROUGH;
   OutputCapture cap;
@@ -168,6 +175,7 @@ TEST(StairsF_Unhandled) {
   auto &g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   g.prsa = V_EXAMINE;
   assert(!GGlobals::stairsF());
@@ -181,6 +189,7 @@ TEST(SailorFcn_Tell) {
   auto &g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   g.prsa = V_TELL;
   g.pCont = true;
@@ -198,6 +207,7 @@ TEST(SailorFcn_Examine) {
   auto &g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   g.prsa = V_EXAMINE;
   OutputCapture cap;
@@ -210,6 +220,7 @@ TEST(SailorFcn_HelloProgression) {
   auto &g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   g.prsa = V_HELLO;
   g.hs = 0;
@@ -255,6 +266,7 @@ TEST(SailorFcn_Unhandled) {
   auto &g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   g.prsa = V_TAKE;
   assert(!GGlobals::sailorFcn());
@@ -268,6 +280,7 @@ TEST(GroundFunction_PutRedirectsToDrop) {
   auto &g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   ZObject *ground = g.getObject(ObjectIds::GROUND);
   ZObject *sword = g.getObject(ObjectIds::SWORD);
@@ -292,6 +305,7 @@ TEST(GroundFunction_Dig) {
   auto &g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   g.prsa = V_DIG;
   OutputCapture cap;
@@ -304,6 +318,7 @@ TEST(GroundFunction_Unhandled) {
   auto &g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   g.prsa = V_LOOK;
   assert(!GGlobals::groundFunction());
@@ -317,6 +332,7 @@ TEST(GrueFunction_Examine) {
   auto &g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   g.prsa = V_EXAMINE;
   OutputCapture cap;
@@ -330,6 +346,7 @@ TEST(GrueFunction_Find) {
   auto &g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   g.prsa = V_FIND;
   OutputCapture cap;
@@ -342,6 +359,7 @@ TEST(GrueFunction_Listen) {
   auto &g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   g.prsa = V_LISTEN;
   OutputCapture cap;
@@ -356,6 +374,7 @@ TEST(GrueFunction_Findable) {
   auto &g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
   ZObject *grue = g.getObject(ObjectIds::GRUE);
   assert(grue != nullptr);
   assert(grue->getDesc() == "lurking grue");
@@ -376,6 +395,7 @@ TEST(GroundAndCretin_UsePerform) {
   auto &g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
   ZObject *ground = g.getObject(ObjectIds::GROUND);
   ZObject *sword = g.getObject(ObjectIds::SWORD);
   sword->moveTo(g.player);
@@ -395,6 +415,7 @@ TEST(GrueFunction_Unhandled) {
   auto &g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   g.prsa = V_TAKE;
   assert(!GGlobals::grueFunction());
@@ -408,6 +429,7 @@ TEST(CretinFcn_Tell) {
   auto &g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   g.prsa = V_TELL;
   g.pCont = true;
@@ -425,6 +447,7 @@ TEST(CretinFcn_GiveRedirectsToTake) {
   auto &g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   ZObject *meObj = g.getObject(ObjectIds::ME);
   ZObject *sword = g.getObject(ObjectIds::SWORD);
@@ -448,6 +471,7 @@ TEST(CretinFcn_MakeDisembarkEat) {
   auto &g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   // MAKE
   g.prsa = V_MAKE;
@@ -478,6 +502,7 @@ TEST(CretinFcn_AttackSuicideAndWeapon) {
   auto &g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   // Without weapon: "Suicide is not the answer."
   g.prsa = V_ATTACK;
@@ -504,6 +529,7 @@ TEST(CretinFcn_ThrowMeAndTake) {
   auto &g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   ZObject *meObj = g.getObject(ObjectIds::ME);
   g.prsa = V_THROW;
@@ -527,6 +553,7 @@ TEST(CretinFcn_ExamineMirrorVsNoMirror) {
   auto &g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   g.prsa = V_EXAMINE;
 
@@ -553,6 +580,7 @@ TEST(CretinFcn_Unhandled) {
   auto &g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   g.prsa = V_READ;
   assert(!GGlobals::cretinFcn());
@@ -566,6 +594,7 @@ TEST(PathObject_Verbs) {
   auto &g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   // TAKE / FOLLOW
   g.prsa = V_TAKE;
@@ -610,6 +639,7 @@ TEST(ZorkmidFunction_Verbs) {
   auto &g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   // EXAMINE
   g.prsa = V_EXAMINE;
@@ -640,6 +670,7 @@ TEST(All18ObjectsInitialization) {
   auto &g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   // 1. GLOBAL-OBJECTS
   ZObject *glob = g.getObject(ObjectIds::GLOBAL_OBJECTS);

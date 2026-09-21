@@ -1,4 +1,5 @@
 #include "test_framework.h"
+#include "../src/core/go.h"
 #include "../src/core/object.h"
 #include "../src/core/globals.h"
 #include "../src/world/rooms.h"
@@ -1472,6 +1473,7 @@ TEST(NPCCreationTroll) {
     
     // Initialize world to create NPCs
     initializeWorld();
+    goSetup();
     
     // Verify TROLL NPC exists
     ZObject* troll = g.getObject(ObjectIds::TROLL);
@@ -1479,11 +1481,13 @@ TEST(NPCCreationTroll) {
     ASSERT_EQ(troll->getDesc(), "troll");
     
     // Verify TROLL has correct flags
-    ASSERT_TRUE(troll->hasFlag(ObjectFlag::FIGHTBIT));
+    // ZIL: FIGHTBIT is set when a fight starts, not in the object's
+    // (FLAGS ...).  Source: 1dungeon.zil:1041, 1actions.zil:3331-3606
+    ASSERT_FALSE(troll->hasFlag(ObjectFlag::FIGHTBIT));
     ASSERT_TRUE(troll->hasFlag(ObjectFlag::ACTORBIT));
     
-    // Verify TROLL has correct strength (stronger than thief)
-    ASSERT_EQ(troll->getProperty(P_STRENGTH), 8);
+    // ZIL: (STRENGTH 2).  Source: zil/1dungeon.zil:1046
+    ASSERT_EQ(troll->getProperty(P_STRENGTH), 2);
     
     // Verify TROLL has correct synonyms
     ASSERT_TRUE(troll->hasSynonym("troll"));
@@ -1500,6 +1504,7 @@ TEST(NPCCreationCyclops) {
     
     // Initialize world to create NPCs
     initializeWorld();
+    goSetup();
     
     // Verify CYCLOPS NPC exists
     ZObject* cyclops = g.getObject(ObjectIds::CYCLOPS);
@@ -1507,15 +1512,22 @@ TEST(NPCCreationCyclops) {
     ASSERT_EQ(cyclops->getDesc(), "cyclops");
     
     // Verify CYCLOPS has correct flags
-    ASSERT_TRUE(cyclops->hasFlag(ObjectFlag::FIGHTBIT));
+    // ZIL: FIGHTBIT is set when a fight starts, not in the object's
+    // (FLAGS ...).  Source: 1dungeon.zil:1146, 1actions.zil:3331-3606
+    ASSERT_FALSE(cyclops->hasFlag(ObjectFlag::FIGHTBIT));
     ASSERT_TRUE(cyclops->hasFlag(ObjectFlag::ACTORBIT));
     
     // Verify CYCLOPS has correct strength
-    ASSERT_EQ(cyclops->getProperty(P_STRENGTH), 10);
+    // ZIL: (STRENGTH 10000) - the cyclops cannot be beaten in a fight.
+    // Source: zil/1dungeon.zil:393
+    ASSERT_EQ(cyclops->getProperty(P_STRENGTH), 10000);
     
     // Verify CYCLOPS has correct synonyms
     ASSERT_TRUE(cyclops->hasSynonym("cyclops"));
-    ASSERT_TRUE(cyclops->hasSynonym("giant"));
+    // ZIL: (SYNONYM CYCLOPS MONSTER EYE) (ADJECTIVE HUNGRY GIANT) - "giant"
+    // is an adjective.  Source: zil/1dungeon.zil:388-390
+    ASSERT_TRUE(cyclops->hasSynonym("monster"));
+    ASSERT_TRUE(cyclops->hasAdjective("giant"));
     
     // Verify CYCLOPS is in correct location (Cyclops Room)
     ASSERT_EQ(cyclops->getLocation(), g.getObject(RoomIds::CYCLOPS_ROOM));
@@ -1529,6 +1541,7 @@ TEST(NPCCreationGrue) {
     
     // Initialize world to create NPCs
     initializeWorld();
+    goSetup();
     
     // Verify GRUE object exists
     ZObject* grue = g.getObject(ObjectIds::GRUE);
@@ -1553,6 +1566,7 @@ TEST(NPCCreationThief) {
     
     // Initialize world to create NPCs
     initializeWorld();
+    goSetup();
     
     // Verify THIEF NPC exists (already created in task 20.1)
     ZObject* thief = g.getObject(ObjectIds::THIEF);
@@ -1560,7 +1574,9 @@ TEST(NPCCreationThief) {
     ASSERT_EQ(thief->getDesc(), "thief");
     
     // Verify THIEF has correct flags
-    ASSERT_TRUE(thief->hasFlag(ObjectFlag::FIGHTBIT));
+    // ZIL: FIGHTBIT is set when a fight starts, not in the object's
+    // (FLAGS ...).  Source: 1dungeon.zil:1073, 1actions.zil:3331-3606
+    ASSERT_FALSE(thief->hasFlag(ObjectFlag::FIGHTBIT));
     ASSERT_TRUE(thief->hasFlag(ObjectFlag::ACTORBIT));
     
     // Verify THIEF has correct strength
@@ -1569,7 +1585,10 @@ TEST(NPCCreationThief) {
     // Verify THIEF has correct synonyms
     ASSERT_TRUE(thief->hasSynonym("thief"));
     ASSERT_TRUE(thief->hasSynonym("robber"));
-    ASSERT_TRUE(thief->hasSynonym("burglar"));
+    // ZIL: (SYNONYM THIEF ROBBER MAN PERSON) - "burglar" is not one of them.
+    // Source: zil/1dungeon.zil:969
+    ASSERT_TRUE(thief->hasSynonym("robber"));
+    ASSERT_TRUE(thief->hasSynonym("person"));
     
     // Cleanup
     g.reset();
