@@ -1,5 +1,6 @@
 // Putty action unit tests for ZIL PUTTY-FCN
 #include "../src/core/globals.h"
+#include "../src/core/go.h"
 #include "../src/core/object.h"
 #include "../src/verbs/verbs.h"
 #include "../src/world/objects.h"
@@ -28,7 +29,11 @@ private:
 extern bool puttyAction();
 
 // Initialize world for testing
-static void setupTestWorld() { initializeWorld(); }
+static void setupTestWorld() {
+  Globals::instance().reset();
+  initializeWorld();
+  goSetup();
+}
 
 // =============================================================================
 // PUTTY-FCN Tests (1actions.zil lines 1379-1384)

@@ -1,5 +1,6 @@
 // Unit tests for ZIL TREE-ROOM (zil/1actions.zil:2880-2917)
 #include "../src/core/globals.h"
+#include "../src/core/go.h"
 #include "../src/core/object.h"
 #include "../src/systems/death.h"
 #include "../src/systems/timer.h"
@@ -29,6 +30,7 @@ private:
 // Initialize world for testing
 static void setupTestWorld() {
   initializeWorld();
+  goSetup();
   DeathSystem::setTestMode(true);
 }
 

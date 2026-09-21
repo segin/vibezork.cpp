@@ -48,7 +48,10 @@ void initializeGame() {
 //        <MAIN-LOOP>
 //        <AGAIN>>
 // Source: zil/1dungeon.zil:2637-2661
-void go() {
+// The banner is printed by go(); every other step of GO lives here, in GO's
+// order.  V-VERSION sits between THIS-IS-IT and SETG LIT in the source and
+// only prints, so hoisting it into go() leaves the output unchanged.
+void goSetup() {
   auto &g = Globals::instance();
 
   // The QUEUE calls allocate the C-TABLE entries in this order (INT,
@@ -89,12 +92,6 @@ void go() {
   // ZIL: <THIS-IS-IT ,MAILBOX>
   g.it = g.getObject(ObjectIds::MAILBOX);
 
-  // ZIL: <COND (<NOT <FSET? ,HERE ,TOUCHBIT>> <V-VERSION> <CRLF>)>
-  if (g.here && !g.here->hasFlag(ObjectFlag::TOUCHBIT)) {
-    Verbs::vVersion();
-    crlf();
-  }
-
   // ZIL: <SETG LIT T>
   g.lit = true;
 
@@ -103,6 +100,19 @@ void go() {
   g.player = g.winner;
   if (g.winner && g.here) {
     g.winner->moveTo(g.here);
+  }
+
+}
+
+void go() {
+  auto &g = Globals::instance();
+
+  goSetup();
+
+  // ZIL: <COND (<NOT <FSET? ,HERE ,TOUCHBIT>> <V-VERSION> <CRLF>)>
+  if (g.here && !g.here->hasFlag(ObjectFlag::TOUCHBIT)) {
+    Verbs::vVersion();
+    crlf();
   }
 
   // ZIL: <V-LOOK>

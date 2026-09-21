@@ -1,4 +1,5 @@
 #include "test_framework.h"
+#include "core/go.h"
 #include "../src/core/object.h"
 #include "../src/core/globals.h"
 #include "../src/world/rooms.h"
@@ -10,7 +11,8 @@
 TEST(WorldInitializationAllRoomsExist) {
     auto& g = Globals::instance();
     g.reset();
-    initializeWorld();
+    initializeGame();
+    goSetup();
     
     // Test that key rooms exist
     ASSERT_TRUE(g.getObject(ROOM_WEST_OF_HOUSE) != nullptr);
@@ -28,7 +30,8 @@ TEST(WorldInitializationAllRoomsExist) {
 TEST(WorldInitializationAllObjectsExist) {
     auto& g = Globals::instance();
     g.reset();
-    initializeWorld();
+    initializeGame();
+    goSetup();
     
     // Test that key objects exist
     ASSERT_TRUE(g.getObject(ObjectIds::MAILBOX) != nullptr);
@@ -43,7 +46,8 @@ TEST(WorldInitializationAllObjectsExist) {
 TEST(WorldInitializationPlayerState) {
     auto& g = Globals::instance();
     g.reset();
-    initializeWorld();
+    initializeGame();
+    goSetup();
     
     // Test player object exists
     ASSERT_TRUE(g.player != nullptr);
@@ -66,7 +70,8 @@ TEST(WorldInitializationPlayerState) {
 TEST(WorldInitializationCurrentRoom) {
     auto& g = Globals::instance();
     g.reset();
-    initializeWorld();
+    initializeGame();
+    goSetup();
     
     // Test current room is set to West of House
     ASSERT_TRUE(g.here != nullptr);
@@ -78,7 +83,8 @@ TEST(WorldInitializationCurrentRoom) {
 TEST(WorldInitializationInitialFlags) {
     auto& g = Globals::instance();
     g.reset();
-    initializeWorld();
+    initializeGame();
+    goSetup();
     
     // Test West of House has correct flags
     ZObject* westOfHouse = g.getObject(ROOM_WEST_OF_HOUSE);
@@ -106,7 +112,8 @@ TEST(WorldInitializationInitialFlags) {
 TEST(WorldInitializationObjectPlacements) {
     auto& g = Globals::instance();
     g.reset();
-    initializeWorld();
+    initializeGame();
+    goSetup();
     
     // Test lamp is in Living Room
     ZObject* lamp = g.getObject(ObjectIds::LAMP);
@@ -132,7 +139,8 @@ TEST(WorldInitializationObjectPlacements) {
 TEST(WorldInitializationContainmentRelationships) {
     auto& g = Globals::instance();
     g.reset();
-    initializeWorld();
+    initializeGame();
+    goSetup();
     
     // Test mailbox contains leaflet (if leaflet is created)
     ZObject* mailbox = g.getObject(ObjectIds::MAILBOX);
@@ -141,7 +149,13 @@ TEST(WorldInitializationContainmentRelationships) {
     // Test trophy case is empty initially
     ZObject* trophyCase = g.getObject(ObjectIds::TROPHY_CASE);
     ASSERT_TRUE(trophyCase != nullptr);
-    ASSERT_EQ(trophyCase->getContents().size(), 0);
+    // ZIL: MAP is (IN TROPHY-CASE) from the start but INVISIBLE; SCORE-UPD
+    // reveals it when the last point is scored (gverbs.zil:1851-1866).
+    // Source: zil/1dungeon.zil:927-935
+    ASSERT_EQ(trophyCase->getContents().size(), 1);
+    ZObject* map = trophyCase->getContents()[0];
+    ASSERT_EQ(map->getId(), ObjectIds::MAP);
+    ASSERT_TRUE(map->hasFlag(ObjectFlag::INVISIBLE));
     
     g.reset();
 }
@@ -149,7 +163,8 @@ TEST(WorldInitializationContainmentRelationships) {
 TEST(WorldInitializationNoOrphanedObjects) {
     auto& g = Globals::instance();
     g.reset();
-    initializeWorld();
+    initializeGame();
+    goSetup();
     
     // Check that important objects have locations
     // Some objects like GRUE, global scenery, etc. don't need locations
@@ -180,7 +195,8 @@ TEST(WorldInitializationNoOrphanedObjects) {
 TEST(WorldInitializationGameStateVariables) {
     auto& g = Globals::instance();
     g.reset();
-    initializeWorld();
+    initializeGame();
+    goSetup();
     
     // Test initial game state
     ASSERT_TRUE(g.lit);  // West of House is lit
@@ -193,7 +209,8 @@ TEST(WorldInitializationGameStateVariables) {
 TEST(WorldInitializationRoomExits) {
     auto& g = Globals::instance();
     g.reset();
-    initializeWorld();
+    initializeGame();
+    goSetup();
     
     // Test West of House has correct exits
     ZRoom* westOfHouse = dynamic_cast<ZRoom*>(g.getObject(ROOM_WEST_OF_HOUSE));
@@ -215,7 +232,8 @@ TEST(WorldInitializationRoomExits) {
 TEST(WorldInitializationTreasureValues) {
     auto& g = Globals::instance();
     g.reset();
-    initializeWorld();
+    initializeGame();
+    goSetup();
     
     // Test treasures have value properties set
     ZObject* trophy = g.getObject(ObjectIds::TROPHY);
@@ -236,24 +254,31 @@ TEST(WorldInitializationTreasureValues) {
 TEST(WorldInitializationNPCStrength) {
     auto& g = Globals::instance();
     g.reset();
-    initializeWorld();
+    initializeGame();
+    goSetup();
     
     // Test NPCs have strength properties
     ZObject* thief = g.getObject(ObjectIds::THIEF);
     if (thief != nullptr) {
-        ASSERT_TRUE(thief->hasFlag(ObjectFlag::FIGHTBIT));
+        // ZIL: FIGHTBIT is set when a fight starts, not in the object's
+    // (FLAGS ...).  Source: zil/1dungeon.zil:391, 972, 1041
+        ASSERT_FALSE(thief->hasFlag(ObjectFlag::FIGHTBIT));
         ASSERT_TRUE(thief->getProperty(P_STRENGTH) > 0);
     }
     
     ZObject* troll = g.getObject(ObjectIds::TROLL);
     if (troll != nullptr) {
-        ASSERT_TRUE(troll->hasFlag(ObjectFlag::FIGHTBIT));
+        // ZIL: FIGHTBIT is set when a fight starts, not in the object's
+    // (FLAGS ...).  Source: zil/1dungeon.zil:391, 972, 1041
+        ASSERT_FALSE(troll->hasFlag(ObjectFlag::FIGHTBIT));
         ASSERT_TRUE(troll->getProperty(P_STRENGTH) > 0);
     }
     
     ZObject* cyclops = g.getObject(ObjectIds::CYCLOPS);
     if (cyclops != nullptr) {
-        ASSERT_TRUE(cyclops->hasFlag(ObjectFlag::FIGHTBIT));
+        // ZIL: FIGHTBIT is set when a fight starts, not in the object's
+    // (FLAGS ...).  Source: zil/1dungeon.zil:391, 972, 1041
+        ASSERT_FALSE(cyclops->hasFlag(ObjectFlag::FIGHTBIT));
         ASSERT_TRUE(cyclops->getProperty(P_STRENGTH) > 0);
     }
     

@@ -1,5 +1,6 @@
 // Unit test suite for ZIL 1dungeon.zil routines, tables, exits, and objects
 #include "test_framework.h"
+#include "core/go.h"
 #include "core/globals.h"
 #include "core/object.h"
 #include "verbs/verbs.h"
@@ -35,29 +36,29 @@ TEST(DungeonConstants_ScoreMaxAndFalseFlag) {
 
 TEST(DungeonTables_WalkAroundTables) {
   // HOUSE_AROUND: WEST, NORTH, EAST, SOUTH, WEST (1dungeon.zil:2620)
-  ASSERT_EQ(Dungeon::HOUSE_AROUND[0], ROOM_WEST_OF_HOUSE);
-  ASSERT_EQ(Dungeon::HOUSE_AROUND[1], ROOM_NORTH_OF_HOUSE);
-  ASSERT_EQ(Dungeon::HOUSE_AROUND[2], ROOM_EAST_OF_HOUSE);
-  ASSERT_EQ(Dungeon::HOUSE_AROUND[3], ROOM_SOUTH_OF_HOUSE);
-  ASSERT_EQ(Dungeon::HOUSE_AROUND[4], ROOM_WEST_OF_HOUSE);
+  ASSERT_EQ(Dungeon::houseAround()[0], ROOM_WEST_OF_HOUSE);
+  ASSERT_EQ(Dungeon::houseAround()[1], ROOM_NORTH_OF_HOUSE);
+  ASSERT_EQ(Dungeon::houseAround()[2], ROOM_EAST_OF_HOUSE);
+  ASSERT_EQ(Dungeon::houseAround()[3], ROOM_SOUTH_OF_HOUSE);
+  ASSERT_EQ(Dungeon::houseAround()[4], ROOM_WEST_OF_HOUSE);
 
   // FOREST_AROUND: FOREST_1, FOREST_2, FOREST_3, FOREST_PATH, CLEARING, FOREST_1 (1dungeon.zil:2625)
-  ASSERT_EQ(Dungeon::FOREST_AROUND[0], RoomIds::FOREST_1);
-  ASSERT_EQ(Dungeon::FOREST_AROUND[1], RoomIds::FOREST_2);
-  ASSERT_EQ(Dungeon::FOREST_AROUND[2], RoomIds::FOREST_3);
-  ASSERT_EQ(Dungeon::FOREST_AROUND[3], RoomIds::FOREST_PATH);
-  ASSERT_EQ(Dungeon::FOREST_AROUND[4], RoomIds::CLEARING);
-  ASSERT_EQ(Dungeon::FOREST_AROUND[5], RoomIds::FOREST_1);
+  ASSERT_EQ(Dungeon::forestAround()[0], RoomIds::FOREST_1);
+  ASSERT_EQ(Dungeon::forestAround()[1], RoomIds::FOREST_2);
+  ASSERT_EQ(Dungeon::forestAround()[2], RoomIds::FOREST_3);
+  ASSERT_EQ(Dungeon::forestAround()[3], RoomIds::FOREST_PATH);
+  ASSERT_EQ(Dungeon::forestAround()[4], RoomIds::CLEARING);
+  ASSERT_EQ(Dungeon::forestAround()[5], RoomIds::FOREST_1);
 
   // IN_HOUSE_AROUND: LIVING_ROOM, KITCHEN, ATTIC, KITCHEN (1dungeon.zil:2629)
-  ASSERT_EQ(Dungeon::IN_HOUSE_AROUND[0], RoomIds::LIVING_ROOM);
-  ASSERT_EQ(Dungeon::IN_HOUSE_AROUND[1], RoomIds::KITCHEN);
-  ASSERT_EQ(Dungeon::IN_HOUSE_AROUND[2], RoomIds::ATTIC);
-  ASSERT_EQ(Dungeon::IN_HOUSE_AROUND[3], RoomIds::KITCHEN);
+  ASSERT_EQ(Dungeon::inHouseAround()[0], RoomIds::LIVING_ROOM);
+  ASSERT_EQ(Dungeon::inHouseAround()[1], RoomIds::KITCHEN);
+  ASSERT_EQ(Dungeon::inHouseAround()[2], RoomIds::ATTIC);
+  ASSERT_EQ(Dungeon::inHouseAround()[3], RoomIds::KITCHEN);
 
   // ABOVE_GROUND: 11 rooms (1dungeon.zil:2631)
-  ASSERT_EQ(Dungeon::ABOVE_GROUND[0], ROOM_WEST_OF_HOUSE);
-  ASSERT_EQ(Dungeon::ABOVE_GROUND[10], RoomIds::CANYON_VIEW);
+  ASSERT_EQ(Dungeon::aboveGround()[0], ROOM_WEST_OF_HOUSE);
+  ASSERT_EQ(Dungeon::aboveGround()[10], RoomIds::CANYON_VIEW);
 }
 
 // =============================================================================
@@ -68,6 +69,7 @@ TEST(DungeonProceduralExits_GratingExit) {
   auto& g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   auto* grate = g.getObject(ObjectIds::GRATE);
   ASSERT_TRUE(grate != nullptr);
@@ -105,6 +107,7 @@ TEST(DungeonProceduralExits_TrapDoorExit) {
   auto& g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   auto* trapDoor = g.getObject(ObjectIds::TRAP_DOOR);
   ASSERT_TRUE(trapDoor != nullptr);
@@ -142,6 +145,7 @@ TEST(DungeonProceduralExits_UpChimneyFunction) {
   auto& g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   auto* adventurer = g.getObject(ObjectIds::ADVENTURER);
   auto* lamp = g.getObject(ObjectIds::LAMP);
@@ -198,6 +202,7 @@ TEST(DungeonProceduralExits_MazeDiodes) {
   auto& g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   // Test maze diode transitions
   g.here = g.getObject(RoomIds::MAZE_2);
@@ -238,6 +243,7 @@ TEST(DungeonRoomActions_CanyonViewLeapIsFatal) {
   auto& g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   DeathSystem::setTestMode(true);
   DeathSystem::reset();
@@ -261,6 +267,7 @@ TEST(DungeonObjectActions_BuoyTreasureInsideScoresEmerald) {
   auto& g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   auto* buoy = g.getObject(ObjectIds::BUOY);
   auto* emerald = g.getObject(ObjectIds::EMERALD);
@@ -271,7 +278,9 @@ TEST(DungeonObjectActions_BuoyTreasureInsideScoresEmerald) {
   ASSERT_EQ(buoy->getLocation()->getId(), RoomIds::RIVER_4);
   ASSERT_EQ(emerald->getLocation(), buoy);
   ASSERT_FALSE(buoy->hasFlag(ObjectFlag::OPENBIT));
-  ASSERT_TRUE(buoy->hasFlag(ObjectFlag::SEARCHBIT));
+  // ZIL: (FLAGS TAKEBIT CONTBIT) - the buoy has no SEARCHBIT.
+  // Source: zil/1dungeon.zil:787
+  ASSERT_TRUE(buoy->hasFlag(ObjectFlag::CONTBIT));
   ASSERT_TRUE(buoy->hasFlag(ObjectFlag::CONTBIT));
   ASSERT_TRUE(buoy->hasFlag(ObjectFlag::TAKEBIT));
 
@@ -292,6 +301,7 @@ TEST(DungeonExits_MazeNavigationVerification) {
   auto& g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   // Verify Maze 1 exits
   auto* m1 = dynamic_cast<ZRoom*>(g.getObject(RoomIds::MAZE_1));
@@ -337,11 +347,14 @@ TEST(DungeonExits_ConditionalExitsVerification) {
   auto& g = Globals::instance();
   g.reset();
   initializeWorld();
+  goSetup();
 
   // 1. Troll room east/west conditional on trollFlag
   auto* trollRoom = dynamic_cast<ZRoom*>(g.getObject(RoomIds::TROLL_ROOM));
   ASSERT_TRUE(trollRoom != nullptr);
-  ASSERT_TRUE(trollRoom->hasGlobal(ObjectIds::TROLL));
+  // ZIL: TROLL-ROOM has no (GLOBAL ...) clause at all; the troll is an
+  // ordinary object (IN TROLL-ROOM).  Source: zil/1dungeon.zil:1036-1037, 1479-1492
+  ASSERT_TRUE(trollRoom->getGlobals().empty());
   g.trollFlag = false;
   auto* troll = g.getObject(ObjectIds::TROLL);
   (void)troll;
@@ -353,9 +366,14 @@ TEST(DungeonExits_ConditionalExitsVerification) {
   // 2. Cyclops room UP and EAST conditional
   auto* cyclopsRoom = dynamic_cast<ZRoom*>(g.getObject(RoomIds::CYCLOPS_ROOM));
   ASSERT_TRUE(cyclopsRoom != nullptr);
-  ASSERT_TRUE(cyclopsRoom->hasGlobal(ObjectIds::CYCLOPS));
-  ASSERT_EQ(cyclopsRoom->getExit(Direction::WEST)->targetRoom, RoomIds::MAZE_15);
+  // ZIL: (GLOBAL STAIRS) is CYCLOPS-ROOM's only global; the cyclops itself is
+  // an object (IN CYCLOPS-ROOM).  Source: zil/1dungeon.zil:1728-1738
+  ASSERT_TRUE(cyclopsRoom->hasGlobal(ObjectIds::STAIRS));
+  ASSERT_TRUE(!cyclopsRoom->hasGlobal(ObjectIds::CYCLOPS));
+  // ZIL: (NW TO MAZE-15) is the only way back into the maze; there is no WEST
+  // exit.  Source: zil/1dungeon.zil:1731
   ASSERT_EQ(cyclopsRoom->getExit(Direction::NW)->targetRoom, RoomIds::MAZE_15);
+  ASSERT_TRUE(cyclopsRoom->getExit(Direction::WEST) == nullptr);
   g.magicFlag = false;
   ASSERT_FALSE(cyclopsRoom->getExit(Direction::EAST)->condition());
   g.magicFlag = true;

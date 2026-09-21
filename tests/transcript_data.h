@@ -122,7 +122,10 @@ const std::vector<TranscriptStep> PARSER_FEATURES = {
 
 // Error handling
 const std::vector<TranscriptStep> ERROR_HANDLING = {
-    {"xyzzy", {"A hollow voice says"}},  // ZIL V-ADVENT (gverbs.zil:151-153)
+    // ZIL: XYZZY is a synonym of PLUGH and reaches V-ADVENT.
+    // Source: zil/gsyntax.zil:352-353, zil/gverbs.zil:151-155.  Confirmed
+    // against release 119 under dfrotz.
+    {"xyzzy", {"A hollow voice says \"Fool.\""}},
     {"take mailbox", {"anchored"}},  // Mailbox can't be taken - "securely anchored"
     {"go blarg", {"don't know"}},  // Unknown word
 };

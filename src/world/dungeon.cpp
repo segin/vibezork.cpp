@@ -6,7 +6,10 @@
 #include "world/rooms.h"
 #include "verbs/verbs.h"
 #include "systems/death.h"
+#include "world/generated/world_data.h"
+#include "world/zil_registry.h"
 #include <format>
+#include <vector>
 #include <iostream>
 
 namespace Dungeon {
@@ -166,29 +169,54 @@ int canyonViewRoomAction(int rarg) {
   return M_NOT_HANDLED;
 }
 
-// ZIL: RANDOM TABLES FOR WALK-AROUND (1dungeon.zil:2620-2633)
-// Source: zil/1dungeon.zil:2620-2633
-const ObjectId HOUSE_AROUND[5] = {
-    ROOM_WEST_OF_HOUSE, ROOM_NORTH_OF_HOUSE,
-    ROOM_EAST_OF_HOUSE, ROOM_SOUTH_OF_HOUSE,
-    ROOM_WEST_OF_HOUSE
-};
+// ZIL: the LTABLEs V-WALK-AROUND picks its next room from.  They are built
+// from the generated model rather than retyped, so they cannot drift from
+// the source.  Source: zil/1dungeon.zil:2620-2633
+namespace {
 
-const ObjectId FOREST_AROUND[6] = {
-    RoomIds::FOREST_1, RoomIds::FOREST_2, RoomIds::FOREST_3,
-    RoomIds::FOREST_PATH, RoomIds::CLEARING, RoomIds::FOREST_1
-};
+/// The rooms of one <GLOBAL name <LTABLE (PURE) ...>>, in source order.
+std::vector<ObjectId> walkTable(std::string_view name) {
+    std::vector<ObjectId> rooms;
+    for (const auto& t : zork::zil::kWalkTables) {
+        if (t.name != name) {
+            continue;
+        }
+        for (std::string_view room : t.rooms) {
+            rooms.push_back(ZilRegistry::idFor(room));
+        }
+    }
+    return rooms;
+}
 
-const ObjectId IN_HOUSE_AROUND[4] = {
-    RoomIds::LIVING_ROOM, RoomIds::KITCHEN, RoomIds::ATTIC, RoomIds::KITCHEN
-};
+} // namespace
 
-const ObjectId ABOVE_GROUND[11] = {
-    ROOM_WEST_OF_HOUSE, ROOM_NORTH_OF_HOUSE,
-    ROOM_EAST_OF_HOUSE, ROOM_SOUTH_OF_HOUSE,
-    RoomIds::FOREST_1, RoomIds::FOREST_2, RoomIds::FOREST_3,
-    RoomIds::FOREST_PATH, RoomIds::CLEARING, RoomIds::GRATING_CLEARING,
-    RoomIds::CANYON_VIEW
-};
+std::span<const ObjectId> houseAround() {
+    static const std::vector<ObjectId> t = walkTable("HOUSE-AROUND");
+    return t;
+}
+
+std::span<const ObjectId> forestAround() {
+    static const std::vector<ObjectId> t = walkTable("FOREST-AROUND");
+    return t;
+}
+
+std::span<const ObjectId> inHouseAround() {
+    static const std::vector<ObjectId> t = walkTable("IN-HOUSE-AROUND");
+    return t;
+}
+
+std::span<const ObjectId> aboveGround() {
+    static const std::vector<ObjectId> t = walkTable("ABOVE-GROUND");
+    return t;
+}
+
+int scoreMax() {
+    for (const auto& gl : zork::zil::kGlobals) {
+        if (gl.name == "SCORE-MAX") {
+            return gl.value;
+        }
+    }
+    return 0;
+}
 
 } // namespace Dungeon

@@ -1,5 +1,6 @@
 // Unit tests for ZIL CHAIN-PSEUDO (zil/1actions.zil:4167-4174)
 #include "../src/core/globals.h"
+#include "../src/core/go.h"
 #include "../src/core/object.h"
 #include "../src/verbs/verbs.h"
 #include "../src/world/objects.h"
@@ -27,7 +28,11 @@ private:
 };
 
 // Initialize world for testing
-static void setupTestWorld() { initializeWorld(); }
+static void setupTestWorld() {
+  Globals::instance().reset();
+  initializeWorld();
+  goSetup();
+}
 
 // =============================================================================
 // ChainPseudoFcn Tests (1actions.zil lines 4167-4174)

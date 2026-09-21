@@ -2,6 +2,7 @@
 #pragma once
 
 #include "core/types.h"
+#include <span>
 #include <string_view>
 #include <span>
 
@@ -9,7 +10,7 @@ namespace Dungeon {
 
 // ZIL: SCORE-MAX (Maximum possible score in game is 350)
 // Source: zil/1dungeon.zil:7
-constexpr int SCORE_MAX = 350;
+constexpr int SCORE_MAX = 350;   // scoreMax() reads the same value out of the model
 
 // ZIL: FALSE-FLAG (Always false flag used in impossible exits)
 // Source: zil/1dungeon.zil:9
@@ -45,11 +46,15 @@ ObjectId mazeDiodes();
 // Source: zil/1dungeon.zil:2406-2411
 int canyonViewRoomAction(int rarg);
 
-// ZIL: Random walk tables for walk-around and navigation
-// Source: zil/1dungeon.zil:2620-2633
-extern const ObjectId HOUSE_AROUND[5];
-extern const ObjectId FOREST_AROUND[6];
-extern const ObjectId IN_HOUSE_AROUND[4];
-extern const ObjectId ABOVE_GROUND[11];
+// ZIL: the walk-around tables, read out of the generated model so they stay
+// the source's tables.  Source: zil/1dungeon.zil:2620-2633
+std::span<const ObjectId> houseAround();
+std::span<const ObjectId> forestAround();
+std::span<const ObjectId> inHouseAround();
+std::span<const ObjectId> aboveGround();
+
+// ZIL: <GLOBAL SCORE-MAX 350>, read from the same model.
+// Source: zil/1dungeon.zil:7
+int scoreMax();
 
 } // namespace Dungeon

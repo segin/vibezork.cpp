@@ -6,6 +6,7 @@
 #include "../src/verbs/verbs.h"
 #include "../src/world/objects.h"
 #include "../src/world/rooms.h"
+#include "../src/core/go.h"
 #include "../src/world/world.h"
 #include "test_framework.h"
 #include <sstream>
@@ -34,7 +35,14 @@ extern bool knifeAction();
 extern bool teethAction();
 
 // Initialize world for testing
-static void setupTestWorld() { initializeWorld(); }
+// Rebuild the world from scratch.  Without the reset a second initializeWorld()
+// replaces every registered object while the previous instances are still
+// pointed at by location_/contents_ and by HERE, which corrupts the heap.
+static void setupTestWorld() {
+  Globals::instance().reset();
+  initializeGame();
+  goSetup();
+}
 
 // =============================================================================
 // AXE-F Tests (1actions.zil lines 622-638)
@@ -501,11 +509,14 @@ TEST(BatF_FlyMeTeleports) {
   ZObject *finalLoc = g.player->getLocation();
   ASSERT_TRUE(finalLoc != safeRoom); // Should have moved
 
-  // List of valid drops (sync with implementation)
+  // ZIL: BAT-DROPS, the eight rooms PICK-ONE chooses between.  The list ended
+  // with MINE-1 instead of MINE-ENTRANCE, so the test failed whenever the bat
+  // dropped the player at the Mine Entrance.
+  // Source: zil/1actions.zil:332-340
   std::vector<int> coalMineRooms = {
       RoomIds::MINE_1,       RoomIds::MINE_2,     RoomIds::MINE_3,
       RoomIds::MINE_4,       RoomIds::LADDER_TOP, RoomIds::LADDER_BOTTOM,
-      RoomIds::SQUEEKY_ROOM, RoomIds::MINE_1};
+      RoomIds::SQUEEKY_ROOM, RoomIds::MINE_ENTRANCE};
 
   bool found = false;
   for (auto id : coalMineRooms) {

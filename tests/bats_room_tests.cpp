@@ -1,5 +1,6 @@
 // Unit tests for ZIL BATS-ROOM (zil/1actions.zil:2478-2486)
 #include "../src/core/globals.h"
+#include "../src/core/go.h"
 #include "../src/core/object.h"
 #include "../src/world/objects.h"
 #include "../src/world/rooms.h"
@@ -29,6 +30,7 @@ private:
 // Initialize world and death system for testing
 static void setupTestWorld() {
   initializeWorld();
+  goSetup();
   DeathSystem::initialize();
   DeathSystem::setTestMode(true);
 }

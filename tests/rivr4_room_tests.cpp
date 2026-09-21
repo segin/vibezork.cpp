@@ -1,5 +1,6 @@
 // Unit tests for ZIL RIVR4-ROOM (zil/1actions.zil:2844-2853)
 #include "../src/core/globals.h"
+#include "../src/core/go.h"
 #include "../src/core/object.h"
 #include "../src/world/objects.h"
 #include "../src/world/rooms.h"
@@ -26,6 +27,7 @@ private:
 // Initialize world for testing
 static void setupTestWorld() {
   initializeWorld();
+  goSetup();
 }
 
 // =============================================================================

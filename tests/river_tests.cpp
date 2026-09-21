@@ -1,6 +1,7 @@
 // River action unit tests for ZIL RIVER-FUNCTION
 // Source: zil/1actions.zil:2669-2690
 #include "../src/core/globals.h"
+#include "../src/core/go.h"
 #include "../src/core/object.h"
 #include "../src/verbs/verbs.h"
 #include "../src/world/objects.h"
@@ -34,6 +35,7 @@ extern bool riverAction();
 static void setupTestWorld() {
   Globals::instance().reset();
   initializeWorld();
+  goSetup();
   DeathSystem::initialize();
   DeathSystem::setTestMode(true);
 }

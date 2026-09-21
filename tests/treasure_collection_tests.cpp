@@ -10,6 +10,7 @@
 //
 // Source: gverbs.zil:1845-1870, 1actions.zil:483-502
 #include "test_framework.h"
+#include "../src/core/go.h"
 #include "../src/core/object.h"
 #include "../src/core/globals.h"
 #include "../src/world/world.h"
@@ -31,6 +32,7 @@ public:
         g.reset();
         ScoreSystem::instance().reset();
         initializeWorld();
+        goSetup();
     }
 
     ~TreasureTestHelper() {
@@ -48,7 +50,7 @@ public:
         ObjectIds::COFFIN,      // Gold coffin           VALUE=10 TVALUE=15
         ObjectIds::DIAMOND,     // Huge diamond          VALUE=10 TVALUE=10
         ObjectIds::JADE,        // Jade figurine         VALUE=5  TVALUE=5
-        ObjectIds::COINS,       // Bag of coins          VALUE=10 TVALUE=5
+        ObjectIds::BAG_OF_COINS, // Bag of coins         VALUE=10 TVALUE=5
         ObjectIds::EMERALD,     // Large emerald         VALUE=5  TVALUE=10
         ObjectIds::PAINTING,    // Painting              VALUE=4  TVALUE=6
         ObjectIds::BAR,         // Platinum bar          VALUE=10 TVALUE=5
@@ -200,6 +202,10 @@ TEST(TreasuresCanBeScored) {
 
     auto* trophyCase = g.getObject(ObjectIds::TROPHY_CASE);
     ASSERT_TRUE(trophyCase != nullptr);
+    // ZIL: (FLAGS TRANSBIT CONTBIT NDESCBIT TRYTAKEBIT SEARCHBIT) - the case
+    // starts closed, so it has to be opened before anything goes in.
+    // Source: zil/1dungeon.zil:343
+    trophyCase->setFlag(ObjectFlag::OPENBIT);
 
     // Move player to living room where trophy case is
     auto* livingRoom = g.getObject(RoomIds::LIVING_ROOM);
@@ -242,6 +248,10 @@ TEST(TreasuresNoDoubleScoring) {
 
     auto* trophyCase = g.getObject(ObjectIds::TROPHY_CASE);
     ASSERT_TRUE(trophyCase != nullptr);
+    // ZIL: (FLAGS TRANSBIT CONTBIT NDESCBIT TRYTAKEBIT SEARCHBIT) - the case
+    // starts closed, so it has to be opened before anything goes in.
+    // Source: zil/1dungeon.zil:343
+    trophyCase->setFlag(ObjectFlag::OPENBIT);
 
     auto* trophy = g.getObject(ObjectIds::TROPHY);
     if (!trophy) {

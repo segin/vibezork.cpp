@@ -1,4 +1,5 @@
 #include <iostream>
+#include "../src/core/go.h"
 #include <cassert>
 #include <vector>
 #include <string>
@@ -16,7 +17,8 @@
 // Helper to reset game state for tests
 void resetGame() {
     auto& g = Globals::instance();
-    initializeWorld(); // Initialize all objects
+    initializeWorld();
+    goSetup(); // Initialize all objects
     // For now we just move player to a known location
     g.here = g.getObject(RoomIds::LIVING_ROOM);
     // The parser derives HERE from the player's location and LIT from the

@@ -29,3 +29,7 @@ Thumbs.db
 
 # Agent worktrees
 .claude/worktrees/
+
+# Generator and test artifacts
+__pycache__/
+test.sav

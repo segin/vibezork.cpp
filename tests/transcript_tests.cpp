@@ -5,13 +5,15 @@
 // Commands are extracted and expected outputs verified
 
 #include "test_framework.h"
+#include "core/go.h"
 #include "transcript_data.h"
 #include "../src/core/globals.h"
 #include "../src/core/io.h"
+#include "../src/core/gmain.h"
+#include "../src/parser/gparser.h"
 #include "../src/parser/parser.h"
 #include "../src/verbs/verbs.h"
 #include "../src/world/world.h"
-#include "../src/core/gmain.h"
 #include "../src/systems/timer.h"
 #include "../src/systems/npc.h"
 #include "../src/systems/lamp.h"
@@ -19,27 +21,22 @@
 #include "../src/systems/sword.h"
 #include <sstream>
 #include <iostream>
-#include <map>
 
-// Verb dispatch table (same as main.cpp)
 
-// Global parser for transcript tests
-static Parser transcriptParser;
-
-// Execute a single command and capture output
+// Execute a single command and capture output.
+//
+// This drives the real per-command path: the parser fills the match tables and
+// MAIN-LOOP-1 dispatches through PERFORM, so the WINNER, room, preaction,
+// PRSI, container and PRSO handlers all get their turn before the default verb
+// routine - which is how, for example, MAILBOX-F answers "take mailbox".
+// Source: zil/gmain.zil:34-172
 std::string executeCommand(const std::string& command) {
-    // Capture output
     std::stringstream buffer;
     std::streambuf* oldCout = std::cout.rdbuf(buffer.rdbuf());
 
-    // Parse the command, then run the real MAIN-LOOP-1 body so PERFORM's
-    // dispatch order (object actions, preactions, defaults) applies exactly
-    // as it does in play (gmain.zil:38-173).
-    ParsedCommand cmd = transcriptParser.parse(command);
-    if (cmd.verb != 0) {
-        ::executeCommand(cmd);
-        TimerSystem::clocker();
-    }
+    GParser::setPromptEnabled(false);
+    GParser::setNextInput(command);
+    mainLoop1();
 
     std::cout.rdbuf(oldCout);
     return buffer.str();
@@ -95,7 +92,8 @@ void runTranscript(const std::vector<TranscriptStep>& steps, const std::string& 
 
 // Initialize game state for testing
 void initializeTestGame() {
-    initializeWorld();
+    initializeGame();
+    goSetup();
     NPCSystem::initializeThief();
     NPCSystem::initializeTroll();
     NPCSystem::initializeCyclops();

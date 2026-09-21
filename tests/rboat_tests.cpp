@@ -4,6 +4,7 @@
 // Plus: death scenarios and boat state transformations
 
 #include "../src/core/globals.h"
+#include "../src/core/go.h"
 #include "../src/core/object.h"
 #include "../src/verbs/verbs.h"
 #include "../src/world/objects.h"
@@ -36,6 +37,7 @@ extern bool inflatedBoatAction();
 static void setupTestWorld() {
   Globals::instance().reset();
   initializeWorld();
+  goSetup();
   DeathSystem::initialize();
   DeathSystem::setTestMode(true);
 }
