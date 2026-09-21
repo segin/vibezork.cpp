@@ -63,10 +63,14 @@ void ZObject::moveTo(ZObject* location) {
         std::erase(location_->contents_, this);
     }
     
-    // Add to new location
+    // Add to new location. ZIL's MOVE makes the object the FIRST child of
+    // its new parent, so FIRST?/NEXT? walks (room and container listings,
+    // TAKE ALL, the thief's room walk) see the most recently moved object
+    // first. Building the world in definition order therefore yields the
+    // reverse-definition chain the story file has.
     location_ = location;
     if (location_) {
-        location_->contents_.push_back(this);
+        location_->contents_.insert(location_->contents_.begin(), this);
     }
 }
 

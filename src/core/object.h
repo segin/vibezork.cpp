@@ -104,6 +104,13 @@ public:
   // Container action handler (ZIL: P?CONTFCN)
   using ContActionFunc = std::function<int()>;
   void setContainerAction(ContActionFunc func) { contAction_ = func; }
+
+  /// ZIL P?DESCFCN: called with M-OBJDESC to describe the object in place
+  /// (gverbs.zil:1694-1696). Returning true suppresses the default line.
+  using DescFunc = std::function<int(int)>;
+  void setDescFcn(DescFunc func) { descFcn_ = func; }
+  bool hasDescFcn() const { return descFcn_ != nullptr; }
+  int performDescFcn(int arg) const { return descFcn_ ? descFcn_(arg) : M_NOT_HANDLED; }
   int performContainerAction() { return contAction_ ? contAction_() : M_NOT_HANDLED; }
   bool hasContainerAction() const { return contAction_ != nullptr; }
 
@@ -130,4 +137,5 @@ private:
   std::vector<ZObject *> contents_;
   ActionFunc action_;
   ContActionFunc contAction_;
+  DescFunc descFcn_;
 };

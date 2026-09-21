@@ -113,7 +113,9 @@ void testGVerbsSystemRoutines() {
 
   // Test CCOUNT & FIRSTER
   assert(Verbs::ccount(chest.get()) == 2); // ruby + scenery detail, not the worn cloak
-  assert(Verbs::firster(chest.get()) == ruby.get());
+  // FIRSTER prints the container header and reports whether it printed
+  // (gverbs.zil:1818-1835); a plain container gets "The X contains:".
+  assert(Verbs::firster(chest.get(), 0));
 
   // Test SEE-INSIDE?
   assert(!Verbs::seeInside(chest.get())); // Closed container

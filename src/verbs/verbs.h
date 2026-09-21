@@ -469,13 +469,17 @@ namespace Verbs {
 
     // ZIL: GVERBS.ZIL System routines (gverbs.zil)
     int ccount(const ZObject *obj);
-    void describeObject(const ZObject *obj, bool isLook = false);
-    void describeObjects(const ZObject *room);
-    void describeRoom(bool look = false);
+    /// ZIL DESCRIBE-OBJECT (gverbs.zil:1693-1728)
+    void describeObject(ZObject *obj, bool v, int level);
+    /// ZIL DESCRIBE-OBJECTS (gverbs.zil:1681-1687)
+    void describeObjects(bool v = false);
+    /// ZIL DESCRIBE-ROOM (gverbs.zil:1635-1679); false when the room is dark
+    bool describeRoom(bool look = false);
     int doWalk(Direction dir);
     ZObject *findIn(const ZObject *container, ObjectFlag flag);
     void finish();
-    ZObject *firster(const ZObject *container);
+    /// ZIL FIRSTER (gverbs.zil:1818-1835): prints the container header
+    bool firster(const ZObject *obj, int level);
     bool globalIn(ObjectId objId, const ZObject *room);
     bool goTo(ZObject *room);
     void hackHack(std::string_view str);
@@ -489,7 +493,8 @@ namespace Verbs {
     void mungRoom(ZObject *room, std::string_view desc);
     void noGoTell(Direction dir);
     ZObject *otherSide(const ZObject *door);
-    bool printCont(const ZObject *obj, bool checkTrans = true);
+    /// ZIL PRINT-CONT (gverbs.zil:1750-1816)
+    bool printCont(const ZObject *obj, bool v = false, int level = 0);
     void printContents(const ZObject *obj);
     void removeCarefully(ZObject *obj);
     void scoreObj(ZObject *obj);

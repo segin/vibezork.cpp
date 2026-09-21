@@ -30,6 +30,7 @@ int westHouseAction(int rarg) {
       print(" A secret path leads southwest into the forest.");
     }
     crlf();
+    return M_HANDLED;
   }
   return M_NOT_HANDLED;
 }
@@ -39,6 +40,7 @@ int northHouseAction(int rarg) {
     printLine("You are facing the north side of a white house. There is no "
               "door here, and all the windows are boarded up. To the north a "
               "narrow path winds through the trees.");
+    return M_HANDLED;
   }
   return M_NOT_HANDLED;
 }
@@ -47,6 +49,7 @@ int southHouseAction(int rarg) {
   if (rarg == M_LOOK) {
     printLine("You are facing the south side of a white house. There is no "
               "door here, and all the windows are boarded.");
+    return M_HANDLED;
   }
   return M_NOT_HANDLED;
 }
@@ -66,6 +69,7 @@ int behindHouseAction(int rarg) {
       print("slightly ajar.");
     }
     crlf();
+    return M_HANDLED;
   }
   return M_NOT_HANDLED;
 }
@@ -95,6 +99,7 @@ int cave2Room(int rarg) {
         printLine("It is now completely dark.");
       }
     }
+    return M_HANDLED;
   }
   return M_NOT_HANDLED;
 }
@@ -141,6 +146,7 @@ int boomRoom(int rarg) {
       }
       DeathSystem::jigsUp("\n    ** BOOOOOOOOOOOM **");
     }
+    return M_HANDLED;
   }
   return M_NOT_HANDLED;
 }
@@ -161,6 +167,7 @@ int batsRoom(int rarg) {
       crlf();
       flyMe();
     }
+    return M_HANDLED;
   }
   return M_NOT_HANDLED;
 }
@@ -177,6 +184,7 @@ int fallsRoom(int rarg) {
     } else {
       printLine("A beautiful rainbow can be seen over the falls and to the west.");
     }
+    return M_HANDLED;
   }
   return M_NOT_HANDLED;
 }
@@ -196,6 +204,7 @@ int rivr4Room(int rarg) {
       printLine("You notice something funny about the feel of the buoy.");
       g.buoyFlag = false;
     }
+    return M_HANDLED;
   }
   return M_NOT_HANDLED;
 }
@@ -354,6 +363,7 @@ int mirrorRoom(int rarg) {
     if (g.mirrorMung) {
       printLine("Unfortunately, the mirror has been destroyed by your recklessness.");
     }
+    return M_HANDLED;
   }
   return M_NOT_HANDLED;
 }
@@ -507,6 +517,7 @@ int stoneBarrowAction(int rarg) {
     printLine("You are standing in front of a massive barrow of stone. In the "
               "east face is a huge stone door which is open. You cannot see "
               "into the dark of the tomb.");
+    return M_HANDLED;
   }
   return M_NOT_HANDLED;
 }
@@ -520,6 +531,7 @@ int mazeRoomAction(int rarg) {
   } else if (rarg == M_YELL) {
     printLine("Your shout echoes through the passages, making it even harder "
               "to tell where you are.");
+    return M_HANDLED;
   }
   return M_NOT_HANDLED;
 }

@@ -344,11 +344,13 @@ TEST(ObjectContainmentOrder) {
     item2.moveTo(&container);
     item3.moveTo(&container);
     
-    // Verify order is preserved
+    // ZIL's MOVE makes the object the FIRST child of its new parent, so the
+    // chain runs newest-first (see ZObject::moveTo). Room listings, TAKE ALL
+    // and the thief's walk all depend on this order.
     const auto& contents = container.getContents();
-    ASSERT_EQ(contents[0], &item1);
+    ASSERT_EQ(contents[0], &item3);
     ASSERT_EQ(contents[1], &item2);
-    ASSERT_EQ(contents[2], &item3);
+    ASSERT_EQ(contents[2], &item1);
 }
 
 // Test object creation and destruction

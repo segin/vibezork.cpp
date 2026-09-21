@@ -265,6 +265,7 @@ void initializeWorld() {
     mountains->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("The forest thins out, revealing impassable mountains.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -308,6 +309,7 @@ void initializeWorld() {
     gratingClearing->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You are in a clearing, with a forest surrounding you on all sides. A path leads south.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -411,6 +413,7 @@ void initializeWorld() {
     livingRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You are in the living room. There is a doorway to the east, a wooden door with strange gothic lettering to the west, which appears to be nailed shut, a trophy case, and a large oriental rug in the center of the room.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -443,6 +446,7 @@ void initializeWorld() {
     kitchen->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You are in the kitchen of the white house. A table seems to have been used recently for the preparation of food. A passage leads to the west and a dark staircase can be seen leading upward. A dark chimney leads down and to the east is a small window which is open.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -479,6 +483,7 @@ void initializeWorld() {
     attic->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is the attic. The only exit is a stairway leading down.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -502,6 +507,7 @@ void initializeWorld() {
     cellar->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You are in a dark and damp cellar with a narrow passageway leading north, and a crawlway to the south. On the west is the bottom of a steep metal ramp which is unclimbable.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -537,6 +543,7 @@ void initializeWorld() {
     gallery->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is an art gallery. Most of the paintings which were here have been stolen by vandals with exceptional taste. The vandals left through either the north or west exits.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -559,6 +566,7 @@ void initializeWorld() {
     studio->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This appears to have been an artist's studio. The walls and floors are splattered with paints of 69 different colors. Strangely enough, nothing of value is hanging here. At the south end of the room is an open door (also covered with paint). A dark and narrow chimney leads up from a fireplace; although you might be able to get up it, it seems unlikely you could get back down.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -592,6 +600,7 @@ void initializeWorld() {
     trollRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a small room with passages to the east and south and a forbidding hole leading west. Bloodstains and deep scratches (perhaps made by an axe) mar the walls.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -625,6 +634,7 @@ void initializeWorld() {
     eastOfChasm->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You are on the east edge of a chasm, the bottom of which cannot be seen. A narrow passage goes north, and the path you are on continues to the east.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -659,6 +669,7 @@ void initializeWorld() {
     ewPassage->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a narrow east-west passageway. There is a narrow stairway leading down at the north end of the room.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -682,6 +693,7 @@ void initializeWorld() {
     nsPassage->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a high north-south passage, which forks to the northeast.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -704,6 +716,7 @@ void initializeWorld() {
     chasmRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("A chasm runs southwest to northeast and the path follows it. You are on the south side of the chasm, where a crack opens into a passage.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -730,6 +743,7 @@ void initializeWorld() {
             printLine("This is a circular stone room with passages in all directions. Several of them have unfortunately been blocked by cave-ins.");
         } else if (rarg == M_LISTEN) {
             printLine("The round room has strange acoustics. You hear faint echoes from the various passages.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -758,6 +772,7 @@ void initializeWorld() {
             printLine("The acoustics of the room are such that you hear a loud roar.");
         } else if (rarg == M_YELL) {
             printLine("Your shout echoes loudly, amplified by the room's acoustics. The sound is deafening!");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -798,6 +813,7 @@ void initializeWorld() {
     dampCave->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This cave has exits to the west and east, and narrows to a crack toward the south. The earth is particularly damp here.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -820,6 +836,7 @@ void initializeWorld() {
     coldPassage->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a cold and damp corridor where a long east-west passageway turns into a southward path.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -841,6 +858,7 @@ void initializeWorld() {
     narrowPassage->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a long and narrow corridor where a long north-south passageway briefly narrows even further.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -862,6 +880,7 @@ void initializeWorld() {
     slideRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a small chamber, which appears to have been part of a coal mine. On the south wall of the chamber the letters \"Granite Wall\" are etched in the rock. To the east is a long passage, and there is a steep metal slide twisting downward. To the north is a small opening.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -884,6 +903,7 @@ void initializeWorld() {
     mineEntrance->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You are standing at the entrance of what might have been a coal mine. The shaft enters the west wall, and there is another exit on the south end of the room.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -906,6 +926,7 @@ void initializeWorld() {
     squeekyRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You are in a small room. Strange squeaky sounds may be heard coming from the passage at the north end. You may also escape to the east.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -944,6 +965,7 @@ void initializeWorld() {
     shaftRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a large room, in the middle of which is a small shaft descending through the floor into darkness below. To the west and the north are exits from this room. Constructed over the top of the shaft is a metal framework to which a heavy iron chain is attached.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -966,6 +988,7 @@ void initializeWorld() {
     smellyRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a small nondescript room. However, from the direction of a small descending staircase a foul odor can be detected. To the south is a narrow tunnel.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -1004,6 +1027,7 @@ void initializeWorld() {
     ladderTop->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a very small room. In the corner is a rickety wooden ladder, leading downward. It might be safe to descend. There is also a staircase leading upward.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -1025,6 +1049,7 @@ void initializeWorld() {
     ladderBottom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a rather wide room. On one side is the bottom of a narrow wooden ladder. To the west and the south are passages leaving the room.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -1048,6 +1073,7 @@ void initializeWorld() {
     timberRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a long and narrow passage, which is cluttered with broken timbers. A wide passage comes from the east and turns at the west end of the room into a very narrow passageway. From the west comes a strong draft.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -1080,6 +1106,7 @@ void initializeWorld() {
     lowerShaft->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a small drafty room in which is the bottom of a long shaft. To the south is a passageway and to the east a very narrow passage. In the shaft can be seen a heavy iron chain.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -1104,6 +1131,7 @@ void initializeWorld() {
     machineRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a large room full of assorted heavy machinery, whirring noisily. The room smells of burned resistors. Along one wall of the room are three buttons which are, respectively, round, triangular, and square. Naturally, above these buttons are instructions written in EBCDIC. A large sign above the buttons says \"DANGER: DEADLY RADIATION BEYOND THIS POINT!\" There are exits to the north and east.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -1124,6 +1152,7 @@ void initializeWorld() {
     deadEnd5->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You have come to a dead end in the mine.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -1143,6 +1172,7 @@ void initializeWorld() {
     mine1->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a nondescript part of a coal mine.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -1161,6 +1191,7 @@ void initializeWorld() {
     mine2->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a nondescript part of a coal mine.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -1179,6 +1210,7 @@ void initializeWorld() {
     mine3->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a nondescript part of a coal mine.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -1197,6 +1229,7 @@ void initializeWorld() {
     mine4->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a nondescript part of a coal mine.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -1219,6 +1252,7 @@ void initializeWorld() {
     reservoirSouth->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You are in a long room on the south shore of a large lake, far too deep and wide for crossing. There is a path along the stream to the east or west, and a steep pathway climbing southwest along the edge of a chasm.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -1249,6 +1283,7 @@ void initializeWorld() {
     reservoir->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You are on the lake. The water is cold and the current is strong. It is difficult to stay afloat.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -1275,6 +1310,7 @@ void initializeWorld() {
     reservoirNorth->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You are in a long room on the north shore of a large lake, far too deep and wide for crossing.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -1303,6 +1339,7 @@ void initializeWorld() {
     streamView->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You are standing on a path beside a gently flowing stream. The path follows the stream, which flows from west to east.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -1323,6 +1360,7 @@ void initializeWorld() {
     inStream->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You are on the gently flowing stream. The upstream route is too narrow to navigate, and the downstream route is invisible due to twisting walls. There is a narrow beach to land on.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -1346,6 +1384,7 @@ void initializeWorld() {
     damRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You are standing on the top of the Flood Control Dam #3, which was quite a tourist attraction in times far distant. There are paths to the north, south, and west, and a scramble down.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -1370,6 +1409,7 @@ void initializeWorld() {
     damLobby->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This room appears to have been the waiting room for groups touring the dam. There are open doorways here to the north and east marked \"Private\", and there is a path leading south over the top of the dam.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -1392,6 +1432,7 @@ void initializeWorld() {
     maintenanceRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is what appears to have been the maintenance room for Flood Control Dam #3. Apparently, this room has been ransacked recently, for most of the valuable equipment is gone. On the wall in front of you is a group of buttons colored blue, yellow, brown, and red. There are doorways to the west and south.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -1414,6 +1455,7 @@ void initializeWorld() {
     damBase->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You are at the base of Flood Control Dam #3, which looms above you and to the north. The river Frigid is flowing by here. Along the river are the White Cliffs which seem to form giant walls stretching from north to south along the shores of the river as it winds its way downstream.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -1682,6 +1724,7 @@ void initializeWorld() {
     engravingsCave->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You have entered a low cave with passages leading northwest and east.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -1871,6 +1914,7 @@ void initializeWorld() {
     gratingRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You are in a small room near the maze. There are twisty passages in the immediate vicinity.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -1886,6 +1930,7 @@ void initializeWorld() {
     deadEnd1->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You have come to a dead end in the maze.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -1900,6 +1945,7 @@ void initializeWorld() {
     deadEnd2->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You have come to a dead end in the maze.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -1914,6 +1960,7 @@ void initializeWorld() {
     deadEnd3->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You have come to a dead end in the maze.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -1928,6 +1975,7 @@ void initializeWorld() {
     deadEnd4->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You have come to a dead end in the maze.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -2167,6 +2215,7 @@ void initializeWorld() {
             if (cyclopsState.wrathLevel != 0) {
                 // Cyclops is agitated - timer is active
             }
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -2208,6 +2257,7 @@ void initializeWorld() {
     strangePassage->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a long passage. To the west is one entrance. On the east there is an old wooden door, with a large hole in it (about cyclops sized).");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -2237,6 +2287,7 @@ void initializeWorld() {
             printLine("You enter the treasure room cautiously.");
         } else if (rarg == M_LISTEN) {
             printLine("You hear nothing unusual.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -2277,6 +2328,7 @@ void initializeWorld() {
     landOfLivingDead->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You have entered the Land of the Living Dead. Thousands of lost souls can be heard weeping and moaning. In the corner are stacked the remains of dozens of previous adventurers less fortunate than yourself. A passage exits to the north.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -2294,6 +2346,7 @@ void initializeWorld() {
     domeRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("You are at the periphery of a large dome, which forms the ceiling of another room below. Protecting you from a precipitous drop is a wooden railing which circles the dome.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -2318,6 +2371,7 @@ void initializeWorld() {
     torchRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a large room with a prominent doorway leading to a down staircase. To the west is a narrow twisting tunnel, through which is coming a horrible stench. Above you is a large dome painted with scenes depicting elvish hacking rites. Up around the edge of the dome (20 feet up) is a wooden railing. In the center of the room there is a white marble pedestal.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -2345,6 +2399,7 @@ void initializeWorld() {
             printLine("You offer a prayer to the ancient gods. The temple seems to acknowledge your reverence.");
         } else if (rarg == M_LISTEN) {
             printLine("The temple is silent, but you sense a profound peace.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -2372,6 +2427,7 @@ void initializeWorld() {
             printLine("You kneel before the altar and pray. A sense of tranquility fills the temple.");
         } else if (rarg == M_LISTEN) {
             printLine("The temple is silent except for a faint echo from the hole in the floor.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -2404,6 +2460,7 @@ void initializeWorld() {
             printLine("You hear nothing but the silence of the ages.");
         } else if (rarg == M_PRAY) {
             printLine("You offer a prayer to the ancient Egyptian gods.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -2448,6 +2505,7 @@ void initializeWorld() {
     smallCave->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a tiny cave with entrances west and north, and a staircase leading down.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -2480,6 +2538,7 @@ void initializeWorld() {
     windingPassage->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a winding passage. It seems that there are only exits on the east and north.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -2497,6 +2556,7 @@ void initializeWorld() {
     twistingPassage->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is a winding passage. It seems that there are only exits on the east and north.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });
@@ -2514,6 +2574,7 @@ void initializeWorld() {
     atlantisRoom->setRoomAction([](int rarg) -> int {
         if (rarg == M_LOOK) {
             printLine("This is an ancient room, long under water. There is an exit to the south and a staircase leading up.");
+          return M_HANDLED;
         }
         return M_NOT_HANDLED;
     });

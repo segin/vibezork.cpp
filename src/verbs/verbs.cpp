@@ -198,170 +198,257 @@ static ZObject *tryImpliedObject(VerbId verb) {
   return nullptr;
 }
 
-bool vLook() {
+// ZIL: <GLOBAL INDENTS <TABLE (PURE) "" "  " ... >>
+// Source: zil/gverbs.zil:2015-2022
+static constexpr std::string_view INDENTS[] = {
+    "", "  ", "    ", "      ", "        ", "          ",
+};
+
+// ZIL: <GLOBAL DESC-OBJECT <>> (gverbs.zil:1691). Set by DESCRIBE-OBJECT and
+// never read; kept because the source keeps it.
+static ZObject *descObject = nullptr;
+
+// ZIL: <ROUTINE FIRSTER (OBJ LEVEL) ...>
+// Source: zil/gverbs.zil:1818-1835
+bool firster(const ZObject *obj, int level) {
   auto &g = Globals::instance();
-  if (!g.here) {
+  if (!obj) return RFALSE;
+  if (obj->getId() == ObjectIds::TROPHY_CASE) {
+    tell("Your collection of treasures consists of:", CR);
     return RTRUE;
   }
-
-  ZRoom *room = dynamic_cast<ZRoom *>(g.here);
-
-  // Superbrief mode: only room name (Requirement 67)
-  if (g.superbriefMode) {
-    printLine(g.here->getDesc());
+  if (obj == g.winner) {
+    tell("You are carrying:", CR);
     return RTRUE;
   }
-
-  // Determine if we should show full description
-  bool showFullDesc = false;
-
-  if (g.verboseMode) {
-    // Verbose mode: always show full description (Requirement 65)
-    showFullDesc = true;
-  } else if (g.briefMode) {
-    // Brief mode: full description for unvisited rooms, short for visited
-    // (Requirement 66)
-    showFullDesc = !g.here->hasFlag(ObjectFlag::TOUCHBIT);
+  if (!dynamic_cast<const ZRoom *>(obj)) {
+    if (level > 0) {
+      tell(INDENTS[level < 6 ? level : 5]);
+    }
+    if (obj->hasFlag(ObjectFlag::SURFACEBIT)) {
+      tell("Sitting on the ", obj, " is: ", CR);
+    } else if (obj->hasFlag(ObjectFlag::ACTORBIT)) {
+      tell("The ", obj, " is holding: ", CR);
+    } else {
+      tell("The ", obj, " contains:", CR);
+    }
+    return RTRUE;
   }
+  return RFALSE;
+}
 
-  // Mark room as visited
-  g.here->setFlag(ObjectFlag::TOUCHBIT);
-
-  // Always print room name first (Requirement 71 - text output fidelity)
-  print(g.here->getDesc());
-  crlf();
-
-  // Display room description
-  if (showFullDesc) {
-    // Show full description
-    if (room) {
-      if (room->hasRoomAction()) {
-        // Room has custom action handler - let it handle display
-        room->performRoomAction(M_LOOK);
-      } else {
-        // No custom action - display long description
-        if (!room->getLongDesc().empty()) {
-          printLine(room->getLongDesc());
-        }
-      }
+// ZIL: <ROUTINE DESCRIBE-OBJECT (OBJ V? LEVEL "AUX" (STR <>) AV) ...>
+// Source: zil/gverbs.zil:1693-1728
+void describeObject(ZObject *obj, bool v, int level) {
+  auto &g = Globals::instance();
+  if (!obj) return;
+  descObject = obj;
+  if (level == 0 && obj->performDescFcn(M_OBJDESC)) {
+    return;
+  }
+  std::string_view str;
+  if (level == 0 &&
+      ((!obj->hasFlag(ObjectFlag::TOUCHBIT) && !obj->getFirstDesc().empty() &&
+        (str = obj->getFirstDesc(), true)) ||
+       (!obj->getLongDesc().empty() && (str = obj->getLongDesc(), true)))) {
+    tell(str);
+  } else if (level == 0) {
+    tell("There is a ", obj, " here");
+    if (obj->hasFlag(ObjectFlag::ONBIT)) {
+      tell(" (providing light)");
+    }
+    tell(".");
+  } else {
+    tell(INDENTS[level < 6 ? level : 5]);
+    tell("A ", obj);
+    if (obj->hasFlag(ObjectFlag::ONBIT)) {
+      tell(" (providing light)");
+    } else if (obj->hasFlag(ObjectFlag::WEARBIT) &&
+               obj->getLocation() == g.winner) {
+      tell(" (being worn)");
     }
   }
+  if (level == 0 && g.winner) {
+    ZObject *av = g.winner->getLocation();
+    if (av && av->hasFlag(ObjectFlag::VEHBIT)) {
+      tell(" (outside the ", av, ")");
+    }
+  }
+  crlf();
+  if (seeInside(obj) && !obj->getContents().empty()) {
+    printCont(obj, v, level);
+  }
+}
 
-  // List visible objects in room (not in superbrief mode)
-  const auto &contents = g.here->getContents();
-  for (const auto *obj : contents) {
-    if (!obj->hasFlag(ObjectFlag::NDESCBIT) &&
-        !obj->hasFlag(ObjectFlag::INVISIBLE)) {
-      // ZIL: untouched objects print FDESC, touched ones LDESC
-      // (DESCRIBE-OBJECT, gverbs.zil:1696-1704)
-      if (!obj->hasFlag(ObjectFlag::TOUCHBIT) && obj->hasFirstDesc()) {
-        printLine(obj->getFirstDesc());
-      } else if (obj->hasLongDesc()) {
-        // Use custom long description
-        printLine(obj->getLongDesc());
-      } else {
-        // Default description with proper article
-        print("There is a ");
-        print(obj->getDesc());
-        printLine(" here.");
+// ZIL: <ROUTINE PRINT-CONT (OBJ "OPTIONAL" (V? <>) (LEVEL 0) ...) ...>
+// Source: zil/gverbs.zil:1750-1816. Two passes: first the untouched objects
+// with an FDESC, then everything else through DESCRIBE-OBJECT. The AUX
+// variable the source calls SHIT tracks whether an FDESC was printed.
+bool printCont(const ZObject *obj, bool v, int level) {
+  auto &g = Globals::instance();
+  if (!obj) return RTRUE;
+  auto contents = obj->getContents();
+  if (contents.empty()) return RTRUE;
+
+  ZObject *av = g.winner ? g.winner->getLocation() : nullptr;
+  if (!(av && av->hasFlag(ObjectFlag::VEHBIT))) {
+    av = nullptr;
+  }
+  bool first = true;
+  bool shit = true;
+  bool pv = false;
+  bool inv = (g.winner == obj) || (g.winner == obj->getLocation());
+
+  if (!inv) {
+    for (ZObject *y : contents) {
+      if (y == av) {
+        pv = true;
+        continue;
       }
-
-      // If object is an open or transparent container, show contents
-      if (obj->hasFlag(ObjectFlag::CONTBIT) &&
-          (obj->hasFlag(ObjectFlag::OPENBIT) ||
-           obj->hasFlag(ObjectFlag::TRANSBIT))) {
-        const auto &objContents = obj->getContents();
-        if (!objContents.empty()) {
-          print("The ");
-          print(obj->getDesc());
-          printLine(" contains:");
-          for (const auto *item : objContents) {
-            print("  ");
-            printLine(item->getDesc());
+      if (y == g.winner) {
+        continue;
+      }
+      if (!y->hasFlag(ObjectFlag::INVISIBLE) &&
+          !y->hasFlag(ObjectFlag::TOUCHBIT) && !y->getFirstDesc().empty()) {
+        if (!y->hasFlag(ObjectFlag::NDESCBIT)) {
+          tell(y->getFirstDesc(), CR);
+          shit = false;
+        }
+        if (seeInside(y) && !(y->getLocation() && y->getLocation()->hasDescFcn()) &&
+            !y->getContents().empty()) {
+          if (printCont(y, v, 0)) {
+            first = false;
           }
         }
       }
     }
   }
 
-  return RTRUE;
+  for (ZObject *y : obj->getContents()) {
+    if (y == av || y == g.player) {
+      continue;
+    }
+    if (!y->hasFlag(ObjectFlag::INVISIBLE) &&
+        (inv || y->hasFlag(ObjectFlag::TOUCHBIT) || y->getFirstDesc().empty())) {
+      if (!y->hasFlag(ObjectFlag::NDESCBIT)) {
+        if (first) {
+          if (firster(obj, level) && level < 0) {
+            level = 0;
+          }
+          level = level + 1;
+          first = false;
+        }
+        if (level < 0) {
+          level = 0;
+        }
+        describeObject(y, v, level);
+      } else if (!y->getContents().empty() && seeInside(y)) {
+        level = level + 1;
+        printCont(y, v, level);
+        level = level - 1;
+      }
+    }
+  }
+  if (pv && av && !av->getContents().empty()) {
+    printCont(av, v, level + 1);
+  }
+  return !(first && shit);
 }
 
-bool vInventory() {
+// ZIL: <ROUTINE DESCRIBE-OBJECTS ("OPTIONAL" (V? <>)) ...>
+// Source: zil/gverbs.zil:1681-1687
+void describeObjects(bool v) {
   auto &g = Globals::instance();
-  if (!g.winner) {
+  if (g.lit) {
+    if (g.here && !g.here->getContents().empty()) {
+      printCont(g.here, v || g.verboseMode, -1);
+    }
+  } else {
+    tell("Only bats can see in the dark. And you're not one.", CR);
+  }
+}
+
+// ZIL: <ROUTINE DESCRIBE-ROOM ("OPTIONAL" (LOOK? <>) "AUX" V? STR AV) ...>
+// Source: zil/gverbs.zil:1635-1679
+bool describeRoom(bool look) {
+  auto &g = Globals::instance();
+  bool v = look || g.verboseMode;
+  if (!g.lit) {
+    tell("It is pitch black.");
+    if (!g.sprayed) {
+      tell(" You are likely to be eaten by a grue.");
+    }
+    crlf();
     return RFALSE;
   }
-
-  const auto &contents = g.winner->getContents();
-  if (contents.empty()) {
-    printLine("You are empty-handed.");
-  } else {
-    printLine("You are carrying:");
-
-    // Helper lambda to print an object with proper article and indentation
-    std::function<void(const ZObject *, int)> printInventoryItem =
-        [&](const ZObject *obj, int indent) {
-          // Print indentation
-          for (int i = 0; i < indent; ++i) {
-            print("  ");
-          }
-
-          // Get description and add proper article
-          std::string desc = obj->getDesc();
-
-          // Capitalize first letter for display
-          char firstChar = desc.empty() ? 'A' : desc[0];
-          bool startsWithVowel =
-              (firstChar == 'a' || firstChar == 'e' || firstChar == 'i' ||
-               firstChar == 'o' || firstChar == 'u' || firstChar == 'A' ||
-               firstChar == 'E' || firstChar == 'I' || firstChar == 'O' ||
-               firstChar == 'U');
-
-          // Use "A" or "An" as appropriate (unless desc already has article)
-          bool hasArticle =
-              (desc.length() > 2 &&
-               (desc.substr(0, 2) == "a " || desc.substr(0, 3) == "an " ||
-                desc.substr(0, 4) == "the " || desc.substr(0, 5) == "some "));
-
-          if (!hasArticle) {
-            if (startsWithVowel) {
-              print("An ");
-            } else {
-              print("A ");
-            }
-          }
-          printLine(desc);
-
-          // If this is an open container with contents, list them
-          if (obj->hasFlag(ObjectFlag::CONTBIT) &&
-              (obj->hasFlag(ObjectFlag::OPENBIT) ||
-               obj->hasFlag(ObjectFlag::TRANSBIT))) {
-            const auto &objContents = obj->getContents();
-            if (!objContents.empty()) {
-              // Print container header
-              for (int i = 0; i < indent; ++i) {
-                print("  ");
-              }
-              print("  The ");
-              print(desc);
-              printLine(" contains:");
-
-              // Print each item in container
-              for (const auto *item : objContents) {
-                printInventoryItem(item, indent + 2);
-              }
-            }
-          }
-        };
-
-    // Print each inventory item
-    for (const auto *obj : contents) {
-      printInventoryItem(obj, 1);
+  if (!g.here) return RFALSE;
+  if (!g.here->hasFlag(ObjectFlag::TOUCHBIT)) {
+    g.here->setFlag(ObjectFlag::TOUCHBIT);
+    v = true;
+  }
+  // Maze rooms never stay "seen", so they are always described in full.
+  if (g.here->hasFlag(ObjectFlag::MAZEBIT)) {
+    g.here->clearFlag(ObjectFlag::TOUCHBIT);
+  }
+  ZRoom *room = dynamic_cast<ZRoom *>(g.here);
+  ZObject *av = g.winner ? g.winner->getLocation() : nullptr;
+  if (room) {
+    tell(g.here->getDesc());
+    if (av && av->hasFlag(ObjectFlag::VEHBIT)) {
+      tell(", in the ", av);
+    }
+    crlf();
+  }
+  if (look || !g.superbriefMode) {
+    if (v && room && room->performRoomAction(M_LOOK)) {
+      return RTRUE;
+    }
+    if (v && !g.here->getLongDesc().empty()) {
+      tell(g.here->getLongDesc(), CR);
+    } else if (room) {
+      room->performRoomAction(M_FLASH);
+    }
+    if (av && av != g.here && av->hasFlag(ObjectFlag::VEHBIT)) {
+      av->performAction();
     }
   }
   return RTRUE;
 }
+
+// ZIL: <ROUTINE V-LOOK () <COND (<DESCRIBE-ROOM T> <DESCRIBE-OBJECTS T>)>>
+// Source: zil/gverbs.zil:858-860
+bool vLook() {
+  if (describeRoom(true)) {
+    describeObjects(true);
+  }
+  return RTRUE;
+}
+
+// ZIL: <ROUTINE V-FIRST-LOOK () ...>
+// Source: zil/gverbs.zil:1630-1633
+bool vFirstLook() {
+  auto &g = Globals::instance();
+  if (describeRoom()) {
+    if (!g.superbriefMode) {
+      describeObjects();
+    }
+  }
+  return RTRUE;
+}
+
+// ZIL: <ROUTINE V-INVENTORY () ...>
+// Source: zil/gverbs.zil:29-31
+bool vInventory() {
+  auto &g = Globals::instance();
+  if (g.winner && !g.winner->getContents().empty()) {
+    printCont(g.winner);
+  } else {
+    tell("You are empty-handed.", CR);
+  }
+  return RTRUE;
+}
+
+
 
 bool vQuit() {
   // Authentic Zork: V-QUIT from gverbs.zil
@@ -2973,10 +3060,6 @@ bool vLookBehind() {
   return RTRUE;
 }
 
-bool vFirstLook() {
-  // Usually triggered by Look, but if called directly:
-  return Verbs::vLook();
-}
 
 // ZIL: <ROUTINE V-RANDOM () ...> (gverbs.zil:134-139)
 // #RANDOM n: <RANDOM <- 0 ,P-NUMBER>> reseeds the interpreter's generator.
@@ -3257,30 +3340,8 @@ int ccount(const ZObject *obj) {
   return cnt;
 }
 
-// ZIL: <ROUTINE DESCRIBE-OBJECT (OBJ "OPTIONAL" (V? <>) "AUX" STR) ...> (gverbs.zil:408-417)
-void describeObject(const ZObject *obj, bool isLook) {
-  if (!obj) return;
-  if (obj->hasLongDesc() && !obj->hasFlag(ObjectFlag::TOUCHBIT)) {
-    printLine(obj->getLongDesc());
-  } else {
-    printLine(std::format("There is a {} here.", obj->getDesc()));
-  }
-}
 
-// ZIL: <ROUTINE DESCRIBE-OBJECTS (V?) ...> (gverbs.zil:420-433)
-void describeObjects(const ZObject *room) {
-  if (!room) return;
-  for (const auto *obj : room->getContents()) {
-    if (obj && !obj->hasFlag(ObjectFlag::NDESCBIT) && !obj->hasFlag(ObjectFlag::INVISIBLE)) {
-      describeObject(obj);
-    }
-  }
-}
 
-// ZIL: <ROUTINE DESCRIBE-ROOM ("OPTIONAL" (LOOK? <>)) ...> (gverbs.zil:435-467)
-void describeRoom(bool look) {
-  vLook();
-}
 
 // ZIL: <ROUTINE DO-WALK (DIR) ...> (gverbs.zil:470-473)
 int doWalk(Direction dir) {
@@ -3314,16 +3375,6 @@ void finish() {
   }
 }
 
-// ZIL: <ROUTINE FIRSTER (OBJ) ...> (gverbs.zil:665-671)
-ZObject *firster(const ZObject *container) {
-  if (!container) return nullptr;
-  for (auto *child : container->getContents()) {
-    if (child && !child->hasFlag(ObjectFlag::NDESCBIT)) {
-      return child;
-    }
-  }
-  return nullptr;
-}
 
 // ZIL: <ROUTINE GLOBAL-IN? (OBJ WHERE) ...> (gverbs.zil:715-720)
 bool globalIn(ObjectId objId, const ZObject *room) {
@@ -3504,19 +3555,6 @@ ZObject *otherSide(const ZObject *door) {
   return door->getLocation();
 }
 
-// ZIL: <ROUTINE PRINT-CONT (OBJ "OPTIONAL" (CHECKTRANS? T) ...) ...> (gverbs.zil:1150-1204)
-// ZIL: <ROUTINE PRINT-CONT (OBJ "OPTIONAL" (V? <>) (LEVEL 0) ...) ...>
-// Source: zil/gverbs.zil:1750-1816. Returns true when anything was printed,
-// which V-LOOK-INSIDE relies on (gverbs.zil:877-879).
-// TODO(C4): the full two-pass FDESC/LDESC walk with INDENTS.
-bool printCont(const ZObject *obj, bool checkTrans) {
-  if (!obj) return RFALSE;
-  if (checkTrans && !seeInside(obj)) return RFALSE;
-  if (obj->getContents().empty()) return RFALSE;
-  firster(obj);
-  printContents(obj);
-  return RTRUE;
-}
 
 // ZIL: <ROUTINE PRINT-CONTENTS (OBJ ...) ...>
 // Source: zil/gverbs.zil:1730-1748. "a X, a Y, and a Z" on one line, and

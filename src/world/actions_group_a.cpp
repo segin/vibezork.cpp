@@ -200,6 +200,7 @@ int cellarAction(int rarg) {
       trapdoor->setFlag(ObjectFlag::TOUCHBIT);
       printLine("The trap door crashes shut, and you hear someone barring it.");
     }
+    return M_HANDLED;
   }
   return M_NOT_HANDLED;
 }
@@ -378,6 +379,7 @@ int cyclopsRoomAction(int rarg) {
           "The cyclops, having eaten the hot peppers, appears to be gasping. "
           "His enflamed tongue protrudes from his man-sized mouth.");
     }
+    return M_HANDLED;
   }
 
   // Blocking Logic (M-BEG usually checks movement verbs)
@@ -464,6 +466,7 @@ int damRoomAction(int rarg) {
       print(" which is glowing serenely");
     }
     printLine(".");
+    return M_HANDLED;
   }
   return M_NOT_HANDLED;
 }
@@ -693,6 +696,7 @@ int deepCanyonRoomAction(int rarg) {
     } else {
       printLine(" You can hear the sound of flowing water from below.");
     }
+    return M_HANDLED;
   }
   return M_NOT_HANDLED;
 }
@@ -1534,6 +1538,7 @@ int livingRoomAction(int rarg) {
     } else {
       printLine("and a large oriental rug in the center of the room.");
     }
+    return M_HANDLED;
   }
 
   // M-END: Update score when touching trophy case
@@ -1570,6 +1575,7 @@ int loudRoomAction(int rarg) {
           "The sound seems to reverberate from all of the walls, making it "
           "difficult even to think.");
     }
+    return M_HANDLED;
   }
 
   // M-END: Eject player if room is too loud
@@ -1637,6 +1643,7 @@ int maze11Action(int rarg) {
         printLine("There is a grating securely fastened into the ground.");
       }
     }
+    return M_HANDLED;
   }
   return M_NOT_HANDLED;
 }
