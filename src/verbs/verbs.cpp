@@ -2346,10 +2346,19 @@ bool vFrobozz() {
 
 // Additional common verbs - authentic ZIL responses
 
+// ZIL: <ROUTINE V-WAIT ("OPTIONAL" (NUM 3)) ...>
+// Source: zil/gverbs.zil:1514-1519. Three clock ticks, stopping early if any
+// interrupt reports something, then CLOCK-WAIT so MAIN-LOOP-1 does not tick
+// again for this command.
 bool vWait() {
-  // Authentic ZIL V-WAIT - passes time
-  printLine("Time passes...");
-  // In full implementation, this would call CLOCKER multiple times
+  auto &g = Globals::instance();
+  tell("Time passes...", CR);
+  int num = 3;
+  while (true) {
+    if (--num < 0) break;
+    if (TimerSystem::clocker()) break;
+  }
+  g.clockWait = true;
   return RTRUE;
 }
 
