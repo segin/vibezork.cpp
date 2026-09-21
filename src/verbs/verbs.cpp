@@ -4,6 +4,7 @@
 #include "../systems/npc.h"
 #include "../systems/score.h"
 #include "core/globals.h"
+#include "core/gmain.h"
 #include "core/io.h"
 #include "parser/parser.h"
 #include "systems/lamp.h"
@@ -793,10 +794,17 @@ bool vUnlock() {
   return RTRUE;
 }
 
-bool vWalk() {
-  // Bare "go" without direction - authentic Zork response
-  printLine("Use compass directions for movement.");
-  return RTRUE;
+// ZIL: <ROUTINE V-WALK ("AUX" PT PTS STR OBJ RM)
+//        <COND (<NOT ,P-WALK-DIR> <PERFORM ,V?WALK-TO ,PRSO> <RTRUE>)
+//              ... direction handling ...
+// Source: gverbs.zil:1521-1580
+int vWalk() {
+  auto &g = Globals::instance();
+  if (!g.pWalkDir) {
+    perform(V_WALK_TO, g.prso);
+    return M_HANDLED;
+  }
+  return vWalkDir(*g.pWalkDir);
 }
 
 // ZIL: every failing branch of V-WALK ends in <RFATAL>; a completed move

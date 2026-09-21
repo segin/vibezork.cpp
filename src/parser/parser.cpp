@@ -825,6 +825,8 @@ bool Parser::isKnownObjectWord(const std::string &word) const {
 }
 
 ParsedCommand Parser::parse(const std::string &input) {
+  // ZIL: <SETG P-WALK-DIR <>> unless the input is a direction (gparser.zil:370-375)
+  Globals::instance().pWalkDir.reset();
   ParsedCommand cmd;
 
   // Handle AGAIN command
@@ -929,6 +931,8 @@ ParsedCommand Parser::parse(const std::string &input) {
     cmd.isDirection = true;
     cmd.direction = *dir;
     cmd.verb = V_WALK;
+    // ZIL: <SETG PRSA ,V?WALK> <SETG PRSO .DIR> <SETG P-WALK-DIR .DIR> (gparser.zil:370-374)
+    Globals::instance().pWalkDir = *dir;
     orphanFlag_ = false;
     return cmd;
   }
@@ -969,6 +973,7 @@ ParsedCommand Parser::parse(const std::string &input) {
     if (dir) {
       cmd.isDirection = true;
       cmd.direction = *dir;
+      Globals::instance().pWalkDir = *dir;
       orphanFlag_ = false;
       return cmd;
     }

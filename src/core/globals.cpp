@@ -77,6 +77,7 @@ void Globals::reset() {
     pMerged = false;
     pNumber = 0;
     pDirection = 0;
+    pWalkDir.reset();
     pGetFlags = 0;
     pSlocbits = 0;
     pGwimbit = 0;

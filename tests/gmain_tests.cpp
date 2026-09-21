@@ -359,6 +359,89 @@ void testRfatalAbortsLoopAndSkipsMEnd() {
   std::println("✓ RFATAL propagation verified against gmain.zil:96-161");
 }
 
+
+// ZIL: a direction goes through PERFORM with PRSA=V?WALK and P-WALK-DIR set
+// (gparser.zil:370-374, gmain.zil:79-81), so the room's M-BEG/M-END hooks
+// and V-WALK all see the WALK verb.
+void testDirectionThroughPerform() {
+  std::println("Testing direction commands go through PERFORM as V?WALK...");
+  auto &g = Globals::instance();
+  g.reset();
+  initializeAllVerbHandlers();
+
+  auto playerObj = std::make_unique<ZObject>(5301, "adventurer");
+  auto roomA = std::make_unique<ZRoom>(5302, "Room A", "Room A desc");
+  auto roomB = std::make_unique<ZRoom>(5303, "Room B", "Room B desc");
+  roomA->setFlag(ObjectFlag::ONBIT);
+  roomB->setFlag(ObjectFlag::ONBIT);
+  roomA->setExit(Direction::NORTH, RoomExit(5303));
+  ZRoom *a = roomA.get();
+  ZRoom *b = roomB.get();
+  g.registerObject(5302, std::move(roomA));
+  g.registerObject(5303, std::move(roomB));
+  g.player = playerObj.get();
+  g.winner = playerObj.get();
+  g.here = a;
+  playerObj->moveTo(a);
+
+  VerbId begVerb = 0;
+  VerbId endVerb = 0;
+  a->setRoomAction([&](int rarg) -> int {
+    if (rarg == M_BEG) {
+      begVerb = g.prsa;
+    }
+    return M_NOT_HANDLED;
+  });
+  b->setRoomAction([&](int rarg) -> int {
+    if (rarg == M_END) {
+      endVerb = g.prsa;
+    }
+    return M_NOT_HANDLED;
+  });
+
+  ParsedCommand cmd;
+  cmd.verb = V_WALK;
+  cmd.words = {"north"};
+  cmd.isDirection = true;
+  cmd.direction = Direction::NORTH;
+  g.pWalkDir = Direction::NORTH;
+
+  int v = executeCommand(cmd);
+  assert(begVerb == V_WALK);
+  assert(g.here == b);
+  assert(playerObj->getLocation() == b);
+  assert(endVerb == V_WALK);
+  assert(v != M_FATAL);
+
+  // A room that handles WALK at M-BEG blocks the move (ZIL: room value true).
+  g.here = a;
+  playerObj->moveTo(a);
+  a->setRoomAction([&](int rarg) -> int {
+    return (rarg == M_BEG && g.prsa == V_WALK) ? M_HANDLED : M_NOT_HANDLED;
+  });
+  g.pWalkDir = Direction::NORTH;
+  executeCommand(cmd);
+  assert(g.here == a);
+
+  // No exit: V-WALK fails with RFATAL, so M-END is skipped.
+  a->setRoomAction(nullptr);
+  int endCalls = 0;
+  a->setRoomAction([&](int rarg) -> int {
+    if (rarg == M_END) {
+      ++endCalls;
+    }
+    return M_NOT_HANDLED;
+  });
+  cmd.direction = Direction::SOUTH;
+  g.pWalkDir = Direction::SOUTH;
+  v = executeCommand(cmd);
+  assert(v == M_FATAL);
+  assert(endCalls == 0);
+  assert(g.here == a);
+
+  std::println("✓ Direction dispatch verified against gmain.zil:79-81");
+}
+
 void testMetaVerbs() {
   std::println("Testing meta-verb recognition...");
 
@@ -394,6 +477,7 @@ int main() {
   testPerformDispatchHierarchy();
   testRoomMBegStopsDispatch();
   testRfatalAbortsLoopAndSkipsMEnd();
+  testDirectionThroughPerform();
   testMetaVerbs();
 
   std::println("========================================");

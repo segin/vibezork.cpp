@@ -10,13 +10,13 @@ test, build, commit, push; then mark `[x]` and update the counters. Every routin
 ported carries `// ZIL:` and `// Source: <file>:<lines>` comments. Never simplify
 away a ZIL behaviour.
 
-Progress: 2/74 (3%)
+Progress: 3/74 (4%)
 
 ## Phase A: engine foundations (src/core, src/systems/timer)
 
 - [x] A1 Room and object action handlers return a tri-state (M-NOT-HANDLED / M-HANDLED / M-FATAL) instead of void/bool; PERFORM stops when the room's M-BEG call returns true (gmain.zil:212; cpp_vs_zil_audit §2.1)
 - [x] A2 RFATAL propagation: value 2 aborts the multi-object loop, skips M-END, clears P-CONT; P-CONT cleared on parse failure (gmain.zil:150-163; §2.3)
-- [ ] A3 Direction commands go through PERFORM with PRSA=V?WALK and P-WALK-DIR (gmain.zil:79-81; §2.2)
+- [x] A3 Direction commands go through PERFORM with PRSA=V?WALK and P-WALK-DIR (gmain.zil:79-81; §2.2)
 - [ ] A4 Object model: FDESC property, VTYPE property, PROPDEF defaults SIZE 5 / CAPACITY 0 / VALUE 0 / TVALUE 0 honoured by getProperty; remove LOCKEDBIT/DEADBIT concepts (§2.15, §7.2, §7.7)
 - [ ] A5 MOVES incremented only inside CLOCKER; remove ScoreSystem::moves_ duplicate (gclock.zil:50; §2.7)
 - [ ] A6 CLOCKER fidelity: C-TABLE of 30 entries allocated downward and scanned from the newest, fires when tick==1 or negative, FLG only when the routine returns true, no auto-repeat, no demon concept (gclock.zil:21-60; §2.9-2.10)

@@ -2,7 +2,11 @@
 #include "object.h"
 #include "types.h"
 #include <memory>
+#include <optional>
 #include <unordered_map>
+
+// Defined in world/rooms.h (scoped enum, underlying int)
+enum class Direction;
 
 /**
  * @brief Global game state singleton (mirrors ZIL global variables)
@@ -98,6 +102,10 @@ public:
   bool pMerged = false;    ///< ZIL: ,P-MERGED (Merged sentence flag)
   int pNumber = 0;         ///< ZIL: ,P-NUMBER (Numeric input value)
   int pDirection = 0;      ///< ZIL: ,P-DIRECTION (Parsed direction)
+  /// ZIL: ,P-WALK-DIR (gparser.zil:383). Set by the parser when the input is
+  /// a bare direction or WALK <dir>; empty otherwise. MAIN-LOOP-1 performs
+  /// V?WALK when it is set (gmain.zil:79-81); V-WALK reads it.
+  std::optional<Direction> pWalkDir;
   int pGetFlags = 0;       ///< ZIL: ,P-GETFLAGS (P-ALL, P-ONE, P-INHIBIT)
   int pSlocbits = 0;       ///< ZIL: ,P-SLOCBITS (Search location bits)
   uint64_t pGwimbit = 0;   ///< ZIL: ,P-GWIMBIT (GWIM required bit)

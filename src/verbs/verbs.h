@@ -347,7 +347,8 @@ namespace Verbs {
     bool vApply();
 
 
-    bool vWalk();
+    /// ZIL V-WALK: WALK-TO when no P-WALK-DIR, else the direction move.
+    int vWalk();
     /// ZIL V-WALK for a direction: returns M_HANDLED on a move, M_FATAL
     /// (RFATAL) when the move fails (gverbs.zil:1521-1580).
     int vWalkDir(Direction dir);

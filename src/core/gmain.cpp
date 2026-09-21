@@ -449,6 +449,16 @@ int executeCommand(const ParsedCommand &cmd) {
   auto &g = Globals::instance();
   int v = M_NOT_HANDLED;
 
+  // ZIL: the parser leaves PRSA/PRSO/PRSI set (SYNTAX-FOUND, SNARF-OBJECTS,
+  // gparser.zil:370-372 for directions); PERFORM saves and restores them, so
+  // the room's M-END call sees this command's verb (gmain.zil:154).
+  g.prsa = cmd.verb;
+  g.prso = cmd.directObj;
+  g.prsi = cmd.indirectObj;
+  if (cmd.isDirection && !g.pWalkDir) {
+    g.pWalkDir = cmd.direction;
+  }
+
   // Multi-object handling (ZIL: lines 91-150)
   if (cmd.isAll) {
     g.pMult = true;
@@ -467,9 +477,11 @@ int executeCommand(const ParsedCommand &cmd) {
         break;
       }
     }
-  } else if (cmd.isDirection) {
+  } else if (cmd.verb == V_WALK && g.pWalkDir) {
+    // ZIL: <COND (<AND <==? ,PRSA ,V?WALK> <NOT <ZERO? ,P-WALK-DIR>>>
+    //             <SET V <PERFORM ,PRSA ,PRSO>>) (gmain.zil:79-81)
     g.pMult = false;
-    v = Verbs::vWalkDir(cmd.direction);
+    v = perform(V_WALK, nullptr, nullptr);
   } else {
     g.pMult = false;
     v = perform(cmd.verb, cmd.directObj, cmd.indirectObj);
