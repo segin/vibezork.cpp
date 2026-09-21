@@ -19,6 +19,10 @@ TEST(DropVerbBasic) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create lamp object in player inventory
@@ -56,6 +60,10 @@ TEST(DropVerbNoObject) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Set up verb context without object
@@ -85,6 +93,10 @@ TEST(DropVerbNotInInventory) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create lamp object in the room (not in inventory)
@@ -99,9 +111,10 @@ TEST(DropVerbNotInInventory) {
     g.prso = lampPtr;
     g.prsa = V_DROP;
     
-    // Test DROP verb on object not in inventory
+    // Test DROP verb on object not in inventory: IDROP refuses and V-DROP
+    // falls through as not-handled (gverbs.zil:1966-1977, 479-481)
     bool result = Verbs::vDrop();
-    ASSERT_TRUE(result);
+    ASSERT_FALSE(result);
     
     // Verify lamp is still in the room (not moved)
     ASSERT_EQ(lampPtr->getLocation(), g.here);
@@ -124,6 +137,10 @@ TEST(DropVerbMultipleObjects) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create lamp object in player inventory
@@ -156,9 +173,9 @@ TEST(DropVerbMultipleObjects) {
     ASSERT_TRUE(result2);
     ASSERT_EQ(swordPtr->getLocation(), g.here);
     
-    // Verify both objects are in the room
+    // Verify both objects are in the room (the actor is in it too)
     const auto& roomContents = g.here->getContents();
-    ASSERT_EQ(roomContents.size(), 2);
+    ASSERT_EQ(roomContents.size(), 3);
     
     // Cleanup
     g.reset();
@@ -180,6 +197,10 @@ TEST(DropVerbInDifferentRoom) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create lamp object in player inventory
@@ -233,6 +254,10 @@ TEST(PutVerbBasic) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create container (box) in room
@@ -282,6 +307,10 @@ TEST(PutVerbClosedContainer) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create closed container (chest) in room
@@ -334,6 +363,10 @@ TEST(PutVerbCapacityLimit) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create small container (bag) with limited capacity
@@ -399,6 +432,10 @@ TEST(PutVerbCapacityWithNestedContainers) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create outer container (sack)
@@ -473,6 +510,10 @@ TEST(PutVerbCapacityExactFit) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create container
@@ -527,6 +568,10 @@ TEST(PutVerbNonContainer) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create non-container object (lamp) in room
@@ -576,6 +621,10 @@ TEST(PutVerbNoObject) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Set up verb context without object
@@ -605,6 +654,10 @@ TEST(PutVerbNoContainer) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create coin object in player inventory
@@ -645,6 +698,10 @@ TEST(PutVerbMultipleObjects) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create container (sack) in room
@@ -713,6 +770,10 @@ TEST(OpenVerbBasic) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create closed container (chest) in room
@@ -751,6 +812,10 @@ TEST(OpenVerbWithContents) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create closed container (box) in room
@@ -796,6 +861,10 @@ TEST(OpenVerbAlreadyOpen) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create open container (sack) in room
@@ -836,6 +905,10 @@ TEST(OpenVerbLockedContainer) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create a container whose action refuses OPEN (ZIL has no lock flag;
@@ -884,6 +957,10 @@ TEST(OpenVerbNonContainer) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create non-container object (lamp) in room
@@ -920,6 +997,10 @@ TEST(OpenVerbNoObject) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Set up verb context without object
@@ -948,6 +1029,10 @@ TEST(CloseVerbBasic) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create open container (chest) in room
@@ -986,6 +1071,10 @@ TEST(CloseVerbAlreadyClosed) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create closed container (box) in room
@@ -1026,6 +1115,10 @@ TEST(CloseVerbNonContainer) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create non-container object (sword) in room
@@ -1062,6 +1155,10 @@ TEST(CloseVerbNoObject) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Set up verb context without object
@@ -1090,6 +1187,10 @@ TEST(OpenCloseSequence) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create closed container (trunk) in room
@@ -1142,6 +1243,10 @@ TEST(LockVerbBasic) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create lockable container (chest) in room
@@ -1199,6 +1304,10 @@ TEST(LockVerbAlreadyLocked) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create container with no LOCK action in room
@@ -1243,6 +1352,10 @@ TEST(LockVerbWithoutKey) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create lockable container (chest) in room
@@ -1280,6 +1393,10 @@ TEST(LockVerbNonLockable) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create non-lockable object (lamp) in room
@@ -1325,6 +1442,10 @@ TEST(UnlockVerbBasic) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create locked container (chest) in room
@@ -1381,6 +1502,10 @@ TEST(UnlockVerbNotLocked) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create unlocked container (box) in room
@@ -1426,6 +1551,10 @@ TEST(UnlockVerbWithoutKey) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create locked container (chest) in room
@@ -1463,6 +1592,10 @@ TEST(LockUnlockSequence) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create lockable container (safe) in room
@@ -1541,6 +1674,10 @@ TEST(TurnVerbBasic) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create object (dial) in room
@@ -1576,6 +1713,10 @@ TEST(TurnVerbNoObject) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Set up verb context without object
@@ -1604,6 +1745,10 @@ TEST(PushVerbBasic) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create object (button) in room
@@ -1639,6 +1784,10 @@ TEST(PushVerbNoObject) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Set up verb context without object
@@ -1667,6 +1816,10 @@ TEST(PullVerbBasic) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create object (lever) in room
@@ -1702,6 +1855,10 @@ TEST(PullVerbNoObject) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Set up verb context without object
@@ -1730,6 +1887,10 @@ TEST(MoveVerbBasic) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Create object (rug) in room
@@ -1765,6 +1926,10 @@ TEST(MoveVerbNoObject) {
     // Create player
     auto player = std::make_unique<ZObject>(999, "player");
     g.winner = player.get();
+    g.player = g.winner;
+    // IDROP moves the object to <LOC ,WINNER> (gverbs.zil:1974), so the
+    // actor has to actually be in the room.
+    g.winner->moveTo(g.here);
     g.registerObject(999, std::move(player));
     
     // Set up verb context without object

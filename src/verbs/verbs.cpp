@@ -1,4 +1,5 @@
 #include "verbs.h"
+#include "verb_tables.h"
 #include "../systems/combat.h"
 #include "../systems/death.h"
 #include "../systems/npc.h"
@@ -20,6 +21,10 @@
 extern bool damGatesOpen;
 
 namespace Verbs {
+
+// ZIL: <GLOBAL FUMBLE-NUMBER 7> <GLOBAL FUMBLE-PROB 8> (gverbs.zil:1896-1898)
+constexpr int FUMBLE_NUMBER = 7;
+constexpr int FUMBLE_PROB = 8;
 
 // Helper function to calculate total weight (size) of an object and all its
 // contents recursively This matches the WEIGHT function from ZIL
@@ -381,144 +386,30 @@ bool vQuit() {
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-TAKE () ...>
+// Source: zil/gverbs.zil:1382-1388. Only an exact T from ITAKE prints;
+// RFATAL (the load message) and RFALSE fall through silently.
 bool vTake() {
   auto &g = Globals::instance();
-
-  // PRE-TAKE checks (Requirement 21, 34, 63, 80)
-
-  // Check if object is specified - try implied object first
-  if (!g.prso) {
-    g.prso = tryImpliedObject(V_TAKE);
-    if (!g.prso) {
-      printLine("What do you want to take?");
-      return RTRUE;
+  if (iTake() == RTRUE) {
+    if (g.prso->hasFlag(ObjectFlag::WEARBIT)) {
+      tell("You are now wearing the ", g.prso, ".", CR);
+    } else {
+      tell("Taken.", CR);
     }
-  }
-
-  // Check if object is already in inventory - authentic ZIL: PRE-TAKE
-  if (g.prso->getLocation() == g.winner) {
-    printLine("You already have that!");
     return RTRUE;
   }
-
-  // Check if taking FROM a specific object (syntax: TAKE OBJECT FROM OBJECT)
-  if (g.prsi) {
-    // Verify object is actually in the source
-    if (g.prso->getLocation() != g.prsi) {
-      print("The ");
-      print(g.prso->getDesc());
-      print(" isn't in the ");
-      print(g.prsi->getDesc());
-      printLine(".");
-      return RTRUE;
-    }
-
-    // Verify source is accessible (open container or surface)
-    // If it's a closed opaque container, we shouldn't be able to take from it
-    // Note: TRANSBIT (transparent) allows looking inside, but NOT taking out if
-    // closed!
-    if (!g.prsi->hasFlag(ObjectFlag::OPENBIT) &&
-        !g.prsi->hasFlag(ObjectFlag::SURFACEBIT)) {
-      print("The ");
-      print(g.prsi->getDesc());
-      printLine(" isn't open.");
-      return RTRUE;
-    }
-  }
-
-  // Call object action handler FIRST for TRYTAKEBIT objects
-  // This allows objects like mailbox to give custom "anchored" messages
-  if (g.prso->hasFlag(ObjectFlag::TRYTAKEBIT)) {
-    if (g.prso->performAction()) {
-      return RTRUE;
-    }
-    // Default message if no custom handler
-    printLine("You can't take that.");
-    return RTRUE;
-  }
-
-  // Check TAKEBIT flag (only takeable objects can be taken)
-  if (!g.prso->hasFlag(ObjectFlag::TAKEBIT)) {
-    printLine("You can't take that.");
-    return RTRUE;
-  }
-
-  // Check if object is accessible (must be in current room, inventory, or open
-  // container)
-  if (!isObjectAccessible(g.prso)) {
-    printLine("You can't see any such thing.");
-    return RTRUE;
-  }
-
-  // Check inventory weight limit (Requirement 63)
-  // Calculate current inventory weight
-  int currentWeight = 0;
-  for (const auto *obj : g.winner->getContents()) {
-    currentWeight += obj->getProperty(P_SIZE);
-  }
-
-  // Get object size
-  int objectSize = g.prso->getProperty(P_SIZE);
-  if (objectSize == 0) {
-    objectSize = 5; // Default size if not specified
-  }
-
-  // Check if adding this object would exceed the limit
-  if (currentWeight + objectSize > g.loadAllowed) {
-    printLine("You're carrying too much.");
-    return RTRUE;
-  }
-
-  // Call object action handler if present (Requirement 35)
-  // This allows objects to override default behavior
-  if (g.prso->performAction()) {
-    return RTRUE;
-  }
-
-  // Default TAKE behavior
-  // Move object to player inventory
-  g.prso->moveTo(g.winner);
-  printLine("Taken.");
-
-  return RTRUE;
+  return RFALSE;
 }
 
+// ZIL: <ROUTINE V-DROP () ...>
+// Source: zil/gverbs.zil:479-481
 bool vDrop() {
-  auto &g = Globals::instance();
-
-  // PRE-DROP checks (Requirement 21, 34)
-
-  // Check if object is specified - try implied object first
-  if (!g.prso) {
-    g.prso = tryImpliedObject(V_DROP);
-    if (!g.prso) {
-      printLine("What do you want to drop?");
-      return RTRUE;
-    }
-  }
-
-  // Check if object is in inventory
-  if (g.prso->getLocation() != g.winner) {
-    printLine("You aren't carrying that.");
+  if (iDrop()) {
+    tell("Dropped.", CR);
     return RTRUE;
   }
-
-  // Check if drop is allowed in current room
-  // Some rooms might not allow dropping (e.g., sacred rooms, special locations)
-  // For now, we allow dropping everywhere unless room action prevents it
-
-  // Call object action handler if present (Requirement 35)
-  // This allows objects to override default behavior
-  if (g.prso->performAction()) {
-    return RTRUE;
-  }
-
-  // Default DROP behavior
-  // Move object to current room
-  g.prso->moveTo(g.here);
-  printLine("Dropped.");
-
-  return RTRUE;
+  return RFALSE;
 }
 
 bool vExamine() {
@@ -3366,13 +3257,15 @@ bool preBurn() {
   return true;
 }
 
-// ZIL: <ROUTINE PRE-DROP () ...> (gverbs.zil:474-478)
+// ZIL: <ROUTINE PRE-DROP () ...>
+// Source: zil/gverbs.zil:474-478
 bool preDrop() {
   auto &g = Globals::instance();
   if (g.winner && g.prso && g.prso == g.winner->getLocation()) {
-    return vDisembark();
+    perform(V_DISEMBARK, g.prso);
+    return RTRUE;
   }
-  return false;
+  return RFALSE;
 }
 
 // ZIL: <ROUTINE PRE-FILL ("AUX" TX) ...> (gverbs.zil:646-654)
@@ -3465,37 +3358,43 @@ bool preSGive() {
   return vGive();
 }
 
-// ZIL: <ROUTINE PRE-TAKE () ...> (gverbs.zil:1353-1380)
+// ZIL: <ROUTINE PRE-TAKE () ...>
+// Source: zil/gverbs.zil:1353-1380
 bool preTake() {
   auto &g = Globals::instance();
-  if (!g.prso) return false;
+  if (!g.prso) return RFALSE;
   if (g.prso->getLocation() == g.winner) {
     if (g.prso->hasFlag(ObjectFlag::WEARBIT)) {
-      printLine("You are already wearing it.");
+      tell("You are already wearing it.", CR);
     } else {
-      printLine("You already have that!");
+      tell("You already have that!", CR);
     }
-    return true;
+    return RTRUE;
   }
-  if (ZObject *loc = g.prso->getLocation()) {
-    if (loc->hasFlag(ObjectFlag::CONTBIT) && !loc->hasFlag(ObjectFlag::OPENBIT)) {
-      printLine("You can't reach something that's inside a closed container.");
-      return true;
-    }
+  ZObject *loc = g.prso->getLocation();
+  if (loc && loc->hasFlag(ObjectFlag::CONTBIT) &&
+      !loc->hasFlag(ObjectFlag::OPENBIT)) {
+    tell("You can't reach something that's inside a closed container.", CR);
+    return RTRUE;
   }
   if (g.prsi) {
-    if (g.prso->getLocation() != g.prsi) {
-      printLine(std::format("The {} isn't in the {}.", g.prso->getDesc(), g.prsi->getDesc()));
-      return true;
+    // ZIL: TAKE x FROM GROUND simply drops the indirect object.
+    if (g.prsi == g.getObject(ObjectIds::GROUND)) {
+      g.prsi = nullptr;
+      return RFALSE;
+    }
+    if (g.prsi != g.prso->getLocation()) {
+      tell("The ", g.prso, " isn't in the ", g.prsi, ".", CR);
+      return RTRUE;
     }
     g.prsi = nullptr;
-    return false;
+    return RFALSE;
   }
   if (g.winner && g.prso == g.winner->getLocation()) {
-    printLine("You're inside of it!");
-    return true;
+    tell("You're inside of it!", CR);
+    return RTRUE;
   }
-  return false;
+  return RFALSE;
 }
 
 // ZIL: <ROUTINE PRE-TURN () ...> (gverbs.zil:1488-1494)
@@ -3516,12 +3415,13 @@ bool preTurn() {
 // ZIL: GVERBS.ZIL System Routines (zil/gverbs.zil)
 // ============================================================================
 
-// ZIL: <ROUTINE CCOUNT (OBJ "AUX" (CNT 0)) ...> (gverbs.zil:273-275)
+// ZIL: <ROUTINE CCOUNT (OBJ "AUX" (CNT 0) X) ...>
+// Source: zil/gverbs.zil:1979-1986. Worn objects do not count.
 int ccount(const ZObject *obj) {
   if (!obj) return 0;
   int cnt = 0;
   for (const auto *child : obj->getContents()) {
-    if (child && !child->hasFlag(ObjectFlag::NDESCBIT)) {
+    if (child && !child->hasFlag(ObjectFlag::WEARBIT)) {
       cnt++;
     }
   }
@@ -3668,35 +3568,86 @@ bool hitSpot() {
   return true;
 }
 
-// ZIL: <ROUTINE IDROP () ...> (gverbs.zil:773-780)
+// ZIL: <ROUTINE IDROP () ...>
+// Source: zil/gverbs.zil:1966-1977
 bool iDrop() {
   auto &g = Globals::instance();
-  if (!g.prso) return false;
-  if (!isHeld(g.prso)) {
-    printLine("You're not carrying that.");
-    return false;
+  ZObject *loc = g.prso ? g.prso->getLocation() : nullptr;
+  if (g.prso && g.prso->getLocation() != g.winner && loc != g.winner) {
+    tell("You're not carrying the ", g.prso, ".", CR);
+    return RFALSE;
   }
-  g.prso->moveTo(g.here);
-  return true;
+  if (g.prso && g.prso->getLocation() != g.winner &&
+      (!loc || !loc->hasFlag(ObjectFlag::OPENBIT))) {
+    tell("The ", g.prso, " is closed.", CR);
+    return RFALSE;
+  }
+  if (g.prso && g.winner) {
+    g.prso->moveTo(g.winner->getLocation());
+  }
+  return RTRUE;
 }
 
-// ZIL: <ROUTINE ITAKE ("OPTIONAL" (VB T) "AUX" CNT) ...> (gverbs.zil:781-806)
-bool iTake(bool vb) {
+// ZIL: <ROUTINE ITAKE ("OPTIONAL" (VB T) "AUX" CNT OBJ) ...>
+// Source: zil/gverbs.zil:1900-1964
+// Returns RFALSE, RFATAL (the load check) or RTRUE; V-TAKE only prints
+// "Taken." when the value is exactly T, so RFATAL stays silent there while
+// V-PUT's <NOT <ITAKE>> treats it as a success (gverbs.zil:1108).
+int iTake(bool vb) {
   auto &g = Globals::instance();
-  if (!g.prso) return false;
-  if (!g.prso->hasFlag(ObjectFlag::TAKEBIT) && !g.prso->hasFlag(ObjectFlag::TRYTAKEBIT)) {
-    if (vb) printLine("You can't take that!");
-    return false;
+  if (!g.prso) {
+    return RFALSE;
   }
-  int objWeight = weight(g.prso);
-  int curWeight = weight(g.winner);
-  if (curWeight + objWeight > g.loadAllowed) {
-    if (vb) printLine("Your load is too heavy.");
-    return false;
+  // ZIL: (,DEAD <COND (.VB <TELL "Your hand passes through its object." CR>)>
+  //       <RFALSE>)
+  if (DeathSystem::isDead()) {
+    if (vb) {
+      tell("Your hand passes through its object.", CR);
+    }
+    return RFALSE;
+  }
+  // ZIL: (<NOT <FSET? ,PRSO ,TAKEBIT>> <TELL <PICK-ONE ,YUKS> CR> <RFALSE>)
+  if (!g.prso->hasFlag(ObjectFlag::TAKEBIT)) {
+    if (vb) {
+      tell(VerbTables::yuks().pickOne(), CR);
+    }
+    return RFALSE;
+  }
+  ZObject *loc = g.prso->getLocation();
+  // ZIL: ;"Kludge for parser calling itake" - a closed container's contents
+  // fail silently so ITAKE-CHECK can fall through to the verb's own message.
+  if (loc && loc->hasFlag(ObjectFlag::CONTBIT) &&
+      !loc->hasFlag(ObjectFlag::OPENBIT)) {
+    return RFALSE;
+  }
+  // ZIL: (<AND <NOT <IN? <LOC ,PRSO> ,WINNER>>
+  //            <G? <+ <WEIGHT ,PRSO> <WEIGHT ,WINNER>> ,LOAD-ALLOWED>> ...)
+  if (!(loc && loc->getLocation() == g.winner) &&
+      weight(g.prso) + weight(g.winner) > g.loadAllowed) {
+    if (vb) {
+      tell("Your load is too heavy");
+      if (g.loadAllowed < g.loadMax) {
+        tell(", especially in light of your condition.");
+      } else {
+        tell(".");
+      }
+      crlf();
+    }
+    return GMacros::rfatal();
+  }
+  // ZIL: (<AND <VERB? TAKE> <G? <SET CNT <CCOUNT ,WINNER>> ,FUMBLE-NUMBER>
+  //            <PROB <* .CNT ,FUMBLE-PROB>>> ...)
+  int cnt = 0;
+  if (g.prsa == V_TAKE && (cnt = ccount(g.winner)) > FUMBLE_NUMBER &&
+      GMacros::prob(cnt * FUMBLE_PROB)) {
+    tell("You're holding too many things already!", CR);
+    return RFALSE;
   }
   g.prso->moveTo(g.winner);
+  g.prso->clearFlag(ObjectFlag::NDESCBIT);
+  g.prso->setFlag(ObjectFlag::TOUCHBIT);
   scoreObj(g.prso);
-  return true;
+  return RTRUE;
 }
 
 // ZIL: <ROUTINE LKP (STR) ...> (gverbs.zil:880-890)
@@ -3805,9 +3756,22 @@ void thisIsIt(ZObject *obj) {
   g.pItObject = obj;
 }
 
-// ZIL: <ROUTINE WEIGHT (OBJ "AUX" (CONT <FIRST? .OBJ>) (WT 0)) ...> (gverbs.zil:1475-1486)
+// ZIL: <ROUTINE WEIGHT (OBJ "AUX" CONT (WT 0)) ...>
+// Source: zil/gverbs.zil:1988-1998. Anything worn by the player counts as 1;
+// everything else counts its own recursive weight. The object's own SIZE is
+// always added, so a container weighs its SIZE plus its contents.
 int weight(const ZObject *obj) {
-  return calculateWeight(obj);
+  if (!obj) return 0;
+  auto &g = Globals::instance();
+  int wt = 0;
+  for (const auto *cont : obj->getContents()) {
+    if (obj == g.player && cont->hasFlag(ObjectFlag::WEARBIT)) {
+      wt += 1;
+    } else {
+      wt += weight(cont);
+    }
+  }
+  return wt + obj->getProperty(P_SIZE);
 }
 
 // ZIL: <ROUTINE YES? () ...> (gverbs.zil:1515-1530)

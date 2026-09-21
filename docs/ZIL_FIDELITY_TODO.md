@@ -10,7 +10,7 @@ test, build, commit, push; then mark `[x]` and update the counters. Every routin
 ported carries `// ZIL:` and `// Source: <file>:<lines>` comments. Never simplify
 away a ZIL behaviour.
 
-Progress: 24/74 (32%)
+Progress: 25/74 (34%)
 
 ## Phase A: engine foundations (src/core, src/systems/timer)
 
@@ -44,7 +44,7 @@ Progress: 24/74 (32%)
 
 ## Phase C: generic verbs (src/verbs, gverbs.zil)
 
-- [ ] C1 ITAKE, IDROP, CCOUNT, WEIGHT, V-TAKE, PRE-TAKE, V-DROP, PRE-DROP incl. DEAD branch, YUKS, closed-container kludge, load message with LOAD-ALLOWED suffix, RFATAL, fumble rule, TOUCHBIT/NDESCBIT/SCORE-OBJ, WEARBIT (gverbs.zil:1353-1389, 1900-1999)
+- [x] C1 ITAKE, IDROP, CCOUNT, WEIGHT, V-TAKE, PRE-TAKE, V-DROP, PRE-DROP incl. DEAD branch, YUKS, closed-container kludge, load message with LOAD-ALLOWED suffix, RFATAL, fumble rule, TOUCHBIT/NDESCBIT/SCORE-OBJ, WEARBIT (gverbs.zil:1353-1389, 1900-1999)
 - [ ] C2 V-PUT (with the NOT-ITAKE truthiness quirk), PRE-PUT=PRE-GIVE, V-PUT-ON, V-PUT-UNDER, V-PUT-BEHIND, V-GIVE, PRE-GIVE, V-SGIVE, PRE-SGIVE (gverbs.zil:704-733, 1075-1135, 1206-1240)
 - [ ] C3 V-OPEN (single-untouched-FDESC case, PRINT-CONTENTS, THIS-IS-IT), V-CLOSE (CAPACITY/SURFACEBIT gate, "It is now pitch black."), SEE-INSIDE?, V-LOOK-INSIDE, V-LOOK-ON, V-SEARCH, V-EXAMINE (gverbs.zil:336-360, 574-600, 866-905, 966-994, 1730-1748, 1837-1840)
 - [ ] C4 DESCRIBE-ROOM (MAZEBIT always verbose, vehicle suffix, M-FLASH), DESCRIBE-OBJECTS ("Only bats can see in the dark. And you're not one."), DESCRIBE-OBJECT (FDESC/TOUCHBIT/LDESC rule, " (providing light)", " (outside the X)"), PRINT-CONT two-pass with INDENTS, FIRSTER, V-LOOK, V-FIRST-LOOK, V-INVENTORY, fixed "A "/"a " articles (gverbs.zil:29-31, 1622-1840)

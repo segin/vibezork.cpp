@@ -101,12 +101,18 @@ void testGVerbsSystemRoutines() {
   hiddenObj->setFlag(ObjectFlag::NDESCBIT);
   hiddenObj->moveTo(chest.get());
 
+  // CCOUNT skips worn objects only (gverbs.zil:1979-1986), so a worn cloak
+  // is the thing it must not count.
+  auto cloak = std::make_unique<ZObject>(7103, "cloak");
+  cloak->setFlag(ObjectFlag::WEARBIT);
+  cloak->moveTo(chest.get());
+
   g.winner = adv.get();
   g.here = room.get();
   adv->moveTo(room.get());
 
   // Test CCOUNT & FIRSTER
-  assert(Verbs::ccount(chest.get()) == 1); // Only ruby (not hiddenObj)
+  assert(Verbs::ccount(chest.get()) == 2); // ruby + scenery detail, not the worn cloak
   assert(Verbs::firster(chest.get()) == ruby.get());
 
   // Test SEE-INSIDE?
@@ -115,9 +121,10 @@ void testGVerbsSystemRoutines() {
   assert(Verbs::seeInside(chest.get())); // Open container
 
   // Test WEIGHT
-  // 10 + 3 + 5: the scenery detail has no SIZE, so it weighs the
-  // <PROPDEF SIZE 5> default (zork1.zil:24)
-  assert(Verbs::weight(chest.get()) == 18);
+  // 10 + 3 + 5 + 5: the scenery detail and the cloak have no SIZE, so each
+  // weighs the <PROPDEF SIZE 5> default (zork1.zil:24). The cloak is only
+  // counted as 1 when it is worn by the PLAYER itself (gverbs.zil:1988-1998).
+  assert(Verbs::weight(chest.get()) == 23);
 
   // Test HELD?
   assert(!Verbs::isHeld(ruby.get()));

@@ -481,7 +481,9 @@ namespace Verbs {
     bool isHeld(const ZObject *obj);
     bool hitSpot();
     bool iDrop();
-    bool iTake(bool vb = true);
+    /// ZIL ITAKE (gverbs.zil:1900-1964): RFALSE (0), RFATAL (2) when the load
+    /// is too heavy, or RTRUE (1) when the object was taken.
+    int iTake(bool vb = true);
     bool lkp(std::string_view text);
     void mungRoom(ZObject *room, std::string_view desc);
     void noGoTell(Direction dir);

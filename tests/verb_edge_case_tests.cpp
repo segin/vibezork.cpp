@@ -22,9 +22,10 @@ TEST(VerbPreCheckTakeNonExistent) {
     g.prsa = V_TAKE;
     g.prso = nullptr;
     
-    // Should handle gracefully - verbs return true when handled (ZIL semantics)
+    // ITAKE has nothing to move, so V-TAKE reports nothing and returns
+    // not-handled (gverbs.zil:1382-1388)
     bool result = Verbs::vTake();
-    ASSERT_TRUE(result);
+    ASSERT_FALSE(result);
     
     g.reset();
 }
@@ -49,9 +50,10 @@ TEST(VerbPreCheckDropNotInInventory) {
     g.prsa = V_DROP;
     g.prso = lampPtr;
     
-    // Even error cases return true (command was handled)
+    // IDROP prints the refusal and returns RFALSE, so V-DROP is not-handled
+    // (gverbs.zil:1966-1981)
     bool result = Verbs::vDrop();
-    ASSERT_TRUE(result);
+    ASSERT_FALSE(result);
     
     g.reset();
 }
@@ -105,9 +107,9 @@ TEST(VerbErrorTakeAnchored) {
     g.prsa = V_TAKE;
     g.prso = housePtr;
     
-    // Even error cases return true (command was handled)
+    // A non-TAKEBIT object gets a YUK and RFALSE (gverbs.zil:1913-1918)
     bool result = Verbs::vTake();
-    ASSERT_TRUE(result);
+    ASSERT_FALSE(result);
     
     g.reset();
 }

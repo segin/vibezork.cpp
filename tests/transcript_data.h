@@ -122,7 +122,7 @@ const std::vector<TranscriptStep> PARSER_FEATURES = {
 
 // Error handling
 const std::vector<TranscriptStep> ERROR_HANDLING = {
-    {"xyzzy", {"not implemented"}},  // Unknown verb response
+    {"xyzzy", {"A hollow voice says"}},  // ZIL V-ADVENT (gverbs.zil:151-153)
     {"take mailbox", {"anchored"}},  // Mailbox can't be taken - "securely anchored"
     {"go blarg", {"don't know"}},  // Unknown word
 };

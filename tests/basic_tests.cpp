@@ -1937,8 +1937,9 @@ TEST(TakeVerbAnchoredObject) {
     // Execute TAKE verb
     bool result = Verbs::vTake();
     
-    // Verify object was NOT taken (still in room)
-    ASSERT_TRUE(result);
+    // V-TAKE only reports when ITAKE returns exactly T; every refusal path
+    // falls through as not-handled (gverbs.zil:1382-1388).
+    ASSERT_FALSE(result);
     ASSERT_EQ(mailboxPtr->getLocation(), &testRoom);
     
     // Cleanup
@@ -1985,8 +1986,8 @@ TEST(TakeVerbWeightLimit) {
     // Execute TAKE verb
     bool result = Verbs::vTake();
     
-    // Verify object was NOT taken (weight limit exceeded)
-    ASSERT_TRUE(result);
+    // ITAKE returns RFATAL for an overload, which is not T (gverbs.zil:1936-1946)
+    ASSERT_FALSE(result);
     ASSERT_EQ(lampPtr->getLocation(), &testRoom);
     
     // Cleanup
@@ -2119,8 +2120,8 @@ TEST(TakeVerbHeavyObject) {
     // Execute TAKE verb
     bool result = Verbs::vTake();
     
-    // Verify object was NOT taken (too heavy)
-    ASSERT_TRUE(result);
+    // ITAKE returns RFATAL for an overload, which is not T (gverbs.zil:1936-1946)
+    ASSERT_FALSE(result);
     ASSERT_EQ(coffinPtr->getLocation(), &testRoom);
     
     // Cleanup
@@ -2215,8 +2216,8 @@ TEST(TakeVerbFromClosedContainer) {
     // Execute TAKE verb
     bool result = Verbs::vTake();
     
-    // Verify object was NOT taken (container is closed, not accessible)
-    ASSERT_TRUE(result);
+    // ITAKE's closed-container kludge returns RFALSE silently (gverbs.zil:1929-1933)
+    ASSERT_FALSE(result);
     ASSERT_EQ(gemPtr->getLocation(), chestPtr);
     
     // Cleanup
@@ -2253,8 +2254,8 @@ TEST(TakeVerbNonTakeableObject) {
     // Execute TAKE verb
     bool result = Verbs::vTake();
     
-    // Verify object was NOT taken
-    ASSERT_TRUE(result);
+    // A non-TAKEBIT object gets a YUK and RFALSE (gverbs.zil:1913-1918)
+    ASSERT_FALSE(result);
     ASSERT_EQ(housePtr->getLocation(), &testRoom);
     
     // Cleanup
@@ -2322,8 +2323,9 @@ TEST(TakeVerbNoObject) {
     // Execute TAKE verb
     bool result = Verbs::vTake();
     
-    // Should return true (command handled, even if it's an error)
-    ASSERT_TRUE(result);
+    // With no PRSO there is nothing for ITAKE to move; the parser asks the
+    // orphan question now, so V-TAKE simply reports nothing.
+    ASSERT_FALSE(result);
     
     // Cleanup
     g.reset();

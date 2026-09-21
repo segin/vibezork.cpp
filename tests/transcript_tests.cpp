@@ -11,6 +11,7 @@
 #include "../src/parser/parser.h"
 #include "../src/verbs/verbs.h"
 #include "../src/world/world.h"
+#include "../src/core/gmain.h"
 #include "../src/systems/timer.h"
 #include "../src/systems/npc.h"
 #include "../src/systems/lamp.h"
@@ -21,134 +22,26 @@
 #include <map>
 
 // Verb dispatch table (same as main.cpp)
-static std::map<VerbId, std::function<bool()>> verbHandlers = {
-    {V_LOOK, Verbs::vLook},
-    {V_INVENTORY, Verbs::vInventory},
-    {V_QUIT, Verbs::vQuit},
-    {V_TAKE, Verbs::vTake},
-    {V_DROP, Verbs::vDrop},
-    {V_EXAMINE, Verbs::vExamine},
-    {V_READ, Verbs::vRead},
-    {V_OPEN, Verbs::vOpen},
-    {V_CLOSE, Verbs::vClose},
-    {V_WALK, Verbs::vWalk},
-    {V_PUT, Verbs::vPut},
-    {V_LOCK, Verbs::vLock},
-    {V_UNLOCK, Verbs::vUnlock},
-    {V_LOOK_INSIDE, Verbs::vLookInside},
-    {V_SEARCH, Verbs::vSearch},
-    {V_ENTER, Verbs::vEnter},
-    {V_EXIT, Verbs::vExit},
-    {V_CLIMB_UP, Verbs::vClimbUp},
-    {V_CLIMB_DOWN, Verbs::vClimbDown},
-    {V_BOARD, Verbs::vBoard},
-    {V_DISEMBARK, Verbs::vDisembark},
-    {V_TURN, Verbs::vTurn},
-    {V_PUSH, Verbs::vPush},
-    {V_PULL, Verbs::vPull},
-    {V_MOVE, Verbs::vMove},
-    {V_TIE, Verbs::vTie},
-    {V_UNTIE, Verbs::vUntie},
-    {V_LISTEN, Verbs::vListen},
-    {V_SMELL, Verbs::vSmell},
-    {V_TOUCH, Verbs::vTouch},
-    {V_YELL, Verbs::vYell},
-    {V_EAT, Verbs::vEat},
-    {V_DRINK, Verbs::vDrink},
-    {V_LAMP_ON, Verbs::vLampOn},
-    {V_LAMP_OFF, Verbs::vLampOff},
-    {V_INFLATE, Verbs::vInflate},
-    {V_DEFLATE, Verbs::vDeflate},
-    {V_PRAY, Verbs::vPray},
-    {V_EXORCISE, Verbs::vExorcise},
-    {V_WAVE, Verbs::vWave},
-    {V_RUB, Verbs::vRub},
-    {V_RING, Verbs::vRing},
-    {V_ATTACK, Verbs::vAttack},
-    {V_THROW, Verbs::vThrow},
-    {V_SWING, Verbs::vSwing},
-    {V_SCORE, Verbs::vScore},
-    {V_DIAGNOSE, Verbs::vDiagnose},
-    {V_VERBOSE, Verbs::vVerbose},
-    {V_BRIEF, Verbs::vBrief},
-    {V_SUPERBRIEF, Verbs::vSuperbrief},
-    {V_SAVE, Verbs::vSave},
-    {V_RESTORE, Verbs::vRestore},
-    {V_RESTART, Verbs::vRestart},
-    {V_VERSION, Verbs::vVersion},
-    {V_TALK, Verbs::vTalk},
-    {V_ASK, Verbs::vAsk},
-    {V_TELL, Verbs::vTell},
-    {V_ODYSSEUS, Verbs::vOdysseus}
-};
 
 // Global parser for transcript tests
 static Parser transcriptParser;
 
 // Execute a single command and capture output
 std::string executeCommand(const std::string& command) {
-    auto& g = Globals::instance();
-    
     // Capture output
     std::stringstream buffer;
     std::streambuf* oldCout = std::cout.rdbuf(buffer.rdbuf());
-    
-    // Parse the command
+
+    // Parse the command, then run the real MAIN-LOOP-1 body so PERFORM's
+    // dispatch order (object actions, preactions, defaults) applies exactly
+    // as it does in play (gmain.zil:38-173).
     ParsedCommand cmd = transcriptParser.parse(command);
-    
-    // Handle parse errors
-    if (cmd.verb == 0) {
-        std::cout.rdbuf(oldCout);
-        return buffer.str();
+    if (cmd.verb != 0) {
+        ::executeCommand(cmd);
+        TimerSystem::clocker();
     }
-    
-    // Set global state for verb handlers
-    g.prsa = cmd.verb;
-    g.prso = cmd.directObj;
-    g.prsi = cmd.indirectObj;
-    
-    // Handle "all" commands
-    if (cmd.isAll) {
-        if (cmd.allObjects.empty()) {
-            printLine("There's nothing here to " + std::string(cmd.words[0]) + ".");
-        } else {
-            for (auto* obj : cmd.allObjects) {
-                g.prso = obj;
-                print(obj->getDesc() + ": ");
-                
-                auto it = verbHandlers.find(cmd.verb);
-                if (it != verbHandlers.end()) {
-                    it->second();
-                }
-            }
-        }
-        
-        g.moves++;
-        std::cout.rdbuf(oldCout);
-        return buffer.str();
-    }
-    
-    // Handle direction commands
-    if (cmd.isDirection) {
-        Verbs::vWalkDir(cmd.direction);
-    } else {
-        // Execute verb handler
-        auto it = verbHandlers.find(cmd.verb);
-        if (it != verbHandlers.end()) {
-            it->second();
-        } else {
-            printLine("That verb is not implemented yet.");
-        }
-    }
-    
-    g.moves++;
-    
-    // Process timers
-    TimerSystem::tick();
-    
-    // Restore cout
+
     std::cout.rdbuf(oldCout);
-    
     return buffer.str();
 }
 

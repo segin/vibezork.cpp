@@ -116,13 +116,12 @@ TEST(TakeFromWrongSourceFailure) {
     g.prsi = boxPtr;
     
     startCapture();
-    Verbs::vTake();
+    // PERFORM runs the preaction before the verb (gmain.zil:213); the
+    // "isn't in the X" refusal lives in PRE-TAKE (gverbs.zil:1365-1377).
+    if (!Verbs::preTake()) {
+        Verbs::vTake();
+    }
     std::string output = stopCapture();
-    
-    // Should FAIL because ball is not in box
-    // But currently vTake ignores PRSI, so it will likely SUCCEED in taking it from floor
-    // This assertion expects CORRECT behavior (Failure).
-    // So this test should FAIL currently.
     
     ASSERT_CONTAINS(output, "isn't in the box");
     ASSERT_EQ(ballPtr->getLocation(), g.here); // Should remain in room
@@ -164,11 +163,14 @@ TEST(TakeFromClosedTransparentFailure) {
     g.prsi = boxPtr;
     
     startCapture();
-    Verbs::vTake();
+    if (!Verbs::preTake()) {
+        Verbs::vTake();
+    }
     std::string output = stopCapture();
     
-    // Should FAIL because box is closed (even if transparent)
-    ASSERT_CONTAINS(output, "isn't open");
+    // PRE-TAKE refuses anything inside a closed container, transparent or
+    // not (gverbs.zil:1359-1364)
+    ASSERT_CONTAINS(output, "You can't reach something that's inside a closed container.");
     ASSERT_EQ(diamondPtr->getLocation(), boxPtr); // Should remain in box
 }
 
