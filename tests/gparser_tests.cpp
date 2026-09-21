@@ -953,6 +953,112 @@ void testNumber() {
   std::println("✓ NUMBER?");
 }
 
+// ---------------------------------------------------------------------------
+// B10: LIT?, THIS-IT?, ACCESSIBLE?, META-LOC, ALWAYS-LIT
+// ---------------------------------------------------------------------------
+
+void testLitThisItAccessible() {
+  std::println("Testing LIT? / THIS-IT? / ACCESSIBLE? / META-LOC...");
+  setupWorld();
+  auto &g = Globals::instance();
+  auto &s = GParser::state();
+  ZObject *cellar = g.getObject(RoomIds::CELLAR);
+  ZObject *lamp = g.getObject(ObjectIds::LAMP);
+  ZObject *mailbox = g.getObject(ObjectIds::MAILBOX);
+  ZObject *grue = g.getObject(ObjectIds::GRUE);
+  assert(cellar && lamp && mailbox && grue);
+  cellar->clearFlag(ObjectFlag::ONBIT);
+  g.here = cellar;
+  g.player->moveTo(cellar);
+  lamp->clearFlag(ObjectFlag::ONBIT);
+  s.nam = nullptr;
+  s.adj = nullptr;
+
+  // LIT?
+  lamp->moveTo(g.player);
+  assert(!GParser::isLit(cellar));
+  lamp->setFlag(ObjectFlag::ONBIT);
+  assert(GParser::isLit(cellar));
+  // inside an open container the player holds
+  mailbox->moveTo(g.player);
+  mailbox->setFlag(ObjectFlag::OPENBIT);
+  lamp->moveTo(mailbox);
+  assert(GParser::isLit(cellar));
+  mailbox->clearFlag(ObjectFlag::OPENBIT);
+  assert(!GParser::isLit(cellar));
+  mailbox->setFlag(ObjectFlag::OPENBIT);
+  // in the room itself
+  lamp->moveTo(cellar);
+  assert(GParser::isLit(cellar));
+  // a lamp the player holds does not light a room other than HERE
+  lamp->moveTo(g.player);
+  ZObject *trollRoom = g.getObject(RoomIds::TROLL_ROOM);
+  trollRoom->clearFlag(ObjectFlag::ONBIT);
+  assert(!GParser::isLit(trollRoom));
+  assert(g.here == cellar); // HERE restored
+  // RMBIT: the room's own ONBIT
+  cellar->setFlag(ObjectFlag::ONBIT);
+  lamp->clearFlag(ObjectFlag::ONBIT);
+  assert(GParser::isLit(cellar));
+  assert(!GParser::isLit(cellar, false));
+  cellar->clearFlag(ObjectFlag::ONBIT);
+  // ALWAYS-LIT
+  s.alwaysLit = true;
+  assert(GParser::isLit(cellar));
+  s.alwaysLit = false;
+  assert(!GParser::isLit(cellar));
+  // LIT? leaves P-GWIMBIT clear
+  assert(g.pGwimbit == 0);
+
+  // THIS-IT?
+  s.nam = GParser::lookupWord("lantern");
+  assert(GParser::thisIt(lamp));
+  s.nam = GParser::lookupWord("mailbox");
+  assert(!GParser::thisIt(lamp));
+  s.nam = GParser::lookupWord("lamp");
+  s.adj = GParser::lookupWord("brass");
+  assert(GParser::thisIt(lamp));
+  s.adj = GParser::lookupWord("small");
+  assert(!GParser::thisIt(lamp));
+  s.adj = nullptr;
+  g.pGwimbit = static_cast<uint64_t>(ObjectFlag::ONBIT);
+  assert(!GParser::thisIt(lamp));
+  lamp->setFlag(ObjectFlag::ONBIT);
+  assert(GParser::thisIt(lamp));
+  g.pGwimbit = 0;
+  lamp->setFlag(ObjectFlag::INVISIBLE);
+  assert(!GParser::thisIt(lamp));
+  lamp->clearFlag(ObjectFlag::INVISIBLE);
+  s.nam = nullptr;
+
+  // META-LOC and ACCESSIBLE?
+  assert(GParser::metaLoc(lamp) == cellar);
+  lamp->moveTo(mailbox); // mailbox is held and open
+  assert(GParser::metaLoc(lamp) == cellar);
+  assert(GParser::isAccessible(lamp));
+  mailbox->clearFlag(ObjectFlag::OPENBIT);
+  assert(!GParser::isAccessible(lamp));
+  assert(GParser::metaLoc(grue) == g.getObject(ObjectIds::GLOBAL_OBJECTS));
+  assert(GParser::isAccessible(grue));
+  // LOCAL-GLOBALS are accessible only where the room lists them
+  ZObject *stairs = g.getObject(ObjectIds::STAIRS);
+  assert(stairs && stairs->getLocation() == g.getObject(ObjectIds::LOCAL_GLOBALS));
+  auto *cellarRoom = dynamic_cast<ZRoom *>(cellar);
+  bool listed = cellarRoom->hasGlobal(ObjectIds::STAIRS);
+  if (!listed) cellarRoom->addGlobal(ObjectIds::STAIRS);
+  assert(GParser::isAccessible(stairs));
+  g.here = trollRoom;
+  g.player->moveTo(trollRoom);
+  if (!dynamic_cast<ZRoom *>(trollRoom)->hasGlobal(ObjectIds::STAIRS)) {
+    assert(!GParser::isAccessible(stairs));
+  }
+  // an object in another room
+  lamp->moveTo(cellar);
+  assert(!GParser::isAccessible(lamp));
+  assert(GParser::metaLoc(nullptr) == nullptr);
+  std::println("✓ LIT?");
+}
+
 } // namespace
 
 int main() {
@@ -975,6 +1081,7 @@ int main() {
   testGlobalCheckAndWhichPrint();
   testManyAndTakeCheck();
   testNumber();
+  testLitThisItAccessible();
   std::println("All gparser tests passed.");
   return 0;
 }
