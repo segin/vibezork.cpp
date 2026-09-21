@@ -142,17 +142,17 @@ bool grueFunction() {
   auto &g = Globals::instance();
   if (g.prsa == V_EXAMINE) {
     printLine(
-        "The grue is a sinister, lurking presence in the dark places of the\n"
-        "earth. Its favorite diet is adventurers, but its insatiable\n"
-        "appetite is tempered by its fear of light. No grue has ever been\n"
-        "seen by the light of day, and few have survived its fearsome jaws\n"
+        "The grue is a sinister, lurking presence in the dark places of the "
+        "earth. Its favorite diet is adventurers, but its insatiable "
+        "appetite is tempered by its fear of light. No grue has ever been "
+        "seen by the light of day, and few have survived its fearsome jaws "
         "to tell the tale.");
     return true;
   }
   if (g.prsa == V_FIND) {
     printLine(
-        "There is no grue here, but I'm sure there is at least one lurking\n"
-        "in the darkness nearby. I wouldn't let my light go out if I were\n"
+        "There is no grue here, but I'm sure there is at least one lurking "
+        "in the darkness nearby. I wouldn't let my light go out if I were "
         "you!");
     return true;
   }

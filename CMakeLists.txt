@@ -257,5 +257,8 @@ if(BUILD_TESTS)
 
     # GO tests (1dungeon.zil:2637-2661 start-up sequence, melee tables)
     add_zork_test(GoTests go_tests tests/go_tests.cpp)
+
+    # Output layer tests (TELL semantics, Z-machine wrapping)
+    add_zork_test(IoTests io_tests tests/io_tests.cpp)
 endif()
 

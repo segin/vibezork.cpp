@@ -1,12 +1,59 @@
+/**
+ * @file io.cpp
+ * @brief Output layer: Z-machine style word wrapping, no auto spacing/CRLF
+ */
+
 #include "io.h"
 #include "object.h"
 #include <iostream>
-#include <print>
-#include <sstream>
 #include <string>
 
-// Track current column position for word wrapping
-static int currentColumn = 0;
+namespace {
+
+int screenWidth = WRAP_WIDTH;
+int currentColumn = 0;
+std::string pendingWord;   // characters not yet committed to the line
+bool pendingSpace = false; // a space seen after the last word
+
+void emit(std::string_view s) {
+  std::cout << s;
+  currentColumn += static_cast<int>(s.size());
+}
+
+void newline() {
+  std::cout << '\n';
+  currentColumn = 0;
+}
+
+// Commit the buffered word to the line, wrapping first if it would not fit
+// (a wrap drops the space that preceded the word, as the interpreter does).
+void flushWord() {
+  if (pendingWord.empty()) {
+    return;
+  }
+  int needed = static_cast<int>(pendingWord.size()) + (pendingSpace ? 1 : 0);
+  if (screenWidth > 0 && currentColumn > 0 && currentColumn + needed > screenWidth) {
+    newline();
+    pendingSpace = false;
+  }
+  if (pendingSpace) {
+    emit(" ");
+    pendingSpace = false;
+  }
+  emit(pendingWord);
+  pendingWord.clear();
+}
+
+} // namespace
+
+void setScreenWidth(int width) { screenWidth = width < 0 ? 0 : width; }
+
+int getScreenWidth() { return screenWidth; }
+
+int getOutputColumn() {
+  flushWord();
+  return currentColumn;
+}
 
 void printDesc(const ZObject *obj) {
   if (obj) {
@@ -15,78 +62,36 @@ void printDesc(const ZObject *obj) {
 }
 
 void print(std::string_view str) {
-  // Process string character by character, preserving explicit newlines
-  // while still doing word wrapping for long lines
-  std::string word;
-
-  for (size_t i = 0; i < str.length(); ++i) {
-    char c = str[i];
-
+  for (char c : str) {
     if (c == '\n') {
-      // Output any pending word first
-      if (!word.empty()) {
-        if (currentColumn > 0 &&
-            currentColumn + word.length() + 1 > WRAP_WIDTH) {
-          std::println(std::cout);
-          currentColumn = 0;
-        }
-        if (currentColumn > 0) {
-          std::print(std::cout, " ");
-          currentColumn++;
-        }
-        std::print(std::cout, "{}", word);
-        currentColumn += word.length();
-        word.clear();
+      flushWord();
+      pendingSpace = false;
+      newline();
+    } else if (c == ' ') {
+      flushWord();
+      if (pendingSpace) {
+        // consecutive spaces are kept verbatim
+        emit(" ");
       }
-      // Output the newline
-      std::println(std::cout);
-      currentColumn = 0;
-    } else if (c == ' ' || c == '\t') {
-      // End of word - output it
-      if (!word.empty()) {
-        if (currentColumn > 0 &&
-            currentColumn + word.length() + 1 > WRAP_WIDTH) {
-          std::println(std::cout);
-          currentColumn = 0;
-        }
-        if (currentColumn > 0) {
-          std::print(std::cout, " ");
-          currentColumn++;
-        }
-        std::print(std::cout, "{}", word);
-        currentColumn += word.length();
-        word.clear();
-      }
+      pendingSpace = true;
     } else {
-      // Add character to current word
-      word += c;
+      pendingWord += c;
     }
   }
-
-  // Output any remaining word
-  if (!word.empty()) {
-    if (currentColumn > 0 && currentColumn + word.length() + 1 > WRAP_WIDTH) {
-      std::println(std::cout);
-      currentColumn = 0;
-    }
-    // Don't add space before punctuation
-    bool isPunctuation = (word.length() == 1 &&
-                          (word[0] == '.' || word[0] == ',' || word[0] == '!' ||
-                           word[0] == '?' || word[0] == ':' || word[0] == ';' ||
-                           word[0] == ')' || word[0] == ']'));
-    if (currentColumn > 0 && !isPunctuation) {
-      std::print(std::cout, " ");
-      currentColumn++;
-    }
-    std::print(std::cout, "{}", word);
-    currentColumn += word.length();
-  }
+  flushWord();
+  std::cout.flush();
 }
 
 void printLine(std::string_view str) {
   print(str);
-  std::println(std::cout);
-  currentColumn = 0;
+  crlf();
+}
+
+void crlf() {
+  flushWord();
+  pendingSpace = false;
+  newline();
+  std::cout.flush();
 }
 
 std::string readLine() {
@@ -104,5 +109,8 @@ std::string readLine() {
     return "";
   }
 
+  // The player's newline echoed by the terminal ends the prompt line
+  currentColumn = 0;
+  pendingSpace = false;
   return line;
 }

@@ -1149,9 +1149,9 @@ bool inflatedBoatAction() {
       if (g.prsa == V_DROP || g.prsa == V_PUT) {
         print(g.prso->getDesc());
       }
-      printLine(" didn't agree with the boat, as evidenced\nby the loud "
+      printLine(" didn't agree with the boat, as evidenced by the loud "
                 "hissing noise issuing therefrom. With a pathetic sputter, "
-                "the\nboat deflates, leaving you without.");
+                "the boat deflates, leaving you without.");
 
       // Check for death condition (RLANDBIT - can't reach land)
       if (g.here->hasFlag(ObjectFlag::RLANDBIT)) {
@@ -1166,8 +1166,8 @@ bool inflatedBoatAction() {
           // River death
           printLine(
               "In other words, fighting the fierce currents of the Frigid "
-              "River. You\nmanage to hold your own for a bit, but then you are "
-              "carried over a\nwaterfall and into some nasty rocks. Ouch!");
+              "River. You manage to hold your own for a bit, but then you are "
+              "carried over a waterfall and into some nasty rocks. Ouch!");
           // TODO: JIGS-UP
         }
       }
@@ -1193,9 +1193,9 @@ bool inflatedBoatAction() {
 
       print("It seems that the ");
       print(g.prsi->getDesc());
-      printLine(" didn't agree with the boat, as evidenced\nby the loud "
+      printLine(" didn't agree with the boat, as evidenced by the loud "
                 "hissing noise issuing therefrom. With a pathetic sputter, "
-                "the\nboat deflates, leaving you without.");
+                "the boat deflates, leaving you without.");
 
       if (g.here->hasFlag(ObjectFlag::RLANDBIT)) {
         crlf();
@@ -1206,8 +1206,8 @@ bool inflatedBoatAction() {
         } else {
           printLine(
               "In other words, fighting the fierce currents of the Frigid "
-              "River. You\nmanage to hold your own for a bit, but then you are "
-              "carried over a\nwaterfall and into some nasty rocks. Ouch!");
+              "River. You manage to hold your own for a bit, but then you are "
+              "carried over a waterfall and into some nasty rocks. Ouch!");
         }
       }
 
@@ -1239,7 +1239,7 @@ bool inflatedBoatAction() {
 
     if (hasSharpWeapon) {
       printLine("Oops! Something sharp seems to have slipped and punctured the "
-                "boat.\nThe boat deflates to the sounds of hissing, "
+                "boat. The boat deflates to the sounds of hissing, "
                 "sputtering, and cursing.");
 
       // Puncture the boat
@@ -2358,8 +2358,8 @@ bool riverAction() {
   // ZIL: <COND (<VERB? LEAP THROUGH> ...)>
   if (g.prsa == V_JUMP || g.prsa == V_ENTER || g.prsa == V_SWIM) {
     printLine(
-        "A look before leaping reveals that the river is wide and dangerous,\n"
-        "with swift currents and large, half-hidden rocks. You decide to forgo your\n"
+        "A look before leaping reveals that the river is wide and dangerous, "
+        "with swift currents and large, half-hidden rocks. You decide to forgo your "
         "swim.");
     return RTRUE;
   }

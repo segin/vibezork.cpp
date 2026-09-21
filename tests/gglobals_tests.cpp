@@ -7,6 +7,7 @@
 
 #include "core/flags.h"
 #include "core/gglobals.h"
+#include "core/io.h"
 #include "core/globals.h"
 #include "core/object.h"
 #include "systems/death.h"
@@ -786,6 +787,8 @@ TEST(GlobalVariables_DefaultsAndReset) {
 }
 
 int main() {
+  setScreenWidth(0); // capture unwrapped text
+
   std::println("Running GGlobalsTests (gglobals.zil)...");
   auto results = TestFramework::instance().runAll();
   int failed = 0;

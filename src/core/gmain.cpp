@@ -396,9 +396,12 @@ void mainLoop1() {
   initializeAllVerbHandlers();
   auto &g = Globals::instance();
 
-  std::println();
-  std::print("> ");
-  std::cout.flush();
+  // ZIL: <COND (<NOT ,SUPER-BRIEF> <CRLF>)> <TELL ">"> <READ ,P-INBUF ,P-LEXV>
+  // (gparser.zil:152-154)
+  if (!g.superbriefMode) {
+    crlf();
+  }
+  print(">");
   std::string input = readLine();
 
   if (input.empty()) {

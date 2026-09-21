@@ -364,9 +364,10 @@ int lldRoom(int rarg) {
   auto &g = Globals::instance();
 
   if (rarg == M_LOOK) {
+    // ZIL: "|" is a hard newline and the source newline after it is dropped;
+    // the other source newlines are spaces (1actions.zil:1061-1066)
     printLine("You are outside a large gateway, on which is inscribed\n\n"
-              "  Abandon every hope\n"
-              "all ye who enter here!\n\n"
+              "  Abandon every hope all ye who enter here!\n\n"
               "The gate is open; through it you can see a desolation, with a pile of "
               "mangled bodies in one corner. Thousands of voices, lamenting some "
               "hideous fate, can be heard.");
@@ -1891,7 +1892,7 @@ bool machineAction() {
     if (coal && coal->getLocation() == g.prso) {
       // Transform coal to diamond!
       printLine("The machine whirs and crackles. Smoke pours from the "
-                "vents.\nAfter a moment, the machine stops.");
+                "vents. After a moment, the machine stops.");
 
       // Get or create diamond
       ZObject *diamond = g.getObject(ObjectIds::DIAMOND);
