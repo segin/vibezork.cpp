@@ -101,8 +101,9 @@ TEST(ScoreVerbRankNovice) {
     g.winner = player.get();
     g.registerObject(999, std::move(player));
     
-    // Set score to novice level (50 points)
-    g.score = 50;
+    // ZIL: <G? ,SCORE 50> gives Novice, so the rank starts at 51
+    // (1actions.zil:4039)
+    g.score = 51;
     g.moves = 20;
     
     // Capture output
@@ -132,7 +133,8 @@ TEST(ScoreVerbRankAdventurer) {
     g.registerObject(999, std::move(player));
     
     // Set score to adventurer level (200 points)
-    g.score = 200;
+    // ZIL: <G? ,SCORE 200> gives Adventurer (1actions.zil:4037)
+    g.score = 201;
     g.moves = 50;
     
     // Capture output
@@ -162,7 +164,8 @@ TEST(ScoreVerbRankMaster) {
     g.registerObject(999, std::move(player));
     
     // Set score to master level (300 points)
-    g.score = 300;
+    // ZIL: <G? ,SCORE 300> gives Master (1actions.zil:4036)
+    g.score = 301;
     g.moves = 100;
     
     // Capture output
@@ -192,7 +195,8 @@ TEST(ScoreVerbRankWizard) {
     g.registerObject(999, std::move(player));
     
     // Set score to wizard level (330 points)
-    g.score = 330;
+    // ZIL: <G? ,SCORE 330> gives Wizard (1actions.zil:4035)
+    g.score = 331;
     g.moves = 150;
     
     // Capture output
@@ -206,6 +210,30 @@ TEST(ScoreVerbRankWizard) {
     ASSERT_CONTAINS(output, "Wizard");
     
     // Cleanup
+    g.reset();
+}
+
+TEST(ScoreVerbRankBoundaries) {
+    auto& g = Globals::instance();
+
+    // The thresholds are strict <G? ,SCORE n> comparisons, so a score of
+    // exactly n gets the LOWER rank (1actions.zil:4034-4043).
+    struct { int score; const char* rank; } cases[] = {
+        {350, "Master Adventurer"},
+        {330, "Master"},
+        {300, "Adventurer"},
+        {200, "Junior Adventurer"},
+        {100, "Novice Adventurer"},
+        {50, "Amateur Adventurer"},
+        {25, "Beginner"},
+    };
+    for (const auto& c : cases) {
+        g.score = c.score;
+        g.moves = 1;
+        OutputCapture capture;
+        Verbs::vScore();
+        ASSERT_CONTAINS(capture.getOutput(), c.rank);
+    }
     g.reset();
 }
 

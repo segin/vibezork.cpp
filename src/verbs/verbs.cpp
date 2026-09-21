@@ -16,6 +16,7 @@
 #include "world/rooms.h"
 #include "world/world.h"
 #include <fstream>
+#include <cctype>
 #include <sstream>
 
 // External state from actions.cpp
@@ -2030,30 +2031,36 @@ bool vSwing() {
 
 // Meta-Game Verbs (Requirement 32, 65, 66, 67, 68)
 
+// ZIL: <ROUTINE V-SCORE ("OPTIONAL" (ASK? T)) ...>
+// Source: zil/1actions.zil:4026-4045. The thresholds are <G? ,SCORE n>, so a
+// score of exactly 330 is "Master", not "Wizard".
 bool vScore() {
   auto &g = Globals::instance();
-  auto &scoreSystem = ScoreSystem::instance();
-
-  int currentScore = (g.score > 0) ? g.score : scoreSystem.getScore();
-  int currentMoves = g.moves;  // ZIL: ,MOVES, the only move counter
-
-  // Display current score
-  printLine(std::format("Your score is {} (total of 350 points), in {} {}.",
-                        currentScore, currentMoves,
-                        currentMoves == 1 ? "move" : "moves"));
-
-  // Display rank based on score using ScoreSystem logic (ZIL: 1actions.zil:4034-4043)
-  std::string_view rank = "Beginner";
-  if (currentScore >= 350) rank = "Master Adventurer";
-  else if (currentScore >= 330) rank = "Wizard";
-  else if (currentScore >= 300) rank = "Master";
-  else if (currentScore >= 200) rank = "Adventurer";
-  else if (currentScore >= 100) rank = "Junior Adventurer";
-  else if (currentScore >= 50) rank = "Novice Adventurer";
-  else if (currentScore >= 25) rank = "Amateur Adventurer";
-
-  printLine(std::format("This gives you the rank of {}.", rank));
-
+  tell("Your score is ");
+  tell(g.score);
+  tell(" (total of 350 points), in ");
+  tell(g.moves);
+  tell(g.moves == 1 ? " move." : " moves.");
+  crlf();
+  tell("This gives you the rank of ");
+  if (g.score == 350) {
+    tell("Master Adventurer");
+  } else if (g.score > 330) {
+    tell("Wizard");
+  } else if (g.score > 300) {
+    tell("Master");
+  } else if (g.score > 200) {
+    tell("Adventurer");
+  } else if (g.score > 100) {
+    tell("Junior Adventurer");
+  } else if (g.score > 50) {
+    tell("Novice Adventurer");
+  } else if (g.score > 25) {
+    tell("Amateur Adventurer");
+  } else {
+    tell("Beginner");
+  }
+  tell(".", CR);
   return RTRUE;
 }
 
@@ -3650,23 +3657,37 @@ void removeCarefully(ZObject *obj) {
   }
 }
 
-// ZIL: <ROUTINE SCORE-OBJ (OBJ "AUX" TEMP) ...> (gverbs.zil:1220-1234)
+// ZIL: <ROUTINE SCORE-OBJ (OBJ "AUX" TEMP) ...>
+// Source: zil/gverbs.zil:1867-1870. The VALUE is zeroed so it is only ever
+// awarded once.
 void scoreObj(ZObject *obj) {
   if (!obj) return;
-  int val = obj->getProperty(P_VALUE);
-  if (val > 0) {
-    scoreUpd(val);
+  int temp = obj->getProperty(P_VALUE);
+  if (temp > 0) {
+    scoreUpd(temp);
     obj->setProperty(P_VALUE, 0);
   }
 }
 
-// ZIL: <ROUTINE SCORE-UPD (VAL) ...> (gverbs.zil:1236-1248)
-void scoreUpd(int val) {
+// ZIL: <ROUTINE SCORE-UPD (NUM) ...>
+// Source: zil/gverbs.zil:1851-1865
+bool scoreUpd(int num) {
   auto &g = Globals::instance();
-  g.score += val;
-  if (g.score >= Globals::SCORE_MAX) {
+  g.baseScore += num;
+  g.score += num;
+  if (g.score == 350 && !g.wonFlag) {
     g.wonFlag = true;
+    if (ZObject *map = g.getObject(ObjectIds::MAP)) {
+      map->clearFlag(ObjectFlag::INVISIBLE);
+    }
+    if (ZObject *woh = g.getObject(RoomIds::WEST_OF_HOUSE)) {
+      woh->clearFlag(ObjectFlag::TOUCHBIT);
+    }
+    tell("An almost inaudible voice whispers in your ear, \"Look to your "
+         "treasures for the final secret.\"",
+         CR);
   }
+  return RTRUE;
 }
 
 // ZIL: <ROUTINE SEE-INSIDE? (OBJ) ...>
@@ -3724,11 +3745,22 @@ int weight(const ZObject *obj) {
   return wt + obj->getProperty(P_SIZE);
 }
 
-// ZIL: <ROUTINE YES? () ...> (gverbs.zil:1515-1530)
+// ZIL: <ROUTINE YES? () ...>
+// Source: zil/gverbs.zil:1872-1877. Only the FIRST word is inspected, and
+// only YES or Y count.
 bool yes() {
-  print("> ");
+  tell(">");
   std::string response = readLine();
-  return response == "yes" || response == "y" || response == "YES" || response == "Y";
+  size_t start = response.find_first_not_of(" \t");
+  if (start == std::string::npos) return RFALSE;
+  size_t end = response.find_first_of(" \t", start);
+  std::string word = response.substr(start, end == std::string::npos
+                                                ? std::string::npos
+                                                : end - start);
+  for (char &c : word) {
+    c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+  }
+  return word == "yes" || word == "y";
 }
 
 } // namespace Verbs

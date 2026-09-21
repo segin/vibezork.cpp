@@ -500,7 +500,8 @@ namespace Verbs {
     void printContents(const ZObject *obj);
     void removeCarefully(ZObject *obj);
     void scoreObj(ZObject *obj);
-    void scoreUpd(int val);
+    /// ZIL SCORE-UPD (gverbs.zil:1851-1865)
+    bool scoreUpd(int num);
     bool seeInside(const ZObject *obj);
     bool shakeLoop(ZObject *obj);
     void tellNoPrsi();

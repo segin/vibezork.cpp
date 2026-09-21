@@ -42,6 +42,7 @@ public:
   bool falseFlag = false; // ZIL: ,FALSE-FLAG
   bool lit = false; // Is current room lit?
   int score = 0;
+  int baseScore = 0;       ///< ZIL: ,BASE-SCORE (gverbs.zil:1847)
   int moves = 0;
   int loadMax = 100;
   int loadAllowed = 100;
