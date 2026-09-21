@@ -10,7 +10,7 @@ test, build, commit, push; then mark `[x]` and update the counters. Every routin
 ported carries `// ZIL:` and `// Source: <file>:<lines>` comments. Never simplify
 away a ZIL behaviour.
 
-Progress: 12/74 (16%)
+Progress: 13/74 (18%)
 
 ## Phase A: engine foundations (src/core, src/systems/timer)
 
@@ -29,7 +29,7 @@ Progress: 12/74 (16%)
 
 ## Phase B: parser (src/parser)
 
-- [ ] B1 Lexer per PARSER/READ: P-INBUF 120 bytes, P-LEXV 59 entries, dictionary built from GSyntax tables plus object SYNONYM/ADJECTIVE words with 6-character truncation, WORD-PRINT echoing the typed word (gparser.zil:109-380, 658-663)
+- [x] B1 Lexer per PARSER/READ: P-INBUF 120 bytes, P-LEXV 59 entries, dictionary built from GSyntax tables plus object SYNONYM/ADJECTIVE words with 6-character truncation, WORD-PRINT echoing the typed word (gparser.zil:109-380, 658-663)
 - [ ] B2 CLAUSE, punctuation, THEN/AND/"."/"," splitting, P-CONT continuation, "dir then"/"dir, ..." rewrites, TO-after-TELL quote, leading-THEN rules, "There were too many nouns in that sentence.", "Please consult your manual..." (gparser.zil:139-146, 217-368, 440-510)
 - [ ] B3 OOPS: all messages, INBUF-STUFF/INBUF-ADD splice, first-word-only warning (gparser.zil:177-206, 402-428)
 - [ ] B4 AGAIN/G: "Beg pardon?", "It's difficult to repeat fragments.", "That would just repeat a mistake.", "AGAIN, x" via RESERVE-LEXV, P-OTBL restore, STUFF 29-entry limit (gparser.zil:132-138, 211-250, 387-400)

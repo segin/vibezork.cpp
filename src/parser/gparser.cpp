@@ -6,581 +6,619 @@
 #include "world/objects.h"
 #include "world/rooms.h"
 #include <algorithm>
-#include <format>
+#include <cctype>
 #include <iostream>
-#include <ranges>
-#include <sstream>
+#include <map>
+#include <unordered_map>
 
 namespace GParser {
 
-// ZIL: <ROUTINE LIT? (RM "OPTIONAL" (RMBIT T) ...> (gparser.zil:1333-1355)
-bool isLit(ZObject *room, bool rmbit) {
+// ============================================================================
+// Dictionary
+// ============================================================================
+
+namespace {
+
+// Z-machine alphabet A2 (the characters that cost two z-characters).
+constexpr std::string_view kA2 = "0123456789.,!?_#'\"/\\-:()";
+
+int zcharCost(char c) {
+  if (c >= 'a' && c <= 'z') return 1;
+  if (kA2.find(c) != std::string_view::npos) return 2;
+  return 4; // ZSCII escape: 5, 6, hi, lo
+}
+
+std::string toLower(std::string_view sv) {
+  std::string s(sv);
+  for (auto &c : s) c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+  return s;
+}
+
+struct Dictionary {
+  std::map<std::string, DictWord> words;      // by key
+  std::map<std::string, std::vector<Syntax>> verbs; // VERBS table by canonical verb
+  std::vector<const DictWord *> prepositions;  // PREPOSITIONS: index = prep number
+  std::unordered_map<std::string, int> prepNumbers;
+  size_t objectCount = 0;
+  bool built = false;
+};
+
+Dictionary &dict() {
+  static Dictionary d;
+  return d;
+}
+
+DictWord &addWord(std::string_view text, int ps) {
+  auto key = zkey(text);
+  auto &w = dict().words[key];
+  w.key = key;
+  w.ps |= ps;
+  return w;
+}
+
+int locBits(const GSyntax::SyntaxElement &e) {
+  int bits = 0;
+  if (e.scopeFlags & GSyntax::SH_HELD) bits |= SH;
+  if (e.scopeFlags & GSyntax::SH_CARRIED) bits |= SC;
+  if (e.scopeFlags & GSyntax::SH_IN_ROOM) bits |= SIR;
+  if (e.scopeFlags & GSyntax::SH_ON_GROUND) bits |= SOG;
+  // ZILCH: an OBJECT without search specifiers searches everywhere.
+  if (bits == 0) bits = SH | SC | SIR | SOG;
+  if (e.take) bits |= STAKE;
+  if (e.many) bits |= SMANY;
+  if (e.have) bits |= SHAVE;
+  return bits;
+}
+
+const std::vector<std::pair<std::string, Direction>> &directionNames() {
+  // ZIL: <DIRECTIONS NORTH EAST WEST SOUTH NE NW SE SW UP DOWN IN OUT LAND>
+  // (1dungeon.zil:5)
+  static const std::vector<std::pair<std::string, Direction>> names = {
+      {"north", Direction::NORTH}, {"east", Direction::EAST},
+      {"west", Direction::WEST},   {"south", Direction::SOUTH},
+      {"ne", Direction::NE},       {"nw", Direction::NW},
+      {"se", Direction::SE},       {"sw", Direction::SW},
+      {"up", Direction::UP},       {"down", Direction::DOWN},
+      {"in", Direction::IN},       {"out", Direction::OUT},
+      {"land", Direction::LAND}};
+  return names;
+}
+
+} // namespace
+
+std::string zkey(std::string_view word) {
+  std::string lower = toLower(word);
+  std::string key;
+  int cost = 0;
+  for (char c : lower) {
+    int cc = zcharCost(c);
+    if (cost + cc > 6) break;
+    cost += cc;
+    key.push_back(c);
+  }
+  return key;
+}
+
+void invalidateDictionary() { dict().built = false; }
+
+void buildDictionary() {
   auto &g = Globals::instance();
-  ZObject *rm = room ? room : g.here;
-  if (!rm) return false;
+  auto &d = dict();
+  if (d.built && d.objectCount == g.getAllObjects().size()) return;
+  d.words.clear();
+  d.verbs.clear();
+  d.prepositions.clear();
+  d.prepNumbers.clear();
+  d.prepositions.push_back(nullptr); // prep numbers start at 1
 
-  if (rmbit && rm->hasFlag(ObjectFlag::ONBIT)) {
-    return true;
-  }
+  const auto &syntaxes = GSyntax::getAllSyntaxes();
 
-  if (g.winner) {
-    for (auto *child : g.winner->getContents()) {
-      if (child && child->hasFlag(ObjectFlag::ONBIT)) return true;
-    }
-  }
-
-  if (g.player && g.player != g.winner) {
-    for (auto *child : g.player->getContents()) {
-      if (child && child->hasFlag(ObjectFlag::ONBIT)) return true;
-    }
-  }
-
-  for (auto *child : rm->getContents()) {
-    if (!child) continue;
-    if (child->hasFlag(ObjectFlag::ONBIT)) return true;
-    if (child->hasFlag(ObjectFlag::OPENBIT) || child->hasFlag(ObjectFlag::TRANSBIT)) {
-      for (auto *sub : child->getContents()) {
-        if (sub && sub->hasFlag(ObjectFlag::ONBIT)) return true;
+  // Prepositions: numbered in order of first appearance (PREPOSITIONS table).
+  for (const auto &s : syntaxes) {
+    for (const auto &e : s.elements) {
+      if (e.type != GSyntax::SyntaxElement::Type::PREPOSITION) continue;
+      std::string canon = toLower(e.value);
+      if (!d.prepNumbers.contains(canon)) {
+        int num = static_cast<int>(d.prepositions.size());
+        d.prepNumbers[canon] = num;
+        auto &w = addWord(canon, PS_PREPOSITION);
+        w.prep = num;
+        d.prepositions.push_back(&w);
+      }
+      int num = d.prepNumbers[canon];
+      for (const auto &syn : e.synonyms) {
+        auto &w = addWord(syn, PS_PREPOSITION);
+        w.prep = num;
       }
     }
   }
+  // Fix up the PREPOSITIONS pointers (map nodes are stable, but be explicit).
+  for (auto &[canon, num] : d.prepNumbers) {
+    d.prepositions[num] = &d.words[zkey(canon)];
+  }
 
-  return false;
+  // Verbs and their SYNONYMs; the VERBS table entry for each verb word.
+  for (const auto &s : syntaxes) {
+    std::string canon = toLower(s.verb);
+    auto &w = addWord(canon, PS_VERB);
+    w.verb = canon;
+    for (const auto &syn : GSyntax::getVerbSynonyms(s.verbId)) {
+      if (GSyntax::canonicalVerb(syn) != canon) continue;
+      auto &sw = addWord(syn, PS_VERB);
+      sw.verb = canon;
+    }
+    Syntax rec;
+    rec.def = &s;
+    rec.action = s.actionId;
+    int objIndex = 0;
+    int pendingPrep = 0;
+    for (const auto &e : s.elements) {
+      if (e.type == GSyntax::SyntaxElement::Type::PREPOSITION) {
+        pendingPrep = d.prepNumbers[toLower(e.value)];
+      } else if (e.type == GSyntax::SyntaxElement::Type::OBJECT) {
+        ++objIndex;
+        uint64_t fwim = e.findFlag ? static_cast<uint64_t>(*e.findFlag) : 0;
+        if (objIndex == 1) {
+          rec.prep1 = pendingPrep;
+          rec.fwim1 = fwim;
+          rec.loc1 = locBits(e);
+        } else if (objIndex == 2) {
+          rec.prep2 = pendingPrep;
+          rec.fwim2 = fwim;
+          rec.loc2 = locBits(e);
+        }
+        pendingPrep = 0;
+      }
+    }
+    if (pendingPrep != 0 && objIndex == 0) rec.prep1 = pendingPrep;
+    rec.nobj = objIndex;
+    d.verbs[canon].push_back(rec);
+  }
+  // ZILCH stores a verb's syntax lines in reverse definition order, so
+  // SYNTAX-CHECK scans them last-defined first (the DRIVE1/DRIVE2 orphan
+  // choice depends on it: "put leaflet" asks "...in?").
+  for (auto &[canon, list] : d.verbs) {
+    std::reverse(list.begin(), list.end());
+  }
+
+  // Directions and their synonyms.
+  for (const auto &[name, dir] : directionNames()) {
+    auto &w = addWord(name, PS_DIRECTION);
+    w.dir = dir;
+    for (const auto &syn : GSyntax::getDirectionSynonyms(name)) {
+      auto &sw = addWord(syn, PS_DIRECTION);
+      sw.dir = dir;
+    }
+  }
+
+  // Buzzwords (gsyntax.zil:9-11).
+  for (const auto &b : GSyntax::getBuzzWords()) {
+    addWord(b, PS_BUZZ_WORD);
+  }
+
+  // Object SYNONYMs and ADJECTIVEs.
+  for (const auto &[id, obj] : g.getAllObjects()) {
+    for (const auto &syn : obj->getSynonyms()) addWord(syn, PS_OBJECT);
+    for (const auto &adj : obj->getAdjectives()) addWord(adj, PS_ADJECTIVE);
+  }
+
+  d.objectCount = g.getAllObjects().size();
+  d.built = true;
 }
 
-// ZIL: <ROUTINE THIS-IT? (OBJ TBL ...> (gparser.zil:1357-1370)
-bool thisIt(const ZObject *obj, std::string_view noun, std::string_view adj, uint64_t gwimbit) {
-  if (!obj) return false;
-  if (obj->hasFlag(ObjectFlag::INVISIBLE)) return false;
-
-  if (!noun.empty() && !obj->hasSynonym(noun)) {
-    return false;
-  }
-
-  if (!adj.empty() && !obj->hasAdjective(adj)) {
-    return false;
-  }
-
-  if (gwimbit != 0 && !obj->hasFlag(static_cast<ObjectFlag>(gwimbit))) {
-    return false;
-  }
-
-  return true;
+const DictWord *lookupWord(std::string_view typed) {
+  buildDictionary();
+  auto &d = dict();
+  auto it = d.words.find(zkey(typed));
+  return it == d.words.end() ? nullptr : &it->second;
 }
 
-// ZIL: <ROUTINE META-LOC (OBJ) ...> (gparser.zil:1398-1407)
-ZObject *metaLoc(const ZObject *obj) {
-  const ZObject *curr = obj;
-  while (curr) {
-    auto *loc = curr->getLocation();
-    if (loc && loc->getId() == ObjectIds::GLOBAL_OBJECTS) {
-      return loc;
-    }
-    if (dynamic_cast<const ZRoom *>(curr)) {
-      return const_cast<ZObject *>(curr);
-    }
-    curr = loc;
+const DictWord *W(std::string_view key) {
+  buildDictionary();
+  auto &d = dict();
+  auto it = d.words.find(std::string(key));
+  return it == d.words.end() ? nullptr : &it->second;
+}
+
+std::span<const Syntax> verbSyntaxes(std::string_view canonicalVerb) {
+  buildDictionary();
+  auto &d = dict();
+  auto it = d.verbs.find(std::string(canonicalVerb));
+  if (it == d.verbs.end()) return {};
+  return it->second;
+}
+
+// ZIL: <ROUTINE PREP-FIND (PREP ...> (gparser.zil:888-893)
+const DictWord *prepFind(int prep) {
+  buildDictionary();
+  auto &d = dict();
+  if (prep <= 0 || prep >= static_cast<int>(d.prepositions.size())) return nullptr;
+  return d.prepositions[prep];
+}
+
+// ============================================================================
+// State
+// ============================================================================
+
+Ptr &ITbl::slot(int n) {
+  switch (n) {
+  case P_NC1: return nc1;
+  case P_NC1L: return nc1l;
+  case P_NC2: return nc2;
+  default: return nc2l;
+  }
+}
+
+const Ptr &ITbl::slot(int n) const {
+  switch (n) {
+  case P_NC1: return nc1;
+  case P_NC1L: return nc1l;
+  case P_NC2: return nc2;
+  default: return nc2l;
+  }
+}
+
+State &state() {
+  static State s;
+  return s;
+}
+
+void resetState() {
+  state() = State{};
+}
+
+const DictWord *wordAt(const Ptr &p) {
+  auto &s = state();
+  if (p.kind == Ptr::Lex) {
+    if (p.idx < 0 || p.idx >= static_cast<int>(s.lexv.e.size())) return nullptr;
+    return s.lexv.e[p.idx].w;
+  }
+  if (p.kind == Ptr::Ocl) {
+    if (p.idx < 0 || p.idx >= static_cast<int>(s.oclause.size())) return nullptr;
+    return s.oclause[p.idx];
   }
   return nullptr;
 }
 
-// ZIL: <ROUTINE ACCESSIBLE? (OBJ ...> (gparser.zil:1372-1396)
-bool isAccessible(const ZObject *obj) {
-  if (!obj || obj->hasFlag(ObjectFlag::INVISIBLE)) {
-    return false;
+std::string_view textAt(const Ptr &p) {
+  auto &s = state();
+  if (p.kind == Ptr::Lex && p.idx >= 0 && p.idx < static_cast<int>(s.lexv.e.size())) {
+    return s.lexv.e[p.idx].text;
   }
-  auto &g = Globals::instance();
-  auto *loc = obj->getLocation();
-  if (!loc) return false;
-
-  if (loc->getId() == ObjectIds::GLOBAL_OBJECTS) {
-    return true;
-  }
-
-  if (loc->getId() == ObjectIds::LOCAL_GLOBALS) {
-    return Verbs::globalIn(obj->getId(), g.here);
-  }
-
-  auto *mLoc = metaLoc(obj);
-  auto *winnerLoc = g.winner ? g.winner->getLocation() : nullptr;
-  if (mLoc != g.here && mLoc != winnerLoc) {
-    return false;
-  }
-
-  if (loc == g.winner || loc == g.here || loc == winnerLoc) {
-    return true;
-  }
-
-  if (loc->hasFlag(ObjectFlag::OPENBIT) && isAccessible(loc)) {
-    return true;
-  }
-
-  return false;
+  // P-OCLAUSE entries carry dictionary words only; ZIL would print garbage
+  // here, but every caller guards this path with P-OFLAG / P-MERGED.
+  auto *w = wordAt(p);
+  return w ? std::string_view(w->key) : std::string_view();
 }
 
-// ZIL: <ROUTINE OBJ-FOUND (OBJ TBL ...> (gparser.zil:1239-1242)
-void objFound(ZObject *obj, std::vector<ZObject *> &table) {
-  if (!obj) return;
-  if (!zmemq(obj, table)) {
-    table.push_back(obj);
+// ============================================================================
+// READ and the LEXV buffers
+// ============================================================================
+
+namespace {
+std::optional<std::string> g_nextInput;
+}
+
+void setNextInput(std::string line) { g_nextInput = std::move(line); }
+
+// The Z-machine READ opcode: the line is lowercased and truncated to the
+// buffer size; words are split at spaces and at the word separators in
+// SIBREAKS (".,\"" gparser.zil:12), which become words of their own; at
+// most P_LEXV_SIZE words are recorded.
+void read(std::string_view line) {
+  buildDictionary();
+  auto &s = state();
+  std::string text = toLower(line);
+  if (text.size() > static_cast<size_t>(P_INBUF_SIZE)) text.resize(P_INBUF_SIZE);
+  s.inbuf = text;
+  s.lexv.count = 0;
+  size_t i = 0;
+  while (i < text.size() && s.lexv.count < P_LEXV_SIZE) {
+    char c = text[i];
+    if (c == ' ') {
+      ++i;
+      continue;
+    }
+    std::string tok;
+    if (c == '.' || c == ',' || c == '"') {
+      tok.push_back(c);
+      ++i;
+    } else {
+      while (i < text.size() && text[i] != ' ' && text[i] != '.' && text[i] != ',' && text[i] != '"') {
+        tok.push_back(text[i]);
+        ++i;
+      }
+    }
+    auto &e = s.lexv.e[s.lexv.count];
+    e.text = tok;
+    e.w = lookupWord(tok);
+    ++s.lexv.count;
   }
+}
+
+// ZIL: <ROUTINE STUFF (SRC DEST "OPTIONAL" (MAX 29) ...> (gparser.zil:387-399)
+// Copies the header and the first MAX entries only.
+void stuff(const LexTable &src, LexTable &dest, int max) {
+  dest.count = src.count;
+  for (int i = 0; i < max && i < static_cast<int>(src.e.size()); ++i) {
+    dest.e[i] = src.e[i];
+  }
+}
+
+// ZIL: <ROUTINE INBUF-STUFF (SRC DEST ...> (gparser.zil:402-406)
+void inbufStuff(const std::string &src, std::string &dest) { dest = src; }
+
+// ZIL: <ROUTINE INBUF-ADD (LEN BEG SLOT ...> (gparser.zil:410-423)
+// Appends the corrected word's characters to OOPS-INBUF and points the
+// AGAIN-LEXV entry at them.
+void inbufAdd(std::string_view text, int slot) {
+  auto &s = state();
+  s.oopsInbuf.append(text);
+  s.oops.end = true;
+  if (slot >= 0 && slot < static_cast<int>(s.againLexv.e.size())) {
+    s.againLexv.e[slot].text = std::string(text);
+  }
+}
+
+// ZIL: <ROUTINE WT? (PTR BIT "OPTIONAL" (B1 5) ...> (gparser.zil:430-436)
+bool wt(const DictWord *w, int bit) { return w && (w->ps & bit); }
+
+// ZIL: <ROUTINE WORD-PRINT (CNT BUF) ...> (gparser.zil:658-663)
+void wordPrint(std::string_view text) { print(text); }
+
+// ZIL: <ROUTINE UNKNOWN-WORD (PTR ...> (gparser.zil:665-675)
+void unknownWord(int ptr) {
+  auto &g = Globals::instance();
+  auto &s = state();
+  s.oops.ptr = ptr;
+  if (g.prsa == V_SAY) {
+    printLine("Nothing happens.");
+    return;
+  }
+  print("I don't know the word \"");
+  wordPrint(s.lexv.e[ptr].text);
+  printLine("\".");
+  g.quoteFlag = false;
+  g.pOflag = false;
+}
+
+// ZIL: <ROUTINE CANT-USE (PTR ...> (gparser.zil:677-686)
+void cantUse(int ptr) {
+  auto &g = Globals::instance();
+  auto &s = state();
+  if (g.prsa == V_SAY) {
+    printLine("Nothing happens.");
+    return;
+  }
+  print("You used the word \"");
+  wordPrint(s.lexv.e[ptr].text);
+  printLine("\" in a way that I don't understand.");
+  g.quoteFlag = false;
+  g.pOflag = false;
+}
+
+// ZIL: <ROUTINE BUFFER-PRINT (BEG END CP ...> (gparser.zil:819-849)
+void bufferPrint(Ptr beg, Ptr end, bool cp) {
+  auto &g = Globals::instance();
+  bool nosp = true;
+  bool first = true;
+  bool pn = false;
+  const DictWord *comma = W(",");
+  const DictWord *period = W(".");
+  const DictWord *me = W("me");
+  const DictWord *intnum = W("intnum");
+  const DictWord *it = W("it");
+  while (!(beg == end)) {
+    const DictWord *wrd = wordAt(beg);
+    if (wrd && wrd == comma) {
+      print(", ");
+    } else if (nosp) {
+      nosp = false;
+    } else {
+      print(" ");
+    }
+    if (wrd && (wrd == period || wrd == comma)) {
+      nosp = true;
+    } else if (wrd && wrd == me) {
+      if (auto *meObj = g.getObject(ObjectIds::ME)) printDesc(meObj);
+      pn = true;
+    } else if (wrd && wrd == intnum) {
+      print(std::to_string(g.pNumber));
+      pn = true;
+    } else {
+      if (first && !pn && cp) print("the ");
+      if (g.pOflag || g.pMerged) {
+        if (wrd) print(wrd->key);
+      } else if (wrd && wrd == it && isAccessible(g.it)) {
+        printDesc(g.it);
+      } else {
+        wordPrint(textAt(beg));
+      }
+      first = false;
+    }
+    beg.idx += 1; // <REST .BEG ,P-WORDLEN>
+  }
+}
+
+// ============================================================================
+// Object search (used by LIT? and, from B6 on, GET-OBJECT)
+// ============================================================================
+
+// ZIL: <ROUTINE OBJ-FOUND (OBJ TBL ...> (gparser.zil:1239-1242)
+void objFound(ZObject *obj, std::vector<ZObject *> &tbl) { tbl.push_back(obj); }
+
+// ZIL: <ROUTINE THIS-IT? (OBJ TBL ...> (gparser.zil:1357-1370)
+bool thisIt(ZObject *obj) {
+  auto &g = Globals::instance();
+  auto &s = state();
+  if (!obj) return false;
+  if (obj->hasFlag(ObjectFlag::INVISIBLE)) return false;
+  if (s.nam) {
+    bool found = false;
+    for (const auto &syn : obj->getSynonyms()) {
+      if (zkey(syn) == s.nam->key) {
+        found = true;
+        break;
+      }
+    }
+    if (!found) return false;
+  }
+  if (s.adj) {
+    bool found = false;
+    for (const auto &adj : obj->getAdjectives()) {
+      if (zkey(adj) == s.adj->key) {
+        found = true;
+        break;
+      }
+    }
+    if (!found) return false;
+  }
+  if (g.pGwimbit != 0 && !obj->hasFlag(static_cast<ObjectFlag>(g.pGwimbit))) return false;
+  return true;
 }
 
 // ZIL: <ROUTINE SEARCH-LIST (OBJ TBL LVL ...> (gparser.zil:1216-1237)
-void searchList(const ZObject *obj, std::vector<ZObject *> &found, int level,
-                std::string_view noun, std::string_view adj, uint64_t gwimbit) {
+void searchList(ZObject *obj, std::vector<ZObject *> &tbl, int lvl) {
   if (!obj) return;
-  for (auto *child : obj->getContents()) {
+  // Iterate over a copy: OBJ-FOUND never moves objects, but callers of the
+  // parser may run with actions that do.
+  const auto contents = obj->getContents();
+  for (auto *child : contents) {
     if (!child) continue;
-    if (level != P_SRCBOT && thisIt(child, noun, adj, gwimbit)) {
-      objFound(child, found);
+    if (lvl != P_SRCBOT && !child->getSynonyms().empty() && thisIt(child)) {
+      objFound(child, tbl);
     }
-    if ((level != P_SRCTOP || child->hasFlag(ObjectFlag::SEARCHBIT) || child->hasFlag(ObjectFlag::SURFACEBIT)) &&
+    if ((lvl != P_SRCTOP || child->hasFlag(ObjectFlag::SEARCHBIT) || child->hasFlag(ObjectFlag::SURFACEBIT)) &&
+        !child->getContents().empty() &&
         (child->hasFlag(ObjectFlag::OPENBIT) || child->hasFlag(ObjectFlag::TRANSBIT))) {
-      int newLevel = (child->hasFlag(ObjectFlag::SURFACEBIT) || child->hasFlag(ObjectFlag::SEARCHBIT))
-                         ? P_SRCALL
-                         : P_SRCTOP;
-      searchList(child, found, newLevel, noun, adj, gwimbit);
+      int sub = child->hasFlag(ObjectFlag::SURFACEBIT) ? P_SRCALL
+                : child->hasFlag(ObjectFlag::SEARCHBIT) ? P_SRCALL
+                                                          : P_SRCTOP;
+      searchList(child, tbl, sub);
     }
   }
 }
 
 // ZIL: <ROUTINE DO-SL (OBJ BIT1 BIT2 ...> (gparser.zil:1202-1210)
-void doSl(const ZObject *obj, int bit1, int bit2, std::vector<ZObject *> &found, int slocbits,
-          std::string_view noun, std::string_view adj, uint64_t gwimbit) {
-  if (!obj) return;
-  if (slocbits == -1 || (slocbits & (bit1 | bit2))) {
-    searchList(obj, found, P_SRCALL, noun, adj, gwimbit);
-  } else if (slocbits & bit1) {
-    searchList(obj, found, P_SRCTOP, noun, adj, gwimbit);
-  } else if (slocbits & bit2) {
-    searchList(obj, found, P_SRCBOT, noun, adj, gwimbit);
-  }
-}
-
-// ZIL: <ROUTINE GLOBAL-CHECK (TBL ...> (gparser.zil:1169-1200)
-void globalCheck(std::vector<ZObject *> &table, std::string_view noun, std::string_view adj) {
+void doSl(ZObject *obj, int bit1, int bit2) {
   auto &g = Globals::instance();
-  auto *localGlobals = g.getObject(ObjectIds::LOCAL_GLOBALS);
-  if (localGlobals) {
-    for (auto *obj : localGlobals->getContents()) {
-      if (thisIt(obj, noun, adj, 0) && Verbs::globalIn(obj->getId(), g.here)) {
-        objFound(obj, table);
-      }
-    }
-  }
-
-  auto *globalObjs = g.getObject(ObjectIds::GLOBAL_OBJECTS);
-  if (globalObjs) {
-    for (auto *obj : globalObjs->getContents()) {
-      if (thisIt(obj, noun, adj, 0)) {
-        objFound(obj, table);
-      }
-    }
+  auto &s = state();
+  if (!s.table) return;
+  int bits = g.pSlocbits;
+  if ((bits & (bit1 + bit2)) == (bit1 + bit2)) {
+    searchList(obj, *s.table, P_SRCALL);
+  } else if (bits & bit1) {
+    searchList(obj, *s.table, P_SRCTOP);
+  } else if (bits & bit2) {
+    searchList(obj, *s.table, P_SRCBOT);
   }
 }
 
-// ZIL: <ROUTINE WHICH-PRINT (TLEN LEN TBL ...> (gparser.zil:1146-1166)
-void whichPrint(const std::vector<ZObject *> &candidates, std::string_view noun) {
-  if (candidates.empty()) return;
-  std::string name = noun.empty() ? "one" : std::string(noun);
-  print(std::format("Which {} do you mean, ", name));
-  for (size_t i = 0; i < candidates.size(); ++i) {
-    if (i > 0 && i == candidates.size() - 1) {
-      print(candidates.size() == 2 ? " or " : ", or ");
-    } else if (i > 0) {
-      print(", ");
-    }
-    print(std::format("the {}", candidates[i]->getDesc()));
-  }
-  printLine("?");
-}
-
-// ZIL: <ROUTINE GET-OBJECT (TBL "OPTIONAL" (VRB T) ...> (gparser.zil:1040-1140)
-bool getObject(std::vector<ZObject *> &table, bool vrb, std::string_view noun, std::string_view adj) {
+// ZIL: <ROUTINE META-LOC (OBJ) ...> (gparser.zil:1398-1407)
+ZObject *metaLoc(const ZObject *obj) {
   auto &g = Globals::instance();
-  if (noun.empty() && adj.empty() && !(g.pGetFlags & P_ALL) && g.pGwimbit == 0) {
-    if (vrb) {
-      printLine("There seems to be a noun missing in that sentence!");
-    }
-    return false;
+  ZObject *globals = g.getObject(ObjectIds::GLOBAL_OBJECTS);
+  const ZObject *curr = obj;
+  while (true) {
+    if (!curr) return nullptr;
+    if (curr->getLocation() && curr->getLocation() == globals) return globals;
+    if (dynamic_cast<const ZRoom *>(curr)) return const_cast<ZObject *>(curr);
+    curr = curr->getLocation();
   }
+}
 
-  std::vector<ZObject *> found;
-  if (isLit(g.here)) {
-    doSl(g.here, SOG, SIR, found, g.pSlocbits, noun, adj, g.pGwimbit);
-  }
-  if (g.winner) {
-    doSl(g.winner, SH, SC, found, g.pSlocbits, noun, adj, g.pGwimbit);
-  }
-
-  if (found.empty()) {
-    globalCheck(found, noun, adj);
-  }
-
-  if (found.empty()) {
-    if (vrb) {
-      if (!isLit(g.here)) {
-        printLine("It's too dark to see!");
-      } else {
-        printLine("You can't see any such thing here.");
-      }
-    }
-    return false;
-  }
-
-  if (found.size() == 1 || (g.pGetFlags & P_ALL)) {
-    for (auto *obj : found) {
-      objFound(obj, table);
-    }
-    return true;
-  }
-
-  if (vrb) {
-    whichPrint(found, noun);
-    g.pOflag = true;
-  }
+// ZIL: <ROUTINE ACCESSIBLE? (OBJ ...> (gparser.zil:1372-1396)
+bool isAccessible(const ZObject *obj) {
+  auto &g = Globals::instance();
+  if (!obj) return false;
+  ZObject *l = obj->getLocation();
+  if (obj->hasFlag(ObjectFlag::INVISIBLE)) return false;
+  if (!l) return false;
+  if (l->getId() == ObjectIds::GLOBAL_OBJECTS) return true;
+  if (l->getId() == ObjectIds::LOCAL_GLOBALS && Verbs::globalIn(obj->getId(), g.here)) return true;
+  ZObject *winnerLoc = g.winner ? g.winner->getLocation() : nullptr;
+  ZObject *ml = metaLoc(obj);
+  if (!(ml == g.here || ml == winnerLoc)) return false;
+  if (l == g.winner || l == g.here || l == winnerLoc) return true;
+  if (l->hasFlag(ObjectFlag::OPENBIT) && isAccessible(l)) return true;
   return false;
 }
 
-// ZIL: <ROUTINE BUT-MERGE (TBL ...> (gparser.zil:945-958)
-std::vector<ZObject *> butMerge(const std::vector<ZObject *> &table, const std::vector<ZObject *> &buts) {
-  std::vector<ZObject *> result;
-  for (auto *obj : table) {
-    if (!zmemq(obj, buts)) {
-      result.push_back(obj);
-    }
-  }
-  return result;
-}
-
-// ZIL: <ROUTINE SNARFEM (PTR EPTR TBL ...> (gparser.zil:978-1030)
-bool snarfem(std::span<const std::string> words, std::vector<ZObject *> &tbl, std::vector<ZObject *> &buts) {
+// ZIL: <ROUTINE LIT? (RM "OPTIONAL" (RMBIT T) ...> (gparser.zil:1333-1355)
+bool isLit(ZObject *rm, bool rmbit) {
   auto &g = Globals::instance();
-  std::string noun;
-  std::string adj;
-  bool isBut = false;
-
-  for (size_t i = 0; i < words.size(); ++i) {
-    const auto &w = words[i];
-    if (w == "all" || w == "everything") {
-      g.pGetFlags |= P_ALL;
-      if (i + 1 < words.size() && words[i + 1] == "of") {
-        i++;
+  auto &s = state();
+  if (!rm) rm = g.here;
+  if (s.alwaysLit && g.winner == g.player) return true;
+  g.pGwimbit = static_cast<uint64_t>(ObjectFlag::ONBIT);
+  ZObject *ohere = g.here;
+  g.here = rm;
+  bool lit = false;
+  if (rmbit && rm && rm->hasFlag(ObjectFlag::ONBIT)) {
+    lit = true;
+  } else {
+    s.merge.clear();
+    s.table = &s.merge;
+    g.pSlocbits = -1;
+    if (ohere == rm) {
+      doSl(g.winner, 1, 1);
+      if (g.winner != g.player && g.player && g.player->getLocation() == rm) {
+        doSl(g.player, 1, 1);
       }
-    } else if (w == "but" || w == "except") {
-      if (!getObject(tbl, false, noun, adj)) return false;
-      noun.clear();
-      adj.clear();
-      isBut = true;
-    } else if (w == "a" || w == "an" || w == "one") {
-      g.pGetFlags |= P_ONE;
-    } else if (w == "the" || w == "of") {
-      // Ignored noise words
-    } else if (w == "and" || w == ",") {
-      if (!getObject(isBut ? buts : tbl, false, noun, adj)) return false;
-      noun.clear();
-      adj.clear();
-    } else {
-      noun = w;
     }
+    doSl(rm, 1, 1);
+    if (!s.table->empty()) lit = true;
   }
-
-  if (!noun.empty() || (g.pGetFlags & P_ALL)) {
-    return getObject(isBut ? buts : tbl, true, noun, adj);
-  }
-  return true;
-}
-
-// ZIL: <ROUTINE SNARF-OBJECTS () ...> (gparser.zil:928-943)
-bool snarfObjects(std::span<const std::string> directClause, std::span<const std::string> indirectClause,
-                  std::vector<ZObject *> &prsoList, std::vector<ZObject *> &prsiList) {
-  std::vector<ZObject *> buts;
-  if (!indirectClause.empty()) {
-    if (!snarfem(indirectClause, prsiList, buts)) return false;
-  }
-  if (!directClause.empty()) {
-    if (!snarfem(directClause, prsoList, buts)) return false;
-  }
-  if (!buts.empty()) {
-    prsoList = butMerge(prsoList, buts);
-  }
-  return true;
-}
-
-// ZIL: <ROUTINE GWIM (GBIT LBIT PREP ...> (gparser.zil:901-926)
-ZObject *gwim(uint64_t gbit, int lbit, int prep) {
-  auto &g = Globals::instance();
-  g.pGwimbit = gbit;
-  g.pSlocbits = lbit;
-
-  std::vector<ZObject *> candidates;
-  if (isLit(g.here)) {
-    doSl(g.here, SOG, SIR, candidates, lbit, "", "", gbit);
-  }
-  if (g.winner) {
-    doSl(g.winner, SH, SC, candidates, lbit, "", "", gbit);
-  }
-
+  g.here = ohere;
   g.pGwimbit = 0;
-  if (candidates.size() == 1) {
-    auto *obj = candidates[0];
-    if (prep != 0) {
-      print(std::format("({} the {})\n", prepFind(prep), obj->getDesc()));
-    } else {
-      print(std::format("({})\n", obj->getDesc()));
-    }
-    return obj;
-  }
-  return nullptr;
+  return lit;
 }
 
-// ZIL: <ROUTINE SYNTAX-FOUND (SYN) ...> (gparser.zil:895-898)
-void syntaxFound(VerbId verb) {
-  Globals::instance().prsa = verb;
-}
+// ============================================================================
+// Routines ported in later items (B2-B10)
+// ============================================================================
 
-// ZIL: <ROUTINE PREP-FIND (PREP ...> (gparser.zil:888-893)
-std::string_view prepFind(int prepCode) {
-  switch (prepCode) {
-    case 1: return "in";
-    case 2: return "on";
-    case 3: return "with";
-    case 4: return "at";
-    case 5: return "to";
-    case 6: return "from";
-    case 7: return "under";
-    case 8: return "behind";
-    default: return "";
-  }
-}
-
-// ZIL: <ROUTINE PREP-PRINT (PREP ...> (gparser.zil:851-858)
-void prepPrint(int prepCode) {
-  auto p = prepFind(prepCode);
-  if (!p.empty()) {
-    print(std::format(" {}", p));
-  }
-}
-
-// ZIL: <ROUTINE CLAUSE-ADD (WRD ...> (gparser.zil:882-886)
-void clauseAdd(std::vector<std::string> &clause, std::string_view word) {
-  clause.emplace_back(word);
-}
-
-// ZIL: <ROUTINE CLAUSE-COPY (SRC DEST "OPTIONAL" (INSRT <>) ...> (gparser.zil:860-879)
-void clauseCopy(const std::vector<std::string> &src, std::vector<std::string> &dest, std::string_view insert) {
-  dest.clear();
-  for (const auto &w : src) {
-    dest.push_back(w);
-  }
-}
-
-// ZIL: <ROUTINE BUFFER-PRINT (BEG END CP ...> (gparser.zil:819-849)
-void bufferPrint(const std::vector<std::string> &tokens, bool thePrefix) {
-  if (thePrefix && !tokens.empty()) {
-    print("the ");
-  }
-  for (size_t i = 0; i < tokens.size(); ++i) {
-    if (i > 0) print(" ");
-    print(tokens[i]);
-  }
-}
-
-// ZIL: <ROUTINE THING-PRINT (PRSO? "OPTIONAL" (THE? <>) ...> (gparser.zil:810-817)
-void thingPrint(bool isPrso, const std::vector<std::string> &tokens, bool thePrefix) {
-  bufferPrint(tokens, thePrefix);
-}
-
-// ZIL: <ROUTINE ORPHAN (D1 D2 ...> (gparser.zil:782-808)
-void orphan(int drive1, int drive2) {
-  auto &g = Globals::instance();
-  g.pOflag = true;
-  g.pMerged = false;
-}
-
-// ZIL: <ROUTINE CANT-ORPHAN () ...> (gparser.zil:777-779)
+std::optional<int> clause(int, int, const DictWord *) { return std::nullopt; }
+const DictWord *numberQ(int) { return nullptr; }
+bool orphanMerge() { return false; }
+bool aclauseWin(const DictWord *) { return true; }
+bool nclauseWin() { return true; }
+bool syntaxCheck() { return false; }
 bool cantOrphan() {
   printLine("\"I don't understand! What are you referring to?\"");
   return false;
 }
-
-// ZIL: <ROUTINE SYNTAX-CHECK () ...> (gparser.zil:707-775)
-bool syntaxCheck(VerbId verb, const std::vector<ZObject *> &prsoObjs, const std::vector<ZObject *> &prsiObjs,
-                 int prep1, int prep2) {
-  if (verb == 0) {
-    printLine("There was no verb in that sentence!");
-    return false;
+void orphan(const Syntax *, const Syntax *) {}
+void thingPrint(bool prso, bool the) {
+  auto &s = state();
+  if (prso) {
+    bufferPrint(s.itbl.nc1, s.itbl.nc1l, the);
+  } else {
+    bufferPrint(s.itbl.nc2, s.itbl.nc2l, the);
   }
-  return true;
 }
-
-// ZIL: <ROUTINE CANT-USE (PTR ...> (gparser.zil:677-686)
-void cantUse(std::string_view word) {
-  printLine(std::format("You used the word \"{}\" in a way that I don't understand.", word));
-  auto &g = Globals::instance();
-  g.quoteFlag = false;
-  g.pOflag = false;
-}
-
-// ZIL: <ROUTINE UNKNOWN-WORD (PTR ...> (gparser.zil:665-675)
-void unknownWord(std::string_view word) {
-  printLine(std::format("I don't know the word \"{}\".", word));
-  auto &g = Globals::instance();
-  g.quoteFlag = false;
-  g.pOflag = false;
-}
-
-// ZIL: <ROUTINE WORD-PRINT (CNT BUF) ...> (gparser.zil:658-663)
-void wordPrint(std::string_view word) {
-  print(word);
-}
-
-// ZIL: <ROUTINE ACLAUSE-WIN (ADJ) ...> (gparser.zil:634-643)
-bool aclauseWin(std::string_view adj) {
-  auto &g = Globals::instance();
-  g.pMerged = true;
-  g.pOflag = false;
-  return true;
-}
-
-// ZIL: <ROUTINE NCLAUSE-WIN () ...> (gparser.zil:645-653)
-bool nclauseWin() {
-  auto &g = Globals::instance();
-  g.pMerged = true;
-  g.pOflag = false;
-  return true;
-}
-
-// ZIL: <ROUTINE ORPHAN-MERGE () ...> (gparser.zil:543-630)
-bool orphanMerge(std::span<const std::string> inputTokens) {
-  auto &g = Globals::instance();
-  g.pOflag = false;
-  g.pMerged = true;
-  return true;
-}
-
-// ZIL: <ROUTINE NUMBER? (PTR ...> (gparser.zil:512-535)
-std::optional<int> parseNumber(std::string_view token) {
-  if (token.empty()) return std::nullopt;
-
-  auto colonPos = token.find(':');
-  if (colonPos != std::string_view::npos) {
-    auto hourPart = token.substr(0, colonPos);
-    auto minPart = token.substr(colonPos + 1);
-    try {
-      int h = std::stoi(std::string(hourPart));
-      int m = std::stoi(std::string(minPart));
-      if (h < 8) h += 12;
-      if (h > 23 || m < 0 || m > 59) return std::nullopt;
-      int totalMinutes = h * 60 + m;
-      Globals::instance().pNumber = totalMinutes;
-      return totalMinutes;
-    } catch (...) {
-      return std::nullopt;
-    }
+void prepPrint(int prep) {
+  if (prep != 0) {
+    print(" ");
+    if (auto *w = prepFind(prep)) print(w->key);
   }
-
-  int sum = 0;
-  for (char c : token) {
-    if (c < '0' || c > '9') return std::nullopt;
-    sum = sum * 10 + (c - '0');
-    if (sum > 10000) return std::nullopt;
-  }
-  Globals::instance().pNumber = sum;
-  return sum;
 }
-
-// ZIL: <ROUTINE CLAUSE (PTR VAL WRD ...> (gparser.zil:440-510)
-int parseClause(std::span<const std::string> tokens, size_t &pos, std::vector<std::string> &clauseTokens) {
-  clauseTokens.clear();
-  while (pos < tokens.size()) {
-    const auto &t = tokens[pos];
-    if (t == "and" || t == "," || t == "." || t == "then") {
-      break;
-    }
-    clauseTokens.push_back(t);
-    pos++;
-  }
-  return static_cast<int>(clauseTokens.size());
+void clauseCopy(ITbl &, ITbl &, const DictWord *) {}
+void clauseAdd(const DictWord *wrd) { state().oclause.push_back(wrd); }
+void syntaxFound(const Syntax *syn) {
+  state().syntax = syn;
+  Globals::instance().prsa = syn ? syn->action : 0;
 }
-
-// ZIL: <ROUTINE WT? (PTR BIT "OPTIONAL" (B1 5) ...> (gparser.zil:430-436)
-bool wt(std::string_view word, int partOfSpeech) {
-  if (word.empty()) return false;
-  if (partOfSpeech == PS_BUZZ_WORD) {
-    return word == "the" || word == "a" || word == "an" || word == "of";
-  }
-  return true;
-}
-
-// ZIL: <ROUTINE INBUF-ADD (LEN BEG SLOT ...> (gparser.zil:410-423)
-void inbufAdd(std::string &buffer, std::string_view word) {
-  if (!buffer.empty()) buffer += " ";
-  buffer += word;
-}
-
-// ZIL: <ROUTINE INBUF-STUFF (SRC DEST ...> (gparser.zil:402-406)
-void inbufStuff(const std::string &src, std::string &dest) {
-  dest = src;
-}
-
-// ZIL: <ROUTINE STUFF (SRC DEST "OPTIONAL" (MAX 29) ...> (gparser.zil:387-399)
-void stuff(const std::vector<std::string> &src, std::vector<std::string> &dest) {
-  dest = src;
-}
-
-// ZIL: <ROUTINE TAKE-CHECK () ...> (gparser.zil:1244-1246)
-bool takeCheck() {
-  auto &g = Globals::instance();
-  if (g.prso && !iTakeCheck(g.prso, STAKE)) return false;
-  if (g.prsi && !iTakeCheck(g.prsi, STAKE)) return false;
-  return true;
-}
-
-// ZIL: <ROUTINE ITAKE-CHECK (TBL IBITS ...> (gparser.zil:1248-1292)
-bool iTakeCheck(ZObject *obj, int ibits) {
-  if (!obj) return true;
-  auto &g = Globals::instance();
-
-  if (!Verbs::isHeld(obj)) {
-    if (obj->hasFlag(ObjectFlag::TRYTAKEBIT)) {
-      return false;
-    }
-    if (ibits & STAKE) {
-      g.prso = obj;
-      if (Verbs::iTake()) {
-        printLine("(Taken)");
-        return true;
-      }
-    }
-    if (ibits & SHAVE) {
-      printLine(std::format("You don't have the {}.", obj->getDesc()));
-      return false;
-    }
-  }
-  return true;
-}
-
-// ZIL: <ROUTINE MANY-CHECK () ...> (gparser.zil:1294-1313)
-bool manyCheck(VerbId verb, size_t prsoCount, size_t prsiCount) {
-  if (prsoCount > 1) {
-    printLine("You can't use multiple objects with that verb.");
-    return false;
-  }
-  if (prsiCount > 1) {
-    printLine("You can't use multiple indirect objects with that verb.");
-    return false;
-  }
-  return true;
-}
-
-// ZIL: <ROUTINE PARSER ("AUX" ...) ...> (gparser.zil:109-380)
-bool parseInput(std::string_view input) {
-  if (input.empty()) return false;
-  auto &g = Globals::instance();
-  g.pWon = true;
-  return true;
-}
+ZObject *gwim(uint64_t, int, int) { return nullptr; }
+bool snarfObjects() { return true; }
+void butMerge(std::vector<ZObject *> &) {}
+bool snarfem(Ptr, Ptr, std::vector<ZObject *> &) { return false; }
+bool getObject(std::vector<ZObject *> &, bool) { return false; }
+void whichPrint(int, int, const std::vector<ZObject *> &) {}
+void globalCheck(std::vector<ZObject *> &) {}
+bool takeCheck() { return true; }
+bool itakeCheck(std::vector<ZObject *> &, int) { return true; }
+bool manyCheck() { return true; }
+bool parser() { return false; }
 
 } // namespace GParser
