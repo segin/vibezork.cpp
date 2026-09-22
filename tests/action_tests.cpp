@@ -2,7 +2,6 @@
 #include "../src/core/globals.h"
 #include "../src/core/object.h"
 #include "../src/systems/death.h"
-#include "../src/systems/npc.h"
 #include "../src/verbs/verbs.h"
 #include "../src/world/objects.h"
 #include "../src/world/rooms.h"
@@ -1966,150 +1965,11 @@ extern bool cyclopsAction();
 // We need access to cyclopsState to set/reset logic?
 // Assuming setupTestWorld resets it or we can manipulate via actions.
 
-TEST(CyclopsFcn_Odysseus) {
-  setupTestWorld();
-  auto &g = Globals::instance();
-
-  ZObject *cyclops = g.getObject(ObjectIds::CYCLOPS);
-  if (!cyclops) {
-    auto c = std::make_unique<ZObject>(ObjectIds::CYCLOPS, "cyclops");
-    g.registerObject(ObjectIds::CYCLOPS, std::move(c));
-    cyclops = g.getObject(ObjectIds::CYCLOPS);
-  }
-
-  // Ensure awake for Odysseus? ZIL 1517 logic: If sleeping -> "No use talking".
-  // So must be awake.
-  // How to wake him? Standard "ALARM" action or manually unset flag if we can
-  // access state. We can use ALARM action to wake him first.
-  g.prsa = V_ALARM;
-  g.prso = cyclops;
-  NPCSystem::cyclopsAction(); // Wakes him up
-
-  // Now Odysseus
-  g.prsa = V_ODYSSEUS;
-  g.prso = cyclops; // Usually prso is not checked for Odysseus verb if it's
-                    // "Say Odysseus"?
-  // ZIL 1520 just checks <VERB? ODYSSEUS>. C++ implementation checks g.prso ==
-  // cyclops? My impl: "if (!cyclops || g.prso != cyclops) return false;" at
-  // top. So PRSO MUST be Cyclops.
-
-  OutputCapture cap;
-  bool result = NPCSystem::cyclopsAction();
-
-  ASSERT_TRUE(result);
-  ASSERT_TRUE(cap.getOutput().find("father's destroyer") != std::string::npos);
-  ASSERT_TRUE(cyclops->hasFlag(ObjectFlag::INVISIBLE)); // Flee hides him
-}
-
-TEST(CyclopsFcn_SleepWake) {
-  setupTestWorld();
-  auto &g = Globals::instance();
-  ZObject *cyclops = g.getObject(ObjectIds::CYCLOPS);
-  if (!cyclops) {
-    // ... (setup) - Assuming setupTestWorld resets mostly, but static state
-    // might persist. If previous test fled, he is INVISIBLE. We might need to
-    // manually reset visibility.
-    auto c = std::make_unique<ZObject>(ObjectIds::CYCLOPS, "cyclops");
-    g.registerObject(ObjectIds::CYCLOPS, std::move(c));
-    cyclops = g.getObject(ObjectIds::CYCLOPS);
-  }
-  cyclops->clearFlag(ObjectFlag::INVISIBLE); // Force visible
-
-  // We can't easily force Sleep state without access to cyclopsState struct?
-  // If it's internal to npc.cpp, we rely on GIVE WATER to make him sleep.
-  // Or we assume default start is Sleeping? (Zork standard).
-  // If default is Sleeping:
-
-  g.prsa = V_EXAMINE;
-  g.prso = cyclops;
-
-  // Try Examine. If "sleeping like a baby", he's asleep.
-  {
-    OutputCapture cap;
-    NPCSystem::cyclopsAction();
-    std::string out = cap.getOutput();
-    if (out.find("sleeping") != std::string::npos) {
-      // He is asleep. Test Wake.
-      g.prsa = V_KICK;
-      OutputCapture cap2;
-      if (NPCSystem::cyclopsAction()) {
-        ASSERT_TRUE(cap2.getOutput().find("yawns and stares") !=
-                    std::string::npos);
-      }
-    } else {
-      // He is awake. (Maybe persistent state).
-    }
-  }
-}
-
-// =============================================================================
-// CYCLOPS-ROOM-FCN Tests (1actions.zil line 1616)
-// ZIL Logic: Room M-LOOK, M-BEG Blocking
-// =============================================================================
-
-// Forward decl
-extern int cyclopsRoomAction(int rarg);
-
-TEST(CyclopsRoomFcn_Look) {
-  setupTestWorld();
-  auto &g = Globals::instance();
-  // Assuming we are in Cyclops Room
-  // Just calling the logic function
-
-  // Check output contains "staircase leading up"
-  // Check output contains "staircase leading up"
-  {
-    OutputCapture cap;
-    cyclopsRoomAction(M_LOOK);
-    ASSERT_TRUE(cap.getOutput().find("staircase leading up") !=
-                std::string::npos);
-  }
-}
-
-TEST(CyclopsRoomFcn_BlockUp) {
-  setupTestWorld();
-  auto &g = Globals::instance();
-
-  // Setup cyclops in room and ensure he's awake and hasn't fled
-  ZObject *cyclops = g.getObject(ObjectIds::CYCLOPS);
-  if (!cyclops) {
-    auto c = std::make_unique<ZObject>(ObjectIds::CYCLOPS, "cyclops");
-    g.registerObject(ObjectIds::CYCLOPS, std::move(c));
-    cyclops = g.getObject(ObjectIds::CYCLOPS);
-  }
-
-  // Set player location to Cyclops Room
-  g.here = g.getObject(RoomIds::CYCLOPS_ROOM);
-  if (!g.here) {
-    auto room =
-        std::make_unique<ZRoom>(RoomIds::CYCLOPS_ROOM, "Cyclops Room", "");
-    g.registerObject(RoomIds::CYCLOPS_ROOM, std::move(room));
-    g.here = g.getObject(RoomIds::CYCLOPS_ROOM);
-  }
-
-  // Ensure cyclops state: awake and not fled
-  NPCSystem::getCyclopsState().isAsleep = false;
-  NPCSystem::getCyclopsState().hasFled = false;
-
-  // Try to Climb Up - cyclops should block
-  g.prsa = V_CLIMB_UP;
-  g.prso = nullptr;
-
-  {
-    OutputCapture cap;
-    cyclopsRoomAction(M_BEG);
-    std::string out = cap.getOutput();
-    ASSERT_TRUE(out.find("refuses to let you pass") != std::string::npos);
-  }
-}
-
-// =============================================================================
-// DAM-FUNCTION Tests (1actions.zil line 1400)
-// ZIL Logic: Open/Close denied. Plug with Hands/Tool specific messages.
-// =============================================================================
-
-// Forward decl
-extern bool damAction();
+// The four cyclops tests that were here drove the invented NPCSystem and
+// asserted its text ("father's destroyer" for what the ZIL calls "his
+// father's deadly nemesis"). CYCLOPS-FCN, I-CYCLOPS, CYCLOPS-ROOM-FCN and
+// V-ODYSSEUS are now ported from the ZIL and covered by
+// tests/cyclops_tests.cpp.
 
 TEST(DamFcn_OpenClose) {
   setupTestWorld();

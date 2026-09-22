@@ -1,5 +1,4 @@
 #include "globals.h"
-#include "systems/combat.h"
 #include "systems/timer.h"
 #include "systems/death.h"
 
@@ -20,11 +19,6 @@ ZObject* Globals::getObject(ObjectId id) {
 
 void Globals::reset() {
     ++vocabGeneration;
-    // End any active combat
-    if (CombatSystem::isInCombat()) {
-        CombatSystem::endCombat();
-    }
-    
     // Clear all timers
     TimerSystem::clear();
     

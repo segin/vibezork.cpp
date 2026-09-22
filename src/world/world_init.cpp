@@ -9,7 +9,6 @@
 #include "core/globals.h"
 #include "core/io.h"
 #include "verbs/verbs.h"
-#include "systems/npc.h"
 #include "systems/candle.h"
 #include <memory>
 

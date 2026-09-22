@@ -5,7 +5,6 @@
 #include "parser/gparser.h"
 #include "parser/parser.h"
 #include "world/objects.h"
-#include "systems/npc.h"
 #include "systems/score.h"
 #include "systems/timer.h"
 #include "verbs/verbs.h"

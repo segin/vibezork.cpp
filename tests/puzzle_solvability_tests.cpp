@@ -1,5 +1,6 @@
 // Puzzle Solvability Tests - Task 70
 // Tests that all puzzles have valid solutions and no unwinnable states
+#include "systems/melee.h"
 #include "test_framework.h"
 #include "../src/core/go.h"
 #include "../src/core/object.h"
@@ -12,7 +13,6 @@
 #include "../src/verbs/verbs.h"
 #include "../src/systems/timer.h"
 #include "../src/systems/score.h"
-#include "../src/systems/combat.h"
 #include "../src/systems/light.h"
 #include <memory>
 #include <iostream>
@@ -84,14 +84,15 @@ TEST(PuzzleTrollBridge) {
     g.prsi = sword;
     g.prsa = V_ATTACK;
     
-    // Start combat
-    CombatSystem::startCombat(troll, sword);
-    ASSERT_TRUE(CombatSystem::isInCombat());
-    
-    // Simulate combat rounds until troll is defeated
-    int maxRounds = 20;
-    for (int i = 0; i < maxRounds && CombatSystem::isInCombat(); i++) {
-        CombatSystem::processCombatRound();
+    // ZIL: each ATTACK is one HERO-BLOW; the troll answers through I-FIGHT
+    // on the clock (1actions.zil:3476, 3810).
+    g.score = 350; // strong enough to survive the exchange
+    int maxRounds = 40;
+    for (int i = 0; i < maxRounds && troll->getLocation() == g.here; i++) {
+        g.prso = troll;
+        g.prsi = sword;
+        g.prsa = V_ATTACK;
+        Melee::heroBlow();
     }
     
     // Verify troll is defeated (dead or fled)

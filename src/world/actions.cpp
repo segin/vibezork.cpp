@@ -6,7 +6,6 @@
 #include "parser/gparser.h"
 #include "systems/candle.h"
 #include "systems/death.h"
-#include "systems/npc.h"
 #include "systems/score.h"
 #include "systems/timer.h"
 #include "verbs/verbs.h"

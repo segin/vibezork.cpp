@@ -10,7 +10,7 @@ test, build, commit, push; then mark `[x]` and update the counters. Every routin
 ported carries `// ZIL:` and `// Source: <file>:<lines>` comments. Never simplify
 away a ZIL behaviour.
 
-Progress: 49/69 (71%)
+Progress: 50/69 (72%)
 
 ## Phase A: engine foundations (src/core, src/systems/timer)
 
@@ -75,7 +75,7 @@ Progress: 49/69 (71%)
 - [x] E5 Cyclops: CYCLOPS-FCN, I-CYCLOPS, CYCLOMAD (six lines), CYCLOPS-ROOM-FCN, V-ODYSSEUS, MAGIC-FLAG/CYCLOPS-FLAG, MIN (1actions.zil:1491-1660, 2339)
 - [x] E6 Death: JIGS-UP (third death ends, SOUTH-TEMPLE Hades rule, "Bad luck, huh?", no prompts), RANDOMIZE-OBJECTS, KILL-INTERRUPTS exact set, DEAD-FUNCTION incl. PRAY resurrection and "You can't even do that." + RFATAL (1actions.zil:3113-3175, 4046-4159)
 - [x] E7 V-DIAGNOSE per 1actions.zil:3993-4025 (wounds, cure countdown, death count)
-- [ ] E8 Remove combat.cpp HP model, invented NPC prose, processTrollTurn/processCyclopsTurn, resurrection prompts
+- [x] E8 Remove combat.cpp HP model, invented NPC prose, processTrollTurn/processCyclopsTurn, resurrection prompts
 
 ## Phase F: light sources (1actions.zil:2178-2445, 3851-3889)
 

@@ -10,12 +10,10 @@
 #include "core/gmain.h"
 #include "core/io.h"
 #include "systems/candle.h"
-#include "systems/combat.h"
 #include "systems/lamp.h"
 #include "systems/melee.h"
 #include "world/villains.h"
 #include "systems/melee_tables.h"
-#include "systems/npc.h"
 #include "systems/sword.h"
 #include "systems/timer.h"
 #include "verbs/verbs.h"
@@ -26,9 +24,6 @@
 void initializeGame() {
   initializeWorld();
   initializeAllVerbHandlers();
-  NPCSystem::initializeThief();
-  NPCSystem::initializeTroll();
-  NPCSystem::initializeCyclops();
 }
 
 // ZIL: <ROUTINE GO ()

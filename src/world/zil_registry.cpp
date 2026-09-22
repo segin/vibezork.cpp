@@ -6,7 +6,6 @@
 #include "world/objects.h"
 #include "core/gglobals.h"
 #include "world/pseudo_actions.h"
-#include "systems/npc.h"
 #include "world/villains.h"
 
 #include <algorithm>

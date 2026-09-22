@@ -78,8 +78,6 @@ if(BUILD_TESTS)
     # Score system tests
     add_zork_test(ScoreSystemTests score_system_tests tests/score_system_tests.cpp)
     
-    # Combat system tests
-    add_zork_test(CombatSystemTests combat_system_tests tests/combat_system_tests.cpp)
     
     # Death system tests
     add_zork_test(DeathSystemTests death_system_tests tests/death_system_tests.cpp)
@@ -141,8 +139,6 @@ if(BUILD_TESTS)
     # Trophy Case tests
     add_zork_test(TrophyCaseTest trophy_case_test tests/trophy_case_test.cpp)
 
-    # Diagnose tests
-    add_zork_test(DiagnoseTest diagnose_test tests/diagnose_test.cpp)
 
     # Critical Puzzles Tests (Egg, Canary, Basket)
     add_zork_test(CriticalPuzzlesTests critical_puzzles_tests tests/critical_puzzles_tests.cpp)

@@ -148,8 +148,8 @@ bool offerResurrection() {
         // Offer full resurrection at Entrance to Hades
         printLine("As you take your last breath, you feel relieved of your burdens. The");
         printLine("feeling passes as you find yourself before the gates of Hell, where");
-        printLine("the spirits jeer at you and deny you entry.  Your senses are");
-        printLine("disturbed.  The objects in the dungeon appear indistinct, bleached of");
+        printLine("the spirits jeer at you and deny you entry. Your senses are");
+        printLine("disturbed. The objects in the dungeon appear indistinct, bleached of");
         printLine("color, even unreal.");
         printLine("");
         print("Do you wish to be resurrected? (Y/N) ");
@@ -166,7 +166,7 @@ bool offerResurrection() {
     } else {
         // Offer simple resurrection in forest
         printLine("Now, let's take a look here...");
-        printLine("Well, you probably deserve another chance.  I can't quite fix you");
+        printLine("Well, you probably deserve another chance. I can't quite fix you");
         printLine("up completely, but you can't have everything.");
         printLine("");
         print("Do you wish to continue? (Y/N) ");
@@ -292,8 +292,8 @@ void jigsUp(std::string_view deathMessage, DeathCause cause) {
     // ZIL: <COND (<NOT <L? ,DEATHS 2>> ...)> - tested before the increment,
     // so the third death is the last.
     if (deathCount_ >= 2) {
-        tell("You clearly are a suicidal maniac.  We don't allow psychotics in "
-             "the cave, since they may harm other adventurers.  Your remains "
+        tell("You clearly are a suicidal maniac. We don't allow psychotics in "
+             "the cave, since they may harm other adventurers. Your remains "
              "will be installed in the Land of the Living Dead, where your "
              "fellow adventurers may gloat over them.", CR);
         Verbs::finish();
@@ -307,8 +307,8 @@ void jigsUp(std::string_view deathMessage, DeathCause cause) {
     if (southTemple && southTemple->hasFlag(ObjectFlag::TOUCHBIT)) {
         tell("As you take your last breath, you feel relieved of your burdens. "
              "The feeling passes as you find yourself before the gates of Hell, "
-             "where the spirits jeer at you and deny you entry.  Your senses "
-             "are disturbed.  The objects in the dungeon appear indistinct, "
+             "where the spirits jeer at you and deny you entry. Your senses "
+             "are disturbed. The objects in the dungeon appear indistinct, "
              "bleached of color, even unreal.", CR, CR);
         dead_ = true;
         g.trollFlag = true;
@@ -321,7 +321,7 @@ void jigsUp(std::string_view deathMessage, DeathCause cause) {
         Verbs::goTo(g.getObject(RoomIds::ENTRANCE_TO_HADES));
     } else {
         tell("Now, let's take a look here... Well, you probably deserve another "
-             "chance.  I can't quite fix you up completely, but you can't have "
+             "chance. I can't quite fix you up completely, but you can't have "
              "everything.", CR, CR);
         Verbs::goTo(g.getObject(RoomIds::FOREST_1));
     }

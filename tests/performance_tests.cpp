@@ -12,7 +12,6 @@
 #include "world/rooms.h"
 #include "verbs/verbs.h"
 #include "systems/timer.h"
-#include "systems/npc.h"
 #include "systems/lamp.h"
 #include "systems/candle.h"
 #include "systems/sword.h"
@@ -100,9 +99,6 @@ void initializeForPerformanceTest() {
     g.reset();
     initializeGame();
     goSetup();
-    NPCSystem::initializeThief();
-    NPCSystem::initializeTroll();
-    NPCSystem::initializeCyclops();
     LampSystem::initialize();
     CandleSystem::initialize();
     SwordSystem::initialize();
