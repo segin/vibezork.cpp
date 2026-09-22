@@ -12,7 +12,6 @@
 #include "world/rooms.h"
 #include "verbs/verbs.h"
 #include "systems/timer.h"
-#include "systems/sword.h"
 #include <chrono>
 #include <iostream>
 #include <sstream>
@@ -97,7 +96,6 @@ void initializeForPerformanceTest() {
     g.reset();
     initializeGame();
     goSetup();
-    SwordSystem::initialize();
 }
 
 // Test: Parser tokenization performance

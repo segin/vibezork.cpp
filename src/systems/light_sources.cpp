@@ -6,6 +6,7 @@
 #include "parser/gparser.h"
 #include "verbs/verbs.h"
 #include "world/objects.h"
+#include "world/rooms.h"
 
 namespace LightSources {
 
@@ -125,6 +126,79 @@ bool iCandles() {
     ++candleIndex;
 
   return tick != 0;
+}
+
+} // namespace LightSources
+
+namespace LightSources {
+
+// ZIL: <ROUTINE INFESTED? (R "AUX" (F <FIRST? .R>))
+//        <REPEAT () <COND (<NOT .F> <RFALSE>)
+//                         (<AND <FSET? .F ,ACTORBIT>
+//                               <NOT <FSET? .F ,INVISIBLE>>> <RTRUE>)
+//                         (<NOT <SET F <NEXT? .F>>> <RFALSE>)>>>
+// Source: zil/1actions.zil:3880-3886
+bool infested(ZObject *room) {
+  if (!room)
+    return false;
+  for (const ZObject *o : room->getContents()) {
+    if (o->hasFlag(ObjectFlag::ACTORBIT) && !o->hasFlag(ObjectFlag::INVISIBLE))
+      return true;
+  }
+  return false;
+}
+
+// ZIL: <ROUTINE I-SWORD ...>
+// Source: zil/1actions.zil:3851-3878
+//
+// Two glows: brightly (TVALUE 2) when a villain shares the room, faintly
+// (TVALUE 1) when one stands through a UEXIT, CEXIT or DEXIT exit.  The
+// interrupt disables itself as soon as the sword is not carried, and it
+// speaks only when the glow actually changes.
+bool iSword() {
+  auto &g = Globals::instance();
+  ZObject *sword = g.getObject(ObjectIds::SWORD);
+  ZObject *adventurer = g.getObject(ObjectIds::ADVENTURER);
+
+  if (!sword || !adventurer || sword->getLocation() != adventurer) {
+    // ZIL: <PUT .DEM ,C-ENABLED? 0> <RFALSE>
+    TimerSystem::disable("I-SWORD");
+    return false;
+  }
+
+  int glow = sword->getProperty(P_TVALUE);
+  int next = 0;
+
+  if (infested(g.here)) {
+    next = 2;
+  } else if (auto *room = dynamic_cast<ZRoom *>(g.here)) {
+    // ZIL walks HERE's property table and only considers the exit kinds that
+    // name a destination room: UEXIT, CEXIT and DEXIT.
+    for (const auto &[dir, exit] : room->getExits()) {
+      (void)dir;
+      if (exit.type == ExitType::PROCEDURAL || exit.type == ExitType::SPECIAL)
+        continue;
+      if (exit.targetRoom == 0)
+        continue; // NEXIT: a refusal string, no room behind it
+      if (infested(g.getObject(exit.targetRoom))) {
+        next = 1;
+        break;
+      }
+    }
+  }
+
+  if (next == glow)
+    return false;
+
+  if (next == 2)
+    printLine("Your sword has begun to glow very brightly.");
+  else if (next == 1)
+    printLine("Your sword is glowing with a faint blue glow.");
+  else
+    printLine("Your sword is no longer glowing.");
+
+  sword->setProperty(P_TVALUE, next);
+  return true;
 }
 
 } // namespace LightSources

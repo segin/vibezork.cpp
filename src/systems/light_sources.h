@@ -35,6 +35,13 @@ bool iLantern();
 /// ZIL: <ROUTINE I-CANDLES ...> (1actions.zil:2310-2317)
 bool iCandles();
 
+/// ZIL: <ROUTINE I-SWORD ...> (1actions.zil:3851-3878)
+bool iSword();
+
+/// ZIL: <ROUTINE INFESTED? (R)> (1actions.zil:3880-3886): does the room hold
+/// a visible ACTORBIT object?
+bool infested(ZObject *room);
+
 /// ZIL: <GLOBAL LAMP-TABLE ...> as the interrupt currently sees it; the
 /// global is a pointer into the table that I-LANTERN advances.
 std::span<const TimerStep> lampTable();

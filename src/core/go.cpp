@@ -13,7 +13,6 @@
 #include "systems/melee.h"
 #include "world/villains.h"
 #include "systems/melee_tables.h"
-#include "systems/sword.h"
 #include "systems/timer.h"
 #include "verbs/verbs.h"
 #include "world/objects.h"
@@ -58,7 +57,7 @@ void goSetup() {
   TimerSystem::enable("I-FIGHT");
 
   // ZIL: <QUEUE I-SWORD -1>  (not enabled until SWORD-FCN, 1actions.zil:2434)
-  TimerSystem::interrupt("I-SWORD", SwordSystem::iSword);
+  TimerSystem::interrupt("I-SWORD", LightSources::iSword);
   TimerSystem::queue("I-SWORD", -1);
 
   // ZIL: <ENABLE <QUEUE I-THIEF -1>>

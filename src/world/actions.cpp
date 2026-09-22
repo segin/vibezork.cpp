@@ -1106,26 +1106,34 @@ bool kitchenWindowAction() {
 
 // Tool action handlers
 
-// Sword action - glows when near enemies
-bool swordAction() {
+// ZIL: <ROUTINE SWORD-FCN ("AUX" G) ...>
+// Source: zil/1actions.zil:2430-2441
+//
+// Taking the sword arms I-SWORD; EXAMINE reports the glow from TVALUE, and
+// says nothing at all when the sword is dark, so V-EXAMINE speaks instead.
+int swordAction() {
   auto &g = Globals::instance();
 
-  // Sword is a weapon with no special behavior in action handler
-  // Glow behavior is handled by timer system (I-SWORD timer)
-  // This handler is mainly for future extensibility
-
-  if (g.prsa == V_EXAMINE && g.prso && g.prso->getId() == ObjectIds::SWORD) {
-    // Check if sword is glowing (has ONBIT flag set by timer)
-    if (g.prso->hasFlag(ObjectFlag::ONBIT)) {
-      printLine("The sword is glowing with a faint blue light.");
-    } else {
-      printLine(
-          "The sword is a beautiful elvish blade, but it is not glowing.");
-    }
-    return RTRUE;
+  if (g.prsa == V_TAKE && g.winner == g.getObject(ObjectIds::ADVENTURER)) {
+    TimerSystem::queue("I-SWORD", -1);
+    TimerSystem::enable("I-SWORD");
+    return M_NOT_HANDLED;
   }
 
-  return RFALSE;
+  if (g.prsa == V_EXAMINE) {
+    ZObject *sword = g.getObject(ObjectIds::SWORD);
+    int glow = sword ? sword->getProperty(P_TVALUE) : 0;
+    if (glow == 1) {
+      printLine("Your sword is glowing with a faint blue glow.");
+      return M_HANDLED;
+    }
+    if (glow == 2) {
+      printLine("Your sword is glowing very brightly.");
+      return M_HANDLED;
+    }
+  }
+
+  return M_NOT_HANDLED;
 }
 
 // ZIL: <ROUTINE LANTERN () ...>

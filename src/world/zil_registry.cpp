@@ -35,7 +35,7 @@ bool paintingAction(); bool puncturedBoatAction(); bool puttyAction();
 bool rainbowAction(); bool riverAction(); bool robberAction(); bool ropeAction();
 bool rugAction(); bool rustyKnifeAction(); bool sandAction();
 bool sandwichBagAction(); bool sceptreAction(); bool slideAction(); bool songbirdAction();
-bool stilettoAction(); bool swordAction(); bool teethAction();
+bool stilettoAction(); int swordAction(); bool teethAction();
 bool toolChestAction(); bool torchAction(); bool trapDoorAction();
 bool trophyCaseAction(); bool trunkAction(); bool tubeAction(); bool waterAction();
 bool whiteHouseAction();
