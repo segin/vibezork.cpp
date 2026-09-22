@@ -188,7 +188,7 @@ void loadObjects() {
     // ordinary description until DESCRIBE-OBJECT is ported in phase C4.
     // Source: zil/1dungeon.zil:1148, zil/gglobals.zil:15
     if (auto contfcn = ZilRegistry::objectActionFor(def.contfcn)) {
-      obj->setContainerAction(std::move(contfcn));
+      obj->setContainerAction([contfcn] { return contfcn(0); });
     }
 
     g.registerObject(id, std::move(obj));

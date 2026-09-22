@@ -306,7 +306,7 @@ ZObject::ActionFunc objectActionFor(std::string_view routine) {
     return {};
   }
   ObjFn fn = it->second;
-  return [fn] { return fn() ? M_HANDLED : M_NOT_HANDLED; };
+  return [fn](int) { return fn() ? M_HANDLED : M_NOT_HANDLED; };
 }
 
 ZRoom::RoomActionFunc roomActionFor(std::string_view routine) {

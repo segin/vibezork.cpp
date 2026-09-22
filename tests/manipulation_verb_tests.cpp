@@ -950,7 +950,7 @@ TEST(OpenVerbLockedContainer) {
     // <PROPDEF CAPACITY 0> means a container with no CAPACITY cannot be
     // opened or closed at all (gverbs.zil:967-968, 340-341).
     safe->setProperty(P_CAPACITY, 20);
-    safe->setAction([]() {
+    safe->setAction([](int) {
         auto& g = Globals::instance();
         if (g.prsa == V_OPEN) {
             std::cout << "The safe is locked." << std::endl;
@@ -1303,7 +1303,7 @@ TEST(LockVerbBasic) {
     // The chest's own action handles LOCK (ZIL: object ACTION intercepts)
     static bool chestLocked = false;
     chestLocked = false;
-    chest->setAction([]() {
+    chest->setAction([](int) {
         auto& g = Globals::instance();
         if (g.prsa == V_LOCK) {
             chestLocked = true;
@@ -1522,7 +1522,7 @@ TEST(UnlockVerbBasic) {
     chest->setProperty(P_CAPACITY, 20);
     static bool chestUnlocked = false;
     chestUnlocked = false;
-    chest->setAction([]() {
+    chest->setAction([](int) {
         auto& g = Globals::instance();
         if (g.prsa == V_UNLOCK) {
             chestUnlocked = true;
@@ -1685,7 +1685,7 @@ TEST(LockUnlockSequence) {
     // ZIL has no lock flag; the object's ACTION keeps its own state
     static bool safeLocked = false;
     safeLocked = false;
-    safe->setAction([]() {
+    safe->setAction([](int) {
         auto& g = Globals::instance();
         if (g.prsa == V_LOCK) {
             safeLocked = true;

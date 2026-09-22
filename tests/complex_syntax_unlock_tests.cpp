@@ -43,7 +43,7 @@ TEST(UnlockSuccessWithHandler) {
     auto box = std::make_unique<ZObject>(200, "box");
     box->moveTo(g.here);
     // Mock handler: Says "Click!" and returns true
-    box->setAction([]() {
+    box->setAction([](int) {
         std::cout << "Click! The box is unlocked." << std::endl;
         return true;
     });

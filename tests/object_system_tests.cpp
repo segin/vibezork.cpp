@@ -502,7 +502,7 @@ TEST(ObjectActionHandlerBasic) {
     ZObject obj(1, "test");
     
     bool actionCalled = false;
-    obj.setAction([&actionCalled]() {
+    obj.setAction([&actionCalled](int) {
         actionCalled = true;
         return true;
     });
@@ -522,11 +522,11 @@ TEST(ObjectActionHandlerReturnValue) {
     ZObject obj(1, "test");
     
     // Test action that returns true
-    obj.setAction([]() { return true; });
+    obj.setAction([](int) { return true; });
     ASSERT_TRUE(obj.performAction());
     
     // Test action that returns false
-    obj.setAction([]() { return false; });
+    obj.setAction([](int) { return false; });
     ASSERT_FALSE(obj.performAction());
 }
 
@@ -534,7 +534,7 @@ TEST(ObjectActionHandlerWithState) {
     ZObject obj(1, "test");
     
     int counter = 0;
-    obj.setAction([&counter]() {
+    obj.setAction([&counter](int) {
         counter++;
         return true;
     });
@@ -556,7 +556,7 @@ TEST(ObjectActionHandlerReplacement) {
     int counter2 = 0;
     
     // Set first action
-    obj.setAction([&counter1]() {
+    obj.setAction([&counter1](int) {
         counter1++;
         return true;
     });
@@ -566,7 +566,7 @@ TEST(ObjectActionHandlerReplacement) {
     ASSERT_EQ(counter2, 0);
     
     // Replace with second action
-    obj.setAction([&counter2]() {
+    obj.setAction([&counter2](int) {
         counter2++;
         return true;
     });

@@ -142,9 +142,9 @@ void testPerformDispatchHierarchy() {
   // 2. Test PRSO Action precedence over Default Action
   bool prsoInvoked = false;
   defaultInvoked = false;
-  swordObj->setAction([&]() -> bool {
+  swordObj->setAction([&](int) -> int {
     prsoInvoked = true;
-    return true;
+    return M_HANDLED;
   });
   res = perform(V_PRAY, swordObj.get(), nullptr);
   assert(res == M_HANDLED);
@@ -168,9 +168,9 @@ void testPerformDispatchHierarchy() {
   bool prsiInvoked = false;
   containerInvoked = false;
   auto targetObj = std::make_unique<ZObject>(5006, "target");
-  targetObj->setAction([&]() -> bool {
+  targetObj->setAction([&](int) -> int {
     prsiInvoked = true;
-    return true;
+    return M_HANDLED;
   });
   res = perform(V_PRAY, swordObj.get(), targetObj.get());
   assert(res == M_HANDLED);
@@ -192,9 +192,9 @@ void testPerformDispatchHierarchy() {
   // 6. Test Winner/Actor Action precedence over everything
   bool actorInvoked = false;
   preactionInvoked = false;
-  playerObj->setAction([&]() -> bool {
+  playerObj->setAction([&](int) -> int {
     actorInvoked = true;
-    return true;
+    return M_HANDLED;
   });
   res = perform(V_PRAY, swordObj.get(), targetObj.get());
   assert(res == M_HANDLED);
@@ -245,9 +245,9 @@ void testRoomMBegStopsDispatch() {
     defaultInvoked = true;
     return true;
   });
-  objA->setAction([&]() -> bool {
+  objA->setAction([&](int) -> int {
     prsoInvoked = true;
-    return true;
+    return M_HANDLED;
   });
 
   // Room returns M_NOT_HANDLED at M-BEG: dispatch continues to PRSO.
@@ -284,7 +284,7 @@ void testRoomMBegStopsDispatch() {
 
   // Object and verb handlers pass M_FATAL through as well.
   roomObj->setRoomAction(nullptr);
-  objA->setAction([&]() -> int { return M_FATAL; });
+  objA->setAction([&](int) -> int { return M_FATAL; });
   res = perform(V_PRAY, objA.get(), nullptr);
   assert(res == M_FATAL);
   assert(!defaultInvoked);
@@ -322,11 +322,11 @@ void testRfatalAbortsLoopAndSkipsMEnd() {
 
   int aCalls = 0;
   int bCalls = 0;
-  objA->setAction([&]() -> int {
+  objA->setAction([&](int) -> int {
     ++aCalls;
     return GMacros::rfatal();
   });
-  objB->setAction([&]() -> int {
+  objB->setAction([&](int) -> int {
     ++bCalls;
     return M_HANDLED;
   });
@@ -348,7 +348,7 @@ void testRfatalAbortsLoopAndSkipsMEnd() {
   assert(!g.pCont);
 
   // Non-fatal: both objects run and M-END is called once.
-  objA->setAction([&]() -> int {
+  objA->setAction([&](int) -> int {
     ++aCalls;
     return M_HANDLED;
   });
@@ -487,7 +487,7 @@ void testItSubstitution() {
       std::make_unique<ZObject>(ObjectIds::NOT_HERE_OBJECT, "such thing");
   ZObject *itObj = itUnique.get();
   ZObject *notHere = notHereUnique.get();
-  notHere->setAction(GGlobals::notHereObjectF);
+  notHere->setAction([](int) { return GGlobals::notHereObjectF() ? M_HANDLED : M_NOT_HANDLED; });
   g.registerObject(ObjectIds::IT, std::move(itUnique));
   g.registerObject(ObjectIds::NOT_HERE_OBJECT, std::move(notHereUnique));
   g.player = playerObj.get();
@@ -627,7 +627,7 @@ void testMultiObjectLoop() {
   auto notHereUnique =
       std::make_unique<ZObject>(ObjectIds::NOT_HERE_OBJECT, "such thing");
   ZObject *notHere = notHereUnique.get();
-  notHere->setAction(GGlobals::notHereObjectF);
+  notHere->setAction([](int) { return GGlobals::notHereObjectF() ? M_HANDLED : M_NOT_HANDLED; });
   g.registerObject(ObjectIds::NOT_HERE_OBJECT, std::move(notHereUnique));
   g.player = playerObj.get();
   g.winner = playerObj.get();

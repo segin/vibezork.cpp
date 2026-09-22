@@ -31,7 +31,7 @@ TEST(TrophyCaseStoreScore) {
     // <CAPACITY 10000> in 1dungeon.zil:340; without it V-PUT's capacity test
     // refuses everything, since <PROPDEF CAPACITY 0> is the default.
     caseObj->setProperty(P_CAPACITY, 10000);
-    caseObj->setAction(trophyCaseAction); // Important: Set the action handler!
+    caseObj->setAction([](int) { return trophyCaseAction() ? M_HANDLED : M_NOT_HANDLED; }); // Important: Set the action handler!
     g.registerObject(ObjectIds::TROPHY_CASE, std::move(caseObj));
     
     auto egg = std::make_unique<ZObject>(ObjectIds::EGG, "egg");
@@ -83,7 +83,7 @@ TEST(TrophyCaseFixed) {
     g.registerObject(ObjectIds::ADVENTURER, std::move(player));
     
     auto caseObj = std::make_unique<ZObject>(ObjectIds::TROPHY_CASE, "trophy case");
-    caseObj->setAction(trophyCaseAction);
+    caseObj->setAction([](int) { return trophyCaseAction() ? M_HANDLED : M_NOT_HANDLED; });
     g.registerObject(ObjectIds::TROPHY_CASE, std::move(caseObj));
 
     ZObject* casePtr = g.getObject(ObjectIds::TROPHY_CASE);

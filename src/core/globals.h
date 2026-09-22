@@ -98,6 +98,11 @@ public:
   bool lucky = true;       ///< ZIL: ,LUCKY (Luck status flag, gmacros.zil:121)
   bool sprayed = false;    ///< ZIL: ,SPRAYED? (gverbs.zil:1628)
   bool mirrorMung = false; ///< ZIL: ,MIRROR-MUNG (1actions.zil:968)
+  /// ZIL: ,THIEF-ENGROSSED (1actions.zil). Set while the thief is admiring a
+  /// treasure; VILLAIN-STRENGTH caps his strength at 2 for one blow and
+  /// I-FIGHT clears it when the player leaves.
+  bool thiefEngrossed = false;
+  int cyclowrath = 0;      ///< ZIL: ,CYCLOWRATH (1actions.zil, cyclops anger)
 
   // Parser state
   int pCont = 0;           ///< ZIL: ,P-CONT (P-LEXV entry index to continue from; 0 = none)

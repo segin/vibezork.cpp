@@ -12,6 +12,7 @@
 #include "systems/candle.h"
 #include "systems/combat.h"
 #include "systems/lamp.h"
+#include "systems/melee.h"
 #include "systems/melee_tables.h"
 #include "systems/npc.h"
 #include "systems/sword.h"
@@ -57,7 +58,7 @@ void goSetup() {
   // The QUEUE calls allocate the C-TABLE entries in this order (INT,
   // gclock.zil:26-39), which fixes the order CLOCKER runs them in.
   // ZIL: <ENABLE <QUEUE I-FIGHT -1>>
-  TimerSystem::interrupt("I-FIGHT", CombatSystem::iFight);
+  TimerSystem::interrupt("I-FIGHT", Melee::iFight);
   TimerSystem::queue("I-FIGHT", -1);
   TimerSystem::enable("I-FIGHT");
 

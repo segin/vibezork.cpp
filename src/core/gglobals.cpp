@@ -292,7 +292,7 @@ void initGlobalObjects(Globals &g) {
   auto *lg = getOrCreate(ObjectIds::LOCAL_GLOBALS, "local globals");
   lg->moveTo(glob);
   lg->addSynonym("zzmgck");
-  lg->setAction(pathObject);
+  lg->setAction([](int) { return pathObject() ? M_HANDLED : M_NOT_HANDLED; });
 
   // 3. ROOMS (gglobals.zil:28-29)
   getOrCreate(ObjectIds::ROOMS, "rooms");
@@ -306,7 +306,7 @@ void initGlobalObjects(Globals &g) {
   // 5. PSEUDO-OBJECT (gglobals.zil:37-40)
   auto *pseudo = getOrCreate(ObjectIds::PSEUDO_OBJECT, "pseudo");
   pseudo->moveTo(lg);
-  pseudo->setAction(cretinFcn);
+  pseudo->setAction([](int) { return cretinFcn() ? M_HANDLED : M_NOT_HANDLED; });
 
   // 6. IT (gglobals.zil:42-46)
   auto *itObj = getOrCreate(ObjectIds::IT, "random object");
@@ -320,7 +320,7 @@ void initGlobalObjects(Globals &g) {
 
   // 7. NOT-HERE-OBJECT (gglobals.zil:48-50)
   auto *notHere = getOrCreate(ObjectIds::NOT_HERE_OBJECT, "such thing");
-  notHere->setAction(notHereObjectF);
+  notHere->setAction([](int) { return notHereObjectF() ? M_HANDLED : M_NOT_HANDLED; });
 
   // 8. BLESSINGS (gglobals.zil:96-100)
   auto *blessings = getOrCreate(ObjectIds::BLESSINGS, "blessings");
@@ -343,7 +343,7 @@ void initGlobalObjects(Globals &g) {
   stairs->addAdjective("steep");
   stairs->setFlag(ObjectFlag::NDESCBIT);
   stairs->setFlag(ObjectFlag::CLIMBBIT);
-  stairs->setAction(stairsF);
+  stairs->setAction([](int) { return stairsF() ? M_HANDLED : M_NOT_HANDLED; });
 
   // 10. SAILOR (gglobals.zil:115-120)
   auto *sailor = getOrCreate(ObjectIds::SAILOR, "sailor");
@@ -352,7 +352,7 @@ void initGlobalObjects(Globals &g) {
   sailor->addSynonym("footpad");
   sailor->addSynonym("aviator");
   sailor->setFlag(ObjectFlag::NDESCBIT);
-  sailor->setAction(sailorFcn);
+  sailor->setAction([](int) { return sailorFcn() ? M_HANDLED : M_NOT_HANDLED; });
 
   // 11. GROUND (gglobals.zil:164-168)
   auto *ground = getOrCreate(ObjectIds::GROUND, "ground");
@@ -361,7 +361,7 @@ void initGlobalObjects(Globals &g) {
   ground->addSynonym("sand");
   ground->addSynonym("dirt");
   ground->addSynonym("floor");
-  ground->setAction(groundFunction);
+  ground->setAction([](int) { return groundFunction() ? M_HANDLED : M_NOT_HANDLED; });
 
   // 12. GRUE (gglobals.zil:184-189): (IN GLOBAL-OBJECTS), DESC "lurking grue",
   // no flags -- it can always be examined, found and listened to.
@@ -372,7 +372,7 @@ void initGlobalObjects(Globals &g) {
   grue->addAdjective("sinister");
   grue->addAdjective("hungry");
   grue->addAdjective("silent");
-  grue->setAction(grueFunction);
+  grue->setAction([](int) { return grueFunction() ? M_HANDLED : M_NOT_HANDLED; });
 
   // 13. LUNGS (gglobals.zil:208-212)
   auto *lungs = getOrCreate(ObjectIds::LUNGS, "blast of air");
@@ -391,7 +391,7 @@ void initGlobalObjects(Globals &g) {
   me->addSynonym("self");
   me->addSynonym("cretin");
   me->setFlag(ObjectFlag::ACTORBIT);
-  me->setAction(cretinFcn);
+  me->setAction([](int) { return cretinFcn() ? M_HANDLED : M_NOT_HANDLED; });
 
   // 15. ADVENTURER (gglobals.zil:267-272)
   auto *adv = getOrCreate(ObjectIds::ADVENTURER, "cretin");
@@ -413,13 +413,13 @@ void initGlobalObjects(Globals &g) {
   path->addAdjective("long");
   path->addAdjective("winding");
   path->setFlag(ObjectFlag::NDESCBIT);
-  path->setAction(pathObject);
+  path->setAction([](int) { return pathObject() ? M_HANDLED : M_NOT_HANDLED; });
 
   // 17. ZORKMID (gglobals.zil:290-294)
   auto *zorkmid = getOrCreate(ObjectIds::ZORKMID, "zorkmid");
   zorkmid->moveTo(glob);
   zorkmid->addSynonym("zorkmid");
-  zorkmid->setAction(zorkmidFunction);
+  zorkmid->setAction([](int) { return zorkmidFunction() ? M_HANDLED : M_NOT_HANDLED; });
 
   // 18. HANDS (gglobals.zil:304-309)
   auto *hands = getOrCreate(ObjectIds::HANDS, "pair of hands");

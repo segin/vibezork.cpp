@@ -223,7 +223,7 @@ void performResurrection() {
         
         // ZIL: Set action to DEAD-FUNCTION
         if (g.player) {
-            g.player->setAction(::deadFunction);
+            g.player->setAction([](int) { return ::deadFunction() ? M_HANDLED : M_NOT_HANDLED; });
         }
         
         // Set troll flag (troll disappears after player dies)

@@ -1,6 +1,7 @@
 #include "verbs.h"
 #include "verb_tables.h"
 #include "../systems/combat.h"
+#include "../systems/melee.h"
 #include "../systems/death.h"
 #include "../systems/npc.h"
 #include "../systems/save.h"
@@ -1467,8 +1468,8 @@ bool vAttack() {
          CR);
     return RTRUE;
   }
-  // TODO(E2): ZIL calls HERO-BLOW, which rolls on the DEF tables.
-  CombatSystem::startCombat(g.prso, g.prsi);
+  // ZIL: <HERO-BLOW>
+  Melee::heroBlow();
   return RTRUE;
 }
 

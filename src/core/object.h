@@ -96,9 +96,14 @@ public:
   // Action handler
   /// Action handlers return M_NOT_HANDLED / M_HANDLED / M_FATAL
   /// (ZIL RFALSE / RTRUE / RFATAL); a bool-returning callable converts.
-  using ActionFunc = std::function<int()>;
+  ///
+  /// The argument is the ZIL routine's optional RARG, which is 0 for ordinary
+  /// verb dispatch and one of the F-* codes when the melee engine calls a
+  /// villain's routine, as in <APPLY <GETP .O ,P?ACTION> ,F-BUSY?>
+  /// (zil/1actions.zil:3344).
+  using ActionFunc = std::function<int(int)>;
   void setAction(ActionFunc func) { action_ = func; }
-  int performAction() { return action_ ? action_() : M_NOT_HANDLED; }
+  int performAction(int rarg = 0) { return action_ ? action_(rarg) : M_NOT_HANDLED; }
   bool hasAction() const { return action_ != nullptr; }
 
   // Container action handler (ZIL: P?CONTFCN)
