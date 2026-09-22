@@ -4,9 +4,16 @@
 #include "core/io.h"
 #include "core/object.h"
 #include "systems/death.h"
+#include "core/gmain.h"
+#include "verbs/verb_tables.h"
 #include "verbs/verbs.h"
 #include "world/objects.h"
 #include "world/rooms.h"
+
+// Helpers from actions.cpp (ZIL 1actions.zil:29-44, 488-505)
+int openClose(ZObject *obj, std::string_view stropn, std::string_view strcls);
+void touchAll(ZObject *obj);
+int otvalFrob(ZObject *o = nullptr);
 
 // Helper to get direction from object (e.g. for "walk north")
 // Maps direction objects (NORTH_OBJECT etc.) to Direction enum
@@ -197,90 +204,34 @@ int cellarAction(int rarg) {
         !trapdoor->hasFlag(ObjectFlag::TOUCHBIT)) {
       trapdoor->clearFlag(ObjectFlag::OPENBIT);
       trapdoor->setFlag(ObjectFlag::TOUCHBIT);
+      // ZIL ends this TELL with CR CR (1actions.zil:544)
       printLine("The trap door crashes shut, and you hear someone barring it.");
+      crlf();
     }
     return M_HANDLED;
   }
   return M_NOT_HANDLED;
 }
 
-// CHIMNEY-F
-// CHIMNEY-F
-// ZIL: EXAMINE prints direction. CLIMB handled by room/direction logic
-// (UP-CHIMNEY-FUNCTION). We implement logic here for CLIMB CHIMNEY verb usage.
-// Source: 1actions.zil lines 545-565
-bool chimneyAction() {
+// ZIL: <ROUTINE CHIMNEY-F ()
+//        <COND (<VERB? EXAMINE>
+//               <TELL "The chimney leads ">
+//               <COND (<==? ,HERE ,KITCHEN> <TELL "down">) (T <TELL "up">)>
+//               <TELL "ward, and looks climbable." CR>)>>
+// Source: zil/1actions.zil:547-553
+//
+// EXAMINE is the whole routine.  Climbing the chimney is the rooms' business:
+// the Kitchen's DOWN exit and the Living Room's UP exit run
+// UP-CHIMNEY-FUNCTION, so the invented CLIMB branches here are gone.
+int chimneyAction() {
   auto &g = Globals::instance();
-  bool inKitchen = (g.here && g.here->getId() == RoomIds::KITCHEN);
-
-  // EXAMINE
   if (g.prsa == V_EXAMINE) {
-    if (inKitchen) {
-      printLine("The chimney leads down ward, and looks climbable.");
-    } else {
-      printLine("The chimney leads up ward, and looks climbable.");
-    }
-    return RTRUE;
+    tell("The chimney leads ");
+    tell(g.here && g.here->getId() == RoomIds::KITCHEN ? "down" : "up");
+    tell("ward, and looks climbable.", CR);
+    return M_HANDLED;
   }
-
-  // CLIMB UP/DOWN
-  if (g.prsa == V_CLIMB_UP || g.prsa == V_CLIMB_DOWN) {
-    if (inKitchen) {
-      if (g.prsa == V_CLIMB_DOWN) {
-        // Check if Living Room exists
-        ZObject *livingRoom = g.getObject(RoomIds::LIVING_ROOM);
-        if (livingRoom) {
-          printLine("You slide down the chimney...");
-          g.player->moveTo(livingRoom);
-          // Force look?
-          // Return true handles it.
-          return RTRUE;
-        }
-      }
-    } else {
-      // Assuming Living Room (or "Not Kitchen")
-      if (g.prsa == V_CLIMB_UP) {
-        // Santa Check: Can only carry Lamp (and maybe nothing else)
-        // Simplify inventory count check
-        int itemCount = 0;
-        bool hasLamp = false;
-        bool hasOther = false;
-
-        // Check player contents
-        const auto &contents = g.player->getContents();
-        for (ZObject *item : contents) {
-          itemCount++;
-          if (item->getId() == ObjectIds::LAMP)
-            hasLamp = true;
-          else
-            hasOther = true;
-        }
-
-        if (itemCount == 0 || (itemCount == 1 && hasLamp)) {
-          ZObject *kitchen = g.getObject(RoomIds::KITCHEN);
-          if (kitchen) {
-            // Trap Door Logic from ZIL 560
-            ZObject *trapDoor = g.getObject(ObjectIds::TRAP_DOOR);
-            if (trapDoor && !trapDoor->hasFlag(ObjectFlag::OPENBIT)) {
-              trapDoor->clearFlag(ObjectFlag::TOUCHBIT);
-            }
-
-            printLine("The chimney is tight, but you manage to squeeze up it.");
-            g.player->moveTo(kitchen);
-            return RTRUE;
-          }
-        } else {
-          printLine("The chimney is too narrow to climb with all that.");
-          return RTRUE;
-        }
-      }
-    }
-
-    printLine("The chimney is too narrow.");
-    return RTRUE;
-  }
-
-  return RFALSE;
+  return M_NOT_HANDLED;
 }
 
 // CLEARING-FCN (Room action for Clearing)
@@ -1411,11 +1362,12 @@ bool leakAction() {
 // LIVING-ROOM-FCN - Living room handler with dynamic description
 // ZIL: M-LOOK shows door/trophy/rug/trap door state, M-END updates score
 // Source: 1actions.zil lines 449-485
-static bool rugMoved = false;  // RUG-MOVED flag
-static bool magicFlag = false; // MAGIC-FLAG (cyclops door opened)
-
 int livingRoomAction(int rarg) {
   auto &g = Globals::instance();
+  // ZIL: ,RUG-MOVED and ,MAGIC-FLAG are globals, set by RUG-FCN and by
+  // V-ODYSSEUS; reading file-local copies here left the description stale.
+  const bool rugMoved = g.rugMoved;
+  const bool magicFlag = g.magicFlag;
 
   // M-LOOK: Dynamic room description
   if (rarg == M_LOOK) {
@@ -1448,11 +1400,20 @@ int livingRoomAction(int rarg) {
     return M_HANDLED;
   }
 
-  // M-END: Update score when touching trophy case
+  // ZIL: M-END recomputes the score from the trophy case's contents whenever
+  // something was taken or put into the case, touching everything inside so
+  // nested treasures count, then SCORE-UPD 0 reports any change.
+  // Source: zil/1actions.zil:477-485
   if (rarg == M_END) {
-    if (g.prsa == V_TAKE || (g.prsa == V_PUT && g.prsi &&
-                             g.prsi->getId() == ObjectIds::TROPHY_CASE)) {
-      // Score update handled by score system
+    if (g.prsa == V_TAKE ||
+        (g.prsa == V_PUT && g.prsi &&
+         g.prsi->getId() == ObjectIds::TROPHY_CASE)) {
+      ZObject *tcase = g.getObject(ObjectIds::TROPHY_CASE);
+      if (g.prso && tcase && g.prso->getLocation() == tcase)
+        touchAll(g.prso);
+      g.score = g.baseScore + otvalFrob(nullptr);
+      Verbs::scoreUpd(0);
+      return M_NOT_HANDLED;
     }
   }
   return M_NOT_HANDLED;
@@ -1926,28 +1887,53 @@ int torchRoomAction(int rarg) {
 }
 
 // TRAP-DOOR-FCN
-bool trapDoorAction() {
+// ZIL: <ROUTINE TRAP-DOOR-FCN () ...>
+// Source: zil/1actions.zil:507-531
+int trapDoorAction() {
   auto &g = Globals::instance();
-  if (g.prsa == V_OPEN) {
-    if (!g.prso->hasFlag(ObjectFlag::OPENBIT)) {
-      g.prso->setFlag(ObjectFlag::OPENBIT);
-      printLine("The trap door opens to reveal a dark stairway descending into "
-                "darkness.");
-    } else {
-      printLine("It's already open.");
-    }
-    return true;
+  ZObject *door = g.getObject(ObjectIds::TRAP_DOOR);
+
+  if (g.prsa == V_RAISE) {
+    perform(V_OPEN, door);
+    return M_HANDLED;
   }
-  if (g.prsa == V_CLOSE) {
-    if (g.prso->hasFlag(ObjectFlag::OPENBIT)) {
-      g.prso->clearFlag(ObjectFlag::OPENBIT);
-      printLine("The trap door slams shut.");
-    } else {
-      printLine("It's already closed.");
-    }
-    return true;
+
+  const bool inLivingRoom = g.here && g.here->getId() == RoomIds::LIVING_ROOM;
+
+  if ((g.prsa == V_OPEN || g.prsa == V_CLOSE) && inLivingRoom) {
+    return openClose(g.prso,
+                     "The door reluctantly opens to reveal a rickety "
+                     "staircase descending into darkness.",
+                     "The door swings shut and closes.");
   }
-  return false;
+
+  if (g.prsa == V_LOOK_UNDER && inLivingRoom) {
+    if (door && door->hasFlag(ObjectFlag::OPENBIT))
+      printLine("You see a rickety staircase descending into darkness.");
+    else
+      printLine("It's closed.");
+    return M_HANDLED;
+  }
+
+  if (g.here && g.here->getId() == RoomIds::CELLAR) {
+    const bool open = door && door->hasFlag(ObjectFlag::OPENBIT);
+    if ((g.prsa == V_OPEN || g.prsa == V_UNLOCK) && !open) {
+      printLine("The door is locked from above.");
+      return M_HANDLED;
+    }
+    if (g.prsa == V_CLOSE && !open) {
+      door->clearFlag(ObjectFlag::TOUCHBIT);
+      door->clearFlag(ObjectFlag::OPENBIT);
+      printLine("The door closes and locks.");
+      return M_HANDLED;
+    }
+    if (g.prsa == V_OPEN || g.prsa == V_CLOSE) {
+      printLine(VerbTables::dummy().pickOne());
+      return M_HANDLED;
+    }
+  }
+
+  return M_NOT_HANDLED;
 }
 
 // TREASURE-ROOM-FCN
@@ -2027,25 +2013,39 @@ const std::vector<ObjectId> BAT_DROPS = {
     RoomIds::SQUEEKY_ROOM, RoomIds::MINE_ENTRANCE};
 
 // Helper for Fweep printing (ZIL: FWEEP, 1actions.zil:326-330)
+// ZIL: <ROUTINE FWEEP (N)
+//        <REPEAT () <COND (<L? <SET N <- .N 1>> 1> <RETURN>)
+//                         (T <TELL "    Fweep!" CR>)>>
+//        <CRLF>>
+// Source: zil/1actions.zil:326-330
+//
+// The decrement happens before the test, so FWEEP prints N-1 lines: the
+// bat's <FWEEP 4> is three Fweeps and <FWEEP 6> is five.  A blank line
+// follows.
 void fweep(int n) {
-  for (int i = 0; i < n; ++i) {
-    printLine("    Fweep!");
+  while (true) {
+    n = n - 1;
+    if (n < 1)
+      break;
+    tell("    Fweep!", CR);
   }
+  crlf();
 }
 
 // FLY-ME logic (ZIL: FLY-ME, 1actions.zil:317-324)
 void flyMe() {
   auto &g = Globals::instance();
   fweep(4);
-  printLine("");
-  printLine(
-      "The bat grabs you by the scruff of your neck and lifts you away....");
-  printLine("");
+  tell("The bat grabs you by the scruff of your neck and lifts you away....",
+       CR);
+  crlf();
 
   // <GOTO <PICK-ONE ,BAT-DROPS> <>>
   if (!BAT_DROPS.empty()) {
-    int idx = GMacros::random(static_cast<int>(BAT_DROPS.size())) - 1;
-    ObjectId targetId = BAT_DROPS[idx];
+    // ZIL: <GOTO <PICK-ONE ,BAT-DROPS> <>> (1actions.zil:320)
+    static GMacros::ZilRandomTable<ObjectId> drops{
+        std::vector<ObjectId>(BAT_DROPS.begin(), BAT_DROPS.end())};
+    ObjectId targetId = drops.pickOne();
     ZObject *target = g.getObject(targetId);
     if (target) {
       if (g.winner) {
@@ -2069,9 +2069,8 @@ bool batAction() {
   // <VERB? TELL> -> FWEEP 6
   if (g.prsa == V_TELL) {
     fweep(6);
+    g.pCont = 0; // ZIL: <SETG P-CONT <>> (1actions.zil:310)
     return true;
-    // ZIL: <SETG P-CONT <>> (Stop parsing?)
-    // In this engine, returning true stops further processing.
   }
 
   // Handle TAKE, ATTACK, MUNG

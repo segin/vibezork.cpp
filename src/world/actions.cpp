@@ -8,6 +8,7 @@
 #include "systems/death.h"
 #include "systems/score.h"
 #include "systems/timer.h"
+#include "verbs/verb_tables.h"
 #include "verbs/verbs.h"
 #include "world.h"
 #include <memory>
@@ -510,14 +511,64 @@ bool iXbh() {
 }
 
 
+// ZIL: <EQUAL? <BAND <GETB 0 1> 8> 0> reads bit 3 of byte 1 of the story
+// header, the "Tandy" flag an interpreter may set to soften the text and drop
+// the sequel advertisement.  zil/COMPILED/zork1.z3 ships with it clear, and
+// nothing in the game sets it, so the port reports it clear.
+// Source: zil/1actions.zil:419
+bool tandyBitSet() { return false; }
+
+// ZIL: <ROUTINE STONE-BARROW-FCN (RARG) ...>
+// Source: zil/1actions.zil:403-431
+//
+// Entering the barrow ends the game. The long sign is printed, then the story
+// header's Tandy bit (byte 1, bit 3) decides whether the Zork II and III
+// advertisement appears, and FINISH takes over.
+//
+// The room's own description is static and comes from the ZIL room data, so
+// there is no M-LOOK clause here.
 int stoneBarrowAction(int rarg) {
-  if (rarg == M_LOOK) {
-    printLine("You are standing in front of a massive barrow of stone. In the "
-              "east face is a huge stone door which is open. You cannot see "
-              "into the dark of the tomb.");
-    return M_HANDLED;
+  auto &g = Globals::instance();
+
+  if (rarg != M_BEG)
+    return M_NOT_HANDLED;
+
+  const bool entering =
+      g.prsa == V_ENTER ||
+      (g.prsa == V_WALK && g.pWalkDir &&
+       (*g.pWalkDir == Direction::WEST || *g.pWalkDir == Direction::IN)) ||
+      (g.prsa == V_THROUGH && g.prso &&
+       g.prso->getId() == ObjectIds::BARROW);
+  if (!entering)
+    return M_NOT_HANDLED;
+
+  tell("Inside the Barrow", CR);
+  tell("As you enter the barrow, the door closes inexorably behind you. "
+       "Around you it is dark, but ahead is an enormous cavern, brightly lit. "
+       "Through its center runs a wide stream. Spanning the stream is a small "
+       "wooden footbridge, and beyond a path leads into a dark tunnel. Above "
+       "the bridge, floating in the air, is a large sign. It reads:  All ye "
+       "who stand before this bridge have completed a great and perilous "
+       "adventure which has tested your wit and courage. You have mastered");
+
+  // ZIL: <COND (<EQUAL? <BAND <GETB 0 1> 8> 0> ...) (T ...)>; the Tandy bit
+  // in the story header suppresses the sequel advertisement.
+  if (!tandyBitSet()) {
+    tell(" the first part of the ZORK trilogy. Those who pass over this "
+         "bridge must be prepared to undertake an even greater adventure "
+         "that will severely test your skill and bravery!",
+         CR);
+    crlf();
+    tell("The ZORK trilogy continues with \"ZORK II: The Wizard of Frobozz\" "
+         "and is completed in \"ZORK III: The Dungeon Master.\"",
+         CR);
+  } else {
+    tell(" ZORK: The Great Underground Empire.", CR);
+    crlf();
   }
-  return M_NOT_HANDLED;
+
+  Verbs::finish();
+  return M_HANDLED;
 }
 
 // Maze room action helper - all maze rooms behave similarly
@@ -683,6 +734,73 @@ bool bagAction() {
 // MATCH-FUNCTION - Matchbook interactions
 // ZIL: COUNT/EXAMINE -> # matches. LIGHT -> Light one, decrement.
 // Source: 1actions.zil lines 2300+
+// ZIL: <ROUTINE OPEN-CLOSE (OBJ STROPN STRCLS) ...>
+// Source: zil/1actions.zil:29-44
+//
+// The shared open/close body: the wrong way round draws a line from the
+// DUMMY table rather than a fixed refusal.
+int openClose(ZObject *obj, std::string_view stropn, std::string_view strcls) {
+  auto &g = Globals::instance();
+  if (!obj)
+    return M_NOT_HANDLED;
+
+  if (g.prsa == V_OPEN) {
+    if (obj->hasFlag(ObjectFlag::OPENBIT)) {
+      tell(VerbTables::dummy().pickOne());
+    } else {
+      tell(stropn);
+      obj->setFlag(ObjectFlag::OPENBIT);
+    }
+    crlf();
+    return M_HANDLED;
+  }
+  if (g.prsa == V_CLOSE) {
+    if (obj->hasFlag(ObjectFlag::OPENBIT)) {
+      tell(strcls);
+      obj->clearFlag(ObjectFlag::OPENBIT);
+    } else {
+      tell(VerbTables::dummy().pickOne());
+    }
+    crlf();
+    return M_HANDLED;
+  }
+  return M_NOT_HANDLED;
+}
+
+// ZIL: <ROUTINE TOUCH-ALL (OBJ "AUX" F) ...>
+// Source: zil/1actions.zil:488-496
+void touchAll(ZObject *obj) {
+  if (!obj)
+    return;
+  for (ZObject *f : obj->getContents()) {
+    f->setFlag(ObjectFlag::TOUCHBIT);
+    if (!f->getContents().empty())
+      touchAll(f);
+  }
+}
+
+// ZIL: <ROUTINE OTVAL-FROB ("OPTIONAL" (O ,TROPHY-CASE) ...) ...>
+// Source: zil/1actions.zil:498-505
+//
+// The total TVALUE of everything in the trophy case, nested contents
+// included.  Note the ZIL recurses without adding the inner total to SCORE,
+// so only the top level and the first nesting level it walks contribute;
+// the recursion's return value is discarded exactly as written.
+int otvalFrob(ZObject *o) {
+  auto &g = Globals::instance();
+  if (!o)
+    o = g.getObject(ObjectIds::TROPHY_CASE);
+  if (!o)
+    return 0;
+  int score = 0;
+  for (ZObject *f : o->getContents()) {
+    score += f->getProperty(P_TVALUE);
+    if (!f->getContents().empty())
+      otvalFrob(f); // ZIL discards this value
+  }
+  return score;
+}
+
 bool iMatch(); // ZIL: I-MATCH (1actions.zil:2296-2300)
 
 // ZIL: <ROUTINE MATCH-FUNCTION ("AUX" CNT) ...>

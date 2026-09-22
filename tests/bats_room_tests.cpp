@@ -159,18 +159,25 @@ TEST(BatsRoomFcn_EnterWithoutGarlicTriggersFlyMe) {
   ASSERT_TRUE(found);
 }
 
+// ZIL: <ROUTINE FWEEP (N)> decrements N before the test, so it prints N-1
+// lines: the bat's <FWEEP 4> is three Fweeps and BAT-F's <FWEEP 6> is five.
+// Source: zil/1actions.zil:326-330
 TEST(BatsRoomFcn_FweepOutputsExpectedLines) {
-  OutputCapture cap;
-  fweep(4);
-  std::string output = cap.getOutput();
-
-  int count = 0;
-  size_t pos = 0;
-  while ((pos = output.find("Fweep!", pos)) != std::string::npos) {
-    count++;
-    pos += 6;
-  }
-  ASSERT_EQ(count, 4);
+  auto countFweeps = [](int n) {
+    OutputCapture cap;
+    fweep(n);
+    std::string output = cap.getOutput();
+    int count = 0;
+    size_t pos = 0;
+    while ((pos = output.find("Fweep!", pos)) != std::string::npos) {
+      count++;
+      pos += 6;
+    }
+    return count;
+  };
+  ASSERT_EQ(countFweeps(4), 3);
+  ASSERT_EQ(countFweeps(6), 5);
+  ASSERT_EQ(countFweeps(1), 0);
 }
 
 int main(int argc, char *argv[]) {

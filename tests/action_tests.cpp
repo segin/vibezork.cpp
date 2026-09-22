@@ -926,9 +926,9 @@ TEST(CellarFcn_StubDoesNotCrash) {
 // ZIL Logic: CLIMB_UP/CLIMB_DOWN - chimney is too narrow
 // =============================================================================
 
-extern bool chimneyAction();
+extern int chimneyAction();
 
-TEST(ChimneyF_ClimbUpBlocked) {
+TEST(ChimneyF_ClimbUpDeclined) {
   setupTestWorld();
   auto &g = Globals::instance();
 
@@ -942,12 +942,13 @@ TEST(ChimneyF_ClimbUpBlocked) {
 
   g.prsa = V_CLIMB_UP;
 
+  // ZIL: CHIMNEY-F's only clause is EXAMINE, so CLIMB falls through to the
+  // Living Room's UP exit, which runs UP-CHIMNEY-FUNCTION and carries the
+  // "You can't get up there with what you're carrying." refusal.
+  // Source: zil/1actions.zil:547-553, 555-567
   OutputCapture cap;
-  bool result = chimneyAction();
-
-  ASSERT_TRUE(result);
-  std::string output = cap.getOutput();
-  ASSERT_TRUE(output.find("narrow") != std::string::npos);
+  ASSERT_EQ(M_NOT_HANDLED, chimneyAction());
+  ASSERT_TRUE(cap.getOutput().empty());
 }
 
 // Note: ChimneyF_OtherVerbsReturnFalse removed - ZIL CHIMNEY-F (lines 545-551)
@@ -1657,9 +1658,10 @@ TEST(ChimneyFcn_Examine) {
   g.here = kitchen;
   {
     OutputCapture cap;
-    bool result = chimneyAction();
+    int result = chimneyAction();
     ASSERT_TRUE(result);
-    ASSERT_TRUE(cap.getOutput().find("leads down ward") != std::string::npos);
+    // ZIL concatenates "down" with "ward, and looks climbable."
+  ASSERT_TRUE(cap.getOutput().find("leads downward") != std::string::npos);
   }
 
   // Living Room (Up)
@@ -1672,81 +1674,25 @@ TEST(ChimneyFcn_Examine) {
   g.here = livingRoom;
   {
     OutputCapture cap;
-    bool result = chimneyAction();
+    int result = chimneyAction();
     ASSERT_TRUE(result);
-    ASSERT_TRUE(cap.getOutput().find("leads up ward") != std::string::npos);
+    ASSERT_TRUE(cap.getOutput().find("leads upward") != std::string::npos);
   }
 }
 
-TEST(ChimneyFcn_ClimbLogic) {
+// ZIL: CHIMNEY-F does not move the player. The Kitchen's DOWN exit and the
+// Living Room's UP exit are what run UP-CHIMNEY-FUNCTION.
+// Source: zil/1actions.zil:547-567
+TEST(ChimneyFcn_DoesNotHandleClimbing) {
   setupTestWorld();
   auto &g = Globals::instance();
+  g.here = g.getObject(RoomIds::KITCHEN);
 
-  ZObject *kitchen = g.getObject(RoomIds::KITCHEN);
-  ZObject *livingRoom = g.getObject(RoomIds::LIVING_ROOM);
-  if (!kitchen) {
-    g.registerObject(RoomIds::KITCHEN,
-                     std::make_unique<ZObject>(RoomIds::KITCHEN, "Kitchen"));
-    kitchen = g.getObject(RoomIds::KITCHEN);
-  }
-  if (!livingRoom) {
-    g.registerObject(
-        RoomIds::LIVING_ROOM,
-        std::make_unique<ZObject>(RoomIds::LIVING_ROOM, "Living Room"));
-    livingRoom = g.getObject(RoomIds::LIVING_ROOM);
-  }
-
-  // Climb Down from Kitchen
-  g.here = kitchen;
-  g.player->moveTo(kitchen);
-  g.prsa = V_CLIMB_DOWN;
-  {
+  for (VerbId v : {V_CLIMB_DOWN, V_CLIMB_UP, V_CLIMB_FOO}) {
+    g.prsa = v;
     OutputCapture cap;
-    bool result = chimneyAction();
-    ASSERT_TRUE(result);
-    ASSERT_TRUE(cap.getOutput().find("slide down") != std::string::npos);
-    ASSERT_EQ(g.player->getLocation()->getId(), RoomIds::LIVING_ROOM);
-  }
-
-  // Climb Up from Living Room (Fail - Heavy)
-  g.here = livingRoom;
-  g.player->moveTo(livingRoom);
-  g.prsa = V_CLIMB_UP;
-
-  // Add heavy item
-  ZObject *sword = g.getObject(ObjectIds::SWORD); // Assume exists or make dummy
-  if (!sword) {
-    auto s = std::make_unique<ZObject>(ObjectIds::SWORD, "sword");
-    g.registerObject(ObjectIds::SWORD, std::move(s));
-    sword = g.getObject(ObjectIds::SWORD);
-  }
-  sword->moveTo(g.player);
-
-  {
-    OutputCapture cap;
-    bool result = chimneyAction();
-    ASSERT_TRUE(result);
-    // Implementation says "too narrow to climb with all that" or "too narrow"
-    ASSERT_TRUE(cap.getOutput().find("narrow") != std::string::npos);
-    ASSERT_EQ(g.player->getLocation()->getId(), RoomIds::LIVING_ROOM);
-  }
-
-  // Climb Up from Living Room (Success - Only Lamp)
-  sword->moveTo(nullptr); // Remove sword
-  ZObject *lantern = g.getObject(ObjectIds::LAMP);
-  if (!lantern) {
-    auto l = std::make_unique<ZObject>(ObjectIds::LAMP, "brass lantern");
-    g.registerObject(ObjectIds::LAMP, std::move(l));
-    lantern = g.getObject(ObjectIds::LAMP);
-  }
-  lantern->moveTo(g.player);
-
-  {
-    OutputCapture cap;
-    bool result = chimneyAction();
-    ASSERT_TRUE(result);
-    ASSERT_TRUE(cap.getOutput().find("squeeze up") != std::string::npos);
-    ASSERT_EQ(g.player->getLocation()->getId(), RoomIds::KITCHEN);
+    ASSERT_EQ(M_NOT_HANDLED, chimneyAction());
+    ASSERT_TRUE(cap.getOutput().empty());
   }
 }
 

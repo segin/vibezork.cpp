@@ -23,7 +23,7 @@ bool axeAction(); bool bagOfCoinsAction(); bool barrowAction(); bool barrowDoorA
 bool basketAction(); bool batAction(); bool bellAction(); bool boardAction();
 bool boardedWindowAction(); bool bodyAction(); bool boltAction(); bool bottleAction();
 bool bubbleAction(); bool buttonAction(); bool canaryAction(); int candlesAction();
-bool canyonViewAction(); bool chaliceAction(); bool chimneyAction(); bool crackAction();
+bool canyonViewAction(); bool chaliceAction(); int chimneyAction(); bool crackAction();
 bool damAction(); bool eggAction();
 bool forestAction(); bool frontDoorAction(); bool garlicAction(); bool ghostsAction();
 bool graniteWallAction(); bool grateAction();
@@ -36,7 +36,7 @@ bool rainbowAction(); bool riverAction(); bool robberAction(); bool ropeAction()
 bool rugAction(); bool rustyKnifeAction(); bool sandAction();
 bool sandwichBagAction(); bool sceptreAction(); bool slideAction(); bool songbirdAction();
 bool stilettoAction(); int swordAction(); bool teethAction();
-bool toolChestAction(); int torchAction(); bool trapDoorAction();
+bool toolChestAction(); int torchAction(); int trapDoorAction();
 bool trophyCaseAction(); bool trunkAction(); bool tubeAction(); bool waterAction();
 bool whiteHouseAction();
 
