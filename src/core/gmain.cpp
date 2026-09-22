@@ -458,9 +458,10 @@ void mainLoop1() {
   // meta verbs and CLOCK-WAIT turns do not count.
   // Process timers if not meta-verb (ZIL: lines 170-172)
   if (g.pWon && !isMetaVerb(cmd.verb)) {
+    // ZIL: <SET V <CLOCKER>> and nothing else. The troll fights through
+    // I-FIGHT and the cyclops through I-CYCLOPS, both of them C-TABLE
+    // interrupts, so there is no per-turn NPC call here.
     TimerSystem::tick();
-    NPCSystem::processTrollTurn();
-    NPCSystem::processCyclopsTurn();
   }
 }
 

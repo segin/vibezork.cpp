@@ -7,6 +7,7 @@
 #include "core/gglobals.h"
 #include "world/pseudo_actions.h"
 #include "systems/npc.h"
+#include "world/villains.h"
 
 #include <algorithm>
 #include <string>
@@ -68,6 +69,9 @@ void noteUnresolved(std::string_view routine) {
 }
 
 using ObjFn = bool (*)();
+/// ZIL object ACTIONs that take the routine's optional RARG: the villains,
+/// whose routines the melee engine calls with F-BUSY?, F-DEAD and friends.
+using ObjArgFn = int (*)(int);
 using RoomFn = int (*)(int);
 using ExitFn = ObjectId (*)();
 
@@ -75,7 +79,7 @@ using ExitFn = ObjectId (*)();
 /// same ZIL name in a comment, the one named after the ZIL routine wins.
 const std::unordered_map<std::string_view, ObjFn> &objectActions() {
   static const std::unordered_map<std::string_view, ObjFn> m = {
-      {"AXE-F", axeAction},
+      {"AXE-F", Villains::axeF},
       {"BAG-OF-COINS-F", bagOfCoinsAction},
       {"BARROW-DOOR-FCN", barrowDoorAction},
       {"BARROW-FCN", barrowAction},
@@ -139,14 +143,14 @@ const std::unordered_map<std::string_view, ObjFn> &objectActions() {
       {"SLIDE-FUNCTION", slideAction},
       {"SONGBIRD-F", songbirdAction},
       {"STAIRS-F", GGlobals::stairsF},
-      {"STILETTO-FUNCTION", stilettoAction},
+      {"STILETTO-FUNCTION", Villains::stilettoFunction},
       {"SWORD-FCN", swordAction},
       {"TEETH-F", teethAction},
       {"TOOL-CHEST-FCN", toolChestAction},
       {"TORCH-OBJECT", torchAction},
       {"TRAP-DOOR-FCN", trapDoorAction},
       {"TREASURE-INSIDE", Dungeon::treasureInsideAction},
-      {"TROLL-FCN", NPCSystem::trollAction},
+      
       {"TROPHY-CASE-FCN", trophyCaseAction},
       {"TRUNK-F", trunkAction},
       {"TUBE-FUNCTION", tubeAction},
@@ -295,9 +299,22 @@ std::function<bool()> flagTestFor(std::string_view n) {
   return [member] { return Globals::instance().*member; };
 }
 
+/// ZIL object ACTIONs that take the routine's optional MODE argument.
+const std::unordered_map<std::string_view, ObjArgFn> &objectArgActions() {
+  static const std::unordered_map<std::string_view, ObjArgFn> m = {
+      {"TROLL-FCN", Villains::trollFcn},
+  };
+  return m;
+}
+
 ZObject::ActionFunc objectActionFor(std::string_view routine) {
   if (routine.empty()) {
     return {};
+  }
+  const auto &args = objectArgActions();
+  if (auto ait = args.find(routine); ait != args.end()) {
+    ObjArgFn fn = ait->second;
+    return [fn](int rarg) { return fn(rarg); };
   }
   const auto &m = objectActions();
   auto it = m.find(routine);

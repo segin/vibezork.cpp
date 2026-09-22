@@ -2049,9 +2049,17 @@ int treasureRoomAction(int rarg) {
   return M_NOT_HANDLED;
 }
 
-// TROLL-ROOM-F
+// ZIL: <ROUTINE TROLL-ROOM-F (RARG) <COND (<AND <EQUAL? .RARG ,M-ENTER>
+//        <IN? ,TROLL ,HERE>> <THIS-IS-IT ,TROLL>)>>
+// Source: zil/1actions.zil:4175-4178
 int trollRoomAction(int rarg) {
-  // Handle troll blocking passage
+  auto &g = Globals::instance();
+  if (rarg == M_ENTER) {
+    ZObject *troll = g.getObject(ObjectIds::TROLL);
+    if (troll && troll->getLocation() == g.here) {
+      Verbs::thisIsIt(troll);
+    }
+  }
   return M_NOT_HANDLED;
 }
 
