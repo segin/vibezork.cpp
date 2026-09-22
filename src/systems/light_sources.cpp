@@ -16,6 +16,10 @@ namespace {
 // it with <REST .TBL 4> after each step, so model it as an index.
 std::size_t lampIndex = 0;
 
+// ZIL: <GLOBAL CANDLE-TABLE <TABLE (PURE) 20 "..." 10 "..." 5 "..." 0>>
+// (1actions.zil:2406-2413), advanced the same way by I-CANDLES.
+std::size_t candleIndex = 0;
+
 } // namespace
 
 std::span<const TimerStep> lampTable() {
@@ -25,7 +29,17 @@ std::span<const TimerStep> lampTable() {
   return all.subspan(lampIndex);
 }
 
-void reset() { lampIndex = 0; }
+std::span<const TimerStep> candleTable() {
+  std::span<const TimerStep> all{zork::zil::kCANDLE_TABLE};
+  if (candleIndex >= all.size())
+    return all.last(1);
+  return all.subspan(candleIndex);
+}
+
+void reset() {
+  lampIndex = 0;
+  candleIndex = 0;
+}
 
 // ZIL: <ROUTINE LIGHT-INT (OBJ TBL TICK)
 //        <COND (<0? .TICK> <FCLEAR .OBJ ,ONBIT> <FSET .OBJ ,RMUNGBIT>)>
@@ -80,6 +94,36 @@ bool iLantern() {
   // ZIL: the routine's value is whatever the final COND yields; a non-zero
   // tick leaves the SETG's value (true), a zero tick falls out false.  Only
   // CLOCKER's FLG depends on it, which V-WAIT uses to stop waiting early.
+  return tick != 0;
+}
+
+} // namespace LightSources
+
+// ZIL: <ROUTINE I-CANDLES ("AUX" TICK (TBL <VALUE CANDLE-TABLE>))
+//        <FSET ,CANDLES ,TOUCHBIT>
+//        <ENABLE <QUEUE I-CANDLES <SET TICK <GET .TBL 0>>>>
+//        <LIGHT-INT ,CANDLES .TBL .TICK>
+//        <COND (<NOT <0? .TICK>> <SETG CANDLE-TABLE <REST .TBL 4>>)>>
+// Source: zil/1actions.zil:2310-2317
+namespace LightSources {
+
+bool iCandles() {
+  auto &g = Globals::instance();
+  ZObject *candles = g.getObject(ObjectIds::CANDLES);
+  if (candles)
+    candles->setFlag(ObjectFlag::TOUCHBIT);
+
+  std::span<const TimerStep> tbl = candleTable();
+  int tick = tbl.empty() ? 0 : tbl.front().turns;
+
+  TimerSystem::queue("I-CANDLES", tick);
+  TimerSystem::enable("I-CANDLES");
+
+  lightInt(candles, tbl, tick);
+
+  if (tick != 0)
+    ++candleIndex;
+
   return tick != 0;
 }
 

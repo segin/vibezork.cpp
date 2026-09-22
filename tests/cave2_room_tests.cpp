@@ -5,8 +5,8 @@
 #include "../src/world/objects.h"
 #include "../src/world/rooms.h"
 #include "../src/world/world.h"
-#include "../src/systems/candle.h"
 #include "../src/parser/gparser.h"
+#include "../src/systems/timer.h"
 #include "test_framework.h"
 #include <cstdlib>
 #include <sstream>
@@ -31,7 +31,6 @@ private:
 static void setupTestWorld() {
   initializeWorld();
   goSetup();
-  CandleSystem::initialize();
 }
 
 // =============================================================================
@@ -133,7 +132,7 @@ TEST(Cave2RoomFcn_CandlesBlownOutAndDarkMessage) {
 
   candles->moveTo(winner);
   candles->setFlag(ObjectFlag::ONBIT);
-  CandleSystem::enableCandleTimer();
+  TimerSystem::enable("I-CANDLES");
 
   // Try until probability roll succeeds
   bool extinguished = false;

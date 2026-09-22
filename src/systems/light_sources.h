@@ -32,9 +32,15 @@ void lightInt(ZObject *obj, std::span<const TimerStep> tbl, int tick);
 /// ZIL: <ROUTINE I-LANTERN ...> (1actions.zil:2303-2308)
 bool iLantern();
 
+/// ZIL: <ROUTINE I-CANDLES ...> (1actions.zil:2310-2317)
+bool iCandles();
+
 /// ZIL: <GLOBAL LAMP-TABLE ...> as the interrupt currently sees it; the
 /// global is a pointer into the table that I-LANTERN advances.
 std::span<const TimerStep> lampTable();
+
+/// ZIL: <GLOBAL CANDLE-TABLE ...> as I-CANDLES currently sees it.
+std::span<const TimerStep> candleTable();
 
 /// Reset the table pointers to the head (start of a new game).
 void reset();

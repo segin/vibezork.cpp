@@ -877,7 +877,7 @@ TEST(ButtonF_PushYellowOpensGates) {
 // ZIL Logic: LAMP_ON/LAMP_OFF lights or extinguishes candles
 // =============================================================================
 
-extern bool candlesAction();
+extern int candlesAction();
 
 TEST(CandlesFcn_LampOnHandled) {
   setupTestWorld();
@@ -887,7 +887,7 @@ TEST(CandlesFcn_LampOnHandled) {
   g.prsa = V_LAMP_ON;
 
   OutputCapture cap;
-  bool result = candlesAction();
+  int result = candlesAction();
 
   ASSERT_TRUE(result);
 }
@@ -902,7 +902,7 @@ TEST(CandlesFcn_LampOffHandled) {
   g.prsa = V_LAMP_OFF;
 
   OutputCapture cap;
-  bool result = candlesAction();
+  int result = candlesAction();
 
   ASSERT_TRUE(result);
 }
@@ -1372,15 +1372,12 @@ TEST(CandlesFcn_LightWithNothingFails) {
 
   bool result = false;
   // Catch FATAL return if possible, but our code uses RFATAL define which is
-  // just true/false usually? In actions.cpp, RFATAL is false. Wait, check
-  // definition. Usually RFALSE/RTRUE. Actually RFATAL returns true but signals
-  // failure? Or just returns? In our codebase typically RTRUE=1, RFALSE=0.
-  // RFATAL might be defined differently. Checking actions.cpp... it's not
-  // defined, or standard header? Assuming RFATAL is handled as return value.
-  // Our impl returns RFATAL.
+  // ZIL: the no-PRSI branch ends in <RFATAL>, which is M-FATAL (2).
+  // Source: zil/1actions.zil:2358-2362
 
   OutputCapture cap;
-  result = candlesAction(); // Should return RFATAL
+  int fatal = candlesAction();
+  ASSERT_EQ(M_FATAL, fatal);
 
   // Check message
   std::string output = cap.getOutput();
@@ -1409,7 +1406,7 @@ TEST(CandlesFcn_LightWithLitMatchSucceeds) {
   g.prsa = V_LAMP_ON;
 
   OutputCapture cap;
-  bool result = candlesAction();
+  int result = candlesAction();
 
   ASSERT_TRUE(result);
   ASSERT_TRUE(cap.getOutput().find("candles are lit") != std::string::npos);
@@ -1439,7 +1436,7 @@ TEST(CandlesFcn_TorchVaporizesCandles) {
   g.prsa = V_LAMP_ON;
 
   OutputCapture cap;
-  bool result = candlesAction();
+  int result = candlesAction();
 
   ASSERT_TRUE(result);
   ASSERT_TRUE(cap.getOutput().find("vaporized") != std::string::npos);
@@ -1457,7 +1454,7 @@ TEST(CandlesFcn_LampOffExtinguishes) {
   g.prsa = V_LAMP_OFF;
 
   OutputCapture cap;
-  bool result = candlesAction();
+  int result = candlesAction();
 
   ASSERT_TRUE(result);
   ASSERT_TRUE(cap.getOutput().find("flame is extinguished") !=

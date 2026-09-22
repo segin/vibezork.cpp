@@ -9,7 +9,6 @@
 #include "core/globals.h"
 #include "core/gmain.h"
 #include "core/io.h"
-#include "systems/candle.h"
 #include "systems/light_sources.h"
 #include "systems/melee.h"
 #include "world/villains.h"
@@ -68,7 +67,7 @@ void goSetup() {
   TimerSystem::enable("I-THIEF");
 
   // ZIL: <QUEUE I-CANDLES 40>  (enabled by CANDLES-FCN, 1actions.zil:2345)
-  TimerSystem::interrupt("I-CANDLES", CandleSystem::iCandles);
+  TimerSystem::interrupt("I-CANDLES", LightSources::iCandles);
   TimerSystem::queue("I-CANDLES", 40);
 
   // ZIL: <QUEUE I-LANTERN 200>  (enabled by LANTERN, 1actions.zil:2241)

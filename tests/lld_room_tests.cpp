@@ -2,7 +2,6 @@
 #include "../src/core/globals.h"
 #include "../src/core/go.h"
 #include "../src/core/object.h"
-#include "../src/systems/candle.h"
 #include "../src/systems/death.h"
 #include "../src/systems/timer.h"
 #include "../src/verbs/verbs.h"
@@ -224,7 +223,7 @@ TEST(LLDRoomFcn_RingBellCeremonyStep1) {
   bell->moveTo(g.player);
   candles->moveTo(g.player);
   candles->setFlag(ObjectFlag::ONBIT);
-  CandleSystem::enableCandleTimer();
+  TimerSystem::enable("I-CANDLES");
 
   g.prsa = V_RING;
   g.prso = bell;

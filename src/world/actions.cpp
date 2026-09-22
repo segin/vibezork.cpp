@@ -2,9 +2,9 @@
 #include "core/globals.h"
 #include "world/dungeon.h"
 #include "core/gmacros.h"
+#include "core/gmain.h"
 #include "core/io.h"
 #include "parser/gparser.h"
-#include "systems/candle.h"
 #include "systems/death.h"
 #include "systems/score.h"
 #include "systems/timer.h"
@@ -91,7 +91,7 @@ int cave2Room(int rarg) {
     auto *winner = g.winner ? g.winner : g.player;
     if (candles && winner && candles->getLocation() == winner &&
         GMacros::prob(50, true) && candles->hasFlag(ObjectFlag::ONBIT)) {
-      CandleSystem::disableCandleTimer();
+      TimerSystem::disable("I-CANDLES");
       candles->clearFlag(ObjectFlag::ONBIT);
       printLine("A gust of wind blows out your candles!");
       g.lit = GParser::isLit(g.here);
@@ -425,7 +425,7 @@ int lldRoom(int rarg) {
         printLine("In your confusion, the candles drop to the ground (and they are out).");
         candles->moveTo(g.here);
         candles->clearFlag(ObjectFlag::ONBIT);
-        CandleSystem::disableCandleTimer();
+        TimerSystem::disable("I-CANDLES");
       }
       // ZIL: <ENABLE <QUEUE I-XB 6>> <ENABLE <QUEUE I-XBH 20>> (1actions.zil:1100-1101)
       TimerSystem::interrupt("I-XB", iXb);
@@ -1297,103 +1297,103 @@ bool torchAction() {
   return RFALSE;
 }
 
-// Candles action - temporary light source that burns down
-// CANDLES-FCN - Candle lighting/burning
-// ZIL: Requires lit MATCH. TORCH destroys. Timer usage.
-// Source: 1actions.zil lines 2343-2400+
-bool candlesAction() {
+// ZIL: <ROUTINE CANDLES-FCN () ...>
+// Source: zil/1actions.zil:2343-2404
+//
+// The routine enables I-CANDLES on first touch whatever the verb, then does
+// nothing at all when the candles are the indirect object (they are the thing
+// being lit *with*), and otherwise dispatches on the verb.
+int candlesAction() {
   auto &g = Globals::instance();
+  ZObject *candles = g.getObject(ObjectIds::CANDLES);
+  if (!candles)
+    return M_NOT_HANDLED;
 
-  if (!g.prso || g.prso->getId() != ObjectIds::CANDLES)
-    return RFALSE;
+  // ZIL: <COND (<NOT <FSET? ,CANDLES ,TOUCHBIT>> <ENABLE <INT I-CANDLES>>)>
+  if (!candles->hasFlag(ObjectFlag::TOUCHBIT))
+    TimerSystem::enable("I-CANDLES");
 
-  // LAMP-ON / BURN
+  // ZIL: <COND (<EQUAL? ,CANDLES ,PRSI> <RFALSE>) (T ...)>
+  if (g.prsi == candles)
+    return M_NOT_HANDLED;
+
   if (g.prsa == V_LAMP_ON || g.prsa == V_BURN) {
-    if (g.prso->getProperty(P_STRENGTH) <= 0) { // ZIL: RMUNGBIT check
+    if (candles->hasFlag(ObjectFlag::RMUNGBIT)) {
       printLine("Alas, there's not much left of the candles. Certainly not "
                 "enough to burn.");
-      return RTRUE;
+      return M_HANDLED;
     }
-
-    ZObject *tool = g.prsi;
-
-    // Auto-infer match if holder has it and it's lit
-    if (!tool) {
+    if (!g.prsi) {
       ZObject *match = g.getObject(ObjectIds::MATCH);
-      if (match &&
-          (match->getLocation() == g.player ||
-           match->getLocation() == g.here) &&
-          match->hasFlag(ObjectFlag::ONBIT)) {
-        printLine("(with the matchbook)");
-        tool = match;
+      if (match && match->hasFlag(ObjectFlag::FLAMEBIT)) {
+        printLine("(with the match)");
+        perform(V_LAMP_ON, candles, match);
+        return M_HANDLED;
       }
-    }
-
-    if (!tool) {
       printLine("You should say what to light them with.");
-      return RTRUE;
+      return GMacros::rfatal();
     }
-
-    if (tool->getId() == ObjectIds::TORCH) { // Vaporize
-      if (g.prso->hasFlag(ObjectFlag::ONBIT)) {
-        printLine(
-            "You realize, just in time, that the candles are already lighted.");
+    if (g.prsi->getId() == ObjectIds::MATCH &&
+        g.prsi->hasFlag(ObjectFlag::ONBIT)) {
+      tell("The candles are ");
+      if (candles->hasFlag(ObjectFlag::ONBIT)) {
+        tell("already lit.", CR);
+      } else {
+        candles->setFlag(ObjectFlag::ONBIT);
+        tell("lit.", CR);
+        TimerSystem::enable("I-CANDLES");
+      }
+      return M_HANDLED;
+    }
+    if (g.prsi->getId() == ObjectIds::TORCH) {
+      if (candles->hasFlag(ObjectFlag::ONBIT)) {
+        printLine("You realize, just in time, that the candles are already "
+                  "lighted.");
       } else {
         printLine("The heat from the torch is so intense that the candles are "
                   "vaporized.");
-        g.prso->moveTo(nullptr);
+        Verbs::removeCarefully(candles);
       }
-      return RTRUE;
-    } else if (tool->getId() == ObjectIds::MATCH &&
-               tool->hasFlag(ObjectFlag::ONBIT)) {
-      if (g.prso->hasFlag(ObjectFlag::ONBIT)) {
-        printLine("The candles are already lit.");
-      } else {
-        g.prso->setFlag(ObjectFlag::ONBIT);
-        printLine("The candles are lit.");
-        CandleSystem::enableCandleTimer();
-      }
-      return RTRUE;
-    } else {
-      printLine(
-          "You have to light them with something that's burning, you know.");
-      return RTRUE;
+      return M_HANDLED;
     }
+    printLine("You have to light them with something that's burning, you know.");
+    return M_HANDLED;
   }
 
-  // LAMP-OFF
-  if (g.prsa == V_LAMP_OFF) {
-    CandleSystem::disableCandleTimer();
-    if (g.prso->hasFlag(ObjectFlag::ONBIT)) {
-      printLine("The flame is extinguished.");
-      g.prso->clearFlag(ObjectFlag::ONBIT);
-      // TODO: Check darkness "It's really dark in here..."
-      return RTRUE;
-    } else {
-      printLine("The candles are not lighted.");
-      return RTRUE;
-    }
-  }
-
-  // EXAMINE (ZIL line 2399) - Prints state
-  if (g.prsa == V_EXAMINE) {
-    print("The candles are ");
-    if (g.prso->hasFlag(ObjectFlag::ONBIT)) {
-      printLine("burning.");
-    } else {
-      printLine("out.");
-    }
-    return RTRUE;
-  }
-
-  // COUNT
   if (g.prsa == V_COUNT) {
-    printLine(
-        "Let's see, how many objects in a pair? Don't tell me, I'll get it.");
-    return RTRUE;
+    printLine("Let's see, how many objects in a pair? Don't tell me, I'll get it.");
+    return M_HANDLED;
   }
 
-  return RFALSE;
+  if (g.prsa == V_LAMP_OFF) {
+    TimerSystem::disable("I-CANDLES");
+    if (candles->hasFlag(ObjectFlag::ONBIT)) {
+      tell("The flame is extinguished.");
+      candles->clearFlag(ObjectFlag::ONBIT);
+      candles->setFlag(ObjectFlag::TOUCHBIT);
+      g.lit = GParser::isLit(g.here);
+      if (!g.lit)
+        tell(" It's really dark in here....");
+      crlf();
+      return M_HANDLED;
+    }
+    printLine("The candles are not lighted.");
+    return M_HANDLED;
+  }
+
+  // ZIL: <AND <VERB? PUT> <FSET? ,PRSI ,BURNBIT>>
+  if (g.prsa == V_PUT && g.prsi && g.prsi->hasFlag(ObjectFlag::BURNBIT)) {
+    printLine("That wouldn't be smart.");
+    return M_HANDLED;
+  }
+
+  if (g.prsa == V_EXAMINE) {
+    tell("The candles are ");
+    tell(candles->hasFlag(ObjectFlag::ONBIT) ? "burning." : "out.", CR);
+    return M_HANDLED;
+  }
+
+  return M_NOT_HANDLED;
 }
 
 // ============================================================================

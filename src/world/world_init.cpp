@@ -9,7 +9,6 @@
 #include "core/globals.h"
 #include "core/io.h"
 #include "verbs/verbs.h"
-#include "systems/candle.h"
 #include <memory>
 
 // Forward declarations for action handlers (defined in actions.cpp)
@@ -42,7 +41,7 @@ bool wrenchAction();
 bool screwdriverAction();
 bool shovelAction();
 bool torchAction();
-bool candlesAction();
+int candlesAction();
 bool matchesAction();
 bool paintingAction();
 bool eggAction();

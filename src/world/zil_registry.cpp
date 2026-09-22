@@ -22,7 +22,7 @@
 bool axeAction(); bool bagOfCoinsAction(); bool barrowAction(); bool barrowDoorAction();
 bool basketAction(); bool batAction(); bool bellAction(); bool boardAction();
 bool boardedWindowAction(); bool bodyAction(); bool boltAction(); bool bottleAction();
-bool bubbleAction(); bool buttonAction(); bool canaryAction(); bool candlesAction();
+bool bubbleAction(); bool buttonAction(); bool canaryAction(); int candlesAction();
 bool canyonViewAction(); bool chaliceAction(); bool chimneyAction(); bool crackAction();
 bool damAction(); bool eggAction();
 bool forestAction(); bool frontDoorAction(); bool garlicAction(); bool ghostsAction();
