@@ -73,7 +73,6 @@ if(BUILD_TESTS)
     add_zork_test(SwordGlowTests sword_glow_tests tests/sword_glow_tests.cpp)
     
     # Light system tests
-    add_zork_test(LightSystemTests light_system_tests tests/light_system_tests.cpp)
     
     # Score system tests
     add_zork_test(ScoreSystemTests score_system_tests tests/score_system_tests.cpp)

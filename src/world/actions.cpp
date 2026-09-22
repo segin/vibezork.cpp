@@ -1299,62 +1299,32 @@ bool shovelAction() {
   return RFALSE;
 }
 
-// Torch action - temporary light source that burns down
-bool torchAction() {
+// ZIL: <ROUTINE TORCH-OBJECT () ...>
+// Source: zil/1actions.zil:944-953
+//
+// The torch is always burning: it has no fuel, cannot be lit and cannot be
+// put out, and water evaporates before it reaches the flame.
+int torchAction() {
   auto &g = Globals::instance();
 
-  if (g.prsa == V_LAMP_ON && g.prso && g.prso->getId() == ObjectIds::TORCH) {
-    // Check if torch is already on
-    if (g.prso->hasFlag(ObjectFlag::ONBIT)) {
-      printLine("The torch is already burning.");
-      return RTRUE;
-    }
-
-    // Check if torch has fuel (property P_STRENGTH tracks remaining fuel)
-    int fuel = g.prso->getProperty(P_STRENGTH);
-    if (fuel <= 0) {
-      printLine("The torch is too wet to light.");
-      return RTRUE;
-    }
-
-    // Light the torch
-    g.prso->setFlag(ObjectFlag::ONBIT);
-    printLine("The torch is now burning.");
-    return RTRUE;
+  if (g.prsa == V_EXAMINE) {
+    printLine("The torch is burning.");
+    return M_HANDLED;
   }
 
-  if (g.prsa == V_LAMP_OFF && g.prso && g.prso->getId() == ObjectIds::TORCH) {
-    // Check if torch is already off
-    if (!g.prso->hasFlag(ObjectFlag::ONBIT)) {
-      printLine("The torch is not burning.");
-      return RTRUE;
-    }
-
-    // Extinguish the torch
-    g.prso->clearFlag(ObjectFlag::ONBIT);
-    printLine("The torch is now out.");
-    return RTRUE;
+  if (g.prsa == V_POUR_ON && g.prsi &&
+      g.prsi->getId() == ObjectIds::TORCH) {
+    printLine("The water evaporates before it gets close.");
+    return M_HANDLED;
   }
 
-  if (g.prsa == V_EXAMINE && g.prso && g.prso->getId() == ObjectIds::TORCH) {
-    int fuel = g.prso->getProperty(P_STRENGTH);
-    if (g.prso->hasFlag(ObjectFlag::ONBIT)) {
-      if (fuel <= 5) {
-        printLine("The torch is burning, but it's almost burned out.");
-      } else {
-        printLine("The torch is burning brightly.");
-      }
-    } else {
-      if (fuel <= 0) {
-        printLine("The torch is too wet to light.");
-      } else {
-        printLine("The torch is not burning.");
-      }
-    }
-    return RTRUE;
+  if (g.prsa == V_LAMP_OFF && g.prso &&
+      g.prso->hasFlag(ObjectFlag::ONBIT)) {
+    printLine("You nearly burn your hand trying to extinguish the flame.");
+    return M_HANDLED;
   }
 
-  return RFALSE;
+  return M_NOT_HANDLED;
 }
 
 // ZIL: <ROUTINE CANDLES-FCN () ...>

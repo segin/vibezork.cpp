@@ -190,6 +190,47 @@ TEST(LanternExamineReportsState) {
   }
 }
 
+// ZIL: TORCH-OBJECT. The torch always burns: EXAMINE says so, water
+// evaporates before it arrives, and trying to put it out burns your hand.
+// It has no fuel and cannot be lit.
+// Source: zil/1actions.zil:944-953
+TEST(TorchIsAlwaysBurning) {
+  setup();
+  auto &g = Globals::instance();
+  ZObject *torch = g.getObject(ObjectIds::TORCH);
+  ASSERT_TRUE(torch != nullptr);
+  ASSERT_TRUE(torch->hasFlag(ObjectFlag::ONBIT));
+  ASSERT_TRUE(torch->hasFlag(ObjectFlag::FLAMEBIT));
+
+  g.prso = torch;
+  g.prsi = nullptr;
+  g.prsa = V_EXAMINE;
+  {
+    OutputCapture cap;
+    ASSERT_EQ(M_HANDLED, torch->performAction(0));
+    ASSERT_CONTAINS(cap.get(), "The torch is burning.");
+  }
+
+  g.prsa = V_LAMP_OFF;
+  {
+    OutputCapture cap;
+    ASSERT_EQ(M_HANDLED, torch->performAction(0));
+    ASSERT_CONTAINS(cap.get(),
+                    "You nearly burn your hand trying to extinguish the flame.");
+  }
+  ASSERT_TRUE(torch->hasFlag(ObjectFlag::ONBIT));
+
+  // POUR water ON the torch: the torch is the indirect object.
+  g.prsa = V_POUR_ON;
+  g.prso = g.getObject(ObjectIds::WATER);
+  g.prsi = torch;
+  {
+    OutputCapture cap;
+    ASSERT_EQ(M_HANDLED, torch->performAction(0));
+    ASSERT_CONTAINS(cap.get(), "The water evaporates before it gets close.");
+  }
+}
+
 int main() {
   auto results = TestFramework::instance().runAll();
   int failed = 0;

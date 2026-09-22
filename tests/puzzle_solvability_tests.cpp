@@ -13,7 +13,6 @@
 #include "../src/verbs/verbs.h"
 #include "../src/systems/timer.h"
 #include "../src/systems/score.h"
-#include "../src/systems/light.h"
 #include <memory>
 #include <iostream>
 

@@ -10,7 +10,6 @@
 #include "core/io.h"
 #include "parser/gparser.h"
 #include "parser/parser.h"
-#include "systems/light.h"
 #include "world/objects.h"
 #include "world/rooms.h"
 #include "world/world.h"

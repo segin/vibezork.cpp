@@ -48,8 +48,6 @@ public:
   int loadAllowed = 100;
 
   // Lamp state (Requirement 47)
-  int lampBattery = 330;   // Lamp battery life in turns (starts at 330)
-  bool lampWarned = false; // Has low battery warning been shown?
 
   // Puzzle and Conditional Exit Flags (ZIL: 1dungeon.zil:1223-1235)
   bool cyclopsFlag = false;   // ZIL: ,CYCLOPS-FLAG (Cyclops asleep or fled)

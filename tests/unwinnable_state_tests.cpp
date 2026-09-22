@@ -9,7 +9,6 @@
 #include "../src/world/objects.h"
 #include "../src/parser/parser.h"
 #include "../src/verbs/verbs.h"
-#include "../src/systems/light.h"
 #include "../src/systems/death.h"
 #include <memory>
 #include <iostream>

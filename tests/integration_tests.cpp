@@ -10,7 +10,6 @@
 #include "../src/verbs/verbs.h"
 #include "../src/systems/timer.h"
 #include "../src/systems/score.h"
-#include "../src/systems/light.h"
 #include "../src/systems/save.h"
 #include "../src/systems/death.h"
 #include <memory>
@@ -23,7 +22,6 @@ public:
         auto& g = Globals::instance();
         g.reset();
         DeathSystem::setTestMode(true);  // Disable interactive prompts
-        LightSystem::reset();  // Reset darkness counter
         initializeGame();
         goSetup();
     }

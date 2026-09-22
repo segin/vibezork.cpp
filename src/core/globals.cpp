@@ -37,8 +37,6 @@ void Globals::reset() {
     moves = 0;
     pCont = false;
     quoteFlag = false;
-    lampBattery = 330;
-    lampWarned = false;
     rugMoved = false;
     lldFlag = false;
     gateFlag = false;       // Dam Green Bubble status

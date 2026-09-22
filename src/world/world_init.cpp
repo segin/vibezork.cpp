@@ -40,7 +40,7 @@ bool ropeAction();
 bool wrenchAction();
 bool screwdriverAction();
 bool shovelAction();
-bool torchAction();
+int torchAction();
 int candlesAction();
 int matchesAction();
 bool paintingAction();

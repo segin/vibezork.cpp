@@ -111,10 +111,6 @@ bool serializeState(std::ofstream& out) {
     out << "BRIEF_MODE=" << (g.briefMode ? 1 : 0) << "\n";
     out << "SUPERBRIEF_MODE=" << (g.superbriefMode ? 1 : 0) << "\n";
     
-    // Save lamp state
-    out << "LAMP_BATTERY=" << g.lampBattery << "\n";
-    out << "LAMP_WARNED=" << (g.lampWarned ? 1 : 0) << "\n";
-    
     // Save scored treasures
     // Note: We need to add a method to ScoreSystem to get scored treasures
     // For now, we'll skip this and rely on the treasure flags
@@ -176,12 +172,6 @@ bool deserializeState(std::ifstream& in) {
         }
         else if (key == "SUPERBRIEF_MODE") {
             g.superbriefMode = (std::stoi(value) != 0);
-        }
-        else if (key == "LAMP_BATTERY") {
-            g.lampBattery = std::stoi(value);
-        }
-        else if (key == "LAMP_WARNED") {
-            g.lampWarned = (std::stoi(value) != 0);
         }
         // Requirement 61.3: Restore all object locations and states
         else if (key == "OBJECT") {

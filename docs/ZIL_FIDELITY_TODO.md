@@ -10,7 +10,7 @@ test, build, commit, push; then mark `[x]` and update the counters. Every routin
 ported carries `// ZIL:` and `// Source: <file>:<lines>` comments. Never simplify
 away a ZIL behaviour.
 
-Progress: 54/69 (78%)
+Progress: 55/69 (80%)
 
 ## Phase A: engine foundations (src/core, src/systems/timer)
 
@@ -83,7 +83,7 @@ Progress: 54/69 (78%)
 - [x] F2 CANDLES-FCN, I-CANDLES, CANDLE-TABLE, first-touch enable, RMUNGBIT end state (1actions.zil:2326-2415)
 - [x] F3 MATCH-FUNCTION (count 6 reporting count-1, drafty rooms), I-MATCH (1actions.zil:2255-2300)
 - [x] F4 SWORD-FCN, I-SWORD three glow states via TVALUE, INFESTED? (1actions.zil:2416-2445, 3851-3889)
-- [ ] F5 TORCH-OBJECT; delete light.cpp/lamp.cpp/candle.cpp/sword.cpp invented systems
+- [x] F5 TORCH-OBJECT; delete light.cpp/lamp.cpp/candle.cpp/sword.cpp invented systems
 
 ## Phase G: object and room actions (1actions.zil, docs/audit/phase2_actions_table.md)
 
