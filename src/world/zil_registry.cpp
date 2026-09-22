@@ -30,7 +30,7 @@ bool graniteWallAction(); bool grateAction();
 bool gunkAction(); bool hotBellAction(); bool iboatFunction(); bool inflatedBoatAction();
 bool kitchenWindowAction(); bool knifeAction(); int lampAction(); bool largeBagAction();
 bool leakFunction(); bool machineAction(); bool machineSwitchAction(); bool mailboxAction();
-bool matchesAction(); bool mirrorAction(); bool mountainRangeAction();
+int matchesAction(); bool mirrorAction(); bool mountainRangeAction();
 bool paintingAction(); bool puncturedBoatAction(); bool puttyAction();
 bool rainbowAction(); bool riverAction(); bool robberAction(); bool ropeAction();
 bool rugAction(); bool rustyKnifeAction(); bool sandAction();

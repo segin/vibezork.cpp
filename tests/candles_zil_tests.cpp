@@ -168,11 +168,10 @@ TEST(CandlesUseABurningMatchImplicitly) {
   match()->setFlag(ObjectFlag::ONBIT);
   match()->moveTo(Globals::instance().winner);
 
-  // This branch's own work is the announcement and the re-dispatch; what the
-  // re-dispatch then prints belongs to MATCH-FUNCTION, which is still the
-  // invented handler and swallows LAMP-ON regardless of PRSO.
-  // TODO(F3): assert "The candles are lit." here once MATCH-FUNCTION is ported.
-  ASSERT_CONTAINS(act(V_LAMP_ON), "(with the match)");
+  std::string out = act(V_LAMP_ON);
+  ASSERT_CONTAINS(out, "(with the match)");
+  ASSERT_CONTAINS(out, "The candles are lit.");
+  ASSERT_TRUE(candles()->hasFlag(ObjectFlag::ONBIT));
 }
 
 // ZIL: lighting them with a burning match held as the indirect object.

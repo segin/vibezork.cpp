@@ -75,7 +75,9 @@ public:
   bool grunlock = false;      // Is grate unlocked? (ZIL: GRUNLOCK)
   int waterLevel = 0;         // Water level in Maintenance Room (0=Dry, >0=Rising)
   bool grateRevealed = false; // Has the grating been revealed in the Clearing?
-  int matchCount = 5;         // Number of matches in matchbook
+  // ZIL: <GLOBAL MATCH-COUNT 6> (1actions.zil:2260).  COUNT reports one
+  // less, so the book holds five usable matches.
+  int matchCount = 6;
   bool buoyFlag = true;       // Notice buoy feel on river (ZIL: BUOY-FLAG)
 
   // Display modes. ZIL starts in brief: <GLOBAL VERBOSE <>> and

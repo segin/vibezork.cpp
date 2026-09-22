@@ -683,45 +683,97 @@ bool bagAction() {
 // MATCH-FUNCTION - Matchbook interactions
 // ZIL: COUNT/EXAMINE -> # matches. LIGHT -> Light one, decrement.
 // Source: 1actions.zil lines 2300+
-bool matchesAction() {
+bool iMatch(); // ZIL: I-MATCH (1actions.zil:2296-2300)
+
+// ZIL: <ROUTINE MATCH-FUNCTION ("AUX" CNT) ...>
+// Source: zil/1actions.zil:2262-2300
+//
+// MATCH-COUNT starts at 6 and the count is reported as one less, so the
+// matchbook offers five usable matches.  Note the LAMP-ON branch only applies
+// when the matchbook is the direct object.
+int matchesAction() {
   auto &g = Globals::instance();
+  ZObject *match = g.getObject(ObjectIds::MATCH);
+  if (!match)
+    return M_NOT_HANDLED;
 
-  if (g.prsa == V_COUNT || g.prsa == V_EXAMINE) {
+  if ((g.prsa == V_LAMP_ON || g.prsa == V_BURN) && g.prso == match) {
+    // ZIL: <COND (<G? ,MATCH-COUNT 0> <SETG MATCH-COUNT <- ,MATCH-COUNT 1>>)>
     if (g.matchCount > 0)
-      printLine("You have " + std::to_string(g.matchCount) + " match" +
-                (g.matchCount == 1 ? "" : "es") + ".");
+      --g.matchCount;
+
+    if (!(g.matchCount > 0)) {
+      printLine("I'm afraid that you have run out of matches.");
+      return M_HANDLED;
+    }
+    if (g.here && (g.here->getId() == RoomIds::LOWER_SHAFT ||
+                   g.here->getId() == RoomIds::TIMBER_ROOM)) {
+      printLine("This room is drafty, and the match goes out instantly.");
+      return M_HANDLED;
+    }
+    match->setFlag(ObjectFlag::FLAMEBIT);
+    match->setFlag(ObjectFlag::ONBIT);
+    // ZIL: <ENABLE <QUEUE I-MATCH 2>>; QUEUE goes through INT, which
+    // allocates the C-TABLE slot on first use.
+    TimerSystem::interrupt("I-MATCH", iMatch);
+    TimerSystem::queue("I-MATCH", 2);
+    TimerSystem::enable("I-MATCH");
+    printLine("One of the matches starts to burn.");
+    if (!g.lit) {
+      g.lit = true;
+      Verbs::vLook();
+    }
+    return M_HANDLED;
+  }
+
+  if (g.prsa == V_LAMP_OFF && match->hasFlag(ObjectFlag::FLAMEBIT)) {
+    printLine("The match is out.");
+    match->clearFlag(ObjectFlag::FLAMEBIT);
+    match->clearFlag(ObjectFlag::ONBIT);
+    g.lit = GParser::isLit(g.here);
+    if (!g.lit)
+      printLine("It's pitch black in here!");
+    TimerSystem::queue("I-MATCH", 0);
+    return M_HANDLED;
+  }
+
+  if (g.prsa == V_COUNT || g.prsa == V_OPEN) {
+    tell("You have ");
+    int cnt = g.matchCount - 1;
+    if (!(cnt > 0))
+      tell("no");
     else
-      printLine("You have no matches.");
-    return RTRUE;
+      tell(std::to_string(cnt));
+    tell(" match");
+    tell(cnt != 1 ? "es." : ".");
+    crlf();
+    return M_HANDLED;
   }
 
-  if (g.prsa == V_LAMP_ON || g.prsa == V_BURN) {
-    if (g.matchCount <= 0) {
-      printLine("You're out of matches.");
-      return RTRUE;
-    }
-
-    g.matchCount--;
-    printLine("One of the matches strikes and burns with a bright flame.");
-
-    // ZIL logic: <FCLEAR ,MATCH ,INVISIBLE> <FSET ,MATCH ,ONBIT> ... <Enable
-    // I-MATCH> Use MATCH object for the lit match.
-    ZObject *match = g.getObject(ObjectIds::MATCH);
-    if (match) {
-      match->clearFlag(ObjectFlag::INVISIBLE);
-      match->setFlag(ObjectFlag::ONBIT);
-      match->setFlag(ObjectFlag::FLAMEBIT);
-      match->setFlag(ObjectFlag::LIGHTBIT);
-      // Move to player? Or just remain in abstract?
-      // ZIL: <MOVE ,MATCH ,WINNER>
-      match->moveTo(g.winner);
-
-      // TODO: Enable I-MATCH timer (Queue 90)
-    }
-    return RTRUE;
+  if (g.prsa == V_EXAMINE) {
+    if (match->hasFlag(ObjectFlag::ONBIT))
+      tell("The match is burning.");
+    else
+      tell("The matchbook isn't very interesting, except for what's written "
+           "on it.");
+    crlf();
+    return M_HANDLED;
   }
 
-  return RFALSE;
+  return M_NOT_HANDLED;
+}
+
+// ZIL: <ROUTINE I-MATCH () ...>
+// Source: zil/1actions.zil:2296-2300
+bool iMatch() {
+  auto &g = Globals::instance();
+  printLine("The match has gone out.");
+  if (ZObject *match = g.getObject(ObjectIds::MATCH)) {
+    match->clearFlag(ObjectFlag::FLAMEBIT);
+    match->clearFlag(ObjectFlag::ONBIT);
+  }
+  g.lit = GParser::isLit(g.here);
+  return true;
 }
 
 // BOTTLE-FUNCTION - Bottle interactions

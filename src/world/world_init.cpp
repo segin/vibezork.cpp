@@ -42,7 +42,7 @@ bool screwdriverAction();
 bool shovelAction();
 bool torchAction();
 int candlesAction();
-bool matchesAction();
+int matchesAction();
 bool paintingAction();
 bool eggAction();
 bool canaryAction();
