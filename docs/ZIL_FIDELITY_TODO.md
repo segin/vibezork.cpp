@@ -10,7 +10,7 @@ test, build, commit, push; then mark `[x]` and update the counters. Every routin
 ported carries `// ZIL:` and `// Source: <file>:<lines>` comments. Never simplify
 away a ZIL behaviour.
 
-Progress: 48/69 (70%)
+Progress: 49/69 (71%)
 
 ## Phase A: engine foundations (src/core, src/systems/timer)
 
@@ -74,7 +74,7 @@ Progress: 48/69 (70%)
 - [x] E4 Thief: I-THIEF, THIEF-VS-ADVENTURER, ROB, STEAL-JUNK, ROB-MAZE, DROP-JUNK, DEPOSIT-BOOTY, RECOVER-STILETTO, HACK-TREASURES, STOLE-LIGHT?, ROBBER-FUNCTION, ROBBER-C-DESC/U-DESC, LARGE-BAG-F, STILETTO handling, CHALICE-FCN, TREASURE-ROOM-FCN, THIEF-IN-TREASURE, EGG-SOLVE (1actions.zil:1748-2177, 3851-3990)
 - [x] E5 Cyclops: CYCLOPS-FCN, I-CYCLOPS, CYCLOMAD (six lines), CYCLOPS-ROOM-FCN, V-ODYSSEUS, MAGIC-FLAG/CYCLOPS-FLAG, MIN (1actions.zil:1491-1660, 2339)
 - [x] E6 Death: JIGS-UP (third death ends, SOUTH-TEMPLE Hades rule, "Bad luck, huh?", no prompts), RANDOMIZE-OBJECTS, KILL-INTERRUPTS exact set, DEAD-FUNCTION incl. PRAY resurrection and "You can't even do that." + RFATAL (1actions.zil:3113-3175, 4046-4159)
-- [ ] E7 V-DIAGNOSE per 1actions.zil:3993-4025 (wounds, cure countdown, death count)
+- [x] E7 V-DIAGNOSE per 1actions.zil:3993-4025 (wounds, cure countdown, death count)
 - [ ] E8 Remove combat.cpp HP model, invented NPC prose, processTrollTurn/processCyclopsTurn, resurrection prompts
 
 ## Phase F: light sources (1actions.zil:2178-2445, 3851-3889)

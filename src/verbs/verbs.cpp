@@ -1547,38 +1547,63 @@ bool vScore() {
   return RTRUE;
 }
 
+// ZIL: <ROUTINE V-DIAGNOSE ("AUX" (MS <FIGHT-STRENGTH <>>) ...) ...>
+// Source: zil/1actions.zil:3993-4025
 bool vDiagnose() {
   auto &g = Globals::instance();
+  const int ms = Melee::fightStrength(false);
+  int wd = g.winner ? g.winner->getProperty(P_STRENGTH) : 0;
+  const int rs = ms + wd;
 
-  // Check if in combat and track health
-  if (CombatSystem::isInCombat()) {
-    auto &combatManager = CombatSystem::CombatManager::instance();
-    auto playerCombatant = combatManager.getPlayerCombatant();
-
-    if (playerCombatant && playerCombatant->object == g.winner) {
-      int health = playerCombatant->health;
-      int maxHealth = playerCombatant->maxHealth;
-
-      if (health == maxHealth) {
-        printLine("You are in perfect health.");
-      } else if (health > maxHealth * 3 / 4) {
-        printLine("You have a few grazes.");
-      } else if (health > maxHealth / 2) {
-        printLine("You have some serious wounds.");
-      } else if (health > 0) {
-        printLine("You are staggering.");
-      } else {
-        printLine("You are dead.");
-      }
-      return RTRUE;
-    }
+  // ZIL: the wound count only counts while I-CURE is running.
+  const TimerSystem::Interrupt *cure =
+      TimerSystem::TimerManager::instance().find("I-CURE");
+  if (!cure || !cure->enabled) {
+    wd = 0;
+  } else {
+    wd = -wd;
   }
 
-  // Default / Out of combat
-  // Since health is ephemeral in current CombatSystem, assume perfect health
-  // when not fighting
-  printLine("You are in perfect health.");
+  if (wd == 0) {
+    tell("You are in perfect health.");
+  } else {
+    tell("You have ");
+    if (wd == 1) {
+      tell("a light wound,");
+    } else if (wd == 2) {
+      tell("a serious wound,");
+    } else if (wd == 3) {
+      tell("several wounds,");
+    } else if (wd > 3) {
+      tell("serious wounds,");
+    }
+  }
+  if (wd != 0) {
+    tell(" which will be cured after ");
+    tell(Melee::CURE_WAIT * (wd - 1) + (cure ? cure->tick : 0));
+    tell(" moves.");
+  }
+  crlf();
 
+  tell("You can ");
+  if (rs == 0) {
+    tell("expect death soon");
+  } else if (rs == 1) {
+    tell("be killed by one more light wound");
+  } else if (rs == 2) {
+    tell("be killed by a serious wound");
+  } else if (rs == 3) {
+    tell("survive one serious wound");
+  } else if (rs > 3) {
+    tell("survive several wounds");
+  }
+  tell(".", CR);
+
+  if (DeathSystem::getDeathCount() != 0) {
+    tell("You have been killed ");
+    tell(DeathSystem::getDeathCount() == 1 ? "once" : "twice");
+    tell(".", CR);
+  }
   return RTRUE;
 }
 
