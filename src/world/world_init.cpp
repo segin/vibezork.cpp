@@ -36,7 +36,7 @@ bool rugAction();
 bool groundAction();
 bool kitchenWindowAction();
 bool swordAction();
-bool lampAction();
+int lampAction();
 bool ropeAction();
 bool wrenchAction();
 bool screwdriverAction();

@@ -15,7 +15,6 @@
 #include "../src/verbs/verbs.h"
 #include "../src/world/world.h"
 #include "../src/systems/timer.h"
-#include "../src/systems/lamp.h"
 #include "../src/systems/candle.h"
 #include "../src/systems/sword.h"
 #include <sstream>
@@ -93,7 +92,6 @@ void runTranscript(const std::vector<TranscriptStep>& steps, const std::string& 
 void initializeTestGame() {
     initializeGame();
     goSetup();
-    LampSystem::initialize();
     CandleSystem::initialize();
     SwordSystem::initialize();
 }

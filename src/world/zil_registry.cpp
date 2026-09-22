@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <string>
+#include <functional>
 #include <unordered_map>
 
 // Action routines ported from zil/1actions.zil and zil/gglobals.zil.  They are
@@ -27,7 +28,7 @@ bool damAction(); bool eggAction();
 bool forestAction(); bool frontDoorAction(); bool garlicAction(); bool ghostsAction();
 bool graniteWallAction(); bool grateAction();
 bool gunkAction(); bool hotBellAction(); bool iboatFunction(); bool inflatedBoatAction();
-bool kitchenWindowAction(); bool knifeAction(); bool lampAction(); bool largeBagAction();
+bool kitchenWindowAction(); bool knifeAction(); int lampAction(); bool largeBagAction();
 bool leakFunction(); bool machineAction(); bool machineSwitchAction(); bool mailboxAction();
 bool matchesAction(); bool mirrorAction(); bool mountainRangeAction();
 bool paintingAction(); bool puncturedBoatAction(); bool puttyAction();
@@ -67,7 +68,11 @@ void noteUnresolved(std::string_view routine) {
   }
 }
 
-using ObjFn = bool (*)();
+// An object ACTION routine.  Most return the ZIL truth value as bool, but a
+// routine whose ZIL body can RFATAL (e.g. CANDLES-FCN, 1actions.zil:2360)
+// returns the tri-state directly, so the slot holds a callable yielding int
+// and a bool-returning function converts into it.
+using ObjFn = std::function<int()>;
 /// ZIL object ACTIONs that take the routine's optional RARG: the villains,
 /// whose routines the melee engine calls with F-BUSY?, F-DEAD and friends.
 using ObjArgFn = int (*)(int);
@@ -325,8 +330,10 @@ ZObject::ActionFunc objectActionFor(std::string_view routine) {
     noteUnresolved(routine);
     return {};
   }
-  ObjFn fn = it->second;
-  return [fn](int) { return fn() ? M_HANDLED : M_NOT_HANDLED; };
+  const ObjFn &fn = it->second;
+  // A bool-returning routine yields 0/1, which are M-NOT-HANDLED/M-HANDLED;
+  // a tri-state routine's M-FATAL (2) passes through unchanged.
+  return [fn](int) { return fn(); };
 }
 
 ZRoom::RoomActionFunc roomActionFor(std::string_view routine) {

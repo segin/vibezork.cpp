@@ -6,7 +6,6 @@
 #include "../src/world/rooms.h"
 #include "../src/world/world.h"
 #include "../src/systems/candle.h"
-#include "../src/systems/lamp.h"
 #include "../src/parser/gparser.h"
 #include "test_framework.h"
 #include <cstdlib>
@@ -33,7 +32,6 @@ static void setupTestWorld() {
   initializeWorld();
   goSetup();
   CandleSystem::initialize();
-  LampSystem::initialize();
 }
 
 // =============================================================================

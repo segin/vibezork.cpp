@@ -12,7 +12,6 @@
 #include "world/rooms.h"
 #include "verbs/verbs.h"
 #include "systems/timer.h"
-#include "systems/lamp.h"
 #include "systems/candle.h"
 #include "systems/sword.h"
 #include <chrono>
@@ -99,7 +98,6 @@ void initializeForPerformanceTest() {
     g.reset();
     initializeGame();
     goSetup();
-    LampSystem::initialize();
     CandleSystem::initialize();
     SwordSystem::initialize();
 }

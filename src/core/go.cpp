@@ -10,7 +10,7 @@
 #include "core/gmain.h"
 #include "core/io.h"
 #include "systems/candle.h"
-#include "systems/lamp.h"
+#include "systems/light_sources.h"
 #include "systems/melee.h"
 #include "world/villains.h"
 #include "systems/melee_tables.h"
@@ -72,7 +72,7 @@ void goSetup() {
   TimerSystem::queue("I-CANDLES", 40);
 
   // ZIL: <QUEUE I-LANTERN 200>  (enabled by LANTERN, 1actions.zil:2241)
-  TimerSystem::interrupt("I-LANTERN", LampSystem::iLantern);
+  TimerSystem::interrupt("I-LANTERN", LightSources::iLantern);
   TimerSystem::queue("I-LANTERN", 200);
 
   // ZIL: <PUTP ,INFLATED-BOAT ,P?VTYPE ,NONLANDBIT>

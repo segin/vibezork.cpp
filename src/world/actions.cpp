@@ -1076,61 +1076,57 @@ bool swordAction() {
   return RFALSE;
 }
 
-// Lamp action - provides light when on, battery drains over time
-bool lampAction() {
+// ZIL: <ROUTINE LANTERN () ...>
+// Source: zil/1actions.zil:2226-2254
+//
+// THROW smashes the lamp and swaps in BROKEN-LAMP; LAMP-ON/LAMP-OFF only
+// gate on RMUNGBIT (a burned-out lamp) and toggle I-LANTERN, returning false
+// so V-LAMP-ON/V-LAMP-OFF print the actual message; EXAMINE reports state.
+int lampAction() {
   auto &g = Globals::instance();
+  ZObject *lamp = g.getObject(ObjectIds::LAMP);
 
-  if (g.prsa == V_LAMP_ON && g.prso && g.prso->getId() == ObjectIds::LAMP) {
-    // Check if lamp is already on
-    if (g.prso->hasFlag(ObjectFlag::ONBIT)) {
-      printLine("The lamp is already on.");
-      return RTRUE;
-    }
-
-    // ZIL: the lamp has no STRENGTH property and no battery level.  It runs
-    // out through the I-LANTERN interrupt stepping LAMP-TABLE, and only then
-    // does LANTERN refuse to light it.  The port used STRENGTH as a battery,
-    // which the ZIL value (absent, so 0) read as "flat".
-    // Source: zil/1actions.zil:2178-2254, 2301-2325
-
-    // Turn on the lamp
-    g.prso->setFlag(ObjectFlag::ONBIT);
-    printLine("The lamp is now on.");
-    return RTRUE;
+  if (g.prsa == V_THROW) {
+    printLine("The lamp has smashed into the floor, and the light has gone out.");
+    TimerSystem::disable("I-LANTERN");
+    Verbs::removeCarefully(lamp);
+    if (ZObject *broken = g.getObject(ObjectIds::BROKEN_LAMP))
+      broken->moveTo(g.here);
+    return M_HANDLED;
   }
 
-  if (g.prsa == V_LAMP_OFF && g.prso && g.prso->getId() == ObjectIds::LAMP) {
-    // Check if lamp is already off
-    if (!g.prso->hasFlag(ObjectFlag::ONBIT)) {
-      printLine("The lamp is already off.");
-      return RTRUE;
+  if (g.prsa == V_LAMP_ON) {
+    if (lamp && lamp->hasFlag(ObjectFlag::RMUNGBIT)) {
+      printLine("A burned-out lamp won't light.");
+      return M_HANDLED;
     }
-
-    // Turn off the lamp
-    g.prso->clearFlag(ObjectFlag::ONBIT);
-    printLine("The lamp is now off.");
-    return RTRUE;
+    // ZIL: <ENABLE <INT I-LANTERN>> then <> so V-LAMP-ON runs
+    TimerSystem::enable("I-LANTERN");
+    return M_NOT_HANDLED;
   }
 
-  if (g.prsa == V_EXAMINE && g.prso && g.prso->getId() == ObjectIds::LAMP) {
-    int battery = g.prso->getProperty(P_STRENGTH);
-    if (g.prso->hasFlag(ObjectFlag::ONBIT)) {
-      if (battery <= 10) {
-        printLine("The lamp is on, but the batteries are almost dead.");
-      } else {
-        printLine("The lamp is on and glowing brightly.");
-      }
-    } else {
-      if (battery <= 0) {
-        printLine("The lamp is off and the batteries are dead.");
-      } else {
-        printLine("The lamp is off.");
-      }
+  if (g.prsa == V_LAMP_OFF) {
+    if (lamp && lamp->hasFlag(ObjectFlag::RMUNGBIT)) {
+      printLine("The lamp has already burned out.");
+      return M_HANDLED;
     }
-    return RTRUE;
+    TimerSystem::disable("I-LANTERN");
+    return M_NOT_HANDLED;
   }
 
-  return RFALSE;
+  if (g.prsa == V_EXAMINE) {
+    tell("The lamp ");
+    if (lamp && lamp->hasFlag(ObjectFlag::RMUNGBIT))
+      tell("has burned out.");
+    else if (lamp && lamp->hasFlag(ObjectFlag::ONBIT))
+      tell("is on.");
+    else
+      tell("is turned off.");
+    crlf();
+    return M_HANDLED;
+  }
+
+  return M_NOT_HANDLED;
 }
 
 // Rope action - used for climbing and tying
