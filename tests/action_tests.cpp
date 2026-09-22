@@ -2447,19 +2447,25 @@ TEST(DeadFcn_LookDesc) {
 
   g.prsa = V_LOOK;
   g.lit = true;
+  g.here->setFlag(ObjectFlag::ONBIT);
   {
     OutputCapture cap;
-    ASSERT_TRUE(deadFunction());
+    // ZIL: the LOOK clause ends in <>, so DEAD-FUNCTION does not handle the
+    // verb and the room description still runs (1actions.zil:3141-3152).
+    ASSERT_FALSE(deadFunction());
     std::string out = cap.getOutput();
     ASSERT_TRUE(out.find("strange and unearthly") != std::string::npos);
     ASSERT_TRUE(out.find("indistinct") != std::string::npos);
     ASSERT_TRUE(out.find("dimly illuminated") == std::string::npos);
   }
 
+  // ZIL keys the extra line on the room's own ONBIT, not on ,LIT
+  // (1actions.zil:3148-3150).
   g.lit = false;
+  g.here->clearFlag(ObjectFlag::ONBIT);
   {
     OutputCapture cap;
-    ASSERT_TRUE(deadFunction());
+    ASSERT_FALSE(deadFunction());
     ASSERT_TRUE(cap.getOutput().find("dimly illuminated") != std::string::npos);
   }
 }

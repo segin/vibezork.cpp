@@ -3000,6 +3000,9 @@ ZObject *findIn(const ZObject *container, ObjectFlag flag) {
 // three words; anything else simply asks again.
 void finish() {
   vScore();
+  // A test asks for non-interactive behaviour, and FINISH would otherwise end
+  // the process the way the ZIL ends the game.
+  if (DeathSystem::inTestMode()) return;
   while (true) {
     crlf();
     tell("Would you like to restart the game from the beginning, restore a "

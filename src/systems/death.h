@@ -28,6 +28,14 @@ void setTestMode(bool enabled);
 // Core death status
 void setDead(bool dead); // Added for testing/ZIL fidelity
 
+/// True while a test has asked for non-interactive behaviour. FINISH consults
+/// it so a unit test can assert the game-over text without the process ending.
+bool inTestMode();
+
+/// ZIL: ,ALWAYS-LIT (gparser.zil:1331). Set while the player is a spirit.
+void setAlwaysLit(bool on);
+bool alwaysLit();
+
 // Main death function (Requirement 58.1)
 // Called when player dies
 // Displays death message, offers resurrection or restart

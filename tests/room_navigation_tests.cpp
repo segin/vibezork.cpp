@@ -16,10 +16,14 @@ TEST(BasicDirectionalMovement) {
     // GOTO refuses a room without RLANDBIT unless the actor is in a
     // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
     room1->setFlag(ObjectFlag::RLANDBIT);
+    // A dark room means GOTO's grue check can kill the player before the
+    // assertion runs (gverbs.zil:2090-2103), so light it.
+    room1->setFlag(ObjectFlag::ONBIT);
     auto room2 = std::make_unique<ZRoom>(2, "Room 2", "You are in room 2.");
     // GOTO refuses a room without RLANDBIT unless the actor is in a
     // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
     room2->setFlag(ObjectFlag::RLANDBIT);
+    room2->setFlag(ObjectFlag::ONBIT);
     
     // Set up exit from room1 to room2
     room1->setExit(Direction::NORTH, RoomExit(2));
@@ -57,6 +61,9 @@ TEST(BlockedExits) {
     // GOTO refuses a room without RLANDBIT unless the actor is in a
     // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
     room1->setFlag(ObjectFlag::RLANDBIT);
+    // A dark room means GOTO's grue check can kill the player before the
+    // assertion runs (gverbs.zil:2090-2103), so light it.
+    room1->setFlag(ObjectFlag::ONBIT);
     room1->setExit(Direction::NORTH, RoomExit("A wall blocks your path."));
     
     ZRoom* r1 = room1.get();
@@ -86,10 +93,14 @@ TEST(DoorExits) {
     // GOTO refuses a room without RLANDBIT unless the actor is in a
     // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
     room1->setFlag(ObjectFlag::RLANDBIT);
+    // A dark room means GOTO's grue check can kill the player before the
+    // assertion runs (gverbs.zil:2090-2103), so light it.
+    room1->setFlag(ObjectFlag::ONBIT);
     auto room2 = std::make_unique<ZRoom>(2, "Room 2", "You are in room 2.");
     // GOTO refuses a room without RLANDBIT unless the actor is in a
     // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
     room2->setFlag(ObjectFlag::RLANDBIT);
+    room2->setFlag(ObjectFlag::ONBIT);
     
     // Create door object
     auto door = std::make_unique<ZObject>(50, "door");
@@ -141,10 +152,14 @@ TEST(LockedDoorExits) {
     // GOTO refuses a room without RLANDBIT unless the actor is in a
     // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
     room1->setFlag(ObjectFlag::RLANDBIT);
+    // A dark room means GOTO's grue check can kill the player before the
+    // assertion runs (gverbs.zil:2090-2103), so light it.
+    room1->setFlag(ObjectFlag::ONBIT);
     auto room2 = std::make_unique<ZRoom>(2, "Room 2", "You are in room 2.");
     // GOTO refuses a room without RLANDBIT unless the actor is in a
     // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
     room2->setFlag(ObjectFlag::RLANDBIT);
+    room2->setFlag(ObjectFlag::ONBIT);
     
     // Create closed door (ZIL has no lock flag; a closed DOORBIT exit blocks)
     auto door = std::make_unique<ZObject>(50, "door");
@@ -182,10 +197,14 @@ TEST(ConditionalExits) {
     // GOTO refuses a room without RLANDBIT unless the actor is in a
     // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
     room1->setFlag(ObjectFlag::RLANDBIT);
+    // A dark room means GOTO's grue check can kill the player before the
+    // assertion runs (gverbs.zil:2090-2103), so light it.
+    room1->setFlag(ObjectFlag::ONBIT);
     auto room2 = std::make_unique<ZRoom>(2, "Room 2", "You are in room 2.");
     // GOTO refuses a room without RLANDBIT unless the actor is in a
     // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
     room2->setFlag(ObjectFlag::RLANDBIT);
+    room2->setFlag(ObjectFlag::ONBIT);
     
     // Create a flag to control the condition
     bool puzzleSolved = false;
@@ -232,10 +251,14 @@ TEST(ExitsRequiringItems) {
     // GOTO refuses a room without RLANDBIT unless the actor is in a
     // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
     room1->setFlag(ObjectFlag::RLANDBIT);
+    // A dark room means GOTO's grue check can kill the player before the
+    // assertion runs (gverbs.zil:2090-2103), so light it.
+    room1->setFlag(ObjectFlag::ONBIT);
     auto room2 = std::make_unique<ZRoom>(2, "Room 2", "You are in room 2.");
     // GOTO refuses a room without RLANDBIT unless the actor is in a
     // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
     room2->setFlag(ObjectFlag::RLANDBIT);
+    room2->setFlag(ObjectFlag::ONBIT);
     
     // Create key item
     auto key = std::make_unique<ZObject>(50, "key");
@@ -284,10 +307,14 @@ TEST(SpecialMovementClimb) {
     // GOTO refuses a room without RLANDBIT unless the actor is in a
     // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
     room1->setFlag(ObjectFlag::RLANDBIT);
+    // A dark room means GOTO's grue check can kill the player before the
+    // assertion runs (gverbs.zil:2090-2103), so light it.
+    room1->setFlag(ObjectFlag::ONBIT);
     auto room2 = std::make_unique<ZRoom>(2, "Tree Top", "You are in a tree.");
     // GOTO refuses a room without RLANDBIT unless the actor is in a
     // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
     room2->setFlag(ObjectFlag::RLANDBIT);
+    room2->setFlag(ObjectFlag::ONBIT);
     
     // Set up special exit requiring CLIMB
     room1->setExit(Direction::UP, RoomExit::createSpecial(
@@ -328,10 +355,14 @@ TEST(OneWayExits) {
     // GOTO refuses a room without RLANDBIT unless the actor is in a
     // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
     room1->setFlag(ObjectFlag::RLANDBIT);
+    // A dark room means GOTO's grue check can kill the player before the
+    // assertion runs (gverbs.zil:2090-2103), so light it.
+    room1->setFlag(ObjectFlag::ONBIT);
     auto room2 = std::make_unique<ZRoom>(2, "Room 2", "You are in room 2.");
     // GOTO refuses a room without RLANDBIT unless the actor is in a
     // vehicle whose VTYPE matches (gverbs.zil:2052-2066).
     room2->setFlag(ObjectFlag::RLANDBIT);
+    room2->setFlag(ObjectFlag::ONBIT);
     
     // Set up one-way exit from room1 to room2
     room1->setExit(Direction::NORTH, RoomExit::createOneWay(2));

@@ -6,6 +6,8 @@
 #include "../core/io.h"
 #include "../world/rooms.h"
 #include "../world/objects.h"
+#include "../world/dungeon.h"
+#include "../verbs/verbs.h"
 #include <cstdlib>
 #include <vector>
 
@@ -56,97 +58,74 @@ bool canResurrect() {
     return deathCount_ < 2;
 }
 
-// Scatter player's inventory randomly (Requirement 59.4)
-// Based on ZIL RANDOMIZE-OBJECTS routine
+// ZIL: <ROUTINE RANDOMIZE-OBJECTS ("AUX" (R <>) F N L) ...>
+// Source: zil/1actions.zil:4101-4123
+//
+// The lamp and the coffin go to fixed places; every other treasure is put in
+// a random dark land room, and everything else in a random above-ground room.
 static void randomizeObjects() {
     auto& g = Globals::instance();
-    
-    if (!g.winner) {
-        return;
-    }
-    
-    // Special handling for lamp - always goes to living room
+    if (!g.winner) return;
+
     auto* lamp = g.getObject(ObjectIds::LAMP);
     if (lamp && lamp->getLocation() == g.winner) {
-        auto* livingRoom = g.getObject(RoomIds::LIVING_ROOM);
-        if (livingRoom) {
-            lamp->moveTo(livingRoom);
-        }
+        lamp->moveTo(g.getObject(RoomIds::LIVING_ROOM));
     }
-    
-    // Special handling for coffin - always goes to Egypt room
     auto* coffin = g.getObject(ObjectIds::COFFIN);
     if (coffin && coffin->getLocation() == g.winner) {
-        auto* egyptRoom = g.getObject(RoomIds::EGYPT_ROOM);
-        if (egyptRoom) {
-            coffin->moveTo(egyptRoom);
-        }
+        coffin->moveTo(g.getObject(RoomIds::EGYPT_ROOM));
     }
-    
-    // ZIL: <PUTP ,SWORD ,P?TVALUE 0>
-    auto* sword = g.getObject(ObjectIds::SWORD);
-    if (sword) {
+    if (auto* sword = g.getObject(ObjectIds::SWORD)) {
         sword->setProperty(P_TVALUE, 0);
     }
-    
-    // Collect all dark land rooms for treasures
-    std::vector<ZObject*> darkLandRooms;
-    std::vector<ZObject*> aboveGroundRooms;
-    
-    // Above ground room IDs: 1000..1014 (House exterior, forest, canyon view)
-    for (const auto& [id, obj] : g.getAllObjects()) {
-        if (id >= 1000) {
-            if (obj->hasFlag(ObjectFlag::RLANDBIT) && !obj->hasFlag(ObjectFlag::ONBIT)) {
-                darkLandRooms.push_back(obj.get());
-            }
-            if (id <= 1014 && obj->hasFlag(ObjectFlag::RLANDBIT)) {
-                aboveGroundRooms.push_back(obj.get());
-            }
-        }
-    }
-    
-    if (aboveGroundRooms.empty()) {
-        auto* westHouse = g.getObject(RoomIds::WEST_OF_HOUSE);
-        if (westHouse) aboveGroundRooms.push_back(westHouse);
-    }
-    if (darkLandRooms.empty()) {
-        darkLandRooms = aboveGroundRooms;
-    }
-    
-    // Scatter player's inventory
+
+    // ZIL walks the child chain of ROOMS, keeping its place between items, and
+    // takes the first room that is land, unlit and passes a 50 percent roll.
+    auto* rooms = g.getObject(ObjectIds::ROOMS);
+    const std::vector<ZObject*> roomList =
+        rooms ? rooms->getContents() : std::vector<ZObject*>{};
+    const auto aboveGround = Dungeon::aboveGround();
+    std::size_t r = 0;
+    bool started = false;
+
     auto contents = g.winner->getContents();
-    for (auto* item : contents) {
-        if (!item || item == lamp || item == coffin) continue;
-        
-        int tvalue = item->getProperty(P_TVALUE);
-        if (tvalue > 0 && !darkLandRooms.empty()) {
-            int idx = GMacros::random(static_cast<int>(darkLandRooms.size())) - 1;
-            item->moveTo(darkLandRooms[idx]);
-        } else if (!aboveGroundRooms.empty()) {
-            int idx = GMacros::random(static_cast<int>(aboveGroundRooms.size())) - 1;
-            item->moveTo(aboveGroundRooms[idx]);
+    for (auto* f : contents) {
+        if (!f) continue;
+        if (f->getProperty(P_TVALUE) > 0) {
+            if (roomList.empty()) continue;
+            for (std::size_t tries = 0; tries < roomList.size() * 4; ++tries) {
+                if (!started) { r = 0; started = true; }
+                ZObject* room = roomList[r % roomList.size()];
+                if (room && room->hasFlag(ObjectFlag::RLANDBIT) &&
+                    !room->hasFlag(ObjectFlag::ONBIT) && GMacros::prob(50)) {
+                    f->moveTo(room);
+                    break;
+                }
+                r = (r + 1) % roomList.size();
+            }
+        } else if (!aboveGround.empty()) {
+            const int idx = GMacros::random(static_cast<int>(aboveGround.size()));
+            ZObject* room = g.getObject(aboveGround[static_cast<std::size_t>(idx - 1)]);
+            if (room) f->moveTo(room);
         }
     }
 }
 
-// Kill all active timers
-// Based on ZIL KILL-INTERRUPTS routine
+// ZIL: <ROUTINE KILL-INTERRUPTS () ...>
+// Source: zil/1actions.zil:4125-4135
+//
+// Exactly these eight, and the match goes out. I-THIEF, I-FIGHT and the
+// troll are deliberately left running.
 static void killInterrupts() {
-    // Disable all timers
-    TimerSystem::disable("I-THIEF");
-    TimerSystem::disable("I-TROLL");
+    TimerSystem::disable("I-XB");
+    TimerSystem::disable("I-XC");
     TimerSystem::disable("I-CYCLOPS");
     TimerSystem::disable("I-LANTERN");
     TimerSystem::disable("I-CANDLES");
     TimerSystem::disable("I-SWORD");
     TimerSystem::disable("I-FOREST-ROOM");
     TimerSystem::disable("I-MATCH");
-    TimerSystem::disable("I-FIGHT");
-    
-    // Turn off match if lit
-    auto& g = Globals::instance();
-    auto* match = g.getObject(ObjectIds::MATCH);
-    if (match) {
+    if (auto* match = Globals::instance().getObject(ObjectIds::MATCH)) {
         match->clearFlag(ObjectFlag::ONBIT);
     }
 }
@@ -271,71 +250,94 @@ void performResurrection() {
 
 // Main death function (Requirement 58.1, 58.2, 58.3)
 // Based on ZIL JIGS-UP routine
+// ZIL: <ROUTINE JIGS-UP (DESC "OPTIONAL" (PLAYER? <>)) ...>
+// Source: zil/1actions.zil:4046-4099
+//
+// The ZIL never asks whether you want to be resurrected. It resurrects you
+// twice and ends the game on the third death, testing DEATHS before the
+// increment.
 void jigsUp(std::string_view deathMessage, DeathCause cause) {
+    (void)cause;
     auto& g = Globals::instance();
-    
-    // Set winner back to player
-    if (g.player) {
-        g.winner = g.player;
-    }
-    
-    // Check if already dead (double death)
+
+    // ZIL: <SETG WINNER ,ADVENTURER>. The adventurer always exists in the
+    // game; a stub world used by a test may not have one.
+    if (g.player) g.winner = g.player;
+
+    // ZIL: killed while already dead.
     if (dead_) {
-        printLine("");
-        printLine("It takes a talented person to be killed while already dead. YOU are such");
-        printLine("a talent. Unfortunately, it takes a talented person to deal with it.");
-        printLine("I am not such a talent. Sorry.");
-        printLine("");
-        printLine("The game is over.");
+        tell(CR, "It takes a talented person to be killed while already dead. "
+                 "YOU are such a talent. Unfortunately, it takes a talented "
+                 "person to deal with it. I am not such a talent. Sorry.", CR);
+        Verbs::finish();
         return;
     }
-    
-    // Display death message (Requirement 58.2)
-    if (!deathMessage.empty()) {
-        printLine(std::string(deathMessage));
+
+    tell(deathMessage, CR);
+    if (!g.lucky) {
+        tell("Bad luck, huh?", CR);
     }
-    
-    // Deduct 10 points for dying
-    auto& score = ScoreSystem::instance();
-    score.addScore(-10);
-    
-    // Display death banner
-    printLine("");
-    printLine("    ****  You have died  ****");
-    printLine("");
-    
-    // Move player out of vehicle if in one
-    if (g.winner && g.winner->getLocation()) {
-        if (g.winner->getLocation()->hasFlag(ObjectFlag::VEHBIT)) {
-            g.winner->moveTo(g.here);
-        }
+
+    Verbs::scoreUpd(-10);
+    // ZIL: <TELL "|    ****  You have died  ****|  |"> - the source newlines
+    // become spaces and each "|" a newline.
+    tell(" ", CR, "    ****  You have died  **** ", CR, CR);
+
+    // ZIL: climb out of a vehicle before being moved.
+    if (g.winner && g.winner->getLocation() && g.here &&
+        g.winner->getLocation()->hasFlag(ObjectFlag::VEHBIT)) {
+        g.winner->moveTo(g.here);
     }
-    
-    // Increment death counter (Requirement 58.5)
+
+    // ZIL: <COND (<NOT <L? ,DEATHS 2>> ...)> - tested before the increment,
+    // so the third death is the last.
+    if (deathCount_ >= 2) {
+        tell("You clearly are a suicidal maniac.  We don't allow psychotics in "
+             "the cave, since they may harm other adventurers.  Your remains "
+             "will be installed in the Land of the Living Dead, where your "
+             "fellow adventurers may gloat over them.", CR);
+        Verbs::finish();
+        return;
+    }
+
     deathCount_++;
-    
-    // Check if resurrection is available (Requirement 59.2, 59.5)
-    if (!canResurrect()) {
-        // Too many deaths - game over (Requirement 59.5)
-        printLine("You clearly are a suicidal maniac.  We don't allow psychotics in the");
-        printLine("cave, since they may harm other adventurers.  Your remains will be");
-        printLine("installed in the Land of the Living Dead, where your fellow");
-        printLine("adventurers may gloat over them.");
-        printLine("");
-        printLine("The game is over.");
-        return;
-    }
-    
-    // Offer resurrection (Requirement 59.1)
-    if (offerResurrection()) {
-        // Player accepted resurrection
-        performResurrection();
+    if (g.winner && g.here) g.winner->moveTo(g.here);
+
+    auto* southTemple = g.getObject(RoomIds::SOUTH_TEMPLE);
+    if (southTemple && southTemple->hasFlag(ObjectFlag::TOUCHBIT)) {
+        tell("As you take your last breath, you feel relieved of your burdens. "
+             "The feeling passes as you find yourself before the gates of Hell, "
+             "where the spirits jeer at you and deny you entry.  Your senses "
+             "are disturbed.  The objects in the dungeon appear indistinct, "
+             "bleached of color, even unreal.", CR, CR);
+        dead_ = true;
+        g.trollFlag = true;
+        alwaysLit_ = true;
+        if (g.winner) {
+            g.winner->setAction([](int) {
+                return ::deadFunction() ? M_HANDLED : M_NOT_HANDLED;
+            });
+        }
+        Verbs::goTo(g.getObject(RoomIds::ENTRANCE_TO_HADES));
     } else {
-        // Player declined resurrection
-        printLine("");
-        printLine("Very well. The game is over.");
+        tell("Now, let's take a look here... Well, you probably deserve another "
+             "chance.  I can't quite fix you up completely, but you can't have "
+             "everything.", CR, CR);
+        Verbs::goTo(g.getObject(RoomIds::FOREST_1));
     }
+
+    if (auto* trapDoor = g.getObject(ObjectIds::TRAP_DOOR)) {
+        trapDoor->clearFlag(ObjectFlag::TOUCHBIT);
+    }
+    g.pCont = 0;
+    randomizeObjects();
+    killInterrupts();
 }
+
+bool inTestMode() { return testMode_; }
+
+void setAlwaysLit(bool on) { alwaysLit_ = on; }
+bool alwaysLit() { return alwaysLit_; }
 
 // Reset death state for new game
 void reset() {

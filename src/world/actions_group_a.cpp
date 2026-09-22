@@ -563,121 +563,116 @@ bool puncturedBoatAction() {
   return false;
 }
 
-// DEAD-FUNCTION (Spirit Actions)
-// ZIL: Handles actions when player is dead (Spirit).
-// Source: 1actions.zil lines 3113-3150+
+// ZIL: <ROUTINE DEAD-FUNCTION ("OPTIONAL" (FOO <>) "AUX" M) ...>
+// Source: zil/1actions.zil:3113-3172
+//
+// The player's own ACTION while dead. Note the ZIL clause order: RUB is
+// listed both with the "beyond your capabilities" group and with TAKE, and
+// the first COND clause wins, so RUB never reaches the TAKE line.
 bool deadFunction() {
   auto &g = Globals::instance();
 
-  // ALLOWED Verbs (Return false to let engine handle)
-  // ZIL: BRIEF, VERBOSE, SUPER-BRIEF, VERSION, RESTORE, RESTART, QUIT, SAVE
-  // (Check line 3118)
-  if (g.prsa == V_BRIEF || g.prsa == V_VERBOSE || g.prsa == V_SUPERBRIEF ||
-      g.prsa == V_VERSION || g.prsa == V_RESTORE || g.prsa == V_RESTART ||
-      g.prsa == V_QUIT || g.prsa == V_SAVE) {
+  if (g.prsa == V_WALK) {
+    if (g.here && g.here->getId() == RoomIds::TIMBER_ROOM &&
+        getDirection(g.prso) == Direction::WEST) {
+      tell("You cannot enter in your condition.", CR);
+      return true;
+    }
     return false;
   }
 
-  // WALK Logic
-  if (g.prsa == V_WALK) {
-    // ZIL: If TIMBER-ROOM and WEST -> "Cannot enter".
-    // Note: TIMBER-ROOM might not be defined if from batch 2?
-    // Assuming RoomIds::TIMBER_ROOM exists.
-    // If not, use generic check or skip specific room check if room ID unknown.
-    // Grep Step 7601 will verify RoomIds.
-    // I'll assume safe to usage if ID exists.
-    // Assuming ID is TIMBER_ROOM.
-    if (g.here->getId() == RoomIds::TIMBER_ROOM &&
-        getDirection(g.prso) == Direction::WEST) {
-      printLine("You cannot enter in your condition.");
-      return true;
-    }
-    return false; // Allow other movement
+  // ZIL: these fall through to the normal handlers.
+  if (g.prsa == V_BRIEF || g.prsa == V_VERBOSE || g.prsa == V_SUPERBRIEF ||
+      g.prsa == V_VERSION || g.prsa == V_SAVE || g.prsa == V_RESTORE ||
+      g.prsa == V_QUIT || g.prsa == V_RESTART) {
+    return false;
   }
 
-  // Denied Verbs
   if (g.prsa == V_ATTACK || g.prsa == V_MUNG || g.prsa == V_ALARM ||
       g.prsa == V_SWING) {
-    printLine("All such attacks are vain in your condition.");
+    tell("All such attacks are vain in your condition.", CR);
     return true;
   }
 
   if (g.prsa == V_OPEN || g.prsa == V_CLOSE || g.prsa == V_EAT ||
       g.prsa == V_DRINK || g.prsa == V_INFLATE || g.prsa == V_DEFLATE ||
       g.prsa == V_TURN || g.prsa == V_BURN || g.prsa == V_TIE ||
-      g.prsa == V_UNTIE ||
-      g.prsa == V_RUB) { // Rub duplicated in ZIL? Line 3125 vs 3134.
-    printLine("Even such an action is beyond your capabilities.");
+      g.prsa == V_UNTIE || g.prsa == V_RUB) {
+    tell("Even such an action is beyond your capabilities.", CR);
     return true;
   }
 
   if (g.prsa == V_WAIT) {
-    printLine("Might as well. You've got an eternity.");
+    tell("Might as well. You've got an eternity.", CR);
     return true;
   }
-
   if (g.prsa == V_LAMP_ON) {
-    printLine("You need no light to guide you.");
+    tell("You need no light to guide you.", CR);
     return true;
   }
-
   if (g.prsa == V_SCORE) {
-    printLine("You're dead! How can you think of your score?");
+    tell("You're dead! How can you think of your score?", CR);
     return true;
   }
-
-  if (g.prsa == V_TAKE) { // RUB logic handled above? ZIL line 3134 has TAKE
-                          // RUB. Line 3125 allows RUB?
-    // ZIL 3125: RUB -> "Beyond capabilities"
-    // ZIL 3134: TAKE RUB -> "Hand passes through".
-    // Order matters in ZIL COND.
-    // 3125 is checked BEFORE 3134. So RUB hits "Beyond capabilities".
-    // Wait, 3125 clause has "RUB". 3134 has "RUB".
-    // First match wins in COND.
-    // So RUB prints "Beyond capabilities".
-    // TAKE prints "Hand passes through".
-    printLine("Your hand passes through its object.");
+  if (g.prsa == V_TAKE) {
+    tell("Your hand passes through its object.", CR);
     return true;
   }
-
   if (g.prsa == V_DROP || g.prsa == V_THROW || g.prsa == V_INVENTORY) {
-    printLine("You have no possessions.");
+    tell("You have no possessions.", CR);
     return true;
   }
-
   if (g.prsa == V_DIAGNOSE) {
-    printLine("You are dead.");
+    tell("You are dead.", CR);
     return true;
   }
 
   if (g.prsa == V_LOOK) {
-    print("The room looks strange and unearthly");
-    // Check objects in room?
-    // ZIL <NOT <FIRST? ,HERE>> -> Empty?
-    // C++: g.objectsInRoom(g.here)?
-    // Helper: g.hasObjects(g.here)?
-    // I'll assume I can check room contents or simply say "and objects appear
-    // indistinct" if generally true. Fidelity: I should check. Simply: `any
-    // objects?`.
-    bool hasObjects = false; // Mock or check
-    // Ideally: auto obs = g.getObjectsInRoom(g.here); hasObjects =
-    // !obs.empty(); I'll stick to printing assuming objects normally. Or check
-    // basic list. For simplicity, always print "indistinct" unless completely
-    // empty system. ZIL check `FIRST?` is simpler. I'll print " and objects
-    // appear indistinct." for now.
-    printLine(" and objects appear indistinct.");
-
-    // Light check
-    // if (!g.lit) -> "Although there is no light..."
-    if (!g.lit) {
-      printLine(
-          "Although there is no light, the room seems dimly illuminated.");
+    tell("The room looks strange and unearthly");
+    if (g.here && g.here->getContents().empty()) {
+      tell(".");
+    } else {
+      tell(" and objects appear indistinct.");
     }
+    crlf();
+    if (g.here && !g.here->hasFlag(ObjectFlag::ONBIT)) {
+      tell("Although there is no light, the room seems dimly illuminated.", CR);
+    }
+    crlf();
+    return false; // ZIL returns <> so the room description still runs
+  }
+
+  if (g.prsa == V_PRAY) {
+    if (g.here == g.getObject(RoomIds::SOUTH_TEMPLE)) {
+      if (auto *lamp = g.getObject(ObjectIds::LAMP)) {
+        lamp->clearFlag(ObjectFlag::INVISIBLE);
+      }
+      if (g.winner) g.winner->setAction(nullptr);
+      DeathSystem::setAlwaysLit(false);
+      DeathSystem::setDead(false);
+      ZObject *troll = g.getObject(ObjectIds::TROLL);
+      if (troll && troll->getLocation() == g.getObject(RoomIds::TROLL_ROOM)) {
+        g.trollFlag = false;
+      }
+      tell("From the distance the sound of a lone trumpet is heard. The room "
+           "becomes very bright and you feel disembodied. In a moment, the "
+           "brightness fades and you find yourself rising as if from a long "
+           "sleep, deep in the woods. In the distance you can faintly hear a "
+           "songbird and the sounds of the forest.",
+           CR, CR);
+      Verbs::goTo(g.getObject(RoomIds::FOREST_1));
+      return true;
+    }
+    tell("Your prayers are not heard.", CR);
     return true;
   }
 
-  return false;
+  // ZIL: anything else at all
+  tell("You can't even do that.", CR);
+  g.pCont = 0;
+  return true; // caller maps this to RFATAL below
 }
+
 // DEEP-CANYON-F (Room Action)
 // ZIL: M-LOOK with water sound logic.
 // Source: 1actions.zil lines 1730-1745

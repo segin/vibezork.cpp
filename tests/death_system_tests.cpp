@@ -47,15 +47,17 @@ TEST(ScorePenalty) {
     // Reset systems
     DeathSystem::reset();
     DeathSystem::setTestMode(true);
-    ScoreSystem::instance().reset();
-    
-    // Set initial score
-    ScoreSystem::instance().addScore(50);
-    ASSERT_EQ(ScoreSystem::instance().getScore(), 50);
+    auto& g = Globals::instance();
+
+    // ZIL: JIGS-UP calls <SCORE-UPD -10>, which moves ,SCORE
+    // (gverbs.zil:1851). ,SCORE is the score the game keeps.
+    g.score = 50;
+    g.baseScore = 50;
+    ASSERT_EQ(g.score, 50);
     
     // Death should deduct 10 points
     DeathSystem::jigsUp("Test death", DeathSystem::DeathCause::COMBAT);
-    ASSERT_EQ(ScoreSystem::instance().getScore(), 40);
+    ASSERT_EQ(g.score, 40);
 }
 
 TEST(DeathCauses) {
