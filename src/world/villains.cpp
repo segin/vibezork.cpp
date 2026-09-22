@@ -18,6 +18,8 @@
 #include "world/objects.h"
 #include "world/rooms.h"
 #include "parser/gparser.h"
+#include "core/gmain.h"
+#include "world/generated/zil_tables.h"
 #include "systems/death.h"
 #include "systems/timer.h"
 
@@ -905,6 +907,226 @@ int treasureRoomFcn(int rarg) {
     thief->setFlag(ObjectFlag::FIGHTBIT);
     thief->clearFlag(ObjectFlag::INVISIBLE);
     thiefInTreasure();
+  }
+  return M_NOT_HANDLED;
+}
+
+} // namespace Villains
+
+// ===========================================================================
+// The cyclops. Source: zil/1actions.zil:1515-1660, 2339-2341.
+// ===========================================================================
+
+namespace Villains {
+
+// ZIL: <ROUTINE MIN (N1 N2)> (1actions.zil:2339-2341). A local routine that
+// shadows the MDL builtin; only CYCLOPS-FCN uses it.
+int minOf(int a, int b) { return a < b ? a : b; }
+
+// I-CYCLOPS is queued by the routines below; declared here for them.
+bool iCyclops();
+
+// ZIL: <ROUTINE CYCLOPS-FCN ("AUX" COUNT) ...>
+// Source: zil/1actions.zil:1515-1597
+//
+// The cyclops handles no F-* mode at all, which is consistent with his never
+// being reached by the melee loop (see melee.cpp). He is driven by I-CYCLOPS.
+int cyclopsFcn(int mode) {
+  auto &g = Globals::instance();
+  ZObject *cyclops = obj(ObjectIds::CYCLOPS);
+  if (!cyclops) return M_NOT_HANDLED;
+  if (mode != 0) return M_NOT_HANDLED;
+
+  const int count = g.cyclowrath;
+
+  // ZIL: talking to him while he is the WINNER (an actor command)
+  if (g.winner == cyclops) {
+    if (g.cyclopsFlag) {
+      tell("No use talking to him. He's fast asleep.", CR);
+      return M_HANDLED;
+    }
+    if (g.prsa == V_ODYSSEUS) {
+      g.winner = g.player;
+      perform(V_ODYSSEUS);
+      return M_HANDLED;
+    }
+    tell("The cyclops prefers eating to making conversation.", CR);
+    return M_HANDLED;
+  }
+
+  if (g.cyclopsFlag) {
+    if (g.prsa == V_EXAMINE) {
+      tell("The cyclops is sleeping like a baby, albeit a very ugly one.", CR);
+      return M_HANDLED;
+    }
+    if (g.prsa == V_ALARM || g.prsa == V_KICK || g.prsa == V_ATTACK ||
+        g.prsa == V_BURN || g.prsa == V_MUNG) {
+      tell("The cyclops yawns and stares at the thing that woke him up.", CR);
+      g.cyclopsFlag = false;
+      cyclops->setFlag(ObjectFlag::FIGHTBIT);
+      g.cyclowrath = count < 0 ? -count : count;
+      return M_HANDLED;
+    }
+    return M_NOT_HANDLED;
+  }
+
+  if (g.prsa == V_EXAMINE) {
+    tell("A hungry cyclops is standing at the foot of the stairs.", CR);
+    return M_HANDLED;
+  }
+
+  if (g.prsa == V_GIVE && g.prsi == cyclops) {
+    ZObject *lunch = obj(ObjectIds::LUNCH);
+    ZObject *water = obj(ObjectIds::WATER);
+    ZObject *bottle = obj(ObjectIds::BOTTLE);
+    if (g.prso == lunch) {
+      if (count >= 0) {
+        Verbs::removeCarefully(lunch);
+        tell("The cyclops says \"Mmm Mmm. I love hot peppers! But oh, could I "
+             "use a drink. Perhaps I could drink the blood of that thing.\"  "
+             "From the gleam in his eye, it could be surmised that you are "
+             "\"that thing\".",
+             CR);
+        g.cyclowrath = minOf(-1, -count);
+      }
+      // ZIL enables the demon even when he was already thirsty.
+      TimerSystem::interrupt("I-CYCLOPS", iCyclops);
+      TimerSystem::queue("I-CYCLOPS", -1);
+      TimerSystem::enable("I-CYCLOPS");
+      return M_HANDLED;
+    }
+    if (g.prso == water ||
+        (g.prso == bottle && water && water->getLocation() == bottle)) {
+      if (count < 0) {
+        Verbs::removeCarefully(water);
+        if (bottle) {
+          bottle->moveTo(g.here);
+          bottle->setFlag(ObjectFlag::OPENBIT);
+        }
+        cyclops->clearFlag(ObjectFlag::FIGHTBIT);
+        tell("The cyclops takes the bottle, checks that it's open, and drinks "
+             "the water. A moment later, he lets out a yawn that nearly blows "
+             "you over, and then falls fast asleep (what did you put in that "
+             "drink, anyway?).",
+             CR);
+        g.cyclopsFlag = true;
+      } else {
+        tell("The cyclops apparently is not thirsty and refuses your generous "
+             "offer.",
+             CR);
+      }
+      return M_HANDLED;
+    }
+    if (g.prso == obj(ObjectIds::GARLIC)) {
+      tell("The cyclops may be hungry, but there is a limit.", CR);
+      return M_HANDLED;
+    }
+    tell("The cyclops is not so stupid as to eat THAT!", CR);
+    return M_HANDLED;
+  }
+
+  if (g.prsa == V_THROW || g.prsa == V_ATTACK || g.prsa == V_MUNG) {
+    TimerSystem::interrupt("I-CYCLOPS", iCyclops);
+    TimerSystem::queue("I-CYCLOPS", -1);
+    TimerSystem::enable("I-CYCLOPS");
+    if (g.prsa == V_MUNG) {
+      tell("\"Do you think I'm as stupid as my father was?\", he says, "
+           "dodging.",
+           CR);
+      return M_HANDLED;
+    }
+    tell("The cyclops shrugs but otherwise ignores your pitiful attempt.", CR);
+    if (g.prsa == V_THROW && g.prso) g.prso->moveTo(g.here);
+    return M_HANDLED;
+  }
+
+  if (g.prsa == V_TAKE) {
+    tell("The cyclops doesn't take kindly to being grabbed.", CR);
+    return M_HANDLED;
+  }
+  if (g.prsa == V_TIE) {
+    tell("You cannot tie the cyclops, though he is fit to be tied.", CR);
+    return M_HANDLED;
+  }
+  if (g.prsa == V_LISTEN) {
+    tell("You can hear his stomach rumbling.", CR);
+    return M_HANDLED;
+  }
+  return M_NOT_HANDLED;
+}
+
+// ZIL: <ROUTINE I-CYCLOPS () ...>
+// Source: zil/1actions.zil:1599-1614
+bool iCyclops() {
+  auto &g = Globals::instance();
+  if (g.cyclopsFlag || DeathSystem::isDead()) return true;
+  if (g.here != obj(RoomIds::CYCLOPS_ROOM)) {
+    TimerSystem::disable("I-CYCLOPS");
+    return false;
+  }
+  const int wrath = g.cyclowrath < 0 ? -g.cyclowrath : g.cyclowrath;
+  if (wrath > 5) {
+    TimerSystem::disable("I-CYCLOPS");
+    DeathSystem::jigsUp(
+        "The cyclops, tired of all of your games and trickery, grabs you "
+        "firmly. As he licks his chops, he says \"Mmm. Just like Mom used to "
+        "make 'em.\" It's nice to be appreciated.");
+    return true;
+  }
+  // ZIL: the wrath runs away from zero in whichever direction it started.
+  if (g.cyclowrath < 0) {
+    g.cyclowrath = g.cyclowrath - 1;
+  } else {
+    g.cyclowrath = g.cyclowrath + 1;
+  }
+  if (!g.cyclopsFlag) {
+    const int idx = (g.cyclowrath < 0 ? -g.cyclowrath : g.cyclowrath) - 1;
+    if (idx >= 0 && idx < static_cast<int>(std::size(zork::zil::kCYCLOMAD))) {
+      tell(zork::zil::kCYCLOMAD[idx], CR);
+    }
+  }
+  return false;
+}
+
+// ZIL: <ROUTINE CYCLOPS-ROOM-FCN (RARG) ...>
+// Source: zil/1actions.zil:1615-1642
+int cyclopsRoomFcn(int rarg) {
+  auto &g = Globals::instance();
+  if (rarg == M_LOOK) {
+    tell("This room has an exit on the northwest, and a staircase leading up.",
+         CR);
+    if (g.cyclopsFlag && !g.magicFlag) {
+      tell("The cyclops is sleeping blissfully at the foot of the stairs.", CR);
+    } else if (g.magicFlag) {
+      tell("The east wall, previously solid, now has a cyclops-sized opening "
+           "in it.",
+           CR);
+    } else if (g.cyclowrath == 0) {
+      tell("A cyclops, who looks prepared to eat horses (much less mere "
+           "adventurers), blocks the staircase. From his state of health, and "
+           "the bloodstains on the walls, you gather that he is not very "
+           "friendly, though he likes people.",
+           CR);
+    } else if (g.cyclowrath > 0) {
+      tell("The cyclops is standing in the corner, eyeing you closely. I don't "
+           "think he likes you very much. He looks extremely hungry, even for "
+           "a cyclops.",
+           CR);
+    } else {
+      tell("The cyclops, having eaten the hot peppers, appears to be gasping. "
+           "His enflamed tongue protrudes from his man-sized mouth.",
+           CR);
+    }
+    return M_HANDLED;
+  }
+  if (rarg == M_ENTER) {
+    // ZIL: <OR <0? ,CYCLOWRATH> <ENABLE <INT I-CYCLOPS>>>. INT allocates the
+    // entry if it is new, leaving its tick at 0, so enabling on its own does
+    // nothing until a QUEUE gives it a tick.
+    if (g.cyclowrath != 0) {
+      TimerSystem::interrupt("I-CYCLOPS", iCyclops);
+      TimerSystem::enable("I-CYCLOPS");
+    }
   }
   return M_NOT_HANDLED;
 }

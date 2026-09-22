@@ -99,7 +99,7 @@ const std::unordered_map<std::string_view, ObjFn> &objectActions() {
       {"CHIMNEY-F", chimneyAction},
       {"CRACK-FCN", crackAction},
       {"CRETIN-FCN", GGlobals::cretinFcn},
-      {"CYCLOPS-FCN", NPCSystem::cyclopsAction},
+      
       {"DAM-FUNCTION", damAction},
       {"DBOAT-FUNCTION", puncturedBoatAction},
       {"EGG-OBJECT", eggAction},
@@ -181,7 +181,7 @@ const std::unordered_map<std::string_view, RoomFn> &roomActions() {
       {"CAVE2-ROOM", cave2Room},
       {"CELLAR-FCN", cellarAction},
       {"CLEARING-FCN", clearingAction},
-      {"CYCLOPS-ROOM-FCN", cyclopsRoomAction},
+      
       {"DAM-ROOM-FCN", damRoomAction},
       {"DEEP-CANYON-F", deepCanyonRoomAction},
       {"DOME-ROOM-FCN", domeRoomAction},
@@ -206,6 +206,7 @@ const std::unordered_map<std::string_view, RoomFn> &roomActions() {
       {"TREE-ROOM", treeRoom},
       {"TROLL-ROOM-F", trollRoomAction},
       {"TREASURE-ROOM-FCN", Villains::treasureRoomFcn},
+      {"CYCLOPS-ROOM-FCN", Villains::cyclopsRoomFcn},
       {"WEST-HOUSE", westHouseAction},
   };
   return m;
@@ -305,6 +306,7 @@ const std::unordered_map<std::string_view, ObjArgFn> &objectArgActions() {
   static const std::unordered_map<std::string_view, ObjArgFn> m = {
       {"TROLL-FCN", Villains::trollFcn},
       {"ROBBER-FUNCTION", Villains::robberFunction},
+      {"CYCLOPS-FCN", Villains::cyclopsFcn},
   };
   return m;
 }

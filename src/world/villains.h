@@ -73,6 +73,18 @@ int treasureRoomFcn(int rarg);
 /// ZIL: <ROUTINE THIEF-IN-TREASURE ()> (1actions.zil:2152-2163)
 void thiefInTreasure();
 
+/// ZIL: <ROUTINE CYCLOPS-FCN ()> (1actions.zil:1515-1597)
+int cyclopsFcn(int mode);
+
+/// ZIL: <ROUTINE I-CYCLOPS ()> (1actions.zil:1599-1622)
+bool iCyclops();
+
+/// ZIL: <ROUTINE CYCLOPS-ROOM-FCN (RARG)> (1actions.zil:1624-1660)
+int cyclopsRoomFcn(int rarg);
+
+/// ZIL: <ROUTINE MIN (N1 N2)> (1actions.zil:2339-2341)
+int minOf(int a, int b);
+
 /// ZIL LDESC strings the thief switches between (1actions.zil:2087-2094).
 extern const char *const kRobberCDesc;
 extern const char *const kRobberUDesc;

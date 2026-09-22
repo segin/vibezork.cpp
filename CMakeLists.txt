@@ -265,6 +265,7 @@ if(BUILD_TESTS)
     add_zork_test(MeleeTests melee_tests tests/melee_tests.cpp)
     add_zork_test(TrollTests troll_tests tests/troll_tests.cpp)
     add_zork_test(ThiefTests thief_tests tests/thief_tests.cpp)
+    add_zork_test(CyclopsTests cyclops_tests tests/cyclops_tests.cpp)
 
     # Output layer tests (TELL semantics, Z-machine wrapping)
     add_zork_test(IoTests io_tests tests/io_tests.cpp)

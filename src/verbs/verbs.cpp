@@ -1722,10 +1722,25 @@ bool vTell() {
   return GMacros::rfatal();
 }
 
+// ZIL: <ROUTINE V-ODYSSEUS () ...>
+// Source: zil/gverbs.zil:945-960
 bool vOdysseus() {
-  // Special verb for the cyclops puzzle
-  // This is called when player types "odysseus" or "ulysses"
-  return NPCSystem::handleOdysseus() ? RTRUE : RFALSE;
+  auto &g = Globals::instance();
+  ZObject *cyclops = g.getObject(ObjectIds::CYCLOPS);
+  if (g.here == g.getObject(RoomIds::CYCLOPS_ROOM) && cyclops &&
+      cyclops->getLocation() == g.here && !g.cyclopsFlag) {
+    TimerSystem::disable("I-CYCLOPS");
+    g.cyclopsFlag = true;
+    tell("The cyclops, hearing the name of his father's deadly nemesis, flees "
+         "the room by knocking down the wall on the east of the room.",
+         CR);
+    g.magicFlag = true;
+    cyclops->clearFlag(ObjectFlag::FIGHTBIT);
+    removeCarefully(cyclops);
+    return RTRUE;
+  }
+  tell("Wasn't he a sailor?", CR);
+  return RTRUE;
 }
 
 // Easter eggs / special words - authentic ZIL responses
