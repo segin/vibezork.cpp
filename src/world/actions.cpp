@@ -637,86 +637,72 @@ bool coffinAction() {
   // It can be taken and opened like a normal container
   return RFALSE;
 }
-
-bool basketAction() {
+// ZIL: <ROUTINE BASKET-F () ...>
+// Source: zil/1actions.zil:277-306
+//
+// The dumbwaiter. CAGE-TOP says which end of the chain the basket is at, and
+// asking for the end it is already at draws a DUMMY line rather than a fixed
+// refusal. Lowering it can take the light away with it.
+int basketAction() {
   auto &g = Globals::instance();
 
-  // Check if handling basket objects
-  if (!g.prso)
-    return RFALSE;
-  bool isBasket = (g.prso->getId() == ObjectIds::BASKET ||
-                   g.prso->getId() == ObjectIds::RAISED_BASKET ||
-                   g.prso->getId() == ObjectIds::LOWERED_BASKET);
-  if (!isBasket && g.prsi) {
-    isBasket = (g.prsi->getId() == ObjectIds::BASKET ||
-                g.prsi->getId() == ObjectIds::RAISED_BASKET ||
-                g.prsi->getId() == ObjectIds::LOWERED_BASKET);
-  }
+  ZObject *raised = g.getObject(ObjectIds::RAISED_BASKET);
+  ZObject *lowered = g.getObject(ObjectIds::LOWERED_BASKET);
+  ZObject *shaft = g.getObject(RoomIds::SHAFT_ROOM);
+  ZObject *lowerShaft = g.getObject(RoomIds::LOWER_SHAFT);
 
-  if (!isBasket)
-    return RFALSE;
-
-  // Static state for basket position (true = top, false = bottom)
-  static bool cageTop = true;
-
-  // RAISE
   if (g.prsa == V_RAISE) {
-    if (cageTop) {
-      printLine(
-          "The basket is already at the top."); // Simple dummy response for now
+    if (g.cageTop) {
+      printLine(VerbTables::dummy().pickOne());
     } else {
-      // Raise it
-      ZObject *raisedBasket = g.getObject(ObjectIds::RAISED_BASKET);
-      ZObject *loweredBasket = g.getObject(ObjectIds::LOWERED_BASKET);
-      ZObject *shaftRoom = g.getObject(RoomIds::SHAFT_ROOM);
-      ZObject *lowerShaft = g.getObject(RoomIds::LOWER_SHAFT);
-
-      if (raisedBasket && shaftRoom)
-        raisedBasket->moveTo(shaftRoom);
-      if (loweredBasket && lowerShaft)
-        loweredBasket->moveTo(lowerShaft);
-
-      cageTop = true;
+      if (raised && shaft)
+        raised->moveTo(shaft);
+      if (lowered && lowerShaft)
+        lowered->moveTo(lowerShaft);
+      g.cageTop = true;
+      Verbs::thisIsIt(raised);
       printLine("The basket is raised to the top of the shaft.");
     }
-    return RTRUE;
+    return M_HANDLED;
   }
 
-  // LOWER
   if (g.prsa == V_LOWER) {
-    if (!cageTop) {
-      printLine("The basket is already at the bottom.");
+    if (!g.cageTop) {
+      printLine(VerbTables::dummy().pickOne());
     } else {
-      // Lower it
-      ZObject *raisedBasket = g.getObject(ObjectIds::RAISED_BASKET);
-      ZObject *loweredBasket = g.getObject(ObjectIds::LOWERED_BASKET);
-      ZObject *shaftRoom = g.getObject(RoomIds::SHAFT_ROOM);
-      ZObject *lowerShaft = g.getObject(RoomIds::LOWER_SHAFT);
-
-      if (raisedBasket && lowerShaft)
-        raisedBasket->moveTo(lowerShaft);
-      if (loweredBasket && shaftRoom)
-        loweredBasket->moveTo(shaftRoom);
-
-      cageTop = false;
+      if (raised && lowerShaft)
+        raised->moveTo(lowerShaft);
+      if (lowered && shaft)
+        lowered->moveTo(shaft);
+      Verbs::thisIsIt(lowered);
       printLine("The basket is lowered to the bottom of the shaft.");
-
-      // Note: Lighting check omitted for now as light system handles it
-      // strictly by location
-      if (g.here && !g.here->hasFlag(ObjectFlag::ONBIT)) {
-        printLine("It is now pitch black.");
+      g.cageTop = false;
+      // ZIL: <COND (<AND ,LIT <NOT <SETG LIT <LIT? ,HERE>>>>
+      //             <TELL "It is now pitch black." CR>)>
+      if (g.lit) {
+        g.lit = GParser::isLit(g.here);
+        if (!g.lit)
+          printLine("It is now pitch black.");
       }
     }
-    return RTRUE;
+    return M_HANDLED;
   }
 
-  // TAKE
-  if (g.prsa == V_TAKE) {
+  // ZIL: anything aimed at the far basket is out of reach.
+  if ((g.prso && g.prso->getId() == ObjectIds::LOWERED_BASKET) ||
+      (g.prsi && g.prsi->getId() == ObjectIds::LOWERED_BASKET)) {
+    printLine("The basket is at the other end of the chain.");
+    return M_HANDLED;
+  }
+
+  if (g.prsa == V_TAKE && g.prso &&
+      (g.prso->getId() == ObjectIds::RAISED_BASKET ||
+       g.prso->getId() == ObjectIds::LOWERED_BASKET)) {
     printLine("The cage is securely fastened to the iron chain.");
-    return RTRUE;
+    return M_HANDLED;
   }
 
-  return RFALSE;
+  return M_NOT_HANDLED;
 }
 
 bool sackAction() {

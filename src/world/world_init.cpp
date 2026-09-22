@@ -23,7 +23,7 @@ int mazeRoomAction(int rarg);
 bool mailboxAction();
 bool trophyCaseAction();
 bool coffinAction();
-bool basketAction();
+int basketAction();
 bool sackAction();
 bool bagAction();
 bool bottleAction();

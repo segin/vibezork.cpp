@@ -59,6 +59,9 @@ public:
   bool magicFlag = false;     // ZIL: ,MAGIC-FLAG (Odysseus spoken, Strange Passage open)
   bool rainbowFlag = false;   // ZIL: ,RAINBOW-FLAG (Rainbow solidified, walkable)
   bool trollFlag = false;     // ZIL: ,TROLL-FLAG (Troll dead/fled, Troll Room passages unblocked)
+  // ZIL: <GLOBAL CAGE-TOP T> (1actions.zil:275): which end of the chain the
+  // dumbwaiter basket is at.
+  bool cageTop = true;
   bool wonFlag = false;       // ZIL: ,WON-FLAG (Score-max reached, Stone Barrow entrance open)
   bool coffinCure = false;    // ZIL: ,COFFIN-CURE (Prayer answered in Egypt Room)
 

@@ -20,13 +20,13 @@
 // can also answer M-FATAL.
 // clang-format off
 bool axeAction(); bool bagOfCoinsAction(); bool barrowAction(); bool barrowDoorAction();
-bool basketAction(); bool batAction(); bool bellAction(); bool boardAction();
+int basketAction(); bool batAction(); bool bellAction(); bool boardAction();
 bool boardedWindowAction(); bool bodyAction(); bool boltAction(); bool bottleAction();
 bool bubbleAction(); bool buttonAction(); bool canaryAction(); int candlesAction();
 bool canyonViewAction(); bool chaliceAction(); int chimneyAction(); bool crackAction();
 bool damAction(); bool eggAction();
 bool forestAction(); bool frontDoorAction(); bool garlicAction(); bool ghostsAction();
-bool graniteWallAction(); bool grateAction();
+int graniteWallAction(); bool grateAction();
 bool gunkAction(); bool hotBellAction(); bool iboatFunction(); bool inflatedBoatAction();
 bool kitchenWindowAction(); bool knifeAction(); int lampAction(); bool largeBagAction();
 bool leakFunction(); bool machineAction(); bool machineSwitchAction(); bool mailboxAction();
@@ -34,7 +34,7 @@ int matchesAction(); bool mirrorAction(); bool mountainRangeAction();
 bool paintingAction(); bool puncturedBoatAction(); bool puttyAction();
 bool rainbowAction(); bool riverAction(); bool robberAction(); bool ropeAction();
 bool rugAction(); bool rustyKnifeAction(); bool sandAction();
-bool sandwichBagAction(); bool sceptreAction(); bool slideAction(); bool songbirdAction();
+bool sandwichBagAction(); bool sceptreAction(); bool slideAction(); int songbirdAction();
 bool stilettoAction(); int swordAction(); bool teethAction();
 bool toolChestAction(); int torchAction(); int trapDoorAction();
 bool trophyCaseAction(); bool trunkAction(); bool tubeAction(); bool waterAction();

@@ -691,18 +691,19 @@ TEST(BoardedWindowFcn_OpenPrintsBoarded) {
   ASSERT_TRUE(output.find("boarded") != std::string::npos);
 }
 
-TEST(BoardedWindowFcn_AttackPrintsCantBreak) {
+// ZIL: BOARDED-WINDOW-FCN handles OPEN and MUNG only, and ATTACK is a
+// separate verb (gsyntax.zil maps BREAK/SMASH/DESTROY to V-MUNG but
+// ATTACK/FIGHT/HIT to V-ATTACK), so ATTACK falls through to the verb layer.
+// Source: zil/1actions.zil:369-374
+TEST(BoardedWindowFcn_AttackFallsThrough) {
   setupTestWorld();
   auto &g = Globals::instance();
 
   g.prsa = V_ATTACK;
 
   OutputCapture cap;
-  bool result = boardedWindowAction();
-
-  ASSERT_TRUE(result);
-  std::string output = cap.getOutput();
-  ASSERT_TRUE(output.find("break") != std::string::npos);
+  ASSERT_FALSE(boardedWindowAction());
+  ASSERT_TRUE(cap.getOutput().empty());
 }
 
 TEST(BoardedWindowFcn_MungPrintsCantBreak) {
@@ -2666,7 +2667,7 @@ TEST(GhostsFcn_Verbs) {
 // =============================================================================
 
 // Forward decl
-extern bool graniteWallAction();
+extern int graniteWallAction();
 
 TEST(GraniteWallFcn_Contexts) {
   setupTestWorld();

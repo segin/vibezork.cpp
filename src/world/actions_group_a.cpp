@@ -649,7 +649,7 @@ bool ghostsAction() {
 
   if (g.prsa == V_TELL) {
     printLine("The spirits jeer loudly and ignore you.");
-    // ZIL: <SETG P-CONT <>> (Stop continuation).
+    g.pCont = 0; // ZIL: <SETG P-CONT <>> (1actions.zil:266)
     return true;
   }
 
@@ -664,6 +664,7 @@ bool ghostsAction() {
     return true;
   }
 
+  // ZIL: <AND <VERB? ATTACK MUNG> <EQUAL? ,PRSO ,GHOSTS>>
   if (g.prsa == V_ATTACK || g.prsa == V_MUNG) {
     if (g.prso && g.prso->getId() == ObjectIds::GHOSTS) {
       printLine("How can you attack a spirit with material objects?");
@@ -679,49 +680,50 @@ bool ghostsAction() {
 // GRANITE-WALL-F
 // GRANITE-WALL-F
 // ZIL: Room-specific interactions (North Temple, Treasure Room, Slide Room).
-// Source: 1actions.zil lines 64-80
-bool graniteWallAction() {
+// ZIL: <ROUTINE GRANITE-WALL-F () ...>
+// Source: zil/1actions.zil:95-111
+//
+// Three rooms answer for the wall and everywhere else denies it. Only FIND,
+// and TAKE/RAISE/LOWER, are handled; the Slide Room adds READ.
+int graniteWallAction() {
   auto &g = Globals::instance();
-  auto room = g.here->getId();
+  const ObjectId room = g.here ? g.here->getId() : 0;
 
-  // Case 1: North Temple (West Wall)
+  const bool find = g.prsa == V_FIND;
+  const bool grab =
+      g.prsa == V_TAKE || g.prsa == V_RAISE || g.prsa == V_LOWER;
+
   if (room == RoomIds::NORTH_TEMPLE) {
-    if (g.prsa == V_FIND || g.prsa == V_EXAMINE) {
+    if (find) {
       printLine("The west wall is solid granite here.");
-      return true;
+      return M_HANDLED;
     }
-    if (g.prsa == V_TAKE || g.prsa == V_RAISE || g.prsa == V_LOWER ||
-        g.prsa == V_MOVE) {
+    if (grab) {
       printLine("It's solid granite.");
-      return true;
+      return M_HANDLED;
     }
+    return M_NOT_HANDLED;
   }
-  // Case 2: Treasure Room (East Wall)
-  else if (room == RoomIds::TREASURE_ROOM) {
-    if (g.prsa == V_FIND || g.prsa == V_EXAMINE) {
+  if (room == RoomIds::TREASURE_ROOM) {
+    if (find) {
       printLine("The east wall is solid granite here.");
-      return true;
+      return M_HANDLED;
     }
-    if (g.prsa == V_TAKE || g.prsa == V_RAISE || g.prsa == V_LOWER ||
-        g.prsa == V_MOVE) {
+    if (grab) {
       printLine("It's solid granite.");
-      return true;
+      return M_HANDLED;
     }
+    return M_NOT_HANDLED;
   }
-  // Case 3: Slide Room (Fake Wall?)
-  else if (room == RoomIds::SLIDE_ROOM) {
-    if (g.prsa == V_FIND || g.prsa == V_EXAMINE || g.prsa == V_READ) {
+  if (room == RoomIds::SLIDE_ROOM) {
+    if (find || g.prsa == V_READ)
       printLine("It only SAYS \"Granite Wall\".");
-      return true;
-    }
-    // Catch-all specific to Slide Room
-    printLine("The wall isn't granite.");
-    return true;
+    else
+      printLine("The wall isn't granite.");
+    return M_HANDLED;
   }
-
-  // Default (Wrong Room)
   printLine("There is no granite wall here.");
-  return true;
+  return M_HANDLED;
 }
 
 // GRATE-FUNCTION
@@ -1783,9 +1785,27 @@ bool slideAction() {
 }
 
 // SONGBIRD-F
-bool songbirdAction() {
-  // Already handled by canaryAction mostly
-  return false;
+// ZIL: <ROUTINE SONGBIRD-F () ...>
+// Source: zil/1actions.zil:84-93
+//
+// The songbird is never actually present: every branch explains its absence,
+// and the final clause answers anything else.
+int songbirdAction() {
+  auto &g = Globals::instance();
+  if (g.prsa == V_FIND || g.prsa == V_TAKE) {
+    printLine("The songbird is not here but is probably nearby.");
+    return M_HANDLED;
+  }
+  if (g.prsa == V_LISTEN) {
+    printLine("You can't hear the songbird now.");
+    return M_HANDLED;
+  }
+  if (g.prsa == V_FOLLOW) {
+    printLine("It can't be followed.");
+    return M_HANDLED;
+  }
+  printLine("You can't see any songbird here.");
+  return M_HANDLED;
 }
 
 // SOUTH-TEMPLE-FCN
@@ -2121,8 +2141,7 @@ bool boardedWindowAction() {
     printLine("The windows are boarded and can't be opened.");
     return true;
   }
-  if (g.prsa == V_ATTACK ||
-      g.prsa == V_MUNG) { // MUNG = break
+  if (g.prsa == V_MUNG) { // MUNG = break
     printLine("You can't break the windows open.");
     return true;
   }
