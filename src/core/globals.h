@@ -103,6 +103,11 @@ public:
   /// I-FIGHT clears it when the player leaves.
   bool thiefEngrossed = false;
   int cyclowrath = 0;      ///< ZIL: ,CYCLOWRATH (1actions.zil, cyclops anger)
+  /// ZIL: ,THIEF-HERE (1actions.zil). True once the thief has shown himself
+  /// in the room the player is in.
+  bool thiefHere = false;
+  /// ZIL: ,EGG-SOLVE (1actions.zil). Set when the thief opens the egg for you.
+  bool eggSolve = false;
 
   // Parser state
   int pCont = 0;           ///< ZIL: ,P-CONT (P-LEXV entry index to continue from; 0 = none)

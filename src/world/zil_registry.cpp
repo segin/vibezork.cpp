@@ -95,7 +95,7 @@ const std::unordered_map<std::string_view, ObjFn> &objectActions() {
       {"BUTTON-F", buttonAction},
       {"CANARY-OBJECT", canaryAction},
       {"CANDLES-FCN", candlesAction},
-      {"CHALICE-FCN", chaliceAction},
+      {"CHALICE-FCN", Villains::chaliceFcn},
       {"CHIMNEY-F", chimneyAction},
       {"CRACK-FCN", crackAction},
       {"CRETIN-FCN", GGlobals::cretinFcn},
@@ -117,7 +117,7 @@ const std::unordered_map<std::string_view, ObjFn> &objectActions() {
       {"KITCHEN-WINDOW-F", kitchenWindowAction},
       {"KNIFE-F", knifeAction},
       {"LANTERN", lampAction},
-      {"LARGE-BAG-F", largeBagAction},
+      {"LARGE-BAG-F", Villains::largeBagF},
       {"LEAK-FUNCTION", leakFunction},
       {"MACHINE-F", machineAction},
       {"MAILBOX-F", mailboxAction},
@@ -132,7 +132,7 @@ const std::unordered_map<std::string_view, ObjFn> &objectActions() {
       {"RAINBOW-FCN", rainbowAction},
       {"RBOAT-FUNCTION", inflatedBoatAction},
       {"RIVER-FUNCTION", riverAction},
-      {"ROBBER-FUNCTION", robberAction},
+      
       {"ROPE-FUNCTION", ropeAction},
       {"RUG-FCN", rugAction},
       {"RUSTY-KNIFE-FCN", rustyKnifeAction},
@@ -202,9 +202,10 @@ const std::unordered_map<std::string_view, RoomFn> &roomActions() {
       {"SOUTH-TEMPLE-FCN", southTempleAction},
       {"STONE-BARROW-FCN", stoneBarrowAction},
       {"TORCH-ROOM-FCN", torchRoomAction},
-      {"TREASURE-ROOM-FCN", treasureRoomAction},
+      
       {"TREE-ROOM", treeRoom},
       {"TROLL-ROOM-F", trollRoomAction},
+      {"TREASURE-ROOM-FCN", Villains::treasureRoomFcn},
       {"WEST-HOUSE", westHouseAction},
   };
   return m;
@@ -303,6 +304,7 @@ std::function<bool()> flagTestFor(std::string_view n) {
 const std::unordered_map<std::string_view, ObjArgFn> &objectArgActions() {
   static const std::unordered_map<std::string_view, ObjArgFn> m = {
       {"TROLL-FCN", Villains::trollFcn},
+      {"ROBBER-FUNCTION", Villains::robberFunction},
   };
   return m;
 }

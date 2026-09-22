@@ -13,6 +13,7 @@
 #include "systems/combat.h"
 #include "systems/lamp.h"
 #include "systems/melee.h"
+#include "world/villains.h"
 #include "systems/melee_tables.h"
 #include "systems/npc.h"
 #include "systems/sword.h"
@@ -67,7 +68,7 @@ void goSetup() {
   TimerSystem::queue("I-SWORD", -1);
 
   // ZIL: <ENABLE <QUEUE I-THIEF -1>>
-  TimerSystem::interrupt("I-THIEF", NPCSystem::iThief);
+  TimerSystem::interrupt("I-THIEF", Villains::iThief);
   TimerSystem::queue("I-THIEF", -1);
   TimerSystem::enable("I-THIEF");
 
